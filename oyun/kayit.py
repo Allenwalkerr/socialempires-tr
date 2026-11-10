@@ -102,24 +102,33 @@ def _load_saved_villages():
             if save is None:
                 continue
         bak = save.pop("_bak_kullanildi", False)
-        USERID = save["playerInfo"]["pid"]
-        if not isinstance(USERID, str):  # KYG-01: sayı kimlik session()'ın str denetiminde açılışı düşürürdü
-            USERID = save["playerInfo"]["pid"] = str(USERID)
+        dosya_uid = file[:-len(".save.json")]
+        USERID = save.get("playerInfo", {}).get("pid")
+        if isinstance(USERID, int) and not isinstance(USERID, bool) and str(USERID) == dosya_uid:
+            USERID = save["playerInfo"]["pid"] = dosya_uid  # KYG-01: sayı kimlik session()'ın str denetimini düşürürdü
             bak = True
+        if not isinstance(USERID, str):  # yok, null, true...: dosya adına güvenilmez, kayıt ikiye bölünmesin
+            print(f"Atlandi: kimlik gecersiz ({USERID!r}).")
+            continue
         try:
             map_name = save["playerInfo"]["map_names"][ save["playerInfo"]["default_map"] ]
         except:
             map_name = '?'
         print(f"({map_name}) Ok.")
-        __saves[USERID] = save
-        # KYG-03: .bak'tan gelen kayıt da göçer (ikisi de çalışır, kısa devre yok)
+        # KYG-03: .bak'tan gelen kayıt da göçer (kısa devre yok). Düzeltme kopyada yapılır: yarıda patlarsa yarım
+        # değişmiş kayıt belleğe girip sonradan diske yazılmaz; kayıt bu açılışta yüklenmez, dosyası olduğu gibi kalır.
+        duzgun = copy.deepcopy(save)
         try:
-            duzeltildi = _yukleme_duzeltmeleri(save)
-            if bak or duzeltildi:
+            duzeltildi = _yukleme_duzeltmeleri(duzgun)
+        except Exception as hata:
+            print(f" ! {file} duzeltilemedi, yuklenmedi ({type(hata).__name__}: {hata})")
+            continue
+        __saves[USERID] = duzgun
+        if bak or duzeltildi:
+            try:
                 save_session(USERID)
-        except Exception as hata:  # tek kaydın düzeltmesi ya da yazımı bütün yüklemeyi düşürmesin
-            print(f" ! {file} duzeltilemedi ya da yazilamadi ({type(hata).__name__}: {hata})")
-
+            except OSError as hata:  # tek kaydın yazımı bütün yüklemeyi düşürmesin
+                print(f" ! {file} yazilamadi ({hata})")
 
 def _kaydi_ac(yol):
     return kaydi_dogrula(json_oku(yol))

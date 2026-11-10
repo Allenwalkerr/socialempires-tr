@@ -182,6 +182,44 @@ class YuklemeDayanikliligi(unittest.TestCase):
             kayit_yedek.zarfi_ac(json.dumps(zarf), "778")
         self.assertEqual(str(h.exception), "kimlik")
 
+    def test_gecersiz_kimlikli_kayit_atlanir_yukleme_surer(self):
+        """#45 incelemesi: null kimlik "None"a çevrilip None.save.json'a yazılmamalı; kimlik hiç yoksa KeyError
+        bütün yüklemeyi düşürmemeli."""
+        diger = kayit.new_village()
+        kayit.save_session(diger)
+        for uid, pid in (("kimliksiz", None), ("dogru-yanlis", True), ("eksik", "SIL")):
+            k = bos_kayit(uid)
+            if pid == "SIL":
+                del k["playerInfo"]["pid"]
+            else:
+                k["playerInfo"]["pid"] = pid
+            with open(self._yol(uid), "w", encoding="utf-8") as f:
+                json.dump(k, f)
+        kayit.load_saved_villages()
+        self.assertIn(diger, kayit.all_saves_userid())
+        for ad in ("None", "True"):
+            self.assertFalse(os.path.exists(os.path.join(SAVES_DIR, f"{ad}.save.json")), ad)
+            self.assertNotIn(ad, kayit.all_saves_userid())
+
+    def test_duzeltme_yarida_patlarsa_kayit_degismez(self):
+        """#45 incelemesi: düzeltme kopyada yapılır; yarıda patlarsa bellekte ve diskte yarım kayıt kalmaz."""
+        from unittest import mock
+        yol = self._yol("yarida")
+        with open(yol, "w", encoding="utf-8") as f:
+            json.dump(bos_kayit("yarida"), f)
+        with open(yol, "rb") as f:
+            bayt = f.read()
+
+        def patlayan(save):
+            save["maps"][0]["coins"] = -1  # yarım değişiklik
+            raise RuntimeError("deneme")
+
+        with mock.patch.object(kayit, "_yukleme_duzeltmeleri", patlayan):
+            kayit.load_saved_villages()
+        self.assertNotIn("yarida", kayit.all_saves_userid())
+        with open(yol, "rb") as f:
+            self.assertEqual(f.read(), bayt)
+
     def test_bak_ile_geri_alinan_eski_kayit_da_gocer(self):
         yol = self._yol("bakgoc")
         with open(yol, "w", encoding="utf-8") as f:
