@@ -1305,7 +1305,7 @@
       "test": null,
       "pr": null,
       "onay": "Sahibi, 31 Ekim 2026",
-      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır."
+      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor)."
     },
     {
       "id": "KAR-14",
@@ -1540,6 +1540,58 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: seviye XP'nin altındaysa yükselir (bozuk XP'li seviye 0 kaydı için eski amaç korunur), 99'un üstündeyse 99'a iner, XP'den yüksekse dokunulmaz. Bağımsız denetimin kayıt alanı (KAR-13, yarım rapor) aynı yolun pid'i sayı olan kayıtta sunucuyu düşürdüğünü yazdı; o bulgu ayrıca yeniden üretilecek."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_kayit_gocu.py: YuklemeDayanikliligi",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-05",
+      "baslik": "Kimliği sayı olan kayıt sunucunun açılışını düşürüyordu",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-01 (docs/denetim/kayit-goc.md). Yeniden üretildi (10.11.2026, master 1a54553): saves/777.save.json, playerInfo.pid = 777, sürüm 0.05a; load_saved_villages göçten sonra save_session(777) → session'ın str denetimi AssertionError, yükleme yarıda. Yedek zarfı (kayit_yedek.zarfi_ac) kimliği str(...) ile denetlediği için böyle kaydı içeri alıyordu.",
+      "notlar": "Düzeltme: yükleme sayı kimliği str'ye çevirip kaydeder; kayıt başına düzeltme ve yazım hatası yakalanır (tek kayıt bütün yüklemeyi düşürmez); zarfi_ac kimliğin str olmasını şart koşar. Testler eski kodda 3'ü de düşüyor."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_kayit_gocu.py: test_bak_ile_geri_alinan_eski_kayit_da_gocer",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-06",
+      "baslik": "Bozuk kayıt .bak'tan geri alınınca göç atlanıyordu",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-03. Yeniden üretildi (10.11.2026): canlı dosya yarım ('{\"yarim'), .bak 0.05a; yüklemeden sonra bellekte ve dosyada sürüm 0.05a. Neden: `save.pop('_bak_kullanildi') or _yukleme_duzeltmeleri(save)` kısa devresi.",
+      "notlar": "Düzeltme: ikisi de çalışır; .bak'tan gelen kayıt göç öncesi yedeği alınıp göçer ve kaydedilir."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-07",
+      "baslik": "Yedek içe aktarma ya da taşıma öncesi hâl yalnızca .bak'ta, o da ilk kayıtta eziliyor",
+      "onem": "Yüksek",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır.",
+      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-08",
+      "baslik": "0.06a kaydın görev numarası çevirisi göç öncesi yedeğin bulunduğu makineye bağlı",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim KYG-04 (denetçi ✔ yazdı; yeniden üretilmedi): kayit.eski_gorev_numaralari yalnızca yerel backups/<uid>.goc-*.save.json'a bakar; içe aktarılan 0.06a kayıtta eski numaralar çevrilmez.",
+      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır)."
     }
   ]
 }

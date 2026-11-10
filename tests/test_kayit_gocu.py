@@ -144,5 +144,60 @@ class SeviyeDuzeltmesi(unittest.TestCase):
         self.assertEqual(k["maps"][0]["level"], 34)
 
 
+
+class YuklemeDayanikliligi(unittest.TestCase):
+    """Bağımsız denetimin kayıt alanı (KAR-13): KYG-01, KYG-03. Beklenen: her kayıt yüklenir ve bu sürüme göçer
+    (docs/YOL_HARITASI_1407.md §2 "Kayıt göçü"); kayıt anahtarı str'dir (`kayit.session` bunu şart koşar)."""
+
+    def _yol(self, uid, uzanti=".save.json"):
+        yol = os.path.join(SAVES_DIR, uid + uzanti)
+        self.addCleanup(lambda: [os.remove(y) for y in (yol, yol + ".bak", yol + ".bozuk") if os.path.exists(y)])
+        return yol
+
+    def setUp(self):
+        self.addCleanup(kayit.load_saved_villages)
+
+    def test_sayi_kimlikli_eski_kayit_yuklemeyi_dusurmez(self):
+        k = bos_kayit("777")
+        k["playerInfo"]["pid"] = 777  # 0.05a: göç kaydı yazar, yazım session(777)'yi çağırırdı
+        with open(self._yol("777"), "w", encoding="utf-8") as f:
+            json.dump(k, f)
+        diger = kayit.new_village()
+        kayit.save_session(diger)
+        kayit.load_saved_villages()
+        self.assertIn(diger, kayit.all_saves_userid())  # yükleme sonuna kadar sürdü
+        self.assertEqual(kayit.session("777")["version"], version_code)
+        with open(self._yol("777"), encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["playerInfo"]["pid"], "777")
+
+    def test_sayi_kimlikli_yedek_iceri_alinmaz(self):
+        from oyun import kayit_yedek
+        import hashlib
+        k = bos_kayit("778")
+        k["playerInfo"]["pid"] = 778
+        ham = json.dumps(k).encode("utf-8")
+        zarf = {"bicim": kayit_yedek.BICIM, "surum": 1, "kimlik": "778", "ad": "x",
+                "sha256": hashlib.sha256(ham).hexdigest(), "kayit": ham.decode()}
+        with self.assertRaises(kayit_yedek.YedekHatasi) as h:
+            kayit_yedek.zarfi_ac(json.dumps(zarf), "778")
+        self.assertEqual(str(h.exception), "kimlik")
+
+    def test_bak_ile_geri_alinan_eski_kayit_da_gocer(self):
+        yol = self._yol("bakgoc")
+        with open(yol, "w", encoding="utf-8") as f:
+            f.write('{"yarim')  # yarım yazım
+        eski = bos_kayit("bakgoc")  # 0.05a
+        with open(yol + ".bak", "w", encoding="utf-8") as f:
+            json.dump(eski, f)
+        yedek = os.path.join(kayit.BACKUP_DIR, "bakgoc.goc-0.05a.save.json")
+        self.addCleanup(lambda: os.path.exists(yedek) and os.remove(yedek))
+        kayit.load_saved_villages()
+        self.assertEqual(kayit.session("bakgoc")["version"], version_code)
+        with open(yol, encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["version"], version_code)
+        with open(yedek, encoding="utf-8") as f:
+            self.assertEqual(json.load(f), eski)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -101,15 +101,24 @@ def _load_saved_villages():
             save = _bozugu_kenara_al(yol)
             if save is None:
                 continue
+        bak = save.pop("_bak_kullanildi", False)
         USERID = save["playerInfo"]["pid"]
+        if not isinstance(USERID, str):  # KYG-01: sayı kimlik session()'ın str denetiminde açılışı düşürürdü
+            USERID = save["playerInfo"]["pid"] = str(USERID)
+            bak = True
         try:
             map_name = save["playerInfo"]["map_names"][ save["playerInfo"]["default_map"] ]
         except:
             map_name = '?'
         print(f"({map_name}) Ok.")
-        __saves[str(USERID)] = save
-        if save.pop("_bak_kullanildi", False) or _yukleme_duzeltmeleri(save):
-            save_session(USERID)
+        __saves[USERID] = save
+        # KYG-03: .bak'tan gelen kayıt da göçer (ikisi de çalışır, kısa devre yok)
+        try:
+            duzeltildi = _yukleme_duzeltmeleri(save)
+            if bak or duzeltildi:
+                save_session(USERID)
+        except Exception as hata:  # tek kaydın düzeltmesi ya da yazımı bütün yüklemeyi düşürmesin
+            print(f" ! {file} duzeltilemedi ya da yazilamadi ({type(hata).__name__}: {hata})")
 
 
 def _kaydi_ac(yol):
