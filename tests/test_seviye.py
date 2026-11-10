@@ -91,6 +91,26 @@ class RtLevelUp(KomutTesti):
         self.assertEqual(self.cash, nakit + ESIK_ODUL[4][1])
         self.assertEqual(ESIK_ODUL[4][0], "c")
 
+    def test_odul_baska_yol_seviyeyi_yukseltse_de_bir_kez(self):
+        """#45 incelemesi: rt_publish_score eşiği geçirip seviyeyi önce yükseltirse ödül kaybolmamalı; seviye
+        düşüp yeniden çıkınca ödül yinelenmemeli. Ödüller config levels[1..3]: 50 odun, 50 yemek, 400 odun."""
+        self.harita.update(level=1, xp=0)
+        odun, yemek = self.harita["wood"], self.harita["food"]
+        self.komut("rt_publish_score", 60)  # 60 XP: istemcide 3. seviye; seviye sunucuda 3 olur
+        self.assertEqual(self.harita["level"], 3)
+        self.komut("rt_level_up", 2)
+        self.komut("rt_level_up", 3)
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 50, yemek + 50))
+        self.komut("rt_level_up", 1)
+        self.komut("rt_level_up", 4)
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 450, yemek + 50))
+
+    def test_xp_bildirimi_seviyeyi_dusurmez(self):
+        """KYT-05 ile aynı kural: istemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp)."""
+        self.harita.update(level=53, xp=69467)
+        self.komut("rt_publish_score", 69467)
+        self.assertEqual(self.harita["level"], 53)
+
 
 class HilePaneliSeviye(unittest.TestCase):
     def uygula(self, islem):

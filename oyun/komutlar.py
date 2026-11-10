@@ -1075,22 +1075,32 @@ def complete_tutorial(save, a):
         save["privateState"]["dragonNestActive"] = 1
 
 
+def _odul_seviyesi(save):
+    """Ödülü verilmiş en yüksek seviye (privateState.odul_seviyesi); ilk okumada kayıttaki seviyeyle başlar."""
+    ps = save.setdefault("privateState", {})
+    if not isinstance(ps.get("odul_seviyesi"), int):
+        try:
+            ps["odul_seviyesi"] = max(1, min(int(save["maps"][0].get("level", 1)), en_yuksek_seviye()))
+        except (TypeError, ValueError, OverflowError):
+            ps["odul_seviyesi"] = 1
+    return ps["odul_seviyesi"]
+
+
 @komut("rt_level_up")
 def rt_level_up(save, a):
     """[seviye]"""
     seviye = max(1, min(a.tam(0), en_yuksek_seviye()))
     h = save["maps"][0]
-    try:
-        onceki = int(h.get("level", seviye))
-    except (TypeError, ValueError, OverflowError):
-        onceki = seviye
+    odulu_verilen = _odul_seviyesi(save)
     h["level"] = seviye
     # SNK-01: istemci yeni seviyenin ödülünü (arLevelList[iLevel - 1]) PopupLevel'de kendisi ekler, komut göndermez.
-    # Yalnızca gerçekten atlanan seviyeler için verilir: aynı komut yeniden gelirse ödül iki kez verilmez.
+    # Ödülü verilmiş en yüksek seviye ayrı tutulur (#45 incelemesi): seviyeyi önce başka bir yol yükseltse de
+    # ödül verilir; aynı ya da daha düşük seviyeden yeniden çıkılırsa ikinci kez verilmez.
     seviyeler = get_game_config()["levels"]
-    for s in range(max(onceki, 1) + 1, seviye + 1):
+    for s in range(odulu_verilen + 1, seviye + 1):
         odul = seviyeler[s - 1]
         kaynak_ekle(save, h, odul.get("reward_type"), int(odul.get("reward_amount") or 0))
+    save["privateState"]["odul_seviyesi"] = max(odulu_verilen, seviye)
     # XP en az seviyenin alt eşiği (OYN-14: eskiden bir sonraki seviyenin eşiğiydi, yeniden açılışta +1 seviye)
     tavan = int(get_game_config()["levels"][-1]["exp_required"])
     h["xp"] = max(get_xp_from_level(seviye), min(int(h.get("xp", 0)), tavan))
@@ -1104,8 +1114,14 @@ def rt_publish_score(save, a):
         print(f" ! publish_score: mantiksiz XP ({xp}), yok sayildi")
         return
     h = save["maps"][0]
+    _odul_seviyesi(save)  # seviye burada yükselirse ödülü sonraki rt_level_up verir
     h["xp"] = xp
-    h["level"] = get_level_from_xp(xp)
+    try:
+        simdiki = int(h.get("level", 1))
+    except (TypeError, ValueError, OverflowError):
+        simdiki = 1
+    # KYT-05 ile aynı kural: XP seviyeyi yalnızca yükseltir (istemci PlayerStatus/checkForLevelUp)
+    h["level"] = min(max(simdiki, get_level_from_xp(xp)), en_yuksek_seviye())
 
 
 @komut("complete_mission")
