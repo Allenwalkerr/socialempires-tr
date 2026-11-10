@@ -213,13 +213,15 @@ def _yukleme_duzeltmeleri(save: dict) -> bool:
 
 
 def _seviyeyi_duzelt(save: dict) -> bool:
-    """Kayıttaki seviye, XP eşiğiyle uyuşmuyorsa düzeltir.
+    """Kayıttaki seviye XP eşiğinin altındaysa yükseltir; en yüksek seviyenin üstündeyse ona indirir.
 
-    Bozuk bir XP (ör. aşırı büyük değer) yüzünden seviye 0'da kalmış
-    kayıtların oyunu kilitlemesini önler.
+    Bozuk bir XP (ör. aşırı büyük değer) yüzünden seviye 0'da kalmış kayıtların oyunu kilitlemesini önler.
+    Seviye XP'den yüksekse dokunulmaz (KYT-05): istemci seviyeyi yalnızca yukarı taşır
+    (PlayerStatus/checkForLevelUp) ve kayıttaki seviyeyi `length - 1`'e kadar olduğu gibi kabul eder
+    (PlayerStatus/Init); indirmek oyuncunun seviyesini siler.
     """
     try:
-        from oyun.config import get_level_from_xp
+        from oyun.config import en_yuksek_seviye, get_level_from_xp
     except Exception:
         return False
     duzeltildi = False
@@ -229,6 +231,10 @@ def _seviyeyi_duzelt(save: dict) -> bool:
             beklenen = get_level_from_xp(int(harita.get("xp", 0)))
         except (TypeError, ValueError):
             continue
+        try:
+            beklenen = min(max(int(harita.get("level")), beklenen), en_yuksek_seviye())
+        except (TypeError, ValueError):
+            pass
         if harita.get("level") != beklenen:
             print(f"   > seviye duzeltildi: {harita.get('level')} -> {beklenen}")
             harita["level"] = beklenen

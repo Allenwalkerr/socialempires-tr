@@ -1,10 +1,10 @@
 {
   "surum": "0.08a",
-  "guncelleme": "2026-11-06",
+  "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "OYN-14",
-    "sonraki_adim": "Bulut oturumu 6.11.2026 (2). #39 birleşti (7afe6fd). OYN-14 düzeltildi, PR #40 açık (claude/keen-keller-83oji2): sahibinin onayıyla birleşir. TST-04 yeniden ölçümü bulutta 7afe6fd üzerinde koşuyor (4 çekirdek, 3 işçi, ~2,5 saat); bitince docs/TEST_OLCUMU.md §12'ye yazılıp ayrı PR açılır. Sonra KAR-13 bağımsız denetim (başlamadan önce sahibine kullanım payı hatırlatılır), GEC-04'ün kalanı ve GEC-05. Sahibinden kararlar: KMT-08, KMT-09, denge sabitleri (TST-04 notları), ONR-01..04, v0.1.0 (GEC-09)."
+    "madde": "GEC-04",
+    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan (Sonnet, orta). GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı Sonnet ajanında; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
   },
   "maddeler": [
     {
@@ -857,13 +857,13 @@
       "baslik": "Kayıt: ~30 yeni alan, şema ve değişmezlikli göç",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da.",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. 10.11.2026: kabul kapısı testle: tests/test_kayit_gocu.py gerçek biçimli 5 köy (villages/, sürümsüz) ve en küçük kaydın 1.4.07 öncesi 7 sürümü (0.01a..0.07a; depo ve mezarlık dolu) bütün yükleme yolundan geçer: I(g(s)) = I(s) (belgedeki 12 değer), g(g(s)) = g(s) (ikinci yükleme kaydı ve dosyayı değiştirmez, .bak'ı ezmez), geri dönüş (.bak eski dosyanın baytları, göç öncesi yedek eski kaydın kendisi). 7 bozmanın 7'si düştü. Değişmezlik testi bir hata buldu: KYT-05.",
+      "test": "tests/test_kayit_gocu.py; tests/test_kayit_semasi.py; tests/test_gorev_gocu.py",
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi. 10.11.2026: geri dönüş testi yazıldı; kabul kapısının üç koşulu testte."
     },
     {
       "id": "GEC-05",
@@ -974,7 +974,7 @@
       "baslik": "Bot dünyası seviye eşiğini sunucunun geri kalanından bir kaydırarak okuyor",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "oyun/dunya.py:535 _ekonomi levels[n].exp_required'ı n. seviyenin eşiği sayar; config.get_level_from_xp (kayit._seviyeyi_duzelt her yüklemede) levels[i]'yi i+1'in eşiği sayar (test_komutlar: 'eşikler 0, 29, 60: 29 xp ile 2. seviye'). Alt ajan iki yolu çalıştırarak gösterdi; kod okunarak doğrulandı. 6.11.2026: istemcinin kuralı bayt kodundan okundu (araclar/abc_okur.py, SocialEmpires1.4.07sec_fixed.swf, SHA-256 doğrulandı): PlayerStatus/checkForLevelUp iExperience >= arLevelList[iLevel].exp_required ise iLevel + 1; PlayerStatus/Init XP çubuğu arLevelList[iLevel - 1] .. arLevelList[iLevel], iLevel >= length ise length - 1. Yani levels[i] (i+1). seviyenin eşiği: config.get_level_from_xp istemciyle aynı; dunya._ekonomi, rt_level_up, sunucu._xp_araligi, hile paneli ve get_xp_from_level bir kayıktı.",
       "test": "tests/test_seviye.py; tests/test_dunya.py: test_bot_istemcinin_esiginde_seviye_atlar",
@@ -1520,13 +1520,26 @@
       "baslik": "Seviye atlayan oyuncu kayıt yeniden açılınca bir seviye daha atlıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Çalıştırıldı (6.11.2026, master 7afe6fd): seviye 1, 29 XP; rt_level_up [2] sonrası xp 60 (levels[2]); kayit._seviyeyi_duzelt 'seviye duzeltildi: 2 -> 3'. Hile panelindeki '+1 seviye' de XP'yi bir sonraki eşiğe koyuyordu (aynı sonuç); 'En yüksek seviye' XP'yi 2016089205 yapıyordu. Kök neden OYN-14.",
       "test": "tests/test_seviye.py: RtLevelUp, HilePaneliSeviye",
       "pr": "#40",
       "onay": null,
       "notlar": "Etkilenmiş eski kayıtlar düzeltilmez: XP'si eşiğe çekilmiş oyuncunun fazladan seviyesi kalır (geri almak kazanılmış seviyeyi silerdi). Sahibi isterse ayrı karar."
+    },
+    {
+      "id": "KYT-05",
+      "baslik": "Yükleme, seviyesi XP'sinden yüksek kaydın seviyesini düşürüyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Çalıştırıldı (10.11.2026, master da09896): villages/Arthur30.json (seviye 53, 69 467 XP) kayıt olarak yüklenince 'seviye duzeltildi: 53 -> 34'. kayit._seviyeyi_duzelt seviyeyi her yüklemede get_level_from_xp'ye eşitliyordu. İstemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp) ve kayıttakini length - 1'e kadar olduğu gibi alır (PlayerStatus/Init; OYN-14'te okundu).",
+      "test": "tests/test_kayit_gocu.py: SeviyeDuzeltmesi, test_degismezlik",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: seviye XP'nin altındaysa yükselir (bozuk XP'li seviye 0 kaydı için eski amaç korunur), 99'un üstündeyse 99'a iner, XP'den yüksekse dokunulmaz. Bağımsız denetimin kayıt alanı (KAR-13, yarım rapor) aynı yolun pid'i sayı olan kayıtta sunucuyu düşürdüğünü yazdı; o bulgu ayrıca yeniden üretilecek."
     }
   ]
 }
