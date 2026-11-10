@@ -33,6 +33,8 @@ Oturum başında göz gezdirilir. Yeni bir sorunla karşılaşınca ya da bir so
 | S-58 | `python -m unittest tests.test_seviye` depo kökünden `No module named 'ortak'` verir | Test dosyaları `ortak`'ı düz içe aktarır; `tests/` yolda değil | Tek dosya için `cd tests && python -m unittest test_seviye`; tam takım `discover -s tests` ile zaten çalışır | ✔ 6.11.2026 |
 | S-59 | Testte `goc-0.01a` kimlikli kayıt göçüyor ama diske yazılmıyor, ikinci yüklemede yeniden göçüyor | Kimlikte nokta geçersiz (`kayit.gecerli_uid`: `[A-Za-z0-9_-]`); `save_session` ve göç öncesi yedek sessizce atlıyor | Test kimliği `goc-0-01a` yapıldı. Gerçek oyunda kimlik sunucuca üretilir, nokta içermez | ✔ 10.11.2026 |
 | S-60 | Bulut konteyneri yeniden başlayınca ayrık koşan mutasyon ölçümü 450/1872'de öldü | Konteyner yeniden kuruldu, süreçler gitti; karalama klasörü kaldı | Kalan çalışma ağaçları kaldırıldı (`git worktree remove --force`, `prune`), ölçüm güncel master'da baştan başlatıldı | ✔ 10.11.2026 |
+| S-61 | #43 ile depo köküne ilgisiz `ids.txt` girdi | 5 Kasım'da bir alt ajan dosyayı asıl depoya yazmış; commit `git add -A` ile yapıldı, liste okunmadı | #44'te silindi. Kural: commit'ten önce `git status --short` okunur, dosyalar adlarıyla eklenir | ✔ 10.11.2026 |
+| S-62 | Devir notuna ve `BULGULAR.json`'a yardımcı ajanın model adı yazıldı (CLAUDE.md yasağı) | Sahibinin mesajındaki adı kitaba aynen taşıdım | Otomatik inceleme yakaladı; #44'te "yardımcı ajan" yapıldı. Ayrıca #43 otomatik birleştirmede denetimler bitmeden birleşti (zorunlu denetim yok): PR'ı açmadan önce farkı kendin oku | ✔ 10.11.2026 |
 
 ## Ağ, GitHub ve upstream
 

@@ -229,11 +229,11 @@ def _seviyeyi_duzelt(save: dict) -> bool:
     for harita in save.get("maps", []):
         try:
             beklenen = get_level_from_xp(int(harita.get("xp", 0)))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):  # JSON 1e999 → inf
             continue
         try:
             beklenen = min(max(int(harita.get("level")), beklenen), en_yuksek_seviye())
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):
             pass
         if harita.get("level") != beklenen:
             print(f"   > seviye duzeltildi: {harita.get('level')} -> {beklenen}")
