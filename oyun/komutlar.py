@@ -1061,7 +1061,17 @@ def rt_level_up(save, a):
     """[seviye]"""
     seviye = max(1, min(a.tam(0), en_yuksek_seviye()))
     h = save["maps"][0]
+    try:
+        onceki = int(h.get("level", seviye))
+    except (TypeError, ValueError, OverflowError):
+        onceki = seviye
     h["level"] = seviye
+    # SNK-01: istemci yeni seviyenin ödülünü (arLevelList[iLevel - 1]) PopupLevel'de kendisi ekler, komut göndermez.
+    # Yalnızca gerçekten atlanan seviyeler için verilir: aynı komut yeniden gelirse ödül iki kez verilmez.
+    seviyeler = get_game_config()["levels"]
+    for s in range(max(onceki, 1) + 1, seviye + 1):
+        odul = seviyeler[s - 1]
+        kaynak_ekle(save, h, odul.get("reward_type"), int(odul.get("reward_amount") or 0))
     # XP en az seviyenin alt eşiği (OYN-14: eskiden bir sonraki seviyenin eşiğiydi, yeniden açılışta +1 seviye)
     tavan = int(get_game_config()["levels"][-1]["exp_required"])
     h["xp"] = max(get_xp_from_level(seviye), min(int(h.get("xp", 0)), tavan))
