@@ -432,7 +432,10 @@ def toplama_miktari(esya, esya_id, kaynak_carpani, birim):
     globals.COLLECT_VARIABLE_IDS'teyse (PopupCollect$/doShit) seçilen üretim süresinin çarpanı
     COLLECT_MULTIPLIER[cp - 1]; içinde birden çok birim varsa her fazla birim tabana MULTIPLIER_PEASANTS katar:
     floor(floor(taban + (birim - 1) * taban * 0.2) * çarpan), yoksa floor(taban * çarpan)."""
-    taban = int(float((get_item_from_id(esya_id) or {}).get("collect") or 0)) * kaynak_carpani
+    esya_bilgi = get_item_from_id(esya_id) or {}
+    taban = int(float(esya_bilgi.get("collect") or 0)) * kaynak_carpani
+    # Birim sayısı istemciden gelir; binanın kapasitesini (config unit_capacity) aşamaz (#45 incelemesi)
+    birim = max(0, min(birim, int(float(esya_bilgi.get("unit_capacity") or 0))))
     secim = 1
     degiskenler = get_game_config().get("globals", {}).get("COLLECT_VARIABLE_IDS") or []
     if esya_id in [int(i) for i in degiskenler] and esya is not None:

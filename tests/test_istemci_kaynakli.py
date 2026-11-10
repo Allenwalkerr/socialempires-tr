@@ -265,6 +265,9 @@ class UretimSecimliToplama(KomutTesti):
     def test_icerideki_birimler(self):
         # 3 birim, 8 saat: floor(floor(300 + 2 * 300 * 0.2) * 3) = 1260; 1 birim: 900
         self.assertEqual((self.topla(4, 3), self.topla(4, 1), self.topla(4, 0)), (1260, 900, 900))
+        # #45 incelemesi: birim sayısı istemciden gelir, config unit_capacity (Mill II: 4) ile sınırlı:
+        # floor(floor(300 + 3 * 300 * 0.2) * 3) = 1440
+        self.assertEqual((self.topla(4, 10 ** 9), self.topla(4, 4)), (1440, 1440))
 
     def test_kaynak_carpani_ve_secimsiz_bina(self):
         self.assertEqual(self.topla(2, 1, kaynak_carpani=2), 600)

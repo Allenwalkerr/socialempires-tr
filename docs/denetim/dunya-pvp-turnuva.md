@@ -3,13 +3,13 @@
 Kapsam: `oyun/dunya.py`, `pvp.py`, `elo.py`, `turnuva.py`, `bot_kimlik.py`, `diyar.py`, `gunluk.py`, `profil.py`, `araclar/bot_koy_uret.py`, `templates/js/oyun.js` (haber/sıralama bölümü).
 Araçlar: `is/dunya-pvp-turnuva/` (`p1.py` PvP, `p2.py` bot akını, `p3.py` turnuva, `p4.py` süre ölçümü). Ekonomi ve sunucu alanlarındaki bulgular tekrarlanmadı.
 
-### DPT-01: Gönüllü bitirilen saldırı (voluntary_end=1) zafer sayılıp kıta fethi, savunma raporu ve kurban kaybı yazıyor
-- Önem: Orta
-- İşaret: ✔
-- Yer: oyun/pvp.py:90-190 (`saldiri_bitir`), oyun/ada.py:105-115 (`fetih_kaydet`)
-- Kanıt: 1.4.07 istemcisinde `end_attack` yalnızca `Assault$/sendAssaultResults` içinde, iki yerde (@343, @379) gönderilir ve yükü sabittir: `win: 1`, `voluntary_end: 1`, `resources {g:0,w:0,s:0,f:0,x:0}`, `honor: 0` (`cagrilar("addCommand")` çıktısı). Gerçek sonuç `end_attack_new` ile gelir (sunucuda yok, bilinen eksik). Sunucu `voluntary_end`'e hiç bakmıyor. Çalıştırdım (`p1.py`): geri çekilme yüküyle `end_attack` -> `Saldiri bitti: ... kazandi`, `universAttackWin == [0]` (fetih kaydedildi), kurbanın `attacksReceived` listesine rapor eklendi, `victim_units` ölenleri kurbandan silindi.
-- Etki: Oyuncu saldırıdan geri çekilince bile kıta yuvası fethedilmiş sayılır; 7 geri çekilişle bir sonraki kıtaya geçilir. Kurban botun birimleri silinir.
-- Öneri: `voluntary_end == 1` iken `win`'i yok say (zafer, fetih, ganimet yok); gerçek sonuç yolunu `end_attack_new` ile kur.
+### DPT-01: `end_attack` yükünde ganimet ve onur her zaman 0 geliyor; sunucu `voluntary_end`'i yok sayıyor
+- Önem: Orta (ganimet kaybı), Düşük (voluntary_end)
+- İşaret: ✔ (bayt kodu, sunucu denemesi), ◐ (etki)
+- Yer: oyun/pvp.py:90-190 (`saldiri_bitir`), oyun/ada.py:105-115
+- Kanıt: DÜZELTME: ilk taslakta `win`/`voluntary_end`'i sabit sandım; `cagrilar` koşullu değerleri tek sabite indirmişti. `Assault$/sendAssaultResults` işlemleri (`coz` ile): `win = bPlayerWinner ? 1 : 0` (@217-234), `voluntary_end = bVoluntaryEnd ? 1 : 0` (@257-274), `resources_victim.g = bPlayerWinner ? 0 : iGoldGainedVictim` (@182-199). Ama `resources = {g:0, w:0, s:0, f:0, x:0}` (@140-162) ve `honor: 0` (@284-287) gerçekten sabit sıfır (`pushbyte 0`). Sunucu `pvp.saldiri_bitir` ganimeti `resources.g/x`ten ve onuru `honor`dan okuyor: bu yolda her zaman 0. Gerçek sonuç `end_attack_new`le gelir (yok, bilinen eksik). Sunucu denemesi (`p1.py`, el yapımı yükle): `voluntary_end=1` + `win=1` birleşimi fetih, kurban raporu ve kurban birim kaybı yazıyor; gerçek istemcinin bu birleşimi gönderip göndermediğini doğrulamadım (?).
+- Etki: Oyuncunun kazandığı saldırıda altın/XP/onur kayda yazılmaz (ganimet kodu ölü yol); sunucu `voluntary_end`e bakmadığı için gönüllü bitirme zafer olarak sayılırsa fetih/kurban kaybı yazılır.
+- Öneri: `voluntary_end == 1` iken zaferi yok say; ganimeti sunucuda hesapla (end_attack_new yazılana dek).
 
 ### DPT-02: Bot akınları oyuncunun köylülerini ve nakitle alınmış birimleri (şifacı, kahraman) öldürüyor
 - Önem: Orta
@@ -47,7 +47,7 @@ Araçlar: `is/dunya-pvp-turnuva/` (`p1.py` PvP, `p2.py` bot akını, `p3.py` tur
 - Önem: Düşük
 - İşaret: ✔ (sunucu), ◐ (istemci)
 - Yer: oyun/pvp.py:134-137
-- Kanıt: `p1.py`: `win: 0`, kural dışı saldırı (4 saat içinde aynı hedef), `honor: 15` -> `privateState.honor` ve `honor_points` 10 oldu. Onur `0..10`a kıstırılıyor; config `HONOR_POINT_PVP_WIN_ATTACK` 15, `..._LOSE_ATTACK` 5 (`PopupPVPFinished/<kurucu>` pencereyi bu değerlerle gösterir). Gerçek istemci bu komutta zaten `honor: 0` yolluyor.
+- Kanıt: `p1.py`: `win: 0`, kural dışı saldırı (4 saat içinde aynı hedef), `honor: 15` -> `privateState.honor` ve `honor_points` 10 oldu. Onur `0..10`a kıstırılıyor; config `HONOR_POINT_PVP_WIN_ATTACK` 15, `..._LOSE_ATTACK` 5 (`PopupPVPFinished/<kurucu>` pencereyi bu değerlerle gösterir). İstemci bu komutta zaten sabit `honor: 0` yolluyor (bayt kodu, `coz` ile doğrulandı).
 - Etki: Pencerede 15 onur görünür, kayda 0 yazılır; elle yollanan istekle kuraldışı saldırıdan onur alınır.
 - Öneri: Onuru sunucuda sonuçtan ve config'ten türet.
 
