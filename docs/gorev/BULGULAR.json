@@ -1,10 +1,10 @@
 {
   "surum": "0.08a",
-  "guncelleme": "2026-11-06",
+  "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KAR-13",
-    "sonraki_adim": "Bulut oturumu 6.11.2026 (2) sahibinin isteğiyle durdu (kullanım payı az). #40 (OYN-14, OYN-18) birleşti (da09896). KAR-13 başlatıldı ama rapor çıkmadan durduruldu: ortak kurallar docs/denetim/BRIEF.md (yollar bulut oturumunun geçici klasörüne göre; yeni oturumda salt okunur kopya yeniden kurulur: git archive <commit>, docs/gorev ve docs/devlog silinir, istemci SWF ayrı klasöre). Yeniden başlamadan önce sahibine kullanım payı hatırlatılır; altı alan aynı anda yerine ikişer ikişer koşmak payı korur. TST-04 yeniden ölçümü 7afe6fd üzerinde yerelde sürüyordu (oturum kapanırsa sonuç kaybolur; baştan koşulur, ~2,5 saat). Sonra docs/TEST_OLCUMU.md §12, GEC-04'ün kalanı, GEC-05. Sahibinden kararlar: KMT-08, KMT-09, denge sabitleri (TST-04 notları), ONR-01..04, v0.1.0 (GEC-09)."
+    "madde": "GEC-04",
+    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan (Sonnet, orta). GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı Sonnet ajanında; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
   },
   "maddeler": [
     {
@@ -857,13 +857,13 @@
       "baslik": "Kayıt: ~30 yeni alan, şema ve değişmezlikli göç",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da.",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. 10.11.2026: kabul kapısı testle: tests/test_kayit_gocu.py gerçek biçimli 5 köy (villages/, sürümsüz) ve en küçük kaydın 1.4.07 öncesi 7 sürümü (0.01a..0.07a; depo ve mezarlık dolu) bütün yükleme yolundan geçer: I(g(s)) = I(s) (belgedeki 12 değer), g(g(s)) = g(s) (ikinci yükleme kaydı ve dosyayı değiştirmez, .bak'ı ezmez), geri dönüş (.bak eski dosyanın baytları, göç öncesi yedek eski kaydın kendisi). 7 bozmanın 7'si düştü. Değişmezlik testi bir hata buldu: KYT-05.",
+      "test": "tests/test_kayit_gocu.py; tests/test_kayit_semasi.py; tests/test_gorev_gocu.py",
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi. 10.11.2026: geri dönüş testi yazıldı; kabul kapısının üç koşulu testte."
     },
     {
       "id": "GEC-05",
@@ -1527,6 +1527,19 @@
       "pr": "#40",
       "onay": null,
       "notlar": "Etkilenmiş eski kayıtlar düzeltilmez: XP'si eşiğe çekilmiş oyuncunun fazladan seviyesi kalır (geri almak kazanılmış seviyeyi silerdi). Sahibi isterse ayrı karar."
+    },
+    {
+      "id": "KYT-05",
+      "baslik": "Yükleme, seviyesi XP'sinden yüksek kaydın seviyesini düşürüyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Çalıştırıldı (10.11.2026, master da09896): villages/Arthur30.json (seviye 53, 69 467 XP) kayıt olarak yüklenince 'seviye duzeltildi: 53 -> 34'. kayit._seviyeyi_duzelt seviyeyi her yüklemede get_level_from_xp'ye eşitliyordu. İstemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp) ve kayıttakini length - 1'e kadar olduğu gibi alır (PlayerStatus/Init; OYN-14'te okundu).",
+      "test": "tests/test_kayit_gocu.py: SeviyeDuzeltmesi, test_degismezlik",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: seviye XP'nin altındaysa yükselir (bozuk XP'li seviye 0 kaydı için eski amaç korunur), 99'un üstündeyse 99'a iner, XP'den yüksekse dokunulmaz. Bağımsız denetimin kayıt alanı (KAR-13, yarım rapor) aynı yolun pid'i sayı olan kayıtta sunucuyu düşürdüğünü yazdı; o bulgu ayrıca yeniden üretilecek."
     }
   ]
 }
