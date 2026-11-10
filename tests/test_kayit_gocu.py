@@ -124,6 +124,19 @@ class SeviyeDuzeltmesi(unittest.TestCase):
         self.assertTrue(kayit._seviyeyi_duzelt(k))
         self.assertEqual(k["maps"][0]["level"], 99)
 
+    def test_sonsuz_seviye_ve_xp_yuklemeyi_dusurmez(self):
+        """JSON'da 1e999 sonsuz olur (Python json belgesi), int(inf) OverflowError verir. Doğrulama yalnızca ilk
+        haritaya bakar; ikinci haritadaki bozuk değer tek kaydın değil bütün yüklemenin düşmesine yol açmamalı."""
+        k = bos_kayit("sonsuz-harita")
+        k["maps"].append(dict(k["maps"][0], id=1, xp="SONSUZ", level="SONSUZ"))
+        yol = os.path.join(SAVES_DIR, "sonsuz-harita.save.json")
+        with open(yol, "w", encoding="utf-8") as f:
+            f.write(json.dumps(k).replace('"SONSUZ"', "1e999"))
+        self.addCleanup(lambda: [os.remove(y) for y in (yol, yol + ".bak") if os.path.exists(y)])
+        self.addCleanup(kayit.load_saved_villages)
+        kayit.load_saved_villages()
+        self.assertEqual(kayit.session("sonsuz-harita")["maps"][1]["level"], float("inf"))
+
     def test_xpnin_altindaki_seviye_yukselir(self):
         k = bos_kayit()
         k["maps"][0].update(level=1, xp=69467)

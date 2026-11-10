@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-04",
-    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan (Sonnet, orta). GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı Sonnet ajanında; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
+    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan. GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı yardımcı ajanda; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
   },
   "maddeler": [
     {
