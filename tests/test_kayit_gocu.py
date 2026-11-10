@@ -220,6 +220,20 @@ class YuklemeDayanikliligi(unittest.TestCase):
         with open(yol, "rb") as f:
             self.assertEqual(f.read(), bayt)
 
+    def test_baktan_alinip_atlanan_kayit_diskte_kalir(self):
+        """#45 incelemesi: bozuk canlı dosya .bozuk'a alınır; .bak'tan gelen kayıt sonra atlanırsa canlı dosya
+        geri konmalı, yoksa yükleyici (yalnızca *.save.json) imparatorluğu bir daha görmez."""
+        yol = self._yol("bakatla")
+        with open(yol, "w", encoding="utf-8") as f:
+            f.write('{"yarim')
+        k = bos_kayit("bakatla")
+        k["playerInfo"]["pid"] = None
+        with open(yol + ".bak", "w", encoding="utf-8") as f:
+            json.dump(k, f)
+        kayit.load_saved_villages()
+        with open(yol, encoding="utf-8") as f, open(yol + ".bak", encoding="utf-8") as g:
+            self.assertEqual(json.load(f), json.load(g))
+
     def test_bak_ile_geri_alinan_eski_kayit_da_gocer(self):
         yol = self._yol("bakgoc")
         with open(yol, "w", encoding="utf-8") as f:
