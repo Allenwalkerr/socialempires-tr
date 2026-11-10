@@ -35,6 +35,7 @@ Oturum başında göz gezdirilir. Yeni bir sorunla karşılaşınca ya da bir so
 | S-60 | Bulut konteyneri yeniden başlayınca ayrık koşan mutasyon ölçümü 450/1872'de öldü | Konteyner yeniden kuruldu, süreçler gitti; karalama klasörü kaldı | Kalan çalışma ağaçları kaldırıldı (`git worktree remove --force`, `prune`), ölçüm güncel master'da baştan başlatıldı | ✔ 10.11.2026 |
 | S-61 | #43 ile depo köküne ilgisiz `ids.txt` girdi | 5 Kasım'da bir alt ajan dosyayı asıl depoya yazmış; commit `git add -A` ile yapıldı, liste okunmadı | #44'te silindi. Kural: commit'ten önce `git status --short` okunur, dosyalar adlarıyla eklenir | ✔ 10.11.2026 |
 | S-62 | Devir notuna ve `BULGULAR.json`'a yardımcı ajanın model adı yazıldı (CLAUDE.md yasağı) | Sahibinin mesajındaki adı kitaba aynen taşıdım | Otomatik inceleme yakaladı; #44'te "yardımcı ajan" yapıldı. Ayrıca #43 otomatik birleştirmede denetimler bitmeden birleşti (zorunlu denetim yok): PR'ı açmadan önce farkı kendin oku | ✔ 10.11.2026 |
+| S-63 | Denetçi `end_attack`'ın `win: 1` ile sabit gönderildiğini yazdı; bayt kodunda `bPlayerWinner ? 1 : 0` | `abc_okur.cagrilar` simgesel yığında koşullu değeri (iki dal) tek sabite indiriyor | Argümanı koşula bağlı olabilecek bir çağrıyı `cagrilar` çıktısıyla değil gövdenin kendisiyle (`coz`) oku. Denetimin `cagrilar`'a dayanan bulguları yeniden üretilir | ✔ 10.11.2026 |
 
 ## Ağ, GitHub ve upstream
 

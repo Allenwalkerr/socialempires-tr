@@ -34,6 +34,8 @@ TOWN_PRICE_GOLD = 100000
 NEST_PRICE_CASH = 50
 NEST_PRICE_GOLD = 100000
 COLLECT_MINUTES = [5, 60, 240, 480]
+COLLECT_MULTIPLIER = [0.5, 1, 2, 3]  # istemci Config/<sınıf>: COLLECT_MINUTES ile aynı sırada (EKF-01)
+MULTIPLIER_PEASANTS = 0.2  # istemci Config.MULTIPLIER_PEASANTS
 
 KAYNAK_ALANI = {"g": "coins", "w": "wood", "f": "food", "s": "stone"}
 
@@ -425,15 +427,32 @@ def unlock_building(save, a):
 # Üretim ve toplama
 # ---------------------------------------------------------------------------
 
+def toplama_miktari(esya, esya_id, kaynak_carpani, birim):
+    """İstemcinin IsoElement/collect hesabı (EKF-01). taban = floor(collect) * kaynak çarpanı. Bina
+    globals.COLLECT_VARIABLE_IDS'teyse (PopupCollect$/doShit) seçilen üretim süresinin çarpanı
+    COLLECT_MULTIPLIER[cp - 1]; içinde birden çok birim varsa her fazla birim tabana MULTIPLIER_PEASANTS katar:
+    floor(floor(taban + (birim - 1) * taban * 0.2) * çarpan), yoksa floor(taban * çarpan)."""
+    taban = int(float((get_item_from_id(esya_id) or {}).get("collect") or 0)) * kaynak_carpani
+    secim = 1
+    degiskenler = get_game_config().get("globals", {}).get("COLLECT_VARIABLE_IDS") or []
+    if esya_id in [int(i) for i in degiskenler] and esya is not None:
+        cp = ozellikler(esya).get("cp")
+        if isinstance(cp, int) and 1 <= cp <= len(COLLECT_MULTIPLIER):
+            secim = COLLECT_MULTIPLIER[cp - 1]
+    if birim > 1:
+        return int(int(taban + (birim - 1) * taban * MULTIPLIER_PEASANTS) * secim)
+    return int(taban * secim)
+
+
 @komut("collect_new")
 def collect_new(save, a):
     """[x, y, kasaba, id, (icindeki_birim, carpan, cash)]"""
     esya_id = a.tam(3)
     h = harita(save, a.tam(2))
     carpan = max(1, min(a.tam(5, 1), 10))
-    apply_collect(save["playerInfo"], h, esya_id, carpan)
-    cash_ekle(save, -a.tam(6))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
+    apply_collect(save["playerInfo"], h, esya_id, carpan, toplama_miktari(esya, esya_id, carpan, a.tam(4, 0)))
+    cash_ekle(save, -a.tam(6))
     if esya and len(esya) > 4:
         esya[4] = timestamp_now()
 

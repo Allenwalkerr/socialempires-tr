@@ -1592,6 +1592,45 @@
       "isaret": "?",
       "kanit": "Bağımsız denetim KYG-04 (denetçi ✔ yazdı; yeniden üretilmedi): kayit.eski_gorev_numaralari yalnızca yerel backups/<uid>.goc-*.save.json'a bakar; içe aktarılan 0.06a kayıtta eski numaralar çevrilmez.",
       "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır)."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_istemci_kaynakli.py: UretimSecimliToplama",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-09",
+      "baslik": "Üretim süresi seçilen binada toplama, seçimi ve içerideki birimleri yok sayıyordu",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-01 (docs/denetim/ekonomi-formuller.md). Yeniden üretildi (10.11.2026): istemci IsoElement/collect @3170-3365 çarpanı Config.COLLECT_MULTIPLIER[cp - 1] = [0.5, 1, 2, 3] (Config/<sınıf> @1915) ile, içerideki birimi MULTIPLIER_PEASANTS 0,2 ile uygular; seçimli binalar globals.COLLECT_VARIABLE_IDS (Base/init, PopupCollect$/doShit). collect_new argümanları [tx, ty, townID, id, iUnitsContainedWhenHarvested, getResourceMultiplier, nakit] (@3941). Sunucu Mill II 8 saatte 300 yazıyordu, istemci 900 gösterir.",
+      "notlar": "Düzeltme: komutlar.toplama_miktari istemcinin formülü. 6 bozmanın 6'sı düştü. cp yoksa sunucu 1 sayar (istemcide parseInt(undefined) NaN olurdu, ◐)."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_seviye.py: test_seviye_odulu_kayda_yazilir",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-10",
+      "baslik": "Seviye atlama ödülü kayda yazılmıyordu",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-01 (docs/denetim/sunucu-komutlar.md). Yeniden üretildi: istemci PopupLevel/<kurucu> @256-328 arLevelList[iLevel - 1].reward_amount'ı Player.adjustStatByType ile kendisi ekler, komut göndermez; rt_level_up yalnızca seviyeyi yazıyordu. Config: 96 seviyede nakit, 2 odun, 1 taş, 1 yemek.",
+      "notlar": "Düzeltme: rt_level_up atlanan her seviyenin ödülünü verir; aynı komut yeniden gelirse vermez. 3 bozmanın 3'ü düştü. Daha önce birikmiş kayıp ödüller geri verilmez."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-11",
+      "baslik": "Gönüllü bitirilen saldırının zafer sayıldığı iddiası (denetim DPT-01)",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "✔",
+      "kanit": "Bayt kodu (10.11.2026): Assault$/sendAssaultResults 'win' = bPlayerWinner ? 1 : 0, 'voluntary_end' = bVoluntaryEnd ? 1 : 0 (@217-276). Teslim olma StateAssault/onSurrenderConfirmed assaultEnd(false, false, true) çağırır: win 0 gider. Denetçinin 'sabit win: 1' okuması abc_okur.cagrilar'ın koşullu değeri tek sabite indirmesinden (S-63).",
+      "notlar": "Denetimin öteki DPT bulguları (docs/denetim/dunya-pvp-turnuva.md) yeniden üretilmeyi bekliyor; cagrilar çıktısına dayananlar ayrıca denetlenecek."
     }
   ]
 }
