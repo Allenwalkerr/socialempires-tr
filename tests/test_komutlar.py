@@ -545,6 +545,17 @@ class PvpKomutlari(KomutTesti):
         self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.harita["coins"] - once),
                          (900, 500, 100))
 
+    def test_yeni_sonuc_eski_ganimetin_ustune_vermez(self):
+        """#50 incelemesi: end_attack resources.g > 0 ile (eski istemci biçimi) ganimet verdiyse aynı savaşın
+        end_attack_new'i ikinci kez altın, XP ya da kaynak vermez; kurbandan da ikinci kez düşülmez."""
+        self.kurban["maps"][0].update(coins=50000, food=500)
+        self.saldir()  # resources g 500, x 30
+        once = {k: self.harita[k] for k in ("coins", "food", "xp")}
+        self.yeni(g=999999, f=500, w=0, s=0, xp=999999)
+        self.assertEqual({k: self.harita[k] for k in once}, once)
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.ps["attacksWon"]),
+                         (49500, 500, 1))
+
     def test_yeni_sonuc_saldirinin_kasabasina(self):
         """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
         import copy

@@ -243,7 +243,9 @@ def saldiri_bitir(saldiran, args):
     aciklama = dict(veri)
     aciklama["resources"] = {"g": altin, "x": xp}
     # 1.4.07: ganimet, XP ve onur ayrı end_attack_new ile gelir (end_attack'ta literal 0); onu bu kayıtla eşler
-    gonderilen.append({"time": simdi, "victim_id": kurban_id, "ganimet_hakki": bool(kurala_uygun and not belediye_yok),
+    # end_attack ganimet verdiyse (eski istemci biçimi) aynı savaşın end_attack_new'i ikinci kez vermez (#50 incelemesi)
+    gonderilen.append({"time": simdi, "victim_id": kurban_id,
+                       "ganimet_hakki": bool(kurala_uygun and not belediye_yok and not (altin or xp)),
                        "kayitli": bool(kayitli and not kalkanli), "yeni_sonuc": False,
                        "altin_tavani": altin_tavani, "harita_no": harita_no,
                        "description": dict(aciklama, oponent=(_ozet(kurban) if kurban else veri.get("victim")))})
