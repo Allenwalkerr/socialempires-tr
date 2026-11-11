@@ -1826,6 +1826,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Test bütün şablonlara uygulanır: her img'de src ve alt, her target=_blank'te rel=noopener."
+    },
+    {
+      "id": "DNT-22",
+      "baslik": "2030 sonrası bayramlar sessizce yoktu; bir yıla düşen ikinci bayram bulunmuyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-05 (docs/denetim/ekonomi-formuller.md). Doğrulandı (11.11.2026): hijridate gereksinimlerde yoktu, kurulu değilken takvim.bayram 2031+ için None; _hijridate_ile yıl başına tek tarih dönüyordu. hijridate 2.6.0 (Ümmü'l-Kurâ): 2033'te 1454 ve 1455 Şevval'in 1'i (2 Ocak, 23 Aralık). Kitaplık 2026-2030'da Diyanet tablosuyla birebir aynı tarihleri verdi (bağımsız sağlama).",
+      "test": "tests/test_icerik.py: test_2030_sonrasi_bayramlar_kitapliktan, test_bir_yildaki_ikinci_bayramin_etkinligi_de_acilir, test_kitaplik_yoksa_bir_kez_uyarir",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: hijridate==2.6.0 requirements.txt ve Android Chaquopy listesinde; takvim.bayramlar yıla düşen bütün bayramları verir, etkinlikler her birini açar; kitaplık yoksa uyarı bir kez. bayram_duzeltme ayarı liste de alır. 3 bozmanın 3'ü düştü. Ümmü'l-Kurâ ile Diyanet 2031 sonrası bir gün ayrışabilir (◐); ayar elle düzeltir."
     }
   ]
 }

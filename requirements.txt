@@ -4,6 +4,8 @@ flask==3.1.3
 jsonpatch==1.43
 waitress==3.0.2
 brotli==1.2.1
+# 2030 sonrası bayram tarihleri (oyun/takvim.py; denetim EKF-05)
+hijridate==2.6.0
 # Dolaylı bağımlılıklar (flask ve jsonpatch getirir; paketleme --no-deps değil, ama yine de sabit kalsın):
 blinker==1.9.0
 click==8.5.0

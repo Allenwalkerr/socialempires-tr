@@ -25,6 +25,38 @@ class TakvimTestleri(unittest.TestCase):
             self.assertEqual(takvim.bayram(yil, "ramazan").isoformat(), ramazan)
             self.assertEqual(takvim.bayram(yil, "kurban").isoformat(), kurban)
 
+    def test_2030_sonrasi_bayramlar_kitapliktan(self):
+        """Denetim EKF-05: 2030'dan sonra hijridate (Ümmü'l-Kurâ) kullanılır; kitaplık gereksinimdedir. Kitaplık
+        2026-2030'da Diyanet tablosuyla (yukarıdaki test) aynı tarihi verir: bağımsız sağlama."""
+        for yil, (ay, gun) in takvim.RAMAZAN.items():
+            self.assertEqual(takvim._hijridate_ile(yil, "ramazan"), [date(yil, ay, gun)])
+        for yil, (ay, gun) in takvim.KURBAN.items():
+            self.assertEqual(takvim._hijridate_ile(yil, "kurban"), [date(yil, ay, gun)])
+        # Bir miladi yıla iki bayram düşebilir: 1454 ve 1455 Şevval'in 1'i 2033'te (Ümmü'l-Kurâ)
+        self.assertEqual(takvim.bayramlar(2033, "ramazan"), [date(2033, 1, 2), date(2033, 12, 23)])
+        self.assertEqual(takvim.bayram(2031, "ramazan"), date(2031, 1, 24))
+
+    def test_bir_yildaki_ikinci_bayramin_etkinligi_de_acilir(self):
+        acik = {e["baslangic"][:4] + e["ad"] for e in takvim.etkinlikler(date(2033, 12, 20)) if "Ramazan" in e["ad"]}
+        self.assertTrue(any(a.startswith("2033") for a in acik), acik)
+
+    def test_kitaplik_yoksa_bir_kez_uyarir(self):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        asil = builtins.__import__
+
+        def yok(ad, *a, **k):
+            if ad == "hijridate":
+                raise ImportError(ad)
+            return asil(ad, *a, **k)
+        cikti = io.StringIO()
+        with mock.patch.object(builtins, "__import__", yok), mock.patch.object(takvim, "_uyarildi", False), \
+                contextlib.redirect_stdout(cikti):
+            self.assertEqual([takvim.bayramlar(2031 + i, "ramazan") for i in range(3)], [[], [], []])
+        self.assertEqual(cikti.getvalue().count("hijridate kurulu degil"), 1)
+
     def test_etkinlik_setleri(self):
         self.assertEqual(takvim.acik_setler(date(2026, 7, 10)), ["Harikalar"])
         self.assertIn("Cadılar Bayramı", takvim.acik_setler(date(2026, 10, 31)))
