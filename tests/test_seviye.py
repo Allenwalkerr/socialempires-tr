@@ -90,6 +90,10 @@ class BaslikYenilenir(unittest.TestCase):
         import re
         tazele = re.search(r"function panelleriTazele\(\) \{([^}]*)\}", js).group(1)
         self.assertIn("baslikYenile()", tazele)
+        # #65 incelemesi: yenilemede sayaç eski değerden yeniye sayar (0'dan saysaydı her 30 sn'de sıfıra düşerdi);
+        # Chromium'da 4 → 5.000 geçişinde örnekler hiç 4'ün altına inmedi (11.11.2026)
+        self.assertIn("say(c[0], c[1], 0, eski)", js)
+        self.assertIn("ilk + (hedef - ilk) *", js)
 
 
 class RtLevelUp(KomutTesti):

@@ -13,14 +13,14 @@
     return e;
   }
 
-  // Sayan sayı (NumberTicker): 0'dan hedefe yavaşlayarak sayar.
-  function say(e, hedef, sure) {
-    hedef = Number(hedef) || 0;
+  // Sayan sayı (NumberTicker): `ilk`ten (yoksa 0'dan) hedefe yavaşlayarak sayar.
+  function say(e, hedef, sure, ilk) {
+    hedef = Number(hedef) || 0; ilk = Number(ilk) || 0;
     if (HAREKETSIZ) { e.textContent = SAYI.format(hedef); return; }
     var bas = performance.now(); sure = sure || 1400;
     (function adim(t) {
       var k = Math.min(1, (t - bas) / sure);
-      e.textContent = SAYI.format(Math.round(hedef * (1 - Math.pow(2, -10 * k))));
+      e.textContent = SAYI.format(Math.round(ilk + (hedef - ilk) * (1 - Math.pow(2, -10 * k))));
       if (k < 1) requestAnimationFrame(adim); else e.textContent = SAYI.format(hedef);
     })(bas);
   }
@@ -35,8 +35,12 @@
       .then(function (v) {
         if (!v) return;
         var seviye = document.getElementById("baslik-seviye"), simdi = document.getElementById("baslik-xp-simdi");
-        if (seviye && String(v.seviye) !== seviye.dataset.say) { seviye.dataset.say = v.seviye; say(seviye, v.seviye); }
-        if (simdi && String(v.xp.simdi) !== simdi.dataset.say) { simdi.dataset.say = v.xp.simdi; say(simdi, v.xp.simdi); }
+        // eski değerden yeniye sayar (0'dan değil: #65 incelemesi, sayı her yenilemede sıfıra düşüyordu)
+        [[seviye, v.seviye], [simdi, v.xp.simdi]].forEach(function (c) {
+          if (c[0] && String(c[1]) !== c[0].dataset.say) {
+            var eski = c[0].dataset.say; c[0].dataset.say = c[1]; say(c[0], c[1], 0, eski);
+          }
+        });
         var son = document.getElementById("baslik-xp-son");
         if (son) son.textContent = SAYI.format(v.xp.son);
         var cubuk = document.getElementById("baslik-xp");
