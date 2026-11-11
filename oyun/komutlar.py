@@ -36,6 +36,7 @@ NEST_PRICE_GOLD = 100000
 COLLECT_MINUTES = [5, 60, 240, 480]
 COLLECT_MULTIPLIER = [0.5, 1, 2, 3]  # istemci Config/<sınıf>: COLLECT_MINUTES ile aynı sırada (EKF-01)
 MULTIPLIER_PEASANTS = 0.2  # istemci Config.MULTIPLIER_PEASANTS
+SUBCATFUNC_BUILDING_FARM = "122"  # istemci Constants.SUBCATFUNC_BUILDING_FARM; config'te alt kategori yazıdır
 
 KAYNAK_ALANI = {"g": "coins", "w": "wood", "f": "food", "s": "stone"}
 
@@ -479,6 +480,12 @@ def collect_new(save, a):
     h = harita(save, a.tam(2))
     carpan = max(1, min(a.tam(5, 1), 10))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
+    bina = get_item_from_id(esya_id) or {}
+    if str(bina.get("subcat_functional")) == SUBCATFUNC_BUILDING_FARM:
+        # DNT-19 (denetim EKF-02): istemci IsoElement/collect @3438-3505 çiftlik hasadında
+        # Math.round(building.collect / 3) odunu kendisi düşer, komut göndermez. Odun yetmezse çiftliği kaldırıp
+        # yalnızca kill yollar, collect yollamaz; buraya o durumda gelinmez (gelirse Yetersiz, KAR-18).
+        bakiyeden_dus(h, "wood", math.floor(float(bina.get("collect") or 0) / 3 + 0.5))
     apply_collect(save["playerInfo"], h, esya_id, carpan, toplama_miktari(esya, esya_id, carpan, a.tam(4, 0)))
     cash_ekle(save, -max(0, a.tam(6)))
     if esya and len(esya) > 4:

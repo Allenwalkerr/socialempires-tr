@@ -1774,6 +1774,19 @@
       "pr": "#46",
       "onay": "KAR-17",
       "notlar": "Düzeltme: kod X-Tasima-Kodu başlığında (gönderen eski sürüm alıcılar için ?kod='u da kabul eder); yanlışlar adres başına 5'te o adresi reddeder, toplam 30'da gönderim kapanır (tahmin olasılığı 30/10^6). 3 bozmanın 3'ü düştü. Kabul edilen risk: aktarım ev ağında düz HTTP; 6 haneli koddan türeyen şifreleme kolay kırılacağı için eklenmedi. Gönderim yalnızca sahibinin başlattığı 10 dakikada açık."
+    },
+    {
+      "id": "DNT-19",
+      "baslik": "Çiftlik hasadında istemcinin düştüğü odun sunucuda düşülmüyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-02 (docs/denetim/ekonomi-formuller.md, ◐ idi). Bayt kodu yeniden okundu (11.11.2026): IsoElement/collect @3438-3505 subcat_functional == Constants.SUBCATFUNC_BUILDING_FARM (122) ise Math.round(building.collect / 3) odun canAfford ise adjustStatByType(-odun, WOOD), komut yok; yetmezse @3576-3675 çiftlik removeElement ve CMD_KILL, yerel 12 false olduğundan yiyecek verilmez ve collect gönderilmez (@3805, @3923). Sunucu collect_new odunu düşmüyordu: yeniden açılışta odun geri geliyordu.",
+      "test": "tests/test_istemci_kaynakli.py: CiftlikHasadi",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: collect_new çiftlikte floor(collect / 3 + 0.5) odun düşer (Yetersiz ise uygulanmaz, KAR-18). Config'te subcat_functional yazıdır ('122'). 3 bozmanın 3'ü düştü (int kesme ve sayı karşılaştırması dahil)."
     }
   ]
 }
