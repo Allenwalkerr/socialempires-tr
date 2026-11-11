@@ -73,12 +73,36 @@ def _olenler(birimler, dahil=None):
 
 
 def _birimleri_sil(harita, kayiplar):
-    """Haritadan yalnızca birimleri (tür 'u') siler; binalara dokunmaz."""
+    """Haritadan yalnızca birimleri (tür 'u') siler; binalara dokunmaz. Silinenleri {id: adet} döner."""
+    silinen = {}
     for birim_id, adet in kayiplar.items():
         if (get_item_from_id(birim_id) or {}).get("type") != "u":
             continue
         for esya in [e for e in harita.get("items", []) if e[0] == birim_id][:adet]:
             harita["items"].remove(esya)
+            silinen[birim_id] = silinen.get(birim_id, 0) + 1
+    return silinen
+
+
+# IsoFightingElement/checkPutToGraveyard@0-180 (1.4.07): köylüler (ID_UNIT_PEASANT_MALE 500, FEMALE 501), hayvanlar
+# (subcat_functional SUBCATFUNC_UNIT_COW 74, SHEEP 75, HORSE 88, BOAR 90) mezarlığa girmez; mavi anka (775) yalnızca
+# kendini diriltemiyorsa girer, sunucu bunu bilemez (◐: girmez sayılır). Çağrılmış (summoned) birim attacker_units'te
+# yoktur (Assault$/killed@32-45).
+MEZARLIGA_GIRMEZ = frozenset((500, 501, 775))
+MEZARLIGA_GIRMEYEN_TURLER = frozenset((74, 75, 88, 90))
+
+
+def _mezarliga(saldiran, silinen):
+    """Saldırıda ölen kendi birlikleri: istemci ASSAULT kipinde yalnızca yerelde mezarlığa ekler, komut göndermez
+    (IsoFightingElement/kill@714-894; CommandManager/addCommand@16-99 ASSAULT'ta sell'i kuyruğa almaz). Sunucu
+    end_attack'ın attacker_units'inden çıkarır: yalnızca haritadan gerçekten silinen net kayıp (ölen − kurtarılan;
+    kurtarılan haritada kalır, mezarlığa da girerse diriltmeyle çoğalırdı)."""
+    from oyun import komutlar
+    for birim_id, adet in silinen.items():
+        birim = get_item_from_id(birim_id) or {}
+        if birim_id in MEZARLIGA_GIRMEZ or _tam(birim.get("subcat_functional")) in MEZARLIGA_GIRMEYEN_TURLER:
+            continue
+        komutlar.mezarliga_ekle(saldiran, birim_id, adet)
 
 
 LIDERLIK_HEYKELI = 366  # Constants.ID_BUILDING_LEADERSHIPSTATUE
@@ -238,7 +262,7 @@ def saldiri_bitir(saldiran, args):
     ps["honor"] = _tam(ps.get("honor")) + onur
     saldiran["playerInfo"]["honor_points"] = _tam(saldiran["playerInfo"].get("honor_points")) + onur
 
-    _birimleri_sil(harita, _olenler(veri.get("attacker_units")))
+    _mezarliga(saldiran, _birimleri_sil(harita, _olenler(veri.get("attacker_units"))))
 
     aciklama = dict(veri)
     aciklama["resources"] = {"g": altin, "x": xp}

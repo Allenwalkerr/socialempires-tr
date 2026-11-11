@@ -353,6 +353,31 @@ class BuyuVeMezarlik(KomutTesti):
         self.assertEqual(self.harita["items"][-1][:3], [512, 5, 5])
 
 
+    def test_olen_birlik_mezarlik_listesine(self):
+        """Mezarlık penceresi Base.resurrectableUnits'i gösterir (PopupGraveyard/refreshItems); kalıcılığı
+        privateState.resurrectableUnits (Base/loadGraveyardState). sell [x, y, id, kasaba, 1, "KILL", mezarliga]
+        (IsoFightingElement/kill@799-867). Kahraman (Constants.ID_UNIT_RANGER 535) mezarliga=0 ile gelir ve yalnızca
+        deadHeroes'a girer (checkPutToGraveyard@295-390). Anka yumurtası (put_graveyard) listeye girmez."""
+        self.harita["items"] += [[668, 3, 3, 0], [535, 4, 4, 0]]
+        self.komut("sell", 3, 3, 668, 0, 1, "KILL", 1)
+        self.komut("sell", 4, 4, 535, 0, 1, "KILL", 0)
+        self.komut("put_graveyard", 777)
+        self.assertEqual(self.ps["resurrectableUnits"], [668])
+        self.assertEqual(self.ps["deadHeroes"], {"668": 1, "535": 1, "777": 1})
+
+    def test_diriltme_bedeli_istemcininki(self):
+        """PopupGraveyard/onBuyItem@149-165: iPotions -= config 'potion' (668: 5); resurrectUnit@123-138 listeden
+        çıkarır. PopupResurrectHeroes/onBuyItem@90-176: cost_unit_cash (535: 3) × RESURRECT_MULTIPLIER (500) altın.
+        Yetmezse uygulanmaz (KAR-18)."""
+        self.ps.update(potion=7, resurrectableUnits=[668, 668], deadHeroes={"668": 2, "535": 1})
+        self.komut("resurrect_hero", 668, 5, 5, 0, "1")
+        self.assertEqual((self.ps["potion"], self.ps["resurrectableUnits"], self.ps["deadHeroes"]["668"]), (2, [668], 1))
+        self.komutlar.command("test", {"commands": [{"cmd": "resurrect_hero", "args": [668, 6, 6, 0, "1"]}]})
+        self.assertEqual((self.ps["potion"], self.ps["resurrectableUnits"]), (2, [668]))  # 2 < 5
+        self.komut("resurrect_hero", 535, 7, 7, 0)
+        self.assertEqual((self.harita["coins"], self.ps["deadHeroes"].get("535")), (50000 - 1500, None))
+
+
 class GenelDavranis(KomutTesti):
     def test_bozuk_komut_digerlerini_dusurmez(self):
         veri = {"commands": [
@@ -565,6 +590,16 @@ class PvpKomutlari(KomutTesti):
 
     def saldiran_onur(self):
         return self.kayit["playerInfo"].get("honor_points", 0)
+
+    def test_saldirida_olen_birlik_mezarliga(self):
+        """1.4.07: ASSAULT'ta ölen kendi birliği istemcide yalnızca yerelde mezarlığa girer, komut gitmez
+        (IsoFightingElement/kill@714-894, CommandManager/addCommand@16-99). Sunucu attacker_units'ten net kaybı
+        (ölen − kurtarılan) ve yalnızca haritadan gerçekten silineni ekler; köylü (500) girmez; kahraman (535)
+        yalnızca deadHeroes'a (checkPutToGraveyard@295-390)."""
+        self.harita["items"] += [[668, 1, 1, 0], [668, 2, 2, 0], [500, 3, 3, 0], [535, 4, 4, 0]]
+        self.saldir(attacker_units=[[668, 5, 4, 1], [500, 1, 1, 0], [535, 1, 1, 0]])  # 668: net 3, haritada 2
+        self.assertEqual(self.ps["resurrectableUnits"], [668, 668])
+        self.assertEqual(self.ps["deadHeroes"], {"668": 2, "535": 1})
 
     def test_yeni_sonuc_saldirinin_kasabasina(self):
         """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
