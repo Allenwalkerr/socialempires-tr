@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "GEC-04",
-    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan. GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı yardımcı ajanda; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
+    "madde": "KAR-13",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşecek (S-65). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1755,8 +1755,8 @@
       "sinif": "hata",
       "onem": "Orta",
       "durum": "ci_bekliyor",
-      "isaret": "◐",
-      "kanit": "Bağımsız denetim DGV-03, DGV-06, DGV-07, DGV-08 (docs/denetim/dagitim-guvenlik.md). Yardımcı ajan düzeltti (ayrı çalışma ağacı, 1c09af9); okunup denetlendi: 7 eylem SHA'sı git ls-remote ile resmî etiketlere karşı doğrulandı (11.11.2026). Gradle/emülatör bu ortamda yok: debug APK ile sınama ilk CI koşusunda görülecek (◐).",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-03, DGV-06, DGV-07, DGV-08 (docs/denetim/dagitim-guvenlik.md). Yardımcı ajan düzeltti (ayrı çalışma ağacı, 1c09af9); okunup denetlendi: 7 eylem SHA'sı git ls-remote ile resmî etiketlere karşı doğrulandı (11.11.2026). Gradle/emülatör bu ortamda yok: debug APK ile sınama ilk CI koşusunda görülecek (◐). CI (#46, 14c5b2a): apk işi debug ve imzasız sürüm APK'larını derledi, sinama işi debug APK ile emülatörde oyunu açtı (ikisi de başarılı). İlk koşuda Android lint dahil olmayan ayarlar.json'un dışlanmasını hata saydı, düzeltildi.",
       "test": "tests/test_dagitim_guvenlik.py; tests/test_android.py",
       "pr": null,
       "onay": "KAR-17",
