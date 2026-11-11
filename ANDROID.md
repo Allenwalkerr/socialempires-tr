@@ -83,6 +83,7 @@ bildirimler kalkar. Android 13 ve sonrasında uygulama ilk açılışta bildirim
 Uygulama tamamen kapatılınca (son uygulamalardan kaydırılınca) bot dünyası durur. O sırada akın olmaz, bu
 yüzden saldırı bildirimi de gelmez. Öteki üçü yine zamanında gelir. Telefon uykudayken Android pil tasarrufu için
 bildirimi biraz (çoğunlukla birkaç dakika, en çok yaklaşık 15 dakika) geciktirebilir.
+Telefon yeniden başlatılınca kurulu bildirimler silinir; oyunu bir kez açıp kapatınca yeniden kurulur.
 
 ## Teknik notlar
 
