@@ -130,10 +130,6 @@ class Odul(KomutTesti):
         self.assertEqual(self.harita["coins"], 50000)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TurkBirimleri(unittest.TestCase):
     """ONR-04, sahibinin kararı (11.11.2026, "Milli bayramlarda"): oyunun Türk birimleri (880 Turkish Swordsman,
     881 Axeman, 882 Archer, 885 Horseman; config'te in_store 0) yalnızca milli bayramda (config/takvim.json bayrak:
@@ -162,3 +158,7 @@ class TurkBirimleri(unittest.TestCase):
         oncelik = {y: o for y, _, o in onindirme.liste()}
         for ad in ("880_tk_sword", "881_tk_axe", "882_tk_archer", "885_tk_horseman"):
             self.assertLessEqual(oncelik["buildingsprites/%s.swf" % ad], onindirme.PAKETLER["temel"], ad)
+
+
+if __name__ == "__main__":
+    unittest.main()
