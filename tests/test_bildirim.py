@@ -140,6 +140,26 @@ class Saldiri(unittest.TestCase):
 
 
 class AndroidKabugu(unittest.TestCase):
+    def test_moduller_tek_basina_yuklenir(self):
+        """#62 sinama işi: Android'de android_giris oyun.bildirim'i oyun.sunucu'dan önce yükleyince yokken → gunluk →
+        diyar → sunucu → profil döngüsü yarım kaldı ve sunucu açılmadı (S-46'nın benzeri). Her modül temiz bir
+        yorumlayıcıda tek başına yüklenebilmeli (tests/ortak.py önce oyun.sunucu'yu yüklediği için takım bunu görmez)."""
+        import subprocess
+        import sys
+        import tempfile
+        with tempfile.TemporaryDirectory() as kayit_dizini:
+            ortam = dict(os.environ, SE_KAYIT_DIZINI=kayit_dizini, PYTHONDONTWRITEBYTECODE="1")
+            for ad in ("oyun.bildirim", "oyun.yokken"):
+                sonuc = subprocess.run([sys.executable, "-c", f"import {ad}"], cwd=KOK, env=ortam,
+                                       capture_output=True, text=True)
+                self.assertEqual(sonuc.returncode, 0, f"{ad}: {sonuc.stderr[-600:]}")
+
+    def test_android_girisi_once_sunucuyu_yukler(self):
+        with open(GIRIS, encoding="utf-8") as f:
+            giris = f.read()
+        baslat = giris[giris.index("def baslat("):giris.index("def _saldiri_bildirimini_bagla")]
+        self.assertLess(baslat.index("from oyun.sunucu import calistir"), baslat.index("_saldiri_bildirimini_bagla()"))
+
     def test_giris_java_yokken_ve_hata_olunca(self):
         g = modul("android_giris_bildirim", GIRIS)
         g._saldiri_bildirimini_bagla()  # masaüstünde `java` modülü yok: sessizce geçer

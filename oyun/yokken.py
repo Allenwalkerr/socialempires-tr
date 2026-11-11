@@ -29,7 +29,7 @@ import os
 import threading
 from datetime import datetime
 
-from oyun import gunluk, yollar
+from oyun import yollar  # gunluk ozet() içinde: oyun.diyar → oyun.sunucu döngüsü (S-46, #62 sinama)
 from oyun.config import get_item_from_id
 from oyun.takvim import TURKIYE
 
@@ -186,6 +186,7 @@ def ozet(kayit, simdi, bas, olaylar=(), ceviriler=None):
     """Özet sözlüğü ya da None (gösterilecek bir şey yoksa). `bas`: son etkinlik zamanı (son_etkinlik); `olaylar`:
     haber şeridinin olayları; `ceviriler`: ceviri/tr.json'un çevirileri (birim adları için) ya da onları döndüren işlev;
     işlev yalnızca özet gösterilecekse çağrılır (300 KB'lık dosya her sayfa açılışında okunmasın, #60 incelemesi)."""
+    from oyun import gunluk
     bas = _tam(bas)
     if bas <= 0 or simdi - bas < ESIK:
         return None

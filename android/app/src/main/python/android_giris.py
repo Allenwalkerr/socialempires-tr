@@ -50,8 +50,8 @@ def baslat(taban=None, jeton=None):
     if not ruffle.hazir_mi() and os.path.exists(RUFFLE_PAKETI):
         with open(RUFFLE_PAKETI, "rb") as f:
             ruffle.hazirla(f.read())  # SHA-512 denetlenir; olmazsa ilk oyunda internetten indirilir
+    from oyun.sunucu import calistir  # önce sunucu: oyun modülleri onun üzerinden yüklenir (S-46)
     _saldiri_bildirimini_bagla()
-    from oyun.sunucu import calistir
     calistir()
 
 
