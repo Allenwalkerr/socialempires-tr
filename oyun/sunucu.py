@@ -258,7 +258,7 @@ def _yokken_ozeti(uid):
     etkin = dunya.etkin
     try:
         return yokken.ozet(kayit_oturumu(uid), timestamp_now(), yokken.son_etkinlik(uid),
-                           list(etkin.olaylar) if etkin else [], turkce.cevirileri_yukle())
+                           list(etkin.olaylar) if etkin else [], turkce.cevirileri_yukle)
     except Exception:  # özet sayfayı düşürmesin
         traceback.print_exc()
         return None

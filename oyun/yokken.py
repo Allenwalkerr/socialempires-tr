@@ -167,10 +167,13 @@ def birim_adi(kimlik, ceviriler):
 
 def ozet(kayit, simdi, bas, olaylar=(), ceviriler=None):
     """Özet sözlüğü ya da None (gösterilecek bir şey yoksa). `bas`: son etkinlik zamanı (son_etkinlik); `olaylar`:
-    haber şeridinin olayları; `ceviriler`: ceviri/tr.json'un çevirileri (birim adları için)."""
+    haber şeridinin olayları; `ceviriler`: ceviri/tr.json'un çevirileri (birim adları için) ya da onları döndüren işlev;
+    işlev yalnızca özet gösterilecekse çağrılır (300 KB'lık dosya her sayfa açılışında okunmasın, #60 incelemesi)."""
     bas = _tam(bas)
     if bas <= 0 or simdi - bas < ESIK:
         return None
+    if callable(ceviriler):
+        ceviriler = ceviriler()
     akinlar = [s for s in gunluk.savaslar(kayit) if s["yon"] == "savunma" and bas < s["zaman"] <= simdi]
     egitim = [{"ad": birim_adi(k, ceviriler or {}), "adet": adet,
                "resim": (get_item_from_id(k) or {}).get("img_name") or ""}

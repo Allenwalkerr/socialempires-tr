@@ -106,6 +106,16 @@ class Ozet(unittest.TestCase):
         self.assertEqual([h["metin"] for h in o["haberler"]], ["h%d" % i for i in range(11, 3, -1)])
         self.assertEqual(len(o["haberler"]), yokken.EN_COK_HABER)
 
+    def test_ceviriler_yalnizca_gerekince_okunur(self):
+        """#60 incelemesi: ceviri/tr.json (~300 KB) özet gösterilmeyecekse okunmaz."""
+        cagri = []
+        yukle = lambda: cagri.append(1) or TR  # noqa: E731
+        yokken.ozet(kayit_kuyruklu(), T0 + 600 + yokken.ESIK - 1, T0 + 600, ceviriler=yukle)
+        yokken.ozet(kayit_kuyruklu(), T0 + 5000, 0, ceviriler=yukle)
+        self.assertEqual(cagri, [])
+        o = yokken.ozet(kayit_kuyruklu(), T0 + 2000, T0 + 600, ceviriler=yukle)
+        self.assertEqual((cagri, o["egitim"][0]["ad"]), ([1], "Türk Kılıççısı"))
+
     def test_bir_sey_olmadiysa_ozet_yok(self):
         self.assertIsNone(yokken.ozet(bos_kayit(), T0 + 5000, T0))
 
