@@ -70,14 +70,32 @@ denetleyebilirsiniz:
 """
 
 
+# Gömülü Python zip'inin SHA-256 özeti (DGV-08). Kaynak: python.org'dan TLS ile indirilen
+# https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip dosyasının özeti. Yeni sürüm
+# eklerken özeti python.org sürüm sayfasındaki .sigstore/SPDX dosyasıyla karşılaştırıp buraya yazın.
+PYTHON_ZIP_OZETLERI = {
+    "3.12.10": "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3",
+}
+
+
+def python_zip_dogrula(surum, veri):
+    beklenen = PYTHON_ZIP_OZETLERI.get(surum)
+    if beklenen is None:
+        raise SystemExit(f"Gomulu Python {surum} icin bilinen SHA-256 ozeti yok (PYTHON_ZIP_OZETLERI)")
+    gercek = hashlib.sha256(veri).hexdigest()
+    if gercek != beklenen:
+        raise SystemExit(f"Gomulu Python zip'inin SHA-256 ozeti tutmuyor: {gercek} (beklenen {beklenen})")
+    return veri
+
+
 def python_zip(surum, yol=None):
     if yol:
         with open(yol, "rb") as f:
-            return f.read()
+            return python_zip_dogrula(surum, f.read())
     url = f"https://www.python.org/ftp/python/{surum}/python-{surum}-embed-amd64.zip"
     print(f"[+] Gomulu Python indiriliyor: {url}")
     with urllib.request.urlopen(url, timeout=300) as yanit:
-        return yanit.read()
+        return python_zip_dogrula(surum, yanit.read())
 
 
 def tekerlekler(hedef, surum):
@@ -86,7 +104,7 @@ def tekerlekler(hedef, surum):
              "--platform", "win_amd64", "--python-version", kisa, "--implementation", "cp",
              "-d", hedef, "-r", os.path.join(KOK, "requirements.txt"),
              # pip işaretleri bu makineye göre değerlendirir: Windows'a özgü bağımlılık
-             "colorama"]
+             "colorama==0.4.6"]
     print("[+] Windows paketleri indiriliyor (pip download)...")
     subprocess.check_call(komut)
     return [os.path.join(hedef, ad) for ad in sorted(os.listdir(hedef)) if ad.endswith(".whl")]

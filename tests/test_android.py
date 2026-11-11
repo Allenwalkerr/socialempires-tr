@@ -145,9 +145,9 @@ class Proje(unittest.TestCase):
     def test_python_bagimliliklari_requirements_ile_ayni(self):
         with open(os.path.join(KOK, "requirements.txt"), encoding="utf-8") as f:
             gerekli = {s.strip().lower() for s in f if s.strip() and not s.startswith("#")}
-        kurulan = set(re.findall(r'install\("([\w-]+)"\)', self.oku("app", "build.gradle.kts")))
+        kurulan = {s.lower() for s in re.findall(r'install\("([\w.-]+==[\w.]+)"\)', self.oku("app", "build.gradle.kts"))}
         # brotli isteğe bağlı (yalnızca Ruffle'ı önceden sıkıştırır); Android'de gzip yeter
-        self.assertEqual(kurulan, gerekli - {"brotli"})
+        self.assertEqual(kurulan, {s for s in gerekli if not s.startswith("brotli==")})
 
     def test_tam_ekran(self):
         java = self.oku("app", "src", "main", "java", "io", "github", "lahmacunveayran", "socialempirestr",

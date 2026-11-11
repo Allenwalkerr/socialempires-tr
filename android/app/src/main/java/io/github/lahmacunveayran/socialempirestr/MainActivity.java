@@ -3,6 +3,7 @@ package io.github.lahmacunveayran.socialempirestr;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.pm.ApplicationInfo;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -47,6 +48,8 @@ import java.security.SecureRandom;
 public class MainActivity extends Activity {
     private static final String TAG = "SocialEmpires";
     private static final String ADRES = "http://127.0.0.1:5050/";
+    /** Kayıt yedeği en çok 32 MB beklenir (DGV-06); daha büyük yanıt belleği doldurmasın. */
+    private static final int YEDEK_EN_COK = 64 * 1024 * 1024;
     private static final long HAZIR_SURESI_MS = 240_000;
     private static final int DOSYA_SEC = 1;
     private static final int DOSYA_KAYDET = 2;
@@ -98,8 +101,11 @@ public class MainActivity extends Activity {
             getWindow().getAttributes().layoutInDisplayCutoutMode =
                     WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         }
-        // Yalnızca CI sınaması (android/sinama.sh) açar: WebView'a adb üzerinden DevTools ile bağlanılabilir
-        if (getIntent().getBooleanExtra("sinama", false)) {
+        // Yalnızca CI sınaması (android/sinama.sh) açar: WebView'a adb üzerinden DevTools ile bağlanılabilir.
+        // Etkinlik dışa açık olduğundan başka bir uygulama da bu ek değeri gönderebilir (DGV-06): yalnızca hata
+        // ayıklama yapısında (FLAG_DEBUGGABLE) dikkate alınır; yayımlanan sürümde hiçbir etkisi yoktur.
+        boolean hataAyiklamaYapisi = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (hataAyiklamaYapisi && getIntent().getBooleanExtra("sinama", false)) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -324,12 +330,32 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Yedek yalnızca uygulamanın kendi sunucusundan indirilir: http://127.0.0.1:<kapı>/... (DGV-06). */
+    static boolean yedekAdresiGecerli(String adres) {
+        if (adres == null) {
+            return false;
+        }
+        try {
+            Uri uri = Uri.parse(adres);
+            return "http".equals(uri.getScheme()) && "127.0.0.1".equals(uri.getHost()) && uri.getPort() > 0
+                    && uri.getUserInfo() == null;
+        } catch (RuntimeException hata) {
+            return false;
+        }
+    }
+
     private void yedekIndir(String adres, String icerikTuru, String mime) {
+        if (!yedekAdresiGecerli(adres)) {
+            Log.w(TAG, "Yedek indirme adresi reddedildi");
+            Toast.makeText(this, R.string.yedek_kaydedilemedi, Toast.LENGTH_LONG).show();
+            return;
+        }
         String ad = URLUtil.guessFileName(adres, icerikTuru, mime);
         String cerez = CookieManager.getInstance().getCookie(adres);
         new Thread(() -> {
             try {
                 HttpURLConnection baglanti = (HttpURLConnection) new URL(adres).openConnection();
+                baglanti.setInstanceFollowRedirects(false);  // yönlendirme 127.0.0.1 dışına çıkamasın
                 if (cerez != null) {
                     baglanti.setRequestProperty("Cookie", cerez);
                 }
@@ -338,6 +364,9 @@ public class MainActivity extends Activity {
                     byte[] tampon = new byte[64 * 1024];
                     int n;
                     while ((n = girdi.read(tampon)) > 0) {
+                        if (veri.size() + n > YEDEK_EN_COK) {
+                            throw new IOException("Yedek beklenenden büyük");
+                        }
                         veri.write(tampon, 0, n);
                     }
                 } finally {
