@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "KAR-13",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşecek (S-65). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşti (e283bd7, Co-authored-by satırı yok). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1570,12 +1570,12 @@
     {
       "sinif": "hata",
       "test": "tests/test_kayit_gocu.py: test_ice_aktarmadan_onceki_hal_kalici_yedekte",
-      "pr": null,
+      "pr": "#46",
       "onay": null,
       "id": "DNT-07",
       "baslik": "Yedek içe aktarma ya da taşıma öncesi hâl yalnızca .bak'ta, o da ilk kayıtta eziliyor",
       "onem": "Yüksek",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır. Yeniden üretildi (11.11.2026): yeni test eski kodda düşüyor (backups/'ta önceki hâlin kopyası yok; iki kayıttan sonra .bak içe aktarılan hâl).",
       "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek. Düzeltme: geri_yukle (yedek yükleme ve Wi-Fi taşıma) üzerine yazmadan önce canlı kaydı backups/<kimlik>.ice-aktarma-<zaman>.save.json olarak da saklar; ad '<kimlik>-' ile başlamadığı için budanmaz."
@@ -1637,11 +1637,11 @@
       "baslik": "Yeniden gönderilen komut paketi iki kez uygulanıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim SNK-02 (docs/denetim/sunucu-komutlar.md). Bayt kodu (11.11.2026): CommandManager/sendPacket paketi first_number, commands, tries ile yollar ve tries'ı artırır; CommandManager/processCommandsTimeout aynı currentPacket'i yeniden sendPacket eder. Sunucu yalnızca commands'ı okuyup her paketi uyguluyordu.",
       "test": "tests/test_http.py: test_yeniden_gonderilen_paket_bir_kez_uygulanir",
-      "pr": null,
+      "pr": "#46",
       "onay": null,
       "notlar": "Düzeltme: kullanıcı başına son paketin (first_number, komutlar) bellekte tutulması; aynısı yeniden gelirse uygulanmaz. Kendi köyünü yükleyince (get_player_info, user yok) silinir: istemcinin sayacı baştan başlar. 2 bozmanın 2'si düştü."
     },
@@ -1702,11 +1702,11 @@
       "baslik": "Ev ağı açıkken ağdaki her cihaz parolasız girip kayıtları indirip ezebiliyordu",
       "sinif": "hata",
       "onem": "Yüksek",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim DGV-01 ve SNK-05 (docs/denetim/dagitim-guvenlik.md, sunucu-komutlar.md). ayarlar.json'daki _ev_agi uyarısı da bunu yazıyordu. Düzeltmeden sonra gerçek sunucuyla denendi (11.11.2026, 0.0.0.0'da waitress, istek makinenin ağ adresinden): girişsiz / → 302 /ev-agi-giris, command.php → 401; doğru parolayla 200; 127.0.0.1 parola sormaz; .ev_agi_parolasi 0600.",
       "test": "tests/test_ev_agi.py",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-17",
       "notlar": "oyun/ev_agi.py: ev ağı açıkken yerel olmayan her istek parolayla açılmış oturum ister (oyunun SWF/resim dosyaları ve sayfanın css/img/js'i açık; Android jetonuyla aynı liste). Parola ayarlar.json ev_agi_parolasi (en az 8) ya da ilk açılışta üretilip .ev_agi_parolasi'nda saklanır ve konsola yazılır. Oturum parolanın özetine bağlı; 5 yanlışta 5 dakika kilit. 6 bozmanın 6'sı düştü."
     },
@@ -1715,11 +1715,11 @@
       "baslik": "Sunucu kaynak yeterliliğine bakmıyor, bedeli 0'a kıskaçlıyordu; eksi argüman kaynak yaratıyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim EKF-03 (docs/denetim/ekonomi-formuller.md). Yeni test eski kodda düşüyor: 20 odunla 30 odunluk House I alımı kayda giriyordu (odun 0); buy fiyat çarpanı -5 odun ekliyordu.",
       "test": "tests/test_komutlar.py: test_yetersiz_alim_uygulanmaz, test_kaynak_ve_nakit_eksiye_dusmez",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-18",
       "notlar": "Düzeltme: ekonomi.bakiyeden_dus bedel bakiyeyi aşarsa Yetersiz atar (apply_cost, cash_ekle, kaynak_ekle hepsi ondan geçer); komut döngüsü komutu geri alır, konsola ve komut_gunlugu.jsonl'a 'red' yazar. Eksi fiyat çarpanı reddedilir (satış iadesi -0.05 hariç); argümandan gelen 11 nakit bedeli max(0, ...). 2 bozmanın 2'si düştü. Risk: sunucu bakiyesi istemcininkinden düşükse istemcide görünen alım kayda girmez; red satırları bunu gösterir."
     },
@@ -1728,11 +1728,11 @@
       "baslik": "Günlükler sınırsız büyüyordu; oturum anahtarı herkese okunur yazılıyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim SNK-09, DGV-07 (günlük kısmı), DGV-08 (anahtar izni). Yeniden üretildi (11.11.2026): komut_gunlugu.jsonl, http_gunlugu.jsonl, istemci_hatalari.jsonl, sunucu_hatalari.log hiç döndürülmüyordu, report_error gövdesi olduğu gibi yazılıyordu; .oturum_anahtari open(..., 'w') ile 0644.",
       "test": "tests/test_gunlukler.py; tests/test_denetim.py: test_oturum_anahtari_yalnizca_sahibine_okunur",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-17",
       "notlar": "Düzeltme: oyun/gunlukler.ekle bütün günlükler için: 2 MB'ta bir eski kopya (.1), tek kayıt en çok 16 KB. Oturum anahtarı 0600 yazılır, eskisi açılışta 0600'e çekilir. 4 bozmanın 4'ü düştü (ilk denemede satır sınırının testi yanlış biçimde istek gönderiyordu, düzeltildi)."
     },
@@ -1741,11 +1741,11 @@
       "baslik": "İndirilen varlıklar özetsizdi; uydurma adlarla sunucu dışarıya indirmeye zorlanabiliyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim DGV-04, DGV-05 (docs/denetim/dagitim-guvenlik.md). Yeniden üretildi (11.11.2026): varliklar._indir her geçerli karakterli yolu iki kaynaktan (ikincisi static.socialpointgames.com, sabitlenmemiş, hâlâ 200 dönüyor) indirmeyi deniyordu; tek içerik denetimi 'boş ya da HTML değil'. Sabit commit'in ağacı içerik indirilmeden alındı (git fetch --filter=blob:none, ls-tree): 4825 dosya; istemci SWF'sinin blob özeti (fc0831af…) indirilen dosyanınkiyle aynı. Gerçek kaynaktan iki dosya (bigboss1.jpg, istemci SWF) yeni denetimden geçti.",
       "test": "tests/test_denetim.py: VarlikIndirme",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-17",
       "notlar": "Düzeltme: config/varlik_ozetleri.tsv (araclar/onindirme_listesi.py üretir) sabit commit'in git blob özetleri. Sunucu yalnızca bu listedeki adları indirir (başarısızlar sözlüğü en çok 4825); indirilen ve önceden inmiş her dosya özetle denetlenir, uymayan sunulmaz. varliklari_indir.py'nin HTTP yolu da aynı denetimi yapar. Kullanıcının elle koyduğu download_assets/ dosyalarına dokunulmaz. Çevrimdışı listedeki temp.png bu commit'te yoktu (404), çıkarıldı. 4 bozmanın 4'ü düştü."
     },
@@ -1754,11 +1754,11 @@
       "baslik": "CI sırları PR koduyla çalışıyordu; eylemler sabitsiz; Android hata ayıklama ve yedek açıkları; bağımlılıklar sabitsiz",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim DGV-03, DGV-06, DGV-07, DGV-08 (docs/denetim/dagitim-guvenlik.md). Yardımcı ajan düzeltti (ayrı çalışma ağacı, 1c09af9); okunup denetlendi: 7 eylem SHA'sı git ls-remote ile resmî etiketlere karşı doğrulandı (11.11.2026). Gradle/emülatör bu ortamda yok: debug APK ile sınama ilk CI koşusunda görülecek (◐). CI (#46, 14c5b2a): apk işi debug ve imzasız sürüm APK'larını derledi, sinama işi debug APK ile emülatörde oyunu açtı (ikisi de başarılı). İlk koşuda Android lint dahil olmayan ayarlar.json'un dışlanmasını hata saydı, düzeltildi.",
       "test": "tests/test_dagitim_guvenlik.py; tests/test_android.py",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-17",
       "notlar": "İmza sırları yalnızca master ve v* etiketinde; pull_request'te imzasız derleme. Eylemler tam SHA'ya sabit, bağlam değerleri env üzerinden. 'sinama' ek değeri yalnızca debuggable yapıda; sınama debug APK ile. yedekIndir yalnızca http://127.0.0.1:<kapı>/, yönlendirmesiz, 64 MB sınırlı. Android yedeği günlükleri (ve .1 kopyalarını) ve ayarlar.json'u dışlar (ayarlar yeni cihaza taşınmaz). requirements.txt ve Chaquopy sürümleri == ile sabit; gömülü Python zip'i SHA-256 ile denetlenir (özet python.org'dan indirilip hesaplandı, bağımsız çapraz doğrulama yok). Kalan: sırlar depo düzeyinde; aynı depodan PR açabilen biri iş akışını değiştirip okuyabilir. Kesin çözüm sahibinin ayarı: sırları yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak. --require-hashes yapılmadı (Chaquopy kendi wheel'lerini kullanıyor)."
     },
@@ -1767,11 +1767,11 @@
       "baslik": "Wi-Fi taşımada kod adres satırındaydı; tek cihaz yanlış denemelerle aktarımı kapatabiliyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim DGV-02 (docs/denetim/dagitim-guvenlik.md). Kod okunarak doğrulandı (11.11.2026): _getir kodu ?kod= ile yolluyordu; _kod_dogru bütün yanlışları tek sayaçta topluyordu (10'da gönderim kapanıyordu).",
       "test": "tests/test_tasima.py: test_kod_basliktan_okunur, test_alici_kodu_baslikla_yollar, test_tek_cihaz_gonderimi_kapatamaz",
-      "pr": null,
+      "pr": "#46",
       "onay": "KAR-17",
       "notlar": "Düzeltme: kod X-Tasima-Kodu başlığında (gönderen eski sürüm alıcılar için ?kod='u da kabul eder); yanlışlar adres başına 5'te o adresi reddeder, toplam 30'da gönderim kapanır (tahmin olasılığı 30/10^6). 3 bozmanın 3'ü düştü. Kabul edilen risk: aktarım ev ağında düz HTTP; 6 haneli koddan türeyen şifreleme kolay kırılacağı için eklenmedi. Gönderim yalnızca sahibinin başlattığı 10 dakikada açık."
     }
