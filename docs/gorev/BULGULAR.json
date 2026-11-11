@@ -1813,6 +1813,19 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Birleştirme squash ile ve commit metni elle yazılarak yapılır (S-65: otomatik squash Co-authored-by satırı ekler). Konuşmalar düzeltmenin commit'iyle yanıtlanıp kapatılır (S-55, S-64)."
+    },
+    {
+      "id": "DNT-21",
+      "baslik": "Eski Flash sayfasında boş resim ve noopener'sız dış bağlantılar",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim TRA-07 (docs/denetim/turkce-arayuz.md). Doğrulandı (11.11.2026): templates/play.html:33-36 <img> src'siz; iki target=_blank bağlantısında rel=noopener yok; resimlerde alt yok. Yeni test eski sayfada iki kez düşüyor.",
+      "test": "tests/test_sayfa_html.py",
+      "pr": null,
+      "onay": null,
+      "notlar": "Test bütün şablonlara uygulanır: her img'de src ve alt, her target=_blank'te rel=noopener."
     }
   ]
 }
