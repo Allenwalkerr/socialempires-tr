@@ -83,6 +83,11 @@ class Yaklasan(unittest.TestCase):
         k = kayit(kalkan=T0 + 1800)
         self.assertEqual([b["zaman"] for b in bildirim.yaklasan(k, T0, TR)], [T0 + bildirim.EN_YAKIN])
         self.assertEqual(bildirim.yaklasan(kayit(kalkan=-1), T0, TR), [])  # -1: kalkan yok (ShieldManager)
+        # #62 incelemesi: EN_YAKIN'dan önce biten kalkana uyarı kurulmaz (bittikten sonra "bitiyor" demesin)
+        for kalan in (30, bildirim.EN_YAKIN):
+            self.assertEqual(bildirim.yaklasan(kayit(kalkan=T0 + kalan), T0, TR), [], kalan)
+        self.assertEqual([b["zaman"] for b in bildirim.yaklasan(kayit(kalkan=T0 + bildirim.EN_YAKIN + 1), T0, TR)],
+                         [T0 + bildirim.EN_YAKIN])
 
 
 class AndroidListesi(unittest.TestCase):

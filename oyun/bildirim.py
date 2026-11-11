@@ -46,7 +46,7 @@ def olaylar(kayit, simdi, ceviriler=None):
         if adet > 0 and bitis > simdi:
             cikti.append((bitis, "egitim", kimlik, adet))
     kalkan = kalkan_bitisi(kayit)
-    if kalkan > simdi:
+    if kalkan > simdi + EN_YAKIN:  # en yakın kurulabilir andan önce biten kalkan için uyarı geç kalır (#62 incelemesi)
         cikti.append((max(simdi + EN_YAKIN, kalkan - KALKAN_UYARISI), "kalkan", kalkan, 1))
     return sorted(c for c in cikti if c[0] >= simdi + EN_YAKIN)
 
