@@ -185,16 +185,22 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     dil = (dil or "en").lower()[:2]
     teklif = kompu_teklifi()
     takvim_setleri = takvimdeki_setler()
-    anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri)
+    from oyun import bayram_hedefleri
+    bayram = bayram_hedefleri.aktif_hedefler()
+    anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
+               tuple(h["id"] for h in bayram))
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
     if dil == "tr":
         kopya = turkce_uygula(__game_config)
-        if ascii_mode:
-            kopya = ascii_uygula(kopya)
     else:
         kopya = copy.deepcopy(__game_config)
+    if bayram:  # GEC-07: süren etkinliklerin hedefleri (metinleri Türkçe yazılı; ASCII kipinde aşağıda çevrilir).
+        # Resimleri goals.json'daki bir hedefinkidir; hedefleri_ekle onları zaten `images`'a koyar.
+        kopya["goals"] = list(kopya.get("goals", [])) + bayram
+    if dil == "tr" and ascii_mode:
+        kopya = ascii_uygula(kopya)
     if teklif:
         kopya["kompu_offers"] = [teklif]
     if takvim_setleri:
