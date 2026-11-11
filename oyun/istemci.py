@@ -82,9 +82,8 @@ def get_player_info_response():
         kayit = kayit_oturumu(uid) if gecerli_uid(uid) else None
         if kayit is None:
             return ({"result": "error"}, 404)  # SNK-04: bilinmeyen kimlik 500 veriyordu
-        if kayit is not None:
-            with save_lock:
-                kompu_donemini_guncelle(kayit)
+        with save_lock:
+            kompu_donemini_guncelle(kayit)
         return (get_player_info(uid, harita_no), 200)
     if neighbor_session(kullanici) is None and kullanici.startswith("100000"):
         return get_quest_map(kullanici)  # görev (quest) haritası

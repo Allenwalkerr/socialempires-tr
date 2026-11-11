@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KAR-13",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşti (e283bd7, Co-authored-by satırı yok). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "GEC-05",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 ve #47 birleşti. #48 (DNT-21 … DNT-24) açık; sahibine sorularak birleşir (KAR-19). GEC-05 (PvP) başladı: yardımcı ajan 8 PvP komutunun bayt kodunu araştırıyor (rapor bulut karalama klasöründe; bulgular kodlanmadan önce yeniden okunur). Kalan denetim bulguları (docs/DENETIM.md): çoğu Düşük; KYG-04 sahibinin kararını bekliyor (göç öncesi yedeği olmayan cihaza taşınan 0.06a kaydında görev numaraları). Sahibinin ayarı: imza sırları için GitHub Environment. Sonra GEC-06 (Türkçe, TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
