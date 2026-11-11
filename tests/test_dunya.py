@@ -486,6 +486,11 @@ class HedefSecimiTestleri(DunyaTesti):
         self.assertEqual(self.secilen(d, "a", sira), "p")
         p["privateState"]["shield_until"] = SIMDI + 100
         self.assertIsNone(self.secilen(d, "a", sira))
+        # KYT-03: oyunda satın alınan kalkan (ShieldManager: privateState.shieldEndTime) da akını durdurur
+        p["privateState"].update(shield_until=0, shieldEndTime=SIMDI + 100)
+        self.assertIsNone(self.secilen(d, "a", sira))
+        p["privateState"]["shieldEndTime"] = SIMDI - 1
+        self.assertEqual(self.secilen(d, "a", sira), "p")
         p["privateState"]["shield_until"], p["maps"][0]["level"] = 0, 1
         self.assertIsNone(self.secilen(d, "a", sira))
         p["maps"][0]["level"] = 10

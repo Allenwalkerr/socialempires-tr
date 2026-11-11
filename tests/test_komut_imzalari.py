@@ -202,8 +202,7 @@ class SunucuOkuma(unittest.TestCase):
 # 1.4.07'nin sunucuda henüz işleyicisi olmayan komutları. GEC-03 ve GEC-05 bu listeyi boşaltır;
 # liste yalnızca küçülür (yeni bir eksik çıkarsa test kırılır).
 EKSIK_1407 = {
-    "begin_attack_new", "buy_shield", "clean_attack_log", "end_attack_new", "end_tournament_match",
-    "get_enemy_new", "reply_attack", "reset_shield",
+    "end_attack_new",  # GEC-05'in ikinci parçası; öteki yedisi GEC-05'in ilk parçasında yazıldı
 }
 
 

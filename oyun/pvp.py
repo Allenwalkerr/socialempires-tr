@@ -20,6 +20,7 @@ import json
 import math
 
 from oyun.ada import fetih_kaydet
+from oyun import pvp_yeni
 from oyun.config import get_game_config, get_item_from_id
 from oyun.ekonomi import timestamp_now
 from oyun.kayit import all_saves_userid, neighbor_session, save_session
@@ -125,7 +126,7 @@ def saldiri_bitir(saldiran, args):
 
     # Kurala uymayan saldırı (hak bitti / aynı hedef 4 saat içinde / hedefin
     # kalkanı var) ganimetsiz kaydedilir; kalkanlı hedefe dokunulmaz.
-    kalkanli = kayitli and _tam(kurban["privateState"].get("shield_until")) > simdi
+    kalkanli = kayitli and pvp_yeni.kalkan_bitisi(kurban) > simdi  # KYT-03
     kurala_uygun = not kalkanli and saldiri_hakki_var(saldiran, simdi) and not any(
         isinstance(a, dict) and str(a.get("victim_id")) == kurban_id
         and simdi - _tam(a.get("time")) < AYNI_HEDEF_SURESI for a in gonderilen)

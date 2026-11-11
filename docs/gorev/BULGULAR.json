@@ -871,12 +871,12 @@
       "sinif": "ozellik",
       "onem": "Yüksek",
       "durum": "acik",
-      "isaret": "?",
+      "isaret": "◐",
       "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 31.10.2026 (GEC-03'ten): saldırıda ölen kendi birliklerin mezarlığa girişi (IsoFightingElement/kill → addUnitToResurrectableUnits, checkPutToGraveyard → Main.deadUnits) yalnızca ASSAULT kipinde; sunucuya ayrı komut gelmez, kill/sell'den çıkarılmalı. privateState.resurrectableUnits GEC-05'te."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 31.10.2026 (GEC-03'ten): saldırıda ölen kendi birliklerin mezarlığa girişi (IsoFightingElement/kill → addUnitToResurrectableUnits, checkPutToGraveyard → Main.deadUnits) yalnızca ASSAULT kipinde; sunucuya ayrı komut gelmez, kill/sell'den çıkarılmalı. privateState.resurrectableUnits GEC-05'te. 11.11.2026 (ilk parça): yardımcı ajanın bayt kodu araştırması docs/inceleme/1407-pvp.md (kodlanan iddialar yeniden okundu; arama bedeli formülündeki ◐ çıkarım yanlıştı, düzeltildi). Bulundu: istemci yeni PvP servislerini oyunun dinamik adresine (pvp/web/app.php/pvp/...) yollar; sunucuda yoktu, 404 alıyordu: rakip aranamıyordu, saldırı başında ve sonunda senkron hatası çıkıyordu (✔ getURLWithUserID). Yazıldı: oyun/pvp_yeni.py ve /pvp/* uçları (enemy: yalnızca bot, kalkansız, son 4 saatte saldırılmamış, seviyesi yakın; pool/check; attack/begin, attack/end, pool/add, pool/del), get_enemy_new, begin_attack_new, buy_shield, reset_shield, reply_attack, clean_attack_log, end_tournament_match. G∖H = 1 (end_attack_new), imza uyumsuzluğu 0. İkinci parça: end_attack_new (1.4.07'de end_attack ganimet ve onuru literal 0 gönderir; ganimet, XP yalnızca end_attack_new'de), attacksWon/Lost, onur, yeni saldırı günlüğü PVPattacksReceived (bot akınları oraya yazılmalı; intikam), OYN-16, OYN-17."
     },
     {
       "id": "GEC-06",
@@ -1234,13 +1234,13 @@
       "baslik": "İki kalkan: sunucunun yeni oyuncu kalkanı (shield_until) ile 1.4.07'nin kalkanı (shieldEndTime) ayrı",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "oyun/kayit.py new_village privateState.shield_until = şimdi + denge.YENI_OYUNCU_KALKANI; 1.4.07 istemcisi kalkanı shieldEndTime'dan gösterir (ShieldManager). Yeni oyuncunun sunucudaki kalkanı istemcide görünmüyor olabilir; denenmedi.",
-      "test": null,
+      "test": "tests/test_pvp_yeni.py: Kalkan, RakipSecimi; tests/test_dunya.py: test_oyuncuya_aralik_kalkan_ve_seviye; tests/test_denge.py: YeniOyuncuKalkaniTestleri",
       "pr": null,
       "onay": null,
-      "notlar": "GEC-05'te (yeni PvP ve kalkan komutları) tek kalkana indirilir."
+      "notlar": "GEC-05'te (yeni PvP ve kalkan komutları) tek kalkana indirilir. 11.11.2026: tek kalkan: pvp_yeni.kalkan_bitisi = max(shieldEndTime, shield_until); bot akınları, eski PvP ve rakip seçimi buna bakar (satın alınan kalkan artık bot akınını durdurur). Yeni köyde shieldEndTime da yazılır (istemci yalnızca onu okur: kalkan oyunda görünür); begin_attack_new ikisini de kaldırır."
     },
     {
       "id": "KAR-10",

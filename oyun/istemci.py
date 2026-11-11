@@ -9,7 +9,7 @@ import traceback
 from flask import jsonify, redirect, request
 
 from oyun import ada as Ada
-from oyun import gunlukler
+from oyun import gunlukler, pvp_yeni
 from oyun import turnuva as Turnuva
 from oyun.config import get_client_game_config, get_game_config, kompu_teklifi
 from oyun.ekonomi import timestamp_now
@@ -332,6 +332,30 @@ def turnuva_ucu(ad):
         _http_gunlugune_yaz("tournaments/" + ad)
         return ("", 404)
     return imzali({"data": sonuc})
+
+
+@app.route(DINAMIK + "/pvp/web/app.php/pvp/<path:ad>", methods=["GET", "POST"])
+def pvp_ucu(ad):
+    """1.4.07'nin yeni PvP servisleri (GEC-05; oyun/pvp_yeni.py). İstemci yolu CommandManager.getURLWithUserID ile
+    oyunun dinamik adresine ekler; gövde SimpleServiceManager.callService'in "<imza>;<json>" zarfıdır. Hepsi
+    {"result": "success", "data": ...} bekler (_responseHandler); önce bu uçlar 404 alıyordu: rakip aranamıyor,
+    saldırı başında ve sonunda "senkron hatası" çıkıyordu."""
+    veri = servis_govdesi()
+    uid = str(veri.get("user_id") or request.values.get("USERID", ""))
+    if ad == "enemy":  # PVPManager/searchEnemy → _onEnemyFound yalnızca data.id okur
+        oyuncu = kayit_oturumu(uid) if gecerli_uid(uid) else None
+        rakip = pvp_yeni.rakip_sec(oyuncu) if oyuncu is not None else None
+        if rakip is None:
+            return imzali({"result": "error", "error": "Şu anda saldırılabilecek bir köy yok."})
+        return imzali({"result": "success", "data": {"id": rakip}})
+    if ad == "pool/check":  # PopupAttackLog/checkCanAttack: data == 1 ise saldırılabilir
+        return imzali({"result": "success", "data": 1 if pvp_yeni.saldirilabilir_mi(uid) else 0})
+    if ad in ("attack/begin", "attack/end", "pool/add", "pool/del"):
+        # Yanıtları kullanılmaz (checkSendBegin boş, checkSendEnd yalnızca "kaydedildi" işareti; havuz botlar
+        # arasında tutulmaz): durum komutlarla (begin_attack_new, end_attack, end_attack_new) gelir.
+        return imzali({"result": "success", "data": {}})
+    _http_gunlugune_yaz("pvp/" + ad)
+    return ("", 404)
 
 
 def _http_gunlugune_yaz(yol):
