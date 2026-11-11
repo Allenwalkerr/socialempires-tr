@@ -29,6 +29,31 @@ class Liste(unittest.TestCase):
         self.assertIn(("buildingsprites/jinetePerdido.swf", 1), {(y, o) for y, _, o in satirlar})
 
 
+    def test_arsivdeki_her_dosya_ya_pakette_ya_gerekcesiyle_disarida(self):
+        """GEC-08: config/varlik_ozetleri.tsv arşivin (AcidCaos/socialemperors@COMMIT assets/) bütün 4825 dosyasıdır.
+        Pakette olmayan her dosyanın kurala uyan bir nedeni olmalı (araclar/onindirme_listesi.py belge dizesi):
+        başka istemci sürümü (flash/), yapılandırmada çizimi geçmeyen eşya (buildingsprites/), sunucunun o adla hiç
+        sunmadığı dosya (varliklar.ESDEGERLER) ya da arşivde boş dosya. Önceki listede 1.4.07'nin 344 yeni dosyası
+        (img 189, images_new 82, externalized 66, swf 5, fx 2) bu nedenlerin hiçbiri olmadan dışarıdaydı."""
+        from oyun.config import get_game_config
+        with open(os.path.join(KOK, "config", "varlik_ozetleri.tsv"), encoding="utf-8") as f:
+            arsiv = {s.split("\t")[0] for s in f if s.strip() and not s.startswith("#")}
+        self.assertEqual(len(arsiv), 4825)
+        c = get_game_config()
+        cizimler = {i["img_name"] for i in c["items"] + c.get("magics", []) if i.get("img_name")}
+        # arşivde boş: HEAD Content-Length 0 (raw.githubusercontent.com, COMMIT, 11.11.2026)
+        BOS = {"buildingthumbs/2147_whirlwind_minion.jpg", "buildingsprites/1410_bahamut_heart.swf"}
+        pakette = {y for y, _, _ in onindirme.liste()}
+
+        def gerekce(yol):
+            klasor, ad = yol.split("/", 1)[0], os.path.splitext(os.path.basename(yol))[0]
+            return ((klasor == "flash" and yol != "flash/SocialEmpires1.4.07sec_fixed.swf")
+                    or (klasor == "buildingsprites" and ad not in cizimler)
+                    or yol in varliklar.ESDEGERLER or yol in BOS)
+        self.assertEqual(sorted(y for y in arsiv - pakette if not gerekce(y)), [])
+        self.assertEqual(pakette - arsiv, set())
+
+
 class Kaynak(unittest.TestCase):
     """Varlıklar dal adından değil sabit commit'ten iner (KYN-03)."""
 
