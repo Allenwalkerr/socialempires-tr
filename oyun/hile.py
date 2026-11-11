@@ -97,7 +97,8 @@ def cheat_uygula():
 
             elif islem == "kalkan":
                 saat = max(1, min(72, int(veri.get("saat", 12))))
-                kayit.setdefault("privateState", {})["shield_until"] = timestamp_now() + saat * 3600
+                ps = kayit.setdefault("privateState", {})
+                ps["shield_until"] = ps["shieldEndTime"] = timestamp_now() + saat * 3600  # KYT-03: oyunda da görünsün
 
             elif islem == "yedek":
                 backup_session(uid)
