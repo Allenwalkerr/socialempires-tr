@@ -121,7 +121,7 @@ def as3_guvensizler(veri: bytes, dizeler):
     anahtarıdır, çevrilirse o eşleşmeler kırılır (GEC-06)."""
     dizeler = set(dizeler)
     ad_olan, sabit, it, ekran, kor = set(), set(), {}, set(), False
-    for k, abc in enumerate(abc_okur.swf_abc(veri)):  # k: ABC sırası; yöntem ve ofset her ABC'de 0'dan başlar
+    for abc_no, abc in enumerate(abc_okur.swf_abc(veri)):  # ABC sırası; yöntem ve ofset her ABC'de 0'dan başlar
         havuz = abc.dizeler
 
         def ekle(kume, i):
@@ -146,9 +146,9 @@ def as3_guvensizler(veri: bytes, dizeler):
                 ekle(ad_olan, i)
         for liste in ([o["ozellikler"] for o in abc.ornekler] + [s[1] for s in abc.siniflar]
                       + [b[1] for b in abc.betikler]):
-            for k in liste:
-                if k[0] in (0, 6) and k[4] and k[5] == 0x01:  # Slot/Const, değer türü dize
-                    ekle(sabit, k[4])
+            for oz in liste:
+                if oz[0] in (0, 6) and oz[4] and oz[5] == 0x01:  # Slot/Const, değer türü dize
+                    ekle(sabit, oz[4])
         for g in abc.govdeler.values():
             try:
                 islemler = abc.coz(g)
@@ -157,9 +157,9 @@ def as3_guvensizler(veri: bytes, dizeler):
                 continue
             for isl in islemler.values():
                 if isl.ad == "pushstring":
-                    it.setdefault(abc.deger(isl), set()).add((k, g.yontem, isl.ofset))
+                    it.setdefault(abc.deger(isl), set()).add((abc_no, g.yontem, isl.ofset))
         noktalar, cozulemeyen = abc.yazi_kaynaklari(YAZI_ALANLARI, YAZI_CAGRILARI)
-        ekran |= {(k,) + n for n in noktalar}
+        ekran |= {(abc_no,) + n for n in noktalar}
         kor = kor or bool(cozulemeyen)
     cikti = {}
     for d in sorted(dizeler):

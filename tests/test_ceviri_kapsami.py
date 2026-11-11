@@ -82,7 +82,9 @@ class As3Guvenligi(unittest.TestCase):
             return {o: Islem(o, "pushstring", (o,), o + 2, ()) for o in itmeler}
         return types.SimpleNamespace(
             dizeler=[None], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)], yontemler=[], ustveriler=[], ornekler=[],
-            siniflar=[], betikler=[], govdeler={1: types.SimpleNamespace(yontem=1)}, coz=coz,
+            # betikte bir özellik kaydı: as3_guvensizler'deki özellik döngüsü dönsün (#54: döngü değişkeni ABC
+            # sırasını ezmişti; iki ABC'nin son kaydı aynıysa anahtarlar yine karışıyordu)
+            siniflar=[], betikler=[(0, [(1, 0, 0, 0)])], govdeler={1: types.SimpleNamespace(yontem=1)}, coz=coz,
             deger=lambda isl: itmeler[isl.ofset], yazi_kaynaklari=lambda *a: (set(ekran), cozulemeyen))
 
     def test_her_itme_noktasi_ekrana_gitmeli(self):
