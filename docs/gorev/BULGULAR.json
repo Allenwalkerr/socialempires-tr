@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-38",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #62 birleşti (dört öneri bitti). #63 (OYN-15, DNT-34, DNT-31) birleşti. DNT-38, DNT-39 PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, kalan denetim bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "KYT-02",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #64 birleşti. Günlük ödül (KYT-02, KAR-24) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-12, 13, kalan denetim bulguları (DNT-25 … DNT-40), GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -935,13 +935,13 @@
       "baslik": "Günlük ödül penceresinin başlığı boş, '250 altın' etiketi sığmıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "curutuldu",
       "isaret": "◐",
       "kanit": "OYN-03 çeviri taramasında ekran görüntüsünde görüldü (PR #15); başlık istemcinin kendi kodunda kuruluyor, nedeni doğrulanmadı.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "1.4.07'nin 5 günlük yeni penceresi eskisinin yerini alıyor (KYN-05); GEC-02'den sonra yeniden ölçülür."
+      "notlar": "1.4.07'nin 5 günlük yeni penceresi eskisinin yerini alıyor (KYN-05); GEC-02'den sonra yeniden ölçülür. 11.11.2026: belirtiler (boş başlık, '250 altın', '1 Kahraman!') eski PopupNewDaily'ye ait (PopupNewDaily/<kurucu>@565-660); 1.4.07'de o pencereyi açan tek yol DailyBonusButton ve config'te active 0: bu pencere artık hiç açılmıyor. Yeni 5 günlük pencere KYT-02/KAR-24 ile açıldı; onun yazıları gözle denetlenmedi (GEC-09). 'Kalan giriş' (1756/1766) sırası ◐ yanlış okunuyor olabilir."
     },
     {
       "id": "OYN-12",
@@ -1221,13 +1221,13 @@
       "baslik": "Yeni günlük ödül, ilk alım teklifi, Ada Ocağı, kuyruklar ve mezarlık alanları yokken bu özellikler kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bayt kodu (31.10.2026): DailyBonusManager/initPlayerData numDayLogged/lastDayRewarded/nextDayReward, DailyBonusButton/isActive showDailyBonus; FirstOfferButton/isActive firstPurchaseTimestamp ve numDayLogged < 3; CollectGameManager collectGame; BuildingQueueManager barracksQueues; loadGraveyardState resurrectableUnits, graveyardCapacity. Alan yokken bu yollar boş ya da kapalı geçiyor; hata vermiyor (yeni imparatorluk ve göç etmiş kayıtta konsol hatası 0, GEC-02).",
-      "test": null,
+      "test": "tests/test_gunluk_odul.py (5 test)",
       "pr": null,
       "onay": null,
-      "notlar": "Göç bunları bilerek eklemiyor (davranışı değiştirirler). Her biri onu işleyen komutla açılır: GEC-03 (kuyruk, collect_game, mezarlık) ve OYN-11 (1.4.07'nin 5 günlük ödül penceresi). İlk alım teklifi gerçek parayla nakit satışıdır; çevrimdışı oyunda açılıp açılmayacağı sahibine sorulur. Kaynak sınırı: initPlayerData'nın okuduğu lastDayRewarded/nextDayReward parametreden okunuyor, araç bunları bulmaz (◐). Düzeltme (31.10.2026): 'ilk alım teklifi gerçek parayla nakit satışıdır' yanlıştı. Bayt kodu (PopupFirstBuy/onBuy): oyunun kendi nakdiyle alınan paket; POPUP_FIRST_PURCHASE_OFFER_COST 28 nakit, ödül POPUP_FIRST_PURCHASE_OFFER_REWARD (Savage Draggy 2242, Scorch 2245, Shock 2248; 20000 altın; 40000 yemek); nakit yetmezse nakit sayfasına gider. Sahibi açılmasını istedi: KAR-10. Ötekiler (günlük ödül, Ada Ocağı, kuyruk, mezarlık) hâlâ kapalı. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): kuyruk, Ada Ocağı alanları, mezarlık ve ilk alım açıldı; kalan tek kapalı yol 1.4.07'nin 5 günlük günlük ödülü (showDailyBonus kayıtta yok, sunucu yazmıyor). OYN-11 buna bağlı."
+      "notlar": "Göç bunları bilerek eklemiyor (davranışı değiştirirler). Her biri onu işleyen komutla açılır: GEC-03 (kuyruk, collect_game, mezarlık) ve OYN-11 (1.4.07'nin 5 günlük ödül penceresi). İlk alım teklifi gerçek parayla nakit satışıdır; çevrimdışı oyunda açılıp açılmayacağı sahibine sorulur. Kaynak sınırı: initPlayerData'nın okuduğu lastDayRewarded/nextDayReward parametreden okunuyor, araç bunları bulmaz (◐). Düzeltme (31.10.2026): 'ilk alım teklifi gerçek parayla nakit satışıdır' yanlıştı. Bayt kodu (PopupFirstBuy/onBuy): oyunun kendi nakdiyle alınan paket; POPUP_FIRST_PURCHASE_OFFER_COST 28 nakit, ödül POPUP_FIRST_PURCHASE_OFFER_REWARD (Savage Draggy 2242, Scorch 2245, Shock 2248; 20000 altın; 40000 yemek); nakit yetmezse nakit sayfasına gider. Sahibi açılmasını istedi: KAR-10. Ötekiler (günlük ödül, Ada Ocağı, kuyruk, mezarlık) hâlâ kapalı. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): kuyruk, Ada Ocağı alanları, mezarlık ve ilk alım açıldı; kalan tek kapalı yol 1.4.07'nin 5 günlük günlük ödülü (showDailyBonus kayıtta yok, sunucu yazmıyor). OYN-11 buna bağlı. 11.11.2026 (KAR-24): 'showDailyBonus yok = kapalı' yanlıştı ✔ (DailyBonusManager/initPlayerData@56-142: pencere showDailyBonus || lastDayRewarded == 0 iken açılır; lastDayRewarded kayıtta hiç yoktu). Pencere her girişte açılıyor, PopupNewDailyBonus/init@754-797 day == numDaysLogged ve numDaysLogged != lastDayRewarded olunca giveReward ile 2. ve 5. günün birimini her açılışta store_add_items ile yeniden veriyordu; kaynak/nakit/iksir kalıcı olmuyordu, 1. gün hiç verilmiyordu. Artık oyun/gunluk_odul.isle: her yeni giriş gününün ilk get_player_info'sunda o günün ödülü bir kez kayda yazılır, lastDayRewarded = numDayLogged; yanıtta showDailyBonus 1 (kayda yazılmaz) pencereyi açar, istemci ikinci kez vermez. 5. günden sonra pencere açılmaz. get_player_info save_lock içine alındı, ödül günü kayıt hemen yazılır. 7 bozmanın 7'si düştü. ◐: pencere Ruffle'da gözle görülmedi."
     },
     {
       "id": "KYT-03",
@@ -2235,24 +2235,24 @@
       "baslik": "Denetim TRA-06: Türkçe SWF önbelleği birikiyor; tarayıcı bir gün eski çeviriyi saklıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-06, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_swf_yama.py: test_uretir_yeniden_kullanir_sozluk_degisince_yeniler",
-      "pr": null,
+      "pr": "#64",
       "onay": null,
-      "notlar": "download_assets/tr/*.tr-<özet>.swf (~4,3 MB) eskisi silinmiyor; SEND_FILE_MAX_AGE_DEFAULT 86400, adres hep aynı. 11.11.2026: yeni Türkçe SWF üretilince aynı SWF'nin eski kopyaları (<ad>.tr-<12 hex>.swf) silinir; başka SWF'lere ve adı uyup biçimi uymayanlara dokunulmaz. Testin eski beklentisi (üç kopya kalır) bulgunun kendisiydi, bilerek değişti. Tarayıcının 1 gün eski çeviriyi saklaması (aynı adres, max-age 86400) bu işte çözülmedi, açık. 3 bozma düştü."
+      "notlar": "download_assets/tr/*.tr-<özet>.swf (~4,3 MB) eskisi silinmiyor; SEND_FILE_MAX_AGE_DEFAULT 86400, adres hep aynı. 11.11.2026: yeni Türkçe SWF üretilince aynı SWF'nin eski kopyaları (<ad>.tr-<12 hex>.swf) silinir; başka SWF'lere ve adı uyup biçimi uymayanlara dokunulmaz. Testin eski beklentisi (üç kopya kalır) bulgunun kendisiydi, bilerek değişti. Tarayıcının 1 gün eski çeviriyi saklaması (aynı adres, max-age 86400) bu işte çözülmedi, açık. 3 bozma düştü. #64 incelemesi (engelleyici değil): sunucu çalışırken çeviri değişir ve iki istek üst üste gelirse ilk istek eski yolu silinmiş bulup bir kez hata alabilir; yeniden yüklemede düzelir. Tek kişilik sunucuda olasılığı düşük, düzeltilmedi."
     },
     {
       "id": "DNT-39",
       "baslik": "Denetim TRA-08: turkce.dogrula yalnızca #n#, etiket ve satır sonunu denetliyor; %s/{0} kaybı geçer",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-08, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_sistemler.py: test_yer_tutucular_korunur, test_yer_tutucu_kurali_hicbir_ceviriyi_dusurmez",
-      "pr": null,
+      "pr": "#64",
       "onay": null,
       "notlar": "Bugün 4573 çeviride sorun yok (denetçi ✔); ileride eklenecek çeviriye karşı koruma yok. 11.11.2026: turkce.YER_TUTUCU artık #n#, %s/%d ve {n} (araclar/ceviri_kapsami.py ile aynı tanım). Önce ölçüldü: bugünkü 4983 çevirinin hiçbiri yeni kurala takılmıyor (İngilizce kalan olmaz). Bozma düştü."
     },
@@ -2372,6 +2372,19 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "ONR-02 ile aynı karar (KAR-22)."
+    },
+    {
+      "id": "KAR-24",
+      "baslik": "5 günlük günlük ödülü sunucu verir; 5. günden sonra pencere açılmaz",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Bayt kodu (docs/inceleme/1407-gunluk-odul.md): istemci kaynak/nakit/iksiri kayda yazmıyor, 1. günü vermiyor, lastDayRewarded'ı sunucuya bildirmiyor; tablo 5 gün, döngü yok. Sahibine iki soru soruldu: 'Sunucu versin / Oyun versin' → 'Sunucu versin'; '5. günden sonra: Pencere kapansın / Başa dönsün' → 'Pencere kapansın'.",
+      "test": "tests/test_gunluk_odul.py",
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Günlük ödül yalnızca oyunun kendi ödülüdür (KAR-03) kuralıyla uyumlu."
     }
   ]
 }
