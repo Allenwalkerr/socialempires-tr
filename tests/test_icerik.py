@@ -14,6 +14,22 @@ from oyun import sunucu as server
 from oyun.yollar import SAVES_DIR
 
 
+class ModListesi(unittest.TestCase):
+    """mods/mods.txt (dosyanın kendi açıklaması: '.json uzantısını yazmanız gerekmez, # ile başlayan satır yok
+    sayılır'). Denetim EKF-06: '.json' yazılmış satır sessizce atlanıyordu."""
+
+    def test_json_soneki_ayiklanir_yorum_ve_bos_satir_atlanir(self):
+        import tempfile
+        from oyun import config
+        klasor = tempfile.mkdtemp()
+        with open(os.path.join(klasor, "mods.txt"), "w", encoding="utf-8") as f:
+            f.write("# yorum\n\nbirinci\n  ikinci.json  \n# ucuncu\nçağrı\n")
+        self.assertEqual(config.mod_listesi(klasor), [
+            ("birinci", os.path.join(klasor, "birinci.json")), ("ikinci", os.path.join(klasor, "ikinci.json")),
+            ("çağrı", os.path.join(klasor, "çağrı.json"))])
+        self.assertEqual(config.mod_listesi(os.path.join(klasor, "yok")), [])
+
+
 class TakvimTestleri(unittest.TestCase):
     def test_diyanet_bayram_tarihleri_2026_2030(self):
         beklenen = {

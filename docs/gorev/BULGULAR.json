@@ -1839,6 +1839,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: hijridate==2.6.0 requirements.txt ve Android Chaquopy listesinde; takvim.bayramlar yıla düşen bütün bayramları verir, etkinlikler her birini açar; kitaplık yoksa uyarı bir kez. bayram_duzeltme ayarı liste de alır. 3 bozmanın 3'ü düştü. Ümmü'l-Kurâ ile Diyanet 2031 sonrası bir gün ayrışabilir (◐); ayar elle düzeltir."
+    },
+    {
+      "id": "DNT-23",
+      "baslik": "mods.txt'te .json yazılmış mod sessizce atlanıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-06. Doğrulandı (11.11.2026): oyun/config.py patch_game_config 'mod.replace(\".json\", \"\")' sonucunu atıyordu; 'x.json' satırı 'x.json.json' arıyor, bulamayınca uyarısız geçiyordu. mods.txt'in kendi açıklaması '.json yazmanız gerekmez' diyor.",
+      "test": "tests/test_icerik.py: ModListesi",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: config.mod_listesi (saf, sınanabilir): yorum ve boş satır atlanır, .json soneki ayıklanır, dosya utf-8 okunur; bulunamayan mod uyarı basar. Bozma denemesinde test düştü."
     }
   ]
 }
