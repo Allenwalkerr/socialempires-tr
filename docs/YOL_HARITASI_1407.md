@@ -174,6 +174,8 @@ tek cümleyle onaylatılır.
 | ONR-03 | Bildirimler | Android'de uygulama kapalıyken yerel bildirim: inşaat, eğitim ya da kuyruk bitti, kalkan bitiyor, saldırıya uğradın. Zamanlar formül defterindeki sürelerden hesaplanır. Simge oyunun kendi simgesidir (`templates/img/simge-192.png`). Bildirim internetsiz çalışır. | 2 / 3 / 5 |
 | ONR-04 | Oyunun Türk birimleri | Oyunun kendi "Turkish Swordsman/Axeman/Archer/Horseman" birimleri (öğe 880, 881, 882, 885; resimleri `880_tk_sword` …) oyunda kullanılabilir olur. Mağazada mı, bayramlarda mı, botlarda mı kullanılacağına sahibi karar verir. | 0,5 / 1 / 2 |
 
+Sahibi 11.11.2026'da ONR-01 … ONR-03'ün tanımlarını onayladı; ONR-04 için kararı "Milli bayramlarda" (KAR-21).
+
 ## 6. Riskler
 
 | Risk | Olasılık | Etki | Önlem |

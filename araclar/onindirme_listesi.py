@@ -75,8 +75,11 @@ def gerekenler(dosyalar, config, esdegerler):
     cizimler = {i["img_name"] for i in config["items"] if i.get("img_name")}
     buyuler = {m["img_name"] for m in config.get("magics", []) if m.get("img_name")}
     # Mağazadakiler ve haritada rastgele beliren kayıp eşyalar (yaralı inek, yalnız şövalye...; alt kategori 91)
+    # Milli bayramlarda açılan Türk birimleri de (ONR-04; oyun.config.TURK_BIRIMLERI)
+    from oyun.config import TURK_BIRIMLERI
     magazada = {i["img_name"] for i in config["items"] if i.get("img_name")
-                and (str(i.get("in_store")) == "1" or str(i.get("subcategory_id")) == "91")}
+                and (str(i.get("in_store")) == "1" or str(i.get("subcategory_id")) == "91"
+                     or str(i.get("id")) in TURK_BIRIMLERI)}
     secilen = []
     for yol, bayt in dosyalar:
         klasor, ad = yol.split("/", 1)[0], os.path.splitext(os.path.basename(yol))[0]

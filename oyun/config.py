@@ -125,6 +125,12 @@ def takvimdeki_setler():
     return frozenset(str(i) for ad in takvim.acik_setler() for i in setler.get(ad, []))
 
 
+# ONR-04 (sahibinin kararı, 11.11.2026: "Milli bayramlarda"): oyunun kendi Türk birimleri (config: Turkish Swordsman,
+# Axeman, Archer, Horseman; in_store 0, mağaza kategorisi 7, nakitle) yalnızca milli bayram günlerinde (config/takvim.json
+# bayrak: true; takvim.milli_bayram) mağazada açılır. Mağaza kipinden bağımsızdır; sunucu satın almada in_store'a bakmaz.
+TURK_BIRIMLERI = ("880", "881", "882", "885")
+
+
 def tema_setlerini_ac():
     """config/tema_setleri.json'daki etkinlik setlerini mağazaya açar.
 
@@ -188,8 +194,10 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     from oyun import bayram_hedefleri
     # GEC-07: metinler Türkçe yazılı; İngilizce config'e gitmez (#56 incelemesi)
     bayram = bayram_hedefleri.aktif_hedefler() if dil == "tr" else []
+    from oyun import takvim
+    milli = takvim.milli_bayram()
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
-               tuple(h["id"] for h in bayram))
+               tuple(h["id"] for h in bayram), milli)
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
@@ -207,6 +215,10 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     if takvim_setleri:
         for esya in kopya.get("items", []):
             if esya["id"] in takvim_setleri:
+                esya["in_store"] = "1"
+    if milli:
+        for esya in kopya.get("items", []):
+            if esya["id"] in TURK_BIRIMLERI:
                 esya["in_store"] = "1"
 
     if olcek != 1.0:

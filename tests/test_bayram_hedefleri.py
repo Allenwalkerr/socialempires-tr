@@ -132,3 +132,33 @@ class Odul(KomutTesti):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TurkBirimleri(unittest.TestCase):
+    """ONR-04, sahibinin kararı (11.11.2026, "Milli bayramlarda"): oyunun Türk birimleri (880 Turkish Swordsman,
+    881 Axeman, 882 Archer, 885 Horseman; config'te in_store 0) yalnızca milli bayramda (config/takvim.json bayrak:
+    true, ör. Cumhuriyet Bayramı 29 Ekim, 2 gün) mağazada açılır; mağaza kipinden bağımsız."""
+
+    def magazada(self, gun, kip=True):
+        with mock.patch.object(takvim, "bugun", lambda: gun), mock.patch.object(config, "tema_seti_kipi", lambda: kip):
+            c = config.get_client_game_config("tr")
+        return {e["id"]: e.get("in_store") for e in c["items"] if e["id"] in ("880", "881", "882", "885")}
+
+    def test_milli_bayramda_acik_baska_gun_kapali(self):
+        acik = {i: "1" for i in ("880", "881", "882", "885")}
+        self.assertEqual(self.magazada(date(2026, 10, 29)), acik)
+        # kip false: bayram hedefi yok, takvim seti yok; önbellek anahtarında güne bağlı tek şey milli bayram
+        self.assertEqual(set(self.magazada(date(2026, 11, 11), kip=False).values()), {"0"})
+        self.assertEqual(self.magazada(date(2026, 10, 29), kip=False), acik)
+        self.assertEqual(self.magazada(date(2026, 4, 23)), acik)
+        self.assertEqual(set(self.magazada(date(2026, 11, 11)).values()), {"0"})
+        self.assertEqual(set(self.magazada(RAMAZAN_2026).values()), {"0"})  # dini bayram milli bayram değil
+        self.assertEqual({e.get("in_store") for e in config.get_game_config()["items"]
+                          if e["id"] in config.TURK_BIRIMLERI}, {"0"})  # sunucunun config'i değişmez
+
+    def test_cizimleri_temel_pakette(self):
+        """Bayram günü internetsiz oyunda çizim eksik kalmasın (araclar/onindirme_listesi.py öncelik 1 = temel)."""
+        from oyun import onindirme
+        oncelik = {y: o for y, _, o in onindirme.liste()}
+        for ad in ("880_tk_sword", "881_tk_axe", "882_tk_archer", "885_tk_horseman"):
+            self.assertLessEqual(oncelik["buildingsprites/%s.swf" % ad], onindirme.PAKETLER["temel"], ad)
