@@ -5,7 +5,7 @@ import os
 import time
 
 from oyun.ekonomi import timestamp_now
-from oyun.kayit import session, neighbor_session, neighbors
+from oyun.kayit import neighbor_session, neighbors, save_session, session
 from oyun.yollar import QUESTS_DIR
 
 
@@ -47,7 +47,14 @@ def get_player_info(USERID, map_number=0):
     kayit = session(USERID)
     ts_now = timestamp_now()
     giris_gunu_say(kayit, ts_now)
+    from oyun import gunluk_odul
+    ozel = kayit["privateState"]
+    odul, goster = gunluk_odul.isle(kayit)
+    if goster:  # KAR-24: bugünün ödülü verildi; pencere yalnızca bu yanıtla açılır (showDailyBonus kayda yazılmaz)
+        ozel = dict(ozel, showDailyBonus=1)
     kayit["playerInfo"]["last_logged_in"] = ts_now
+    if odul:
+        save_session(USERID)  # ödül ve lastDayRewarded hemen kalıcı olsun
     _acik_kasabalar[str(USERID)] = map_number if 0 <= map_number < len(kayit["maps"]) else 0
     return {
         "result": "ok",
@@ -55,7 +62,7 @@ def get_player_info(USERID, map_number=0):
         "timestamp": ts_now,
         "playerInfo": kayit["playerInfo"],
         "map": _harita(kayit, map_number),
-        "privateState": kayit["privateState"],
+        "privateState": ozel,
         "neighbors": neighbors(USERID),
     }
 

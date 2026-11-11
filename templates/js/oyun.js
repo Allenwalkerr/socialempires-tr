@@ -13,20 +13,45 @@
     return e;
   }
 
-  // Sayan sayı (NumberTicker): 0'dan hedefe yavaşlayarak sayar.
-  function say(e, hedef, sure) {
-    hedef = Number(hedef) || 0;
+  // Sayan sayı (NumberTicker): `ilk`ten (yoksa 0'dan) hedefe yavaşlayarak sayar.
+  function say(e, hedef, sure, ilk) {
+    hedef = Number(hedef) || 0; ilk = Number(ilk) || 0;
     if (HAREKETSIZ) { e.textContent = SAYI.format(hedef); return; }
     var bas = performance.now(); sure = sure || 1400;
     (function adim(t) {
       var k = Math.min(1, (t - bas) / sure);
-      e.textContent = SAYI.format(Math.round(hedef * (1 - Math.pow(2, -10 * k))));
+      e.textContent = SAYI.format(Math.round(ilk + (hedef - ilk) * (1 - Math.pow(2, -10 * k))));
       if (k < 1) requestAnimationFrame(adim); else e.textContent = SAYI.format(hedef);
     })(bas);
   }
   document.querySelectorAll("[data-say]").forEach(function (e) { say(e, e.dataset.say); });
   var xpDolum = document.querySelector(".xp-dolum");
   if (xpDolum) requestAnimationFrame(function () { xpDolum.style.width = xpDolum.dataset.oran + "%"; });
+
+  // OYN-12: oyunda seviye atlayınca ya da XP kazanınca başlık da yenilensin (sunucu: /oyuncu/baslik)
+  function baslikYenile() {
+    fetch("/oyuncu/baslik", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (v) {
+        if (!v) return;
+        var seviye = document.getElementById("baslik-seviye"), simdi = document.getElementById("baslik-xp-simdi");
+        // eski değerden yeniye sayar (0'dan değil: #65 incelemesi, sayı her yenilemede sıfıra düşüyordu)
+        [[seviye, v.seviye], [simdi, v.xp.simdi]].forEach(function (c) {
+          if (c[0] && String(c[1]) !== c[0].dataset.say) {
+            var eski = c[0].dataset.say; c[0].dataset.say = c[1]; say(c[0], c[1], 0, eski);
+          }
+        });
+        var son = document.getElementById("baslik-xp-son");
+        if (son) son.textContent = SAYI.format(v.xp.son);
+        var cubuk = document.getElementById("baslik-xp");
+        if (cubuk) cubuk.title = "Sonraki seviyeye " + (v.xp.son - v.xp.simdi) + " XP";
+        if (xpDolum) xpDolum.style.width = v.xp.oran + "%";
+        var rutbe = document.getElementById("baslik-rutbe");
+        if (rutbe) { rutbe.textContent = v.rutbe || ""; rutbe.hidden = !v.rutbe; }
+      })
+      .catch(function () {});
+  }
+  setInterval(gorunurken(baslikYenile), 30000);
 
   // "3 dk önce"
   var GORELI = new Intl.RelativeTimeFormat("tr", { numeric: "auto" });
@@ -449,7 +474,7 @@
   haftaYukle();
   setInterval(gorunurken(haftaYukle), 60000);
   setInterval(gorunurken(sayac), 1000);
-  function panelleriTazele() { yokla(); kursuYukle(); haftaYukle(); sayac(); }
+  function panelleriTazele() { yokla(); kursuYukle(); haftaYukle(); sayac(); baslikYenile(); }  // OYN-12: oyun modundan çıkınca başlık da hemen
   document.addEventListener("visibilitychange", function () { if (!panellerGizli()) panelleriTazele(); });
 
   // --- Etkinlik takvimi

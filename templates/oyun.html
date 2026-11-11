@@ -25,20 +25,19 @@
     <header class="baslik">
         <a class="logo" href="/" title="Giriş ekranı"><img src="/img/logo.png" alt="Social Empires"></a>
         <div class="oturum">
-            <div class="muhur-seviye" title="Seviye"><small>sv.</small><span data-say="{{ save_info.level }}">{{ save_info.level }}</span></div>
+            <div class="muhur-seviye" title="Seviye"><small>sv.</small><span id="baslik-seviye" data-say="{{ save_info.level }}">{{ save_info.level }}</span></div>
             <div class="oturum-metin">
                 <div class="imparatorluk yazi-oyun">{{ save_info.name }}</div>
-                {% if rutbe %}<span class="rutbe-cip">{{ rutbe }}</span>{% endif %}
-                {% if xp.son <= xp.bas %}{% set xp_oran = 100 %}{% elif xp.simdi < xp.bas %}{% set xp_oran = xp.simdi / xp.son * 100 %}{% else %}{% set xp_oran = (xp.simdi - xp.bas) / (xp.son - xp.bas) * 100 %}{% endif %}
-                <div class="xp" title="Sonraki seviyeye {{ xp.son - xp.simdi }} XP">
-                    <div class="xp-dolum" data-oran="{{ [3, [xp_oran, 100] | min] | max }}"></div>
-                    <span class="xp-yazi yazi-oyun"><span data-say="{{ xp.simdi }}">{{ xp.simdi }}</span>&nbsp;/&nbsp;{{ "{:,}".format(xp.son).replace(",", ".") }} XP</span>
+                <span class="rutbe-cip" id="baslik-rutbe"{% if not rutbe %} hidden{% endif %}>{{ rutbe }}</span>
+                <div class="xp" id="baslik-xp" title="Sonraki seviyeye {{ xp.son - xp.simdi }} XP">
+                    <div class="xp-dolum" data-oran="{{ xp.oran }}"></div>
+                    <span class="xp-yazi yazi-oyun"><span id="baslik-xp-simdi" data-say="{{ xp.simdi }}">{{ xp.simdi }}</span>&nbsp;/&nbsp;<span id="baslik-xp-son">{{ "{:,}".format(xp.son).replace(",", ".") }}</span> XP</span>
                 </div>
                 <div class="baglantilar"><a href="/">çıkış</a> · <a href="/gunluk">günlük</a> · <a href="/profil">profil resmi</a> · <a href="/cheat">hile paneli</a> ·
                     <a href="/kayit/indir">yedek indir</a> ·
                     <a href="/cevrimdisi">çevrimdışı paket</a> ·
                     <a href="/tasima">wi-fi ile taşı</a> ·
-                    <label class="yedek-yukle">yedek yükle<input type="file" id="yedek-dosyasi" accept=".json,application/json" hidden></label></div>
+                    <label class="yedek-yukle">yedek yükle<input type="file" id="yedek-dosyasi" class="gizli" accept=".json,application/json"></label></div>
             </div>
             <nav class="ust-dugmeler" aria-label="Oyun bağlantıları">
                 <button class="ust-dugme tam-ekran-dugme" id="tam-ekran" type="button">Tam Ekran</button>

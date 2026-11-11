@@ -52,9 +52,48 @@ class EsikOkumasi(unittest.TestCase):
 
     def test_xp_cubugu_istemcinin_araligi(self):
         """Oyun sayfasındaki XP çubuğu istemcininkiyle aynı aralığı çizer (uiExpMin, uiExpMax)."""
-        self.assertEqual(server._xp_araligi({"level": 2, "xp": 40}), {"simdi": 40, "bas": 29, "son": 60})
-        self.assertEqual(server._xp_araligi({"level": 99, "xp": 0}), {"simdi": 0, "bas": ESIK[98], "son": ESIK[99]})
+        # oran: şablonun önceki formülü (seviye içindeki ilerleme %, en az 3, en çok 100); OYN-12'den beri sunucuda
+        self.assertEqual(server._xp_araligi({"level": 2, "xp": 40}),
+                         {"simdi": 40, "bas": 29, "son": 60, "oran": (40 - 29) / (60 - 29) * 100})
+        self.assertEqual(server._xp_araligi({"level": 99, "xp": 0}),
+                         {"simdi": 0, "bas": ESIK[98], "son": ESIK[99], "oran": 3})
         self.assertEqual(server._xp_araligi({"level": 500, "xp": 0})["bas"], ESIK[98])  # Init: length - 1
+
+
+class BaslikYenilenir(unittest.TestCase):
+    """OYN-12: oyun sayfasının başlığı (seviye, XP, rütbe) yalnızca sayfa açılırken yazılıyordu; oyunda seviye
+    atlayınca eski kalıyordu. /oyuncu/baslik kaydın şimdiki hâlini verir, oyun.js onu yoklar."""
+
+    def test_seviye_atlayinca_uc_yeni_degeri_verir(self):
+        import os
+        from ortak import KOK
+        uid = server.new_village()
+        istemci = server.app.test_client()
+        self.assertEqual(istemci.get("/oyuncu/baslik").status_code, 404)  # oturum yok
+        istemci.post("/", data={"USERID": uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        sayfa = istemci.get("/play.html").get_data(as_text=True)
+        harita = server.kayit_oturumu(uid)["maps"][0]
+        harita["level"], harita["xp"] = 2, 40  # oyunda seviye atlandı (rt_level_up)
+        v = istemci.get("/oyuncu/baslik").get_json()
+        self.assertEqual(v["seviye"], 2)
+        self.assertEqual(v["xp"], {"simdi": 40, "bas": 29, "son": 60, "oran": (40 - 29) / (60 - 29) * 100})
+        self.assertEqual(v["rutbe"], server.rutbe(2))
+        # oyun.js'in güncellediği öğeler sayfada var
+        with open(os.path.join(KOK, "templates", "js", "oyun.js"), encoding="utf-8") as f:
+            js = f.read()
+        for kimlik in ("baslik-seviye", "baslik-xp-simdi", "baslik-xp-son", "baslik-xp", "baslik-rutbe"):
+            self.assertIn('id="%s"' % kimlik, sayfa)
+            self.assertIn('getElementById("%s")' % kimlik, js)
+        self.assertIn('fetch("/oyuncu/baslik"', js)
+        # #65 incelemesi: oyun modundan çıkınca ve sekme öne gelince (panelleriTazele) başlık da hemen yenilenir;
+        # yalnızca 30 sn'lik aralıkla olsaydı tam ekranda atlanan seviye bir süre eski görünürdü
+        import re
+        tazele = re.search(r"function panelleriTazele\(\) \{([^}]*)\}", js).group(1)
+        self.assertIn("baslikYenile()", tazele)
+        # #65 incelemesi: yenilemede sayaç eski değerden yeniye sayar (0'dan saysaydı her 30 sn'de sıfıra düşerdi);
+        # Chromium'da 4 → 5.000 geçişinde örnekler hiç 4'ün altına inmedi (11.11.2026)
+        self.assertIn("say(c[0], c[1], 0, eski)", js)
+        self.assertIn("ilk + (hedef - ilk) *", js)
 
 
 class RtLevelUp(KomutTesti):

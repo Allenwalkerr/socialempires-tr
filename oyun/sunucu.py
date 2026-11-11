@@ -227,10 +227,27 @@ DINAMIK_YOL = "/dynamic.flash1.dev.socialpoint.es/appsfb/socialempiresdev/srvemp
 
 
 def _xp_araligi(bilgi):
-    """Başlıktaki XP çubuğu için (şimdiki, seviye başı, sonraki seviye)."""
+    """Başlıktaki XP çubuğu için (şimdiki, seviye başı, sonraki seviye) ve çubuğun doluluğu (%, 3 … 100)."""
     from oyun.config import seviye_araligi
     bas, son = seviye_araligi(int(bilgi.get("level", 0)))
-    return {"simdi": int(bilgi.get("xp", 0)), "bas": bas, "son": son}
+    simdi = int(bilgi.get("xp", 0))
+    if son <= bas:
+        oran = 100
+    elif simdi < bas:
+        oran = simdi / son * 100
+    else:
+        oran = (simdi - bas) / (son - bas) * 100
+    return {"simdi": simdi, "bas": bas, "son": son, "oran": max(3, min(oran, 100))}
+
+
+@app.route("/oyuncu/baslik")
+def baslik_ucu():
+    """OYN-12: oyun sayfasının başlığı (seviye, XP, rütbe) oyun sürerken yenilensin; oyun.js yoklar."""
+    uid = session.get("USERID")
+    if not uid or uid not in all_saves_userid():
+        return ({"hata": "oturum yok"}, 404)
+    bilgi = save_info(uid)
+    return {"seviye": int(bilgi.get("level", 0)), "rutbe": rutbe(bilgi.get("level", 0)), "xp": _xp_araligi(bilgi)}
 
 
 def _oyun_sayfasi(sablon, ruffle_js=None):
