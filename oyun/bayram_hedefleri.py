@@ -21,6 +21,7 @@ import json
 from datetime import timedelta
 
 from oyun import takvim
+from oyun import config
 from oyun.config import tema_setleri
 
 TABAN = 900000
@@ -64,7 +65,11 @@ def _hedef(etkinlik, sira):
 
 
 def aktif_hedefler(gun=None):
-    """Bugün süren etkinliklerin hedefleri (kimlik sırasıyla)."""
+    """Bugün süren etkinliklerin hedefleri (kimlik sırasıyla). Mağazada tema setleri kapalıysa
+    (ayarlar.json magaza_tema_setleri: false) hedef tamamlanamazdı; o kipte hedef yok (#56 incelemesi). True kipinde
+    setler hep açık, "takvim" kipinde etkinlik sürerken açık (config.takvimdeki_setler)."""
+    if config.tema_seti_kipi() is False:
+        return []
     sira = _etkinlik_sirasi()
     cikti = []
     for e in takvim.etkinlikler(gun, ileri=0):

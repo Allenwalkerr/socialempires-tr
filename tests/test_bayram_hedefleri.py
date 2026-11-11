@@ -29,6 +29,15 @@ class Takvim(unittest.TestCase):
         self.assertIn(kimlik, gunler[22])
         self.assertNotIn(kimlik, gunler[23])
 
+    def test_magazada_setler_kapaliysa_hedef_yok(self):
+        """#56 incelemesi: magaza_tema_setleri false ise set eşyaları mağazada yok, hedef tamamlanamazdı.
+        True (hepsi açık) ve "takvim" (etkinlikte açık) kiplerinde hedef gelir."""
+        sonuc = {}
+        for kip in (False, True, "takvim"):
+            with mock.patch.object(config, "tema_seti_kipi", lambda kip=kip: kip):
+                sonuc[kip] = len(bayram_hedefleri.aktif_hedefler(RAMAZAN_2026))
+        self.assertEqual(sonuc, {False: 0, True: 1, "takvim": 1})
+
     def test_hedef_istemcinin_okuyacagi_bicimde(self):
         with open(os.path.join(KOK, "config", "tema_setleri.json"), encoding="utf-8") as f:
             setler = json.load(f)["setler"]
