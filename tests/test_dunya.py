@@ -426,6 +426,31 @@ class SavasTestleri(DunyaTesti):
             self.assertEqual(d._son_sonuc["kazandi"], durum != "puskurttu", durum)
             self.assertEqual([(s["ittifak"], s["hedef"]) for s in d.seferler], sefer, durum)
 
+    def test_oyuncuya_akin_yeni_gunlukte_intikam_icin(self):
+        """1.4.07'nin saldırı günlüğü privateState.PVPattacksReceived'tır (PlayerStatus/Init); AttackLogItem kayıttan
+        name, level, id, attackTime, attackWinner (== id ise saldıran kazandı → intikam düğmesi), attackResourcesLost
+        {g, w, f, s}, reply (0 ise düğme görünür) okur. Anahtar attackTime'dır (PopupAttackLog sayısal sıralar)."""
+        d = self.kur(a=koy("a", birim=10, ittifak=0), p=koy("p", bot=False, coins=10000, wood=0, stone=0, food=0))
+        d._savas("a", self.kayitlar["a"], "p", self.kayitlar["p"], SIMDI, oyuncuya=True)
+        self.assertTrue(d._son_sonuc["kazandi"])
+        kayit = self.kayitlar["p"]["privateState"]["PVPattacksReceived"][str(SIMDI)]
+        kayip = 10000 - self.kayitlar["p"]["maps"][0]["coins"]
+        self.assertEqual(kayit, {"name": "Köy a", "level": 10, "id": "a", "attackTime": SIMDI, "attackWinner": "a",
+                                 "attackResourcesLost": {"g": kayip, "w": 0, "f": 0, "s": 0}, "reply": 0})
+        self.assertGreater(kayip, 0)
+        # bota akında oyuncu günlüğü yok
+        d = self.kur(a=koy("a", birim=10, ittifak=0), v=koy("v", ittifak=1))
+        d._savas("a", self.kayitlar["a"], "v", self.kayitlar["v"], SIMDI)
+        self.assertNotIn("PVPattacksReceived", self.kayitlar["v"]["privateState"])
+
+    def test_yeni_gunluk_sinirli(self):
+        k = koy("p", bot=False)
+        for i in range(dunya.YENI_GUNLUK_SINIRI + 5):
+            dunya.yeni_gunluge_ekle(k, koy("a"), SIMDI + i, False, {})
+        gunluk = k["privateState"]["PVPattacksReceived"]
+        self.assertEqual((len(gunluk), min(map(int, gunluk))), (dunya.YENI_GUNLUK_SINIRI, SIMDI + 5))
+        self.assertEqual(gunluk[str(SIMDI + 5)]["attackWinner"], "p")  # saldıran kaybetti → savunanın id'si
+
     def test_oyuncu_saldirinca_intikam_olasiligi(self):
         """VARSAYILAN_AYAR oyuncuya_intikam: 'oyuncu bir bota saldırınca' kurbanın ittifakı sefer ilan eder;
         olasılık 0 ise etmez. Sefer kurbanın ittifakından, hedefi oyuncu."""
