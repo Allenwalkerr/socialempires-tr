@@ -131,6 +131,7 @@ class ArgumanSirasi(ortak.KomutTesti):
         kayit["maps"].append(ikinci)
         for h in kayit["maps"]:
             h["items"].append([150, 5, 9, 0, 0, 0])  # kahraman sunağı: buy_cash kahramanı ancak sunak varsa koyar
+            h["warehousedUnits"] = list(IDLER)  # place_warehoused_item depoda olanı koyar (DNT-20)
         kayit["playerInfo"]["map_names"].append("İkinci")
         kayit["playerInfo"]["map_sizes"].append(0)
         kayit["privateState"]["gifts"] = [0] * IDLER[1] + [1]  # depodan yerleştirme ve satma için

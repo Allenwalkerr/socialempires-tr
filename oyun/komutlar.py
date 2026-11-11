@@ -334,8 +334,12 @@ def store_item(save, a):
     esya_id = a.tam(3)
     h = harita(save, a.tam(2))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
-    if esya:
-        h["items"].remove(esya)
+    if not esya:
+        # DNT-20 (denetim SNK-03): istemci Base/storeItem bunu (ve _frombug'ı) haritadaki öğenin tx, ty'siyle yollar;
+        # haritada olmayanı depoya eklemek için store_add_items vardır. Bulunmayan eşya çoğaltılmaz.
+        print(f" ! store_item: ({a.tam(0)}, {a.tam(1)}) konumunda {esya_id} yok, depoya eklenmedi")
+        return
+    h["items"].remove(esya)
     depo_ekle(save, esya_id)
 
 
@@ -1038,8 +1042,9 @@ def add_unit_warehouse(save, a):
     h = harita(save, a.tam(2))
     birim_id = a.tam(3)
     birim = esya_bul(h, a.tam(0), a.tam(1), birim_id)
-    if birim:
-        h["items"].remove(birim)
+    if not birim:  # DNT-20: haritada olmayan birim depoya girmez (tekrarlanan komut çoğaltmasın)
+        return
+    h["items"].remove(birim)
     h.setdefault("warehousedUnits", []).append(birim_id)
 
 
@@ -1049,8 +1054,9 @@ def place_warehoused_item(save, a):
     h = harita(save, a.tam(4))
     birim_id = a.tam(0)
     depodaki = h.setdefault("warehousedUnits", [])
-    if birim_id in depodaki:
-        depodaki.remove(birim_id)
+    if birim_id not in depodaki:  # DNT-20: depoda olmayan birim haritaya konmaz (place_gift'in sayaç denetimi gibi)
+        return
+    depodaki.remove(birim_id)
     esya_ekle(h, birim_id, a.tam(1), a.tam(2), a.tam(3))
 
 
