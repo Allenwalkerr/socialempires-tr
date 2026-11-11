@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
     private static final long HAZIR_SURESI_MS = 240_000;
     private static final int DOSYA_SEC = 1;
     private static final int DOSYA_KAYDET = 2;
+    private static final int BILDIRIM_IZNI = 3;
     // Sayfa bu işaretle uygulamada olduğunu anlar ve oyun modunu (tam ekran) varsayılan açar (oyun.js)
     private static final String AJAN_ISARETI = " SocialEmpiresTR-Android";
     private static final long CIKIS_ARALIGI_MS = 2000;
@@ -105,8 +106,14 @@ public class MainActivity extends Activity {
         // Etkinlik dışa açık olduğundan başka bir uygulama da bu ek değeri gönderebilir (DGV-06): yalnızca hata
         // ayıklama yapısında (FLAG_DEBUGGABLE) dikkate alınır; yayımlanan sürümde hiçbir etkisi yoktur.
         boolean hataAyiklamaYapisi = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        if (hataAyiklamaYapisi && getIntent().getBooleanExtra("sinama", false)) {
+        boolean sinama = hataAyiklamaYapisi && getIntent().getBooleanExtra("sinama", false);
+        if (sinama) {
             WebView.setWebContentsDebuggingEnabled(true);
+        }
+        // ONR-03: yerel bildirimler. Android 13+ izni bir kez sorar; CI sınamasında sorulmaz (pencere oyunu örtmesin).
+        Bildirimler.hazirla(this);
+        if (Build.VERSION.SDK_INT >= 33 && !sinama && !Bildirimler.izinVar(this)) {
+            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, BILDIRIM_IZNI);
         }
 
         web = new WebView(this);
@@ -445,6 +452,8 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         onde = true;
+        Bildirimler.onde = true;
+        Bildirimler.iptal(this); // oyuncu döndü: kurulu bildirimler kalkar
         web.resumeTimers();
     }
 
@@ -453,9 +462,27 @@ public class MainActivity extends Activity {
         super.onStop();
         Log.i(TAG, "onStop");
         onde = false;
+        Bildirimler.onde = false;
         // Arka plandayken oyun döngüsü ve müzik dursun (pil); sunucu ve bot dünyası çalışmayı sürdürür.
         // onPause'da değil: Android 7-9'da bölünmüş ekranda oyun görünürken de onPause gelir.
         web.pauseTimers();
+        bildirimleriKur();
+    }
+
+    /** ONR-03: uygulama kapalıyken gelecek bildirimler (oyun/bildirim.py). Sunucu açılmadıysa kurulmaz. */
+    private void bildirimleriKur() {
+        if (!Python.isStarted() || !Bildirimler.izinVar(this)) {
+            return;
+        }
+        final android.content.Context baglam = getApplicationContext();
+        new Thread(() -> {
+            try {
+                String liste = Python.getInstance().getModule("android_giris").callAttr("bildirimler").toString();
+                Bildirimler.kur(baglam, liste);
+            } catch (Throwable hata) {
+                Log.w(TAG, "Bildirimler kurulamadi", hata);
+            }
+        }, "bildirim").start();
     }
 
     @Override

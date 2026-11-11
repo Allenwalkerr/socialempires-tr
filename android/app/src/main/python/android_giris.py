@@ -50,5 +50,27 @@ def baslat(taban=None, jeton=None):
     if not ruffle.hazir_mi() and os.path.exists(RUFFLE_PAKETI):
         with open(RUFFLE_PAKETI, "rb") as f:
             ruffle.hazirla(f.read())  # SHA-512 denetlenir; olmazsa ilk oyunda internetten indirilir
+    _saldiri_bildirimini_bagla()
     from oyun.sunucu import calistir
     calistir()
+
+
+def _saldiri_bildirimini_bagla():
+    """ONR-03: arka plandayken bot akını olunca Android bildirimi (Bildirimler.saldiri; uygulama öndeyse gösterilmez)."""
+    try:
+        from java import jclass
+    except ImportError:  # masaüstünde ve testlerde Java yok
+        return
+    from oyun import bildirim
+    kopru = jclass("io.github.lahmacunveayran.socialempirestr.Bildirimler")
+    bildirim.dinleyici = lambda metin: kopru.saldiri(metin)
+
+
+def bildirimler():
+    """MainActivity.onStop: uygulama kapalıyken gelecek bildirimler, JSON [{kimlik, zaman, metin}] (ONR-03)."""
+    try:
+        from oyun import bildirim
+        return bildirim.android_listesi()
+    except Exception as hata:  # bildirim kurulamasa da uygulama kapanabilsin
+        print(f" ! Bildirimler hesaplanamadi: {hata}")
+        return "[]"

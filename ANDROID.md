@@ -67,6 +67,23 @@ Oyun sayfasının üstündeki **çevrimdışı paket** bağlantısı:
 - Android'in yazı boyutu ayarı oyun sayfasını büyütmez; düzen her cihazda aynı kalır.
 - Discord gibi dış bağlantılar tarayıcıda açılır.
 
+## Bildirimler
+
+Uygulama kapalıyken ya da arka plandayken telefon şunları bildirir:
+
+- **Üretim hazır:** değirmen, maden, çiftlik, harika gibi binaların ürünü toplanmaya hazır.
+- **Eğitim bitti:** eğitim kuyruğundaki birimlerin hepsi hazır.
+- **Kalkan bitiyor:** kalkanın bitmesine bir saat kala.
+- **Saldırıya uğradın:** uygulama arka plandayken bir bot akın ederse.
+
+İnternet gerekmez. Birbirine 10 dakikadan yakın olaylar tek bildirimde toplanır. Oyunu açınca bekleyen
+bildirimler kalkar. Android 13 ve sonrasında uygulama ilk açılışta bildirim izni ister. İzni sonradan
+**Ayarlar → Uygulamalar → Social Empires → Bildirimler**'den açıp kapatabilirsiniz.
+
+Uygulama tamamen kapatılınca (son uygulamalardan kaydırılınca) bot dünyası durur. O sırada akın olmaz, bu
+yüzden saldırı bildirimi de gelmez. Öteki üçü yine zamanında gelir. Telefon uykudayken Android pil tasarrufu için
+bildirimi biraz (çoğunlukla birkaç dakika, en çok yaklaşık 15 dakika) geciktirebilir.
+
 ## Teknik notlar
 
 - Oyun sunucusu yalnızca cihazın kendisine açıktır (`127.0.0.1:5050`); evdeki başka cihazlar oyuna bağlanamaz.

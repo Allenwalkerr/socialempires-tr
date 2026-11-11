@@ -3,6 +3,8 @@
 
     <!-- Oyun varlıkları ilk açılışta indirilir; sunucu yalnızca 127.0.0.1'de dinler -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ONR-03: üretim hazır, eğitim bitti, kalkan bitiyor, saldırı (yerel bildirim; Android 13+ izin ister) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:label="@string/uygulama_adi"
@@ -25,5 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Zamanı gelen bildirimi gösterir (Bildirimler.kur); başka uygulamalara kapalı -->
+        <receiver
+            android:name=".Bildirimler$Alici"
+            android:exported="false" />
     </application>
 </manifest>

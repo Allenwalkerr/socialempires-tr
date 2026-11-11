@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "BLG-01",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 birleşti. #60 (ONR-02) birleşti. .md taraması kitaba işlendi (BLG-01, DNT-25 … DNT-40 ve ötekiler), PR'da, birleştirme sahibine sorulur (KAR-19). Sırada ONR-03 ('inşaat bitti' sahibine sorulur), OYN-11/KYT-02, OYN-12, 13, 15, denetimin açık bulguları, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "ONR-03",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59, #60, #61 birleşti. ONR-03 (Android bildirimleri, KAR-23) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, 15, denetimin açık bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1052,13 +1052,13 @@
       "baslik": "Bildirimler: Android'de inşaat/eğitim bitti, saldırı, kalkan bitiyor",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
       "kanit": "Sahibi 30.10.2026 'hepsini istiyorum' dedi (KAR-08). Önerinin önceki oturumdaki metni depoda yok; taslak tanım docs/YOL_HARITASI_1407.md §5.",
-      "test": null,
+      "test": "tests/test_bildirim.py (10 test)",
       "pr": null,
       "onay": null,
-      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları."
+      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları. 11.11.2026 (KAR-21, KAR-23): oyun/bildirim.py zamanları 'sen yokken' ile aynı hesaptan çıkarır (yokken.uretimler, yokken.kuyruklar; kalkan pvp_yeni.kalkan_bitisi, bitmeden 1 saat önce). MainActivity.onStop android_giris.bildirimler()'i çağırır, Bildirimler.kur AlarmManager.setAndAllowWhileIdle ile kurar (kesin zaman izni istemez), onStart iptal eder. Saldırı: dunya._savas oyuncuya akında bildirim.saldiri → android_giris'in kurduğu dinleyici → Bildirimler.saldiri (uygulama öndeyse gösterilmez). 10 dk içindeki olaylar ilkinin zamanında birleşir, en çok 20 bildirim, 1 dakikadan yakını kurulmaz. Simge @mipmap/ic_launcher (oyunun simge-192.png'si). Android 13+ POST_NOTIFICATIONS ilk açılışta sorulur; CI sınamasında sorulmaz. 15 bozmanın 15'i düştü (ilk turda gruplamanın çapası sağ kaldı, test verisi güçlendirildi). ◐: Java bu ortamda derlenemiyor (Android SDK yok), CI apk ve emülatör işi derler; bildirimin ekranda görünüşü gerçek cihazda denenmedi (sahibinin tablet denemesi, GEC-09)."
     },
     {
       "id": "ONR-04",
@@ -2079,11 +2079,11 @@
       "baslik": "Denetim EKF-07: docs/inceleme/1407-config-hatti.md depodaki yama durumuyla uyuşmuyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) EKF-07, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
-      "pr": null,
+      "pr": "#61",
       "onay": null,
       "notlar": "Belge GEC-02'den önceki 13 yamayı ölçüyor; config/patch'te 6 yama var. Geçmiş ölçüm olarak kalır, üstüne not düşülür (bu taramanın belge PR'ı)."
     },
@@ -2352,13 +2352,26 @@
       "baslik": "Belgeler bayat: README, GELISTIRME, DENETIM, ANDROID, görev kitabı çekirdeği",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): README 'gerçek portreler', 'güneşe göre gökyüzü', '120'den fazla komut', eski paket boyutları, yayınlanmamış sürüm; GELISTIRME 'yere tıklanmıyor', 'turnuva kapalı', 'fotoğraf boş'; DENETIM sayıları eski; ANDROID 'başka cihaz bağlanamaz' (Wi-Fi taşıma ile çelişik); 00-CEKIRDEK 0926, 507 test; KAPILAR G∖H 31; 10-BOLUM-I/20-BOLUM-II tabloları eski; YOL_HARITASI_DURUM 'Arthur hedefleri yapılamaz', 'SVG silueti', 'sıradaki GEC-07'. RESIM_KAYNAKLARI kurala aykırı kaynakları anlatıyor.",
       "test": null,
-      "pr": null,
+      "pr": "#61",
       "onay": null,
       "notlar": "Belge PR'ında düzeltilir; kullanılmayan dört resim silinir."
+    },
+    {
+      "id": "KAR-23",
+      "baslik": "Android bildirimlerinde 'inşaat bitti' yerine 'üretim hazır'",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Onaylanan ONR-03 tanımında 'inşaat bitti' vardı; oyunda kendi kendine biten inşaat yok (KAR-22'nin bayt kodu kanıtı). Sahibine iki seçenek soruldu (üretim hazır / inşaatı çıkar): 'Üretim hazır olsun'.",
+      "test": "tests/test_bildirim.py",
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "ONR-02 ile aynı karar (KAR-22)."
     }
   ]
 }
