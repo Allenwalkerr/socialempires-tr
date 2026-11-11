@@ -1190,8 +1190,13 @@ def reward_mission(save, a):
     if gorev_id in ps.get("rewardedMissions", []):
         return
     config = get_game_config()
-    gorev = next((g for g in config.get("goals", config["missions"]) if int(g["id"]) == gorev_id), {})
-    kaynak_ekle(save, harita(save, a.tam(0)), "g", int(gorev.get("reward", 0) or 0))
+    from oyun import bayram_hedefleri
+    if bayram_hedefleri.bayram_kimligi_mi(gorev_id):  # GEC-07: bayram hedefi config'te değil, takvimden türer
+        miktar = bayram_hedefleri.odul(gorev_id)
+    else:
+        gorev = next((g for g in config.get("goals", config["missions"]) if int(g["id"]) == gorev_id), {})
+        miktar = int(gorev.get("reward", 0) or 0)
+    kaynak_ekle(save, harita(save, a.tam(0)), "g", miktar)
     listeye_ekle(ps, "rewardedMissions", gorev_id)
 
 

@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-07",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #53, #54 birleşti; GEC-06 kapandı (◐: yeni pencereler tek tek açılmadı). Sıradaki: GEC-07 (bayram hedefleri, ICR-01), sonra GEC-08 (Android paketi, hız), öneriler ONR-01 … ONR-04, GEC-09 (kabul). Küçük hatalar: OYN-11, OYN-12, OYN-13, OYN-15. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. GEC-07 (bayram hedefleri) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-08 (Android paketi +347 dosya, açılış süresi), öneriler ONR-01 … ONR-04, GEC-09 (kabul). Küçük hatalar: OYN-11, OYN-12, OYN-13, OYN-15. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -298,13 +298,13 @@
       "baslik": "Arthur'un etkinliğe özel hedefleri",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "engelli",
+      "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Yapılandırmadaki 228 görev yalnızca metin; koşullar istemci SWF'sinde görev numarasına gömülü. mission_goals 'built_id' türleri bu istemcide yok (SWF'de dize aranıp bulunamadı).",
       "test": null,
       "pr": "#10",
       "onay": null,
-      "notlar": "Yapmak için istemcinin AS3 bayt kodunu değiştirmek gerekir. 30.10.2026: 0926'da görev tablosu Constants sınıfında (228 kayıt, ~70 MISSION_ türü), kod gizlenmiş. 1.4.07'de hedefler config'ten (goals) okunuyor; upstream nerroth-rewrite 206 hedefle bunu kullanıyor (KYN-01). 0926'da kalınırsa yol: sunucu tarafında takip ve var olan görevlerin metin/ödülünü değiştirmek. 30.10.2026: sahibi 1.4.07'ye tam geçişi seçti (KAR-08); bu madde GEC-07'de (bayram hedefleri) çözülecek."
+      "notlar": "Yapmak için istemcinin AS3 bayt kodunu değiştirmek gerekir. 30.10.2026: 0926'da görev tablosu Constants sınıfında (228 kayıt, ~70 MISSION_ türü), kod gizlenmiş. 1.4.07'de hedefler config'ten (goals) okunuyor; upstream nerroth-rewrite 206 hedefle bunu kullanıyor (KYN-01). 0926'da kalınırsa yol: sunucu tarafında takip ve var olan görevlerin metin/ödülünü değiştirmek. 30.10.2026: sahibi 1.4.07'ye tam geçişi seçti (KAR-08); bu madde GEC-07'de (bayram hedefleri) çözülecek. 11.11.2026: GEC-07 ile çözüldü (etkinliğe özel hedefler 1.4.07'nin goals listesiyle; istemci değiştirilmedi)."
     },
     {
       "id": "KAR-01",
@@ -896,13 +896,13 @@
       "baslik": "Bayram hedefleri: sunucu goals listesini tarihe göre değiştirir (ICR-01)",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da.",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Hedef sistemi bayt kodundan (docs/inceleme/1407-hedefler.md; yardımcı ajan, kodlanan iddialar yeniden okundu): hedefler açılışta config goals'tan okunur; orders 0 atlanır; order farkıyla sıralanır, en çok 15 etkin; completedMissions/rewardedMissions kimlikle; ödül reward altını. Sunucu: reward_mission yalnızca config goals'a bakıyordu.",
+      "test": "tests/test_bayram_hedefleri.py (11 test)",
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026)."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 yapıldı: oyun/bayram_hedefleri.py. config/takvim.json'daki her etkinlik sürerken istemci config'ine bir hedef eklenir: etkinliğin tema setinden bir yapı kur (built_id, setlerin hepsi bina), orders -1 (başa gelir), ödül 500 altın (goals.json'daki en yüksek), resim hedef 32'nin goal_032.jpg ve nino_07.png'si (oyunun kendi resmi). Kimlik 900000 + (yıl−2000)×100 + etkinlik sırası: her yıl yeni, ödül bir kez (rewardedMissions). reward_mission bayram kimliğini takvimden doğrular: etkinlik başlamış ve en çok 30 gün önce bitmiş olmalı (elle yazılmış paketle gelecek yılın ödülü alınamaz, KAR-17). Config önbellek anahtarına etkin hedefler girdi. 8 bozmanın 8'i düştü (biri ancak mağaza kipi sabitlenince: takvim kipinde tema setleri de anahtarı değiştiriyordu). İşaret ◐: built_id'nin oturum içinde sayıldığı (önceden kurulu yapı sayılmaz) ajanın çıkarımı; oyunda denenmedi. #56 incelemesi: magaza_tema_setleri false kipinde set mağazada yok, hedef tamamlanamazdı; o kipte hedef gönderilmez. test_magazada_setler_kapaliysa_hedef_yok; bozma düştü. #56 incelemesi (2): kimlik artık 10 000 000 + no × 100 000 + başlangıç gününün 1.1.2000'den uzaklığı: takvim.json'a kalıcı 'no' eklendi (sıra değişse de kaymaz) ve bir yıla düşen iki bayram (2033'te iki Ramazan) ayrı kimlik alır. Hedefler yalnızca Türkçe config'e gider. Ödül de hedef gönderimiyle aynı koşula (_set_esyalari: mağaza kipi, set eşyası) bakar; kimlikteki başlangıç günü gerçek bir başlangıç olmalı. 6 bozmanın 6'sı düştü."
     },
     {
       "id": "GEC-08",
