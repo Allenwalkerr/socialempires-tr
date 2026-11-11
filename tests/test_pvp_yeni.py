@@ -151,5 +151,19 @@ class PvpUclari(unittest.TestCase):
         self.assertEqual(self.istemci.post(f"{DINAMIK}/pvp/web/app.php/pvp/bilinmeyen").status_code, 404)
 
 
+class HilePaneliKalkani(unittest.TestCase):
+    def test_kalkan_oyunda_da_gorunur(self):
+        """#49 incelemesi (KYT-03): istemci kalkanı yalnızca shieldEndTime'dan okur (ShieldManager/
+        setPlayerShieldState); hile panelinin kalkanı da oraya yazılır."""
+        from oyun.kayit import session
+        uid = server.new_village()
+        istemci = server.app.test_client()
+        istemci.post("/", data={"USERID": uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        self.assertEqual(istemci.post("/cheat/uygula", json={"islem": "kalkan", "saat": 5}).status_code, 200)
+        ps = session(uid)["privateState"]
+        self.assertEqual(ps["shieldEndTime"], ps["shield_until"])
+        self.assertTrue(pvp_yeni.kalkan_aktif(session(uid)))
+
+
 if __name__ == "__main__":
     unittest.main()
