@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "GEC-06",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #53 birleşti (hedefler). CEV-04 (SWF metinleri ve AS3 dizeleri) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-06'nın kalanı: oyunda ekran görüntüsüyle denetim (yeni pencereler, Türkçe harfler), kabul kapısı. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "GEC-07",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #53, #54 birleşti; GEC-06 kapandı (◐: yeni pencereler tek tek açılmadı). Sıradaki: GEC-07 (bayram hedefleri, ICR-01), sonra GEC-08 (Android paketi, hız), öneriler ONR-01 … ONR-04, GEC-09 (kabul). Küçük hatalar: OYN-11, OYN-12, OYN-13, OYN-15. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -883,13 +883,13 @@
       "baslik": "Türkçe: yeni SWF metinleri, 428 config adı, 206 hedef",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "acik",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. Başlangıç ölçümü GEC-01'de (✔ 31.10.2026, araclar/ceviri_kapsami.py): 1.4.07'de kalan 234 SWF metin alanı, 14 sabit yazı, 219 AS3 dizesi, 498 config loc metni, 410 hedef metni (206 hedef; anahtar biçimi goal:<id>:baslik|aciklama|talimat). Liste: docs/inceleme/ceviri-kapsami.md.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_ceviri_kapsami.py (HedefCevirisi, As3Guvenligi, Dolgu)",
+      "pr": "#54",
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer. 11.11.2026: hedefler (TRA-01) CEV-03 ile 410/410. Kalan: SWF metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219 (çoğu geliştirici dolgusu; tek tek kanıtla DOLGU'ya ya da çeviriye), ekran görüntüsü denetimi. 11.11.2026: CEV-04 ile SWF metin alanları 554/554, sabit yazılar 44/46, AS3 213/219 (kalanlar kanıtıyla çevrilemez). Kalan: ekran görüntüsü denetimi, yazı tiplerinde Türkçe harf denetimi."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer. 11.11.2026: hedefler (TRA-01) CEV-03 ile 410/410. Kalan: SWF metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219 (çoğu geliştirici dolgusu; tek tek kanıtla DOLGU'ya ya da çeviriye), ekran görüntüsü denetimi. 11.11.2026: CEV-04 ile SWF metin alanları 554/554, sabit yazılar 44/46, AS3 213/219 (kalanlar kanıtıyla çevrilemez). Kalan: ekran görüntüsü denetimi, yazı tiplerinde Türkçe harf denetimi. 11.11.2026 kapanış: kabul kapısı (Dört T = 1) iki kanıtlı istisnayla: sabit yazılarda cash ve 'Use times' (DefineText, yazı tipine gömülü), AS3'te 6 güvensiz dize. Ekran denetimi Ruffle'da yeni imparatorlukla yapıldı (eğitim, Konak, komşu şeridi Türkçe, Türkçe harfler doğru, konsol hatası 0); yeni pencereler tek tek açılmadı (◐), sahibinin denemesinde (GEC-09) bakılır."
     },
     {
       "id": "GEC-07",
