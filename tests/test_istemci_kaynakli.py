@@ -299,7 +299,7 @@ class CiftlikHasadi(KomutTesti):
     def test_ciftlik_olmayan_bina_odun_dusmez(self):
         self.harita.update(wood=100, items=[[19, 30, 30, 0, 0, 0, [], {}]])
         self.komut("collect_new", 30, 30, 0, 19, 0, 1, 0)
-        self.assertGreaterEqual(self.harita["wood"], 100)
+        self.assertEqual(self.harita["wood"], 120)  # config 19 Tree: collect "20", collect_type "w"; odun düşülmez
 
 
 if __name__ == "__main__":
