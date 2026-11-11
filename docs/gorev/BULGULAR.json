@@ -948,26 +948,26 @@
       "baslik": "Seviye atlayınca sayfanın üstündeki seviye/XP bilgisi yenilenmiyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Önceki oturumun devrinde bildirildi; bu oturumda yeniden üretilmedi.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_seviye.py: BaslikYenilenir, test_xp_cubugu_istemcinin_araligi",
+      "pr": "#65",
       "onay": null,
-      "notlar": "Önce yeniden üretilecek (S-19: görmeden çürütme yok)."
+      "notlar": "Önce yeniden üretilecek (S-19: görmeden çürütme yok). 11.11.2026: kodda doğrulandı ✔: başlıktaki seviye/XP/rütbe yalnızca sayfa açılırken yazılıyordu, yenileyen kod yoktu. Yeni /oyuncu/baslik (kaydın şimdiki hâli), oyun.js 30 sn'de bir yoklar (sayfa görünürken); XP doluluğu sunucuda tek yerde (_xp_araligi oran, şablonun eski formülü). Chromium'da taklit yanıtla başlık 30 sn içinde yenilendi. 4 bozma düştü."
     },
     {
       "id": "OYN-13",
       "baslik": "'Yedek yükle' düğmesine klavyeyle ulaşılamıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Önceki oturumun devrinde bildirildi; bu oturumda yeniden üretilmedi.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_diyar.py: test_yedek_dosya_secicisi_klavyeyle_ulasilir",
+      "pr": "#65",
       "onay": null,
-      "notlar": "Önce yeniden üretilecek."
+      "notlar": "Önce yeniden üretilecek. 11.11.2026: yeniden üretildi ✔ (Playwright: eski sayfada Tab dosya seçiciye hiç ulaşmadı, hidden öznitelik). Oyun ve giriş sayfasında seçici .gizli sınıfla gizlenir; Tab 9. basışta ulaşır, odak çerçevesi görünür, Boşluk dosya penceresini açar. Enter için eklenen kod Chromium'da pencere açmadığı (doğrulanamadı) için geri alındı. Bozma düştü."
     },
     {
       "id": "OYN-14",

@@ -54,6 +54,21 @@ class GirisSayfasiTestleri(unittest.TestCase):
         self.assertIn('href="/new.html"', sayfa)
         self.assertIn('id="yedek-dosyasi"', sayfa)
 
+    def test_yedek_dosya_secicisi_klavyeyle_ulasilir(self):
+        """OYN-13: `hidden` öznitelikli öğe odak sırasına girmez (HTML: hidden öğe görüntülenmez, odaklanamaz); dosya
+        seçici görünmez sınıfla (.gizli) gizlenir. Playwright'ta Tab eski sayfada hiç ulaşmadı, yenisinde 9. basışta
+        ulaştı ve Boşluk dosya penceresini açtı (11.11.2026)."""
+        import re
+        istemci = server.app.test_client()
+        uid = server.new_village()
+        giris = istemci.get("/").get_data(as_text=True)
+        istemci.post("/", data={"USERID": uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        oyun = istemci.get("/play.html").get_data(as_text=True)
+        for ad, sayfa in (("giriş", giris), ("oyun", oyun)):
+            secici = re.search(r'<input type="file" id="yedek-dosyasi"[^>]*>', sayfa).group(0)
+            self.assertNotRegex(secici, r"\shidden[\s>]", ad)
+            self.assertIn('class="gizli"', secici, ad)
+
     def test_karttan_giris(self):
         uid = server.new_village()
         istemci = server.app.test_client()

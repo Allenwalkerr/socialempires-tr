@@ -28,6 +28,27 @@
   var xpDolum = document.querySelector(".xp-dolum");
   if (xpDolum) requestAnimationFrame(function () { xpDolum.style.width = xpDolum.dataset.oran + "%"; });
 
+  // OYN-12: oyunda seviye atlayınca ya da XP kazanınca başlık da yenilensin (sunucu: /oyuncu/baslik)
+  function baslikYenile() {
+    fetch("/oyuncu/baslik", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (v) {
+        if (!v) return;
+        var seviye = document.getElementById("baslik-seviye"), simdi = document.getElementById("baslik-xp-simdi");
+        if (seviye && String(v.seviye) !== seviye.dataset.say) { seviye.dataset.say = v.seviye; say(seviye, v.seviye); }
+        if (simdi && String(v.xp.simdi) !== simdi.dataset.say) { simdi.dataset.say = v.xp.simdi; say(simdi, v.xp.simdi); }
+        var son = document.getElementById("baslik-xp-son");
+        if (son) son.textContent = SAYI.format(v.xp.son);
+        var cubuk = document.getElementById("baslik-xp");
+        if (cubuk) cubuk.title = "Sonraki seviyeye " + (v.xp.son - v.xp.simdi) + " XP";
+        if (xpDolum) xpDolum.style.width = v.xp.oran + "%";
+        var rutbe = document.getElementById("baslik-rutbe");
+        if (rutbe) { rutbe.textContent = v.rutbe || ""; rutbe.hidden = !v.rutbe; }
+      })
+      .catch(function () {});
+  }
+  setInterval(gorunurken(baslikYenile), 30000);
+
   // "3 dk önce"
   var GORELI = new Intl.RelativeTimeFormat("tr", { numeric: "auto" });
   function once(zaman) {

@@ -163,6 +163,9 @@ img { -webkit-user-drag: none; }
 .baglantilar { font: 700 12px var(--metin-yazi); color: var(--murekkep-soluk); margin-top: 6px; }
 .baglantilar a, .yedek-yukle { color: var(--murekkep-soluk); text-decoration: none; border-bottom: 1px dotted currentColor; cursor: pointer; }
 .baglantilar a:hover, .yedek-yukle:hover { color: var(--muhur); }
+/* OYN-13: dosya seçici görünmez ama klavyeyle odaklanır (hidden olsaydı Tab ona hiç uğramazdı); odak etikette görünür */
+.yedek-yukle:focus-within { color: var(--muhur); outline: 2px solid currentColor; outline-offset: 2px; }
+.yedekten:focus-within { outline: 3px solid #fff; outline-offset: 2px; }
 /* Dokunmatik ekranda bağlantılar parmakla vurulabilir boyutta (yan yana "çıkış" ile "günlük" karışmasın) */
 @media (pointer: coarse) {
   .baglantilar a, .yedek-yukle { display: inline-block; padding: 10px 4px; margin: -8px 0; }
