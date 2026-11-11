@@ -3,13 +3,13 @@
 import hashlib
 import hmac
 import json
-import os
 import random
 import traceback
 
 from flask import jsonify, redirect, request
 
 from oyun import ada as Ada
+from oyun import gunlukler
 from oyun import turnuva as Turnuva
 from oyun.config import get_client_game_config, get_game_config, kompu_teklifi
 from oyun.ekonomi import timestamp_now
@@ -19,7 +19,6 @@ from oyun.kayit_semasi import saldiri_sonuclari
 from oyun.komutlar import command, depo_ekle, listeye_ekle, paket_gecmisini_sil
 from oyun.oyuncu import get_neighbor_info, get_player_info, get_quest_map
 from oyun.sunucu import OYUN_DILI, app
-from oyun.yollar import SAVES_DIR
 
 DINAMIK = "/dynamic.flash1.dev.socialpoint.es/appsfb/socialempiresdev/srvempires"
 
@@ -235,12 +234,7 @@ def register_found_item_response():
 @app.route(DINAMIK + "/report_error.php", methods=["POST"])
 def report_error_response():
     """İstemci hatası: saves/istemci_hatalari.jsonl'a yazılır."""
-    try:
-        os.makedirs(SAVES_DIR, exist_ok=True)
-        with open(os.path.join(SAVES_DIR, "istemci_hatalari.jsonl"), "a", encoding="utf-8") as f:
-            f.write(json.dumps(servis_govdesi(), ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    gunlukler.ekle("istemci_hatalari.jsonl", json.dumps(servis_govdesi(), ensure_ascii=False) + "\n")
     return imzali({"result": "success", "data": {}})
 
 
@@ -329,15 +323,8 @@ def turnuva_ucu(ad):
 
 def _http_gunlugune_yaz(yol):
     """İstemcinin çağırdığı ama sunucuda karşılığı olmayan istekleri kaydeder."""
-    try:
-        os.makedirs(SAVES_DIR, exist_ok=True)
-        with open(os.path.join(SAVES_DIR, "http_gunlugu.jsonl"), "a", encoding="utf-8") as f:
-            f.write(json.dumps(
-                {"yol": yol, "method": request.method, "args": request.values.to_dict()},
-                ensure_ascii=False,
-            ) + "\n")
-    except OSError:
-        pass
+    gunlukler.ekle("http_gunlugu.jsonl", json.dumps(
+        {"yol": yol, "method": request.method, "args": request.values.to_dict()}, ensure_ascii=False) + "\n")
     print(f"[EKSIK UC] {request.method} /{yol} -> {dict(request.values)}")
 
 

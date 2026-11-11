@@ -15,13 +15,13 @@ import math
 import os
 import traceback
 
-from oyun import pvp
+from oyun import gunlukler, pvp
 from oyun.config import (en_yuksek_seviye, get_game_config, get_item_from_id, get_item_from_subcat_functional,
                          get_level_from_xp, get_xp_from_level)
 from oyun.ekonomi import Yetersiz, apply_collect, apply_collect_xp, apply_cost, bakiyeden_dus, timestamp_now
 from oyun.kayit import all_saves_userid, neighbor_session, save_session, session
 from oyun.oyuncu import acik_kasaba
-from oyun.yollar import SAVES_DIR, VILLAGES_DIR
+from oyun.yollar import VILLAGES_DIR
 from oyun.zaman import zaman_olcegi
 
 KOMUTLAR = {}
@@ -242,17 +242,14 @@ def _gunluge_yaz(USERID, komutlar):
     """Paketteki komutları saves/komut_gunlugu.jsonl'a yazar (hata ayıklama)."""
     if not komutlar:
         return
-    try:
-        os.makedirs(SAVES_DIR, exist_ok=True)
-        simdi = timestamp_now()
-        with open(os.path.join(SAVES_DIR, "komut_gunlugu.jsonl"), "a", encoding="utf-8") as f:
-            for cmd, args, red in komutlar:
-                satir = {"ts": simdi, "user": str(USERID), "cmd": cmd, "args": args}
-                if red:
-                    satir["red"] = red
-                f.write(json.dumps(satir, ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    simdi = timestamp_now()
+    satirlar = []
+    for cmd, args, red in komutlar:
+        satir = {"ts": simdi, "user": str(USERID), "cmd": cmd, "args": args}
+        if red:
+            satir["red"] = red
+        satirlar.append(json.dumps(satir, ensure_ascii=False) + "\n")
+    gunlukler.ekle("komut_gunlugu.jsonl", "".join(satirlar))
 
 
 # ---------------------------------------------------------------------------

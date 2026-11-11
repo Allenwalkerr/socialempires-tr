@@ -1722,6 +1722,19 @@
       "pr": null,
       "onay": "KAR-18",
       "notlar": "Düzeltme: ekonomi.bakiyeden_dus bedel bakiyeyi aşarsa Yetersiz atar (apply_cost, cash_ekle, kaynak_ekle hepsi ondan geçer); komut döngüsü komutu geri alır, konsola ve komut_gunlugu.jsonl'a 'red' yazar. Eksi fiyat çarpanı reddedilir (satış iadesi -0.05 hariç); argümandan gelen 11 nakit bedeli max(0, ...). 2 bozmanın 2'si düştü. Risk: sunucu bakiyesi istemcininkinden düşükse istemcide görünen alım kayda girmez; red satırları bunu gösterir."
+    },
+    {
+      "id": "DNT-15",
+      "baslik": "Günlükler sınırsız büyüyordu; oturum anahtarı herkese okunur yazılıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-09, DGV-07 (günlük kısmı), DGV-08 (anahtar izni). Yeniden üretildi (11.11.2026): komut_gunlugu.jsonl, http_gunlugu.jsonl, istemci_hatalari.jsonl, sunucu_hatalari.log hiç döndürülmüyordu, report_error gövdesi olduğu gibi yazılıyordu; .oturum_anahtari open(..., 'w') ile 0644.",
+      "test": "tests/test_gunlukler.py; tests/test_denetim.py: test_oturum_anahtari_yalnizca_sahibine_okunur",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: oyun/gunlukler.ekle bütün günlükler için: 2 MB'ta bir eski kopya (.1), tek kayıt en çok 16 KB. Oturum anahtarı 0600 yazılır, eskisi açılışta 0600'e çekilir. 4 bozmanın 4'ü düştü (ilk denemede satır sınırının testi yanlış biçimde istek gönderiyordu, düzeltildi)."
     }
   ]
 }

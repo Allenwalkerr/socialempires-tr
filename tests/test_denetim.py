@@ -121,6 +121,21 @@ class KokenDenetimi(unittest.TestCase):
         self.assertNotEqual(server.app.secret_key, "SECRET_KEY")
         self.assertGreaterEqual(len(server.app.secret_key), 32)
 
+    @unittest.skipUnless(os.name == "posix", "dosya izinleri POSIX'te")
+    def test_oturum_anahtari_yalnizca_sahibine_okunur(self):
+        """Denetim DGV-08: anahtar 0644 yazılıyordu; bilen, oturum çerezini (hangi köy, ev ağı girişi) taklit eder."""
+        import stat
+        import tempfile
+        from unittest import mock
+        klasor = tempfile.mkdtemp()
+        yol = os.path.join(klasor, ".oturum_anahtari")
+        with mock.patch.object(server, "BASE_DIR", klasor):
+            anahtar = server._oturum_anahtari()
+            self.assertEqual(stat.S_IMODE(os.stat(yol).st_mode), 0o600)
+            os.chmod(yol, 0o644)  # eski sürümün yazdığı dosya
+            self.assertEqual(server._oturum_anahtari(), anahtar)
+            self.assertEqual(stat.S_IMODE(os.stat(yol).st_mode), 0o600)
+
 
 
 class UygulamaJetonu(unittest.TestCase):

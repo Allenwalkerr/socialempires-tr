@@ -19,7 +19,7 @@ import traceback
 print(" [+] Oyun ayarlari yukleniyor...")
 from flask import Flask, redirect, render_template, request, send_from_directory, session
 
-from oyun import aktarim, ayarlar, kaynaklar, ruffle as Ruffle, takvim
+from oyun import aktarim, ayarlar, gunlukler, kaynaklar, ruffle as Ruffle, takvim
 from oyun.dunya import rutbe
 from oyun.ekonomi import timestamp_now
 from oyun.kayit import (all_saves_info, all_saves_userid, fb_friends_str, load_saved_villages,
@@ -46,13 +46,19 @@ def _oturum_anahtari():
         with open(yol, encoding="ascii") as f:
             anahtar = f.read().strip()
         if len(anahtar) >= 32:
+            try:
+                os.chmod(yol, 0o600)  # DGV-08: eski sürümler 0644 yazıyordu; paylaşımlı bilgisayarda okunmasın
+            except OSError:
+                pass
             return anahtar
     except OSError:
         pass
     anahtar = secrets.token_hex(32)
     try:
-        with open(yol, "w", encoding="ascii") as f:
+        fd = os.open(yol, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="ascii") as f:
             f.write(anahtar)
+        os.chmod(yol, 0o600)  # dosya önceden varsa O_CREAT izni değiştirmez
     except OSError:
         pass  # yazılamazsa bu açılış için geçerli
     return anahtar
@@ -157,13 +163,7 @@ def _hatayi_kaydet(hata):
     from werkzeug.exceptions import HTTPException
     if isinstance(hata, HTTPException):
         return hata
-    try:
-        os.makedirs(SAVES_DIR, exist_ok=True)
-        with open(HATA_LOG, "a", encoding="utf-8") as f:
-            f.write(f"\n=== {timestamp_now()} {request.path} ===\n")
-            traceback.print_exc(file=f)
-    except OSError:
-        pass
+    gunlukler.ekle(os.path.basename(HATA_LOG), f"\n=== {timestamp_now()} {request.path} ===\n" + traceback.format_exc())
     print(" ! Sunucu hatasi (ayrinti saves/sunucu_hatalari.log):", hata)
     return ({"result": "error"}, 500)
 
