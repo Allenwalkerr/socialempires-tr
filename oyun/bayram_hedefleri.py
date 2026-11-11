@@ -9,8 +9,10 @@
   olmayan kimlik yok sayılır. Bu yüzden bayram bitince hedef listeden çıkar, kayıttaki kimlik zararsız kalır.
 - Ödül hedefin `reward`'ı kadar altındır; istemci kendi config'inden ekler, sunucu reward_mission'da aynısını yazar.
 
-Kimlik yıla ve etkinliğe göre değişir (her yıl yeni hedef, ödül bir kez): 900000 + (yıl − 2000) × 100 + etkinlik sırası
-(config/takvim.json'daki sırası, 1'den). Var olan hedef kimlikleri 0 … 1008; eski görev numaraları da 1008'in altında.
+Kimlik her etkinlik gerçekleşmesine özgüdür (her yıl yeni hedef, ödül bir kez): 10 000 000 + no × 100 000 + başlangıç
+gününün 1 Ocak 2000'den uzaklığı (gün). `no`, config/takvim.json'daki kalıcı numaradır: dosyada sıra değişse de kimlik
+kaymaz; başlangıç günü bir yıla düşen iki bayramı da ayırır (2033'te iki Ramazan Bayramı; #56 incelemesi). Var olan hedef
+kimlikleri 0 … 1008; en büyük kimlik (no 99, 2099) 2^31'in çok altında.
 
 Hedef: etkinliğin mağazaya açtığı tema setinden (config/tema_setleri.json) bir yapı kurmak (`built_id`; setlerin
 bütün eşyaları bina). Resim ve karakter oyunun kendi hedef resimleridir: hedef 32'nin ("Build 5 decorations")
@@ -18,13 +20,15 @@ goal_032.jpg ve nino_07.png'si (CLAUDE.md: kendi görsel üretilmez). Ödül 500
 """
 
 import json
-from datetime import timedelta
+from datetime import date, timedelta
 
 from oyun import takvim
 from oyun import config
 from oyun.config import tema_setleri
 
-TABAN = 900000
+TABAN = 10_000_000
+NO_ADIMI = 100_000
+GUN_SIFIRI = date(2000, 1, 1)
 ODUL = 500
 GEC_ODUL_GUNU = 30  # bayramın son günü tamamlanan hedefin ödülü sonraki girişte de gelebilir
 RESIM, KARAKTER = "goal_032.jpg", "nino_07.png"
@@ -39,23 +43,27 @@ def _tarih(iso):
     return "%d %s" % (gun, AYLAR[ay - 1])
 
 
-def hedef_kimligi(yil, sira):
-    return TABAN + (int(yil) - 2000) * 100 + int(sira)
+def hedef_kimligi(no, baslangic):
+    return TABAN + int(no) * NO_ADIMI + (baslangic - GUN_SIFIRI).days
 
 
-def _etkinlik_sirasi():
-    return {e["ad"]: i + 1 for i, e in enumerate(takvim._yukle().get("etkinlikler", []))}
-
-
-def _hedef(etkinlik, sira):
+def _set_esyalari(setler_adlari):
+    """Etkinliğin hedefi olabilir mi: mağazada tema setleri açık olacak (ayarlar.json magaza_tema_setleri false
+    değil; #56 incelemesi: kapalıyken hedef tamamlanamazdı) ve setlerinde eşya olacak. Hedef gönderimi ile ödül aynı
+    koşula bakar (ayrışırsa istemciye hiç gitmemiş bir hedefin ödülü alınabilirdi)."""
+    if config.tema_seti_kipi() is False:
+        return []
     setler = tema_setleri()
-    ids = sorted({int(i) for ad in etkinlik["setler"] for i in setler.get(ad, [])})
-    if not ids:
+    return sorted({int(i) for ad in setler_adlari for i in setler.get(ad, [])})
+
+
+def _hedef(etkinlik):
+    ids = _set_esyalari(etkinlik["setler"])
+    if not ids or not isinstance(etkinlik.get("no"), int):
         return None
-    yil = int(etkinlik["baslangic"][:4])
     set_adi = " ya da ".join(etkinlik["setler"])
     return {
-        "id": hedef_kimligi(yil, sira), "types": "built_id", "orders": -1, "min_level": 1, "reward": ODUL,
+        "id": hedef_kimligi(etkinlik["no"], date.fromisoformat(etkinlik["baslangic"])), "types": "built_id", "orders": -1, "min_level": 1, "reward": ODUL,
         "title": "%s kutlu olsun!" % etkinlik["ad"],
         "description": "%s şerefine mağazadaki %s setinden bir yapı kur. (Son gün: %s.)"
                        % (etkinlik["ad"], set_adi, _tarih(etkinlik["son_gun"])),
@@ -65,18 +73,9 @@ def _hedef(etkinlik, sira):
 
 
 def aktif_hedefler(gun=None):
-    """Bugün süren etkinliklerin hedefleri (kimlik sırasıyla). Mağazada tema setleri kapalıysa
-    (ayarlar.json magaza_tema_setleri: false) hedef tamamlanamazdı; o kipte hedef yok (#56 incelemesi). True kipinde
-    setler hep açık, "takvim" kipinde etkinlik sürerken açık (config.takvimdeki_setler)."""
-    if config.tema_seti_kipi() is False:
-        return []
-    sira = _etkinlik_sirasi()
-    cikti = []
-    for e in takvim.etkinlikler(gun, ileri=0):
-        if e["aktif"] and e["ad"] in sira:
-            h = _hedef(e, sira[e["ad"]])
-            if h:
-                cikti.append(h)
+    """Bugün süren etkinliklerin hedefleri (kimlik sırasıyla). True kipinde setler hep açık, "takvim" kipinde
+    etkinlik sürerken açık (config.takvimdeki_setler); false kipinde hedef yok (_set_esyalari)."""
+    cikti = [h for h in (_hedef(e) for e in takvim.etkinlikler(gun, ileri=0) if e["aktif"]) if h]
     return sorted(cikti, key=lambda h: h["id"])
 
 
@@ -85,19 +84,20 @@ def bayram_kimligi_mi(hedef_id):
 
 
 def odul(hedef_id, gun=None):
-    """Bayram hedefinin ödülü; verilemezse 0. Kimlik takvimdeki bir etkinliğe ve yıla denk gelmeli, o yılki etkinlik
-    başlamış ve en çok GEC_ODUL_GUNU gün önce bitmiş olmalı: elle yazılmış bir reward_mission gelecek ya da hiç
-    açılmamış bir yılın hedefinden altın alamaz (KAR-17)."""
+    """Bayram hedefinin ödülü; verilemezse 0. Kimlikteki etkinlik numarası takvimde olmalı, kimlikteki başlangıç günü o
+    etkinliğin gerçek bir başlangıcı olmalı, etkinlik başlamış ve en çok GEC_ODUL_GUNU gün önce bitmiş olmalı, hedefi
+    gönderilir olmalı (_set_esyalari): elle yazılmış bir reward_mission gelecek, uydurma ya da hiç gönderilmemiş bir
+    hedeften altın alamaz (KAR-17)."""
     hedef_id, gun = int(hedef_id), gun or takvim.bugun()
-    yil, sira = 2000 + (hedef_id - TABAN) // 100, (hedef_id - TABAN) % 100
-    etkinlikler = takvim._yukle().get("etkinlikler", [])
-    if hedef_id < TABAN or not 1 <= sira <= len(etkinlikler):
+    if hedef_id < TABAN:
         return 0
-    etkinlik = etkinlikler[sira - 1]
-    if not any(tema_setleri().get(ad) for ad in etkinlik.get("setler", [])):
+    no, gunler = divmod(hedef_id - TABAN, NO_ADIMI)
+    baslangic = GUN_SIFIRI + timedelta(days=gunler)
+    etkinlik = next((e for e in takvim._yukle().get("etkinlikler", []) if e.get("no") == no), None)
+    if etkinlik is None or not _set_esyalari(etkinlik.get("setler", [])):
         return 0
-    for merkez_yili in (yil, yil + 1):  # Yılbaşı bir önceki yılın Aralık'ında başlar; kimlik başlangıç yılını taşır
-        for baslangic, bitis in takvim._araliklar(etkinlik, merkez_yili):
-            if baslangic.year == yil and baslangic <= gun < bitis + timedelta(days=GEC_ODUL_GUNU):
+    for merkez_yili in (baslangic.year, baslangic.year + 1):  # Yılbaşı bir önceki yılın Aralık'ında başlar
+        for bas, bitis in takvim._araliklar(etkinlik, merkez_yili):
+            if bas == baslangic and bas <= gun < bitis + timedelta(days=GEC_ODUL_GUNU):
                 return ODUL
     return 0

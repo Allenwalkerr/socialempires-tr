@@ -186,7 +186,8 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     teklif = kompu_teklifi()
     takvim_setleri = takvimdeki_setler()
     from oyun import bayram_hedefleri
-    bayram = bayram_hedefleri.aktif_hedefler()
+    # GEC-07: metinler Türkçe yazılı; İngilizce config'e gitmez (#56 incelemesi)
+    bayram = bayram_hedefleri.aktif_hedefler() if dil == "tr" else []
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
                tuple(h["id"] for h in bayram))
     if anahtar in __istemci_config_onbellegi:
