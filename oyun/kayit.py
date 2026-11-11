@@ -101,15 +101,45 @@ def _load_saved_villages():
             save = _bozugu_kenara_al(yol)
             if save is None:
                 continue
-        USERID = save["playerInfo"]["pid"]
+        baktan = bak = save.pop("_bak_kullanildi", False)
+        dosya_uid = file[:-len(".save.json")]
+        USERID = save.get("playerInfo", {}).get("pid")
+        if isinstance(USERID, int) and not isinstance(USERID, bool) and str(USERID) == dosya_uid:
+            USERID = save["playerInfo"]["pid"] = dosya_uid  # KYG-01: sayı kimlik session()'ın str denetimini düşürürdü
+            bak = True
+        if not isinstance(USERID, str):  # yok, null, true...: dosya adına güvenilmez, kayıt ikiye bölünmesin
+            print(f"Atlandi: kimlik gecersiz ({USERID!r}).")
+            _baki_geri_koy(yol, baktan)
+            continue
         try:
             map_name = save["playerInfo"]["map_names"][ save["playerInfo"]["default_map"] ]
         except:
             map_name = '?'
         print(f"({map_name}) Ok.")
-        __saves[str(USERID)] = save
-        if save.pop("_bak_kullanildi", False) or _yukleme_duzeltmeleri(save):
-            save_session(USERID)
+        # KYG-03: .bak'tan gelen kayıt da göçer (kısa devre yok). Düzeltme kopyada yapılır: yarıda patlarsa yarım
+        # değişmiş kayıt belleğe girip sonradan diske yazılmaz; kayıt bu açılışta yüklenmez, dosyası olduğu gibi kalır.
+        duzgun = copy.deepcopy(save)
+        try:
+            duzeltildi = _yukleme_duzeltmeleri(duzgun)
+        except Exception as hata:
+            print(f" ! {file} duzeltilemedi, yuklenmedi ({type(hata).__name__}: {hata})")
+            _baki_geri_koy(yol, baktan)
+            continue
+        __saves[USERID] = duzgun
+        if bak or duzeltildi:
+            try:
+                save_session(USERID)
+            except OSError as hata:  # tek kaydın yazımı bütün yüklemeyi düşürmesin
+                print(f" ! {file} yazilamadi ({hata})")
+
+def _baki_geri_koy(yol, baktan):
+    """.bak'tan alınıp sonra atlanan kaydın canlı dosyası yoktur (bozuğu kenara alındı); yükleyici yalnızca
+    *.save.json'a baktığı için imparatorluk listeden düşerdi (#45 incelemesi). .bak canlı adına kopyalanır."""
+    if baktan and not os.path.exists(yol) and os.path.exists(yol + ".bak"):
+        try:
+            shutil.copyfile(yol + ".bak", yol)
+        except OSError as hata:
+            print(f" ! .bak geri konamadi ({hata})")
 
 
 def _kaydi_ac(yol):

@@ -22,6 +22,7 @@ from oyun import sunucu as server
 from oyun.kayit import _seviyeyi_duzelt
 
 ESIK = [int(s["exp_required"]) for s in config.get_game_config()["levels"]]
+ESIK_ODUL = [(s["reward_type"], int(s["reward_amount"])) for s in config.get_game_config()["levels"]]
 
 
 def istemci_seviyesi(xp, seviye=1):
@@ -71,6 +72,44 @@ class RtLevelUp(KomutTesti):
         self.assertEqual((self.harita["level"], self.harita["xp"]), (3, 60))
         _seviyeyi_duzelt(self.kayit)
         self.assertEqual(self.harita["level"], 3)
+
+    def test_seviye_odulu_kayda_yazilir(self):
+        """SNK-01 (bağımsız denetim). İstemci PopupLevel/<kurucu>: arLevelList[iLevel - 1] ödülünü
+        Player.adjustStatByType(reward_amount, reward_type) ile kendisi ekler, komut göndermez. Config levels[1] =
+        50 odun (w), levels[2] = 50 yemek (f), levels[3] = 400 odun, levels[4] = nakit (c)."""
+        self.assertEqual([(ESIK_ODUL[i]) for i in (1, 2, 3)], [("w", 50), ("f", 50), ("w", 400)])
+        self.harita.update(level=1, xp=29)
+        odun, yemek = self.harita["wood"], self.harita["food"]
+        self.komut("rt_level_up", 2)
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 50, yemek))
+        self.komut("rt_level_up", 2)  # aynı komut yeniden: ödül bir kez
+        self.assertEqual(self.harita["wood"], odun + 50)
+        self.komut("rt_level_up", 4)  # 2 → 4: 3. ve 4. seviyenin ödülleri
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 450, yemek + 50))
+        nakit = self.cash
+        self.komut("rt_level_up", 5)
+        self.assertEqual(self.cash, nakit + ESIK_ODUL[4][1])
+        self.assertEqual(ESIK_ODUL[4][0], "c")
+
+    def test_odul_baska_yol_seviyeyi_yukseltse_de_bir_kez(self):
+        """#45 incelemesi: rt_publish_score eşiği geçirip seviyeyi önce yükseltirse ödül kaybolmamalı; seviye
+        düşüp yeniden çıkınca ödül yinelenmemeli. Ödüller config levels[1..3]: 50 odun, 50 yemek, 400 odun."""
+        self.harita.update(level=1, xp=0)
+        odun, yemek = self.harita["wood"], self.harita["food"]
+        self.komut("rt_publish_score", 60)  # 60 XP: istemcide 3. seviye; seviye sunucuda 3 olur
+        self.assertEqual(self.harita["level"], 3)
+        self.komut("rt_level_up", 2)
+        self.komut("rt_level_up", 3)
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 50, yemek + 50))
+        self.komut("rt_level_up", 1)
+        self.komut("rt_level_up", 4)
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (odun + 450, yemek + 50))
+
+    def test_xp_bildirimi_seviyeyi_dusurmez(self):
+        """KYT-05 ile aynı kural: istemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp)."""
+        self.harita.update(level=53, xp=69467)
+        self.komut("rt_publish_score", 69467)
+        self.assertEqual(self.harita["level"], 53)
 
 
 class HilePaneliSeviye(unittest.TestCase):
