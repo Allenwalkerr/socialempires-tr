@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-06",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #49 … #51 birleşti; GEC-05'in kabul kapısı ölçüldü ve kapandı (◐: PvP oyunda elle oynanmadı). Sıradaki aşama GEC-06 (Türkçe, TRA-01). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Kalan Düşük denetim bulguları (docs/DENETIM.md). Açık küçük not: recoverEnemyUnits protect (? 1407-mezarlik.md). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #49 … #52 birleşti, GEC-05 kapandı. GEC-06 başladı: hedefler (CEV-03, TRA-01) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-06'nın kalanı: SWF metin alanları (404/638), sabit yazılar (44/58), AS3 dizeleri (0/219); her kalan ya çevrilir ya kanıtıyla ceviri_kapsami.DOLGU'ya girer; ekran görüntüsü denetimi. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -884,12 +884,12 @@
       "sinif": "ozellik",
       "onem": "Yüksek",
       "durum": "acik",
-      "isaret": "?",
+      "isaret": "◐",
       "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. Başlangıç ölçümü GEC-01'de (✔ 31.10.2026, araclar/ceviri_kapsami.py): 1.4.07'de kalan 234 SWF metin alanı, 14 sabit yazı, 219 AS3 dizesi, 498 config loc metni, 410 hedef metni (206 hedef; anahtar biçimi goal:<id>:baslik|aciklama|talimat). Liste: docs/inceleme/ceviri-kapsami.md.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer. 11.11.2026: hedefler (TRA-01) CEV-03 ile 410/410. Kalan: SWF metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219 (çoğu geliştirici dolgusu; tek tek kanıtla DOLGU'ya ya da çeviriye), ekran görüntüsü denetimi."
     },
     {
       "id": "GEC-07",
@@ -2008,6 +2008,19 @@
       "kanit": "IsoFightingElement/kill@714-894: SELF birimi ASSAULT'ta checkPutToGraveyard ise yerelde addUnitToResurrectableUnits; aynı yerdeki sell CommandManager/addCommand@16-99'da yalnızca NORMAL kipte (ya da zorla) kuyruğa girer: sunucuya hiçbir şey gitmez.",
       "test": "tests/test_komutlar.py: test_saldirida_olen_birlik_mezarliga",
       "notlar": "Düzeltme: pvp.saldiri_bitir haritadan gerçekten silinen net kaybı (ölen − kurtarılan) mezarlığa ekler; köylü, hayvan (subcat 74/75/88/90) ve mavi anka (775, ◐) girmez; kahraman deadHeroes'a. Ajanın raporu docs/inceleme/1407-mezarlik.md."
+    },
+    {
+      "id": "CEV-03",
+      "baslik": "1.4.07'nin hedefleri (goals, 206 hedef, 410 metin) Türkçeleşmiyordu (denetim TRA-01)",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Denetim TRA-01 (docs/denetim/turkce-arayuz.md); ölçüm (araclar/ceviri_kapsami.py --hedefler config/goals.json): hedefler 0/410. oyun/turkce._bolum_anahtarlari config['goals']'u hiç taramıyordu.",
+      "test": "tests/test_ceviri_kapsami.py: HedefCevirisi (3 test)",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: turkce._bolum_anahtarlari hedef bölümü (anahtar goal:<id>:baslik|aciklama|talimat, ölçüm aracıyla aynı; 'none' yer tutucu çevrilmez). 410 metnin 357'si eski görevlerin birebir aynı İngilizce metninin çevirisinden alındı (aynı kaynak metin, aynı çeviri), 53'ü yeni çevrildi; adlar config'teki Türkçe eşya ve arayüz adlarıyla (Hafif Okçu, Ruh Kazanı, Konak, Asker Paketleri, Cenk Rehberi, Düşman ara…). Sonra hedefler 410/410, dogrula denetimi temiz. 4 bozmanın 4'ü düştü. Oyunda ekran görüntüsüyle bakılmadı (GEC-06 ekran denetiminde)."
     }
   ]
 }
