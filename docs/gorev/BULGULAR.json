@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-05",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 … #49 birleşti. GEC-05 ikinci parça (end_attack_new ganimeti OYN-19, liderlik heykeli OYN-16, savunma ödülü OYN-17, bot akınının yeni saldırı günlüğüne yazılması) PR'da; sahibine sorularak birleşir (KAR-19). GEC-05'te kalan: turnuva maçı, onur/sıralama ekranı, mezarlık (resurrectableUnits). Sahibine sorulacak: KYG-04; PvP ganimetinin kurbandan düşülmesi (şimdi #5 gereği düşülmüyor). Sahibinin ayarı: imza sırları için GitHub Environment. Sonra kalan Düşük denetim bulguları, GEC-06 (TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 … #49 birleşti. GEC-05 ikinci parça (end_attack_new ganimeti OYN-19, liderlik heykeli OYN-16, savunma ödülü OYN-17, bot akınının yeni saldırı günlüğüne yazılması, KAR-20 ganimetin kurbandan düşülmesi) PR'da; sahibine sorularak birleşir (KAR-19). GEC-05'te kalan: turnuva maçı, onur/sıralama ekranı, mezarlık (resurrectableUnits). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Sonra kalan Düşük denetim bulguları, GEC-06 (TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1878,6 +1878,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: pvp.yeni_sonuc: end_attack'ın saldırı kaydına (ganimet hakkı: saldırı hakkı, aynı hedef 4 sa, kalkan, belediye) eşlenir; ganimet hedefin elindekini geçmez (kurbandan düşülmez, PR #5'ten beri); XP eski tavanla; onur config HONOR_POINT_PVP_WIN/LOSE_ATTACK 15/5; attacksWon/attacksLost yazılır (istemci attacksLost'u hiç yazmaz). Aynı savaşa ikinci sonuç verilmez. 7 bozmanın 7'si düştü. Eksik komut 0 (|G ∖ H| = 0)."
+    },
+    {
+      "id": "KAR-20",
+      "baslik": "PvP ganimeti kurbandan düşülür",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin yanıtı (11.11.2026): \"Düşülsün.\" Soru: PvP'de kazanılan ganimet kurbanın kaynağından düşülsün mü (PR #5'ten beri düşülmüyordu).",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_ganimeti_verir, test_ganimet_kurbandan_saldirana_gecer",
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Uygulama: pvp.yeni_sonuc (end_attack_new) her kaynağı kurbanın elindekiyle sınırlar ve düşer, kurbanın kaydını yazar; pvp.saldiri_bitir (eski end_attack) altını kurbanın altınıyla sınırlar ve düşer. Statik komşular ve kalkanlı hedefler değişmez. Botlar kaynağı dunya._ekonomi ile yeniden üretir. 4 bozmanın 4'ü düştü."
     }
   ]
 }

@@ -498,13 +498,18 @@ class PvpKomutlari(KomutTesti):
         self.kurban["maps"][0].update(coins=1000, food=500, wood=300, stone=0)
         self.saldir(resources={"g": 0, "x": 0, "w": 0, "s": 0, "f": 0}, honor=0)
         once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone", "xp")}
+        kaydedilen = []
+        self.pvp.save_session = kaydedilen.append
         self.yeni()
         self.assertEqual({k: self.harita[k] - once[k] for k in once},
                          {"coins": 600, "food": 100, "wood": 300, "stone": 0, "xp": 40})
         self.assertEqual((self.ps["attacksWon"], self.ps.get("attacksLost", 0), self.ps["honor"]), (1, 0, 15))
         self.assertEqual(self.ps["attacksSent"][-1]["description"]["resources"],
                          {"g": 600, "f": 100, "w": 300, "s": 0, "x": 40})
-        self.assertEqual(self.kurban["maps"][0]["coins"], 1000)  # eski end_attack gibi kurbandan düşülmez
+        # KAR-20 (sahibinin kararı, 11.11.2026): ganimet kurbandan düşülür; 300 isteyen odunun hepsi gider
+        self.assertEqual({k: self.kurban["maps"][0][k] for k in ("coins", "food", "wood", "stone")},
+                         {"coins": 400, "food": 400, "wood": 0, "stone": 0})
+        self.assertEqual(kaydedilen, ["rakip"])
         self.yeni()  # aynı savaşın ikinci sonucu: verilmez
         self.assertEqual(self.harita["coins"] - once["coins"], 600)
 
@@ -521,17 +526,22 @@ class PvpKomutlari(KomutTesti):
         self.yeni()
         self.assertEqual((self.harita["coins"], self.ps["attacksWon"], self.ps.get("honor", 0)), (50000, 1, 0))
 
-    def test_ganimet_saldirana_kurbandan_dusulmez(self):
+    def test_ganimet_kurbandan_saldirana_gecer(self):
+        """KAR-20 (sahibinin kararı, 11.11.2026): PvP ganimeti kurbandan düşülür; elinde olmayan verilmez."""
         self.saldir()
         self.assertEqual(self.harita["coins"], 50500)
         self.assertEqual(self.harita["xp"], 30)
-        self.assertEqual(self.kurban["maps"][0]["coins"], 50000)
+        self.assertEqual(self.kurban["maps"][0]["coins"], 49500)
         self.assertEqual(self.ps["honor"], 4)
         rapor = self.kurban["privateState"]["attacksReceived"][0]
         self.assertEqual(rapor["attacker_id"], "test")
         self.assertEqual(rapor["viewPending"], 1)
         self.assertEqual(rapor["description"]["oponent"]["name"], "Test")
         self.assertEqual(self.ps["attacksSent"][0]["description"]["oponent"]["name"], "Rakip")
+        self.kurban["maps"][0]["coins"] = 120
+        self.ps["attacksSent"] = []
+        self.saldir()  # kurbanda 120 altın var: 500 değil 120 alınır
+        self.assertEqual((self.harita["coins"], self.kurban["maps"][0]["coins"]), (50620, 0))
 
     def test_ganimet_istemci_formuluyle_sinirli(self):
         # 2 birim yıkıldı, kurban seviye 5: en çok 200*2 + 500 + 25 = 925

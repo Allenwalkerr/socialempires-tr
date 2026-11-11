@@ -145,8 +145,10 @@ def yeni_sonuc(saldiran, args):
         miktar = max(0, _tam(args[sira]))
         if kurban_harita is not None:
             # İstemcinin ganimet havuzu hedefin kaynaklarından hesaplanır (PvpPlayerManager.setEnemyInfo); hedefte
-            # olmayandan fazlası verilmez. Eski end_attack gibi kurbandan düşülmez (PR #5'ten beri süren davranış).
-            miktar = min(miktar, max(0, _tam(kurban_harita.get(alan_adi))))
+            # olmayandan fazlası verilmez. Ganimet kurbandan düşülür (KAR-20, sahibinin kararı 11.11.2026).
+            mevcut = max(0, _tam(kurban_harita.get(alan_adi)))
+            miktar = min(miktar, mevcut)
+            kurban_harita[alan_adi] = mevcut - miktar
         harita[alan_adi] = _tam(harita.get(alan_adi)) + miktar
         ganimet[kisa] = miktar
     yikilan = sum(_olenler(aciklama.get("victim_units")).values())
@@ -157,6 +159,8 @@ def yeni_sonuc(saldiran, args):
     ps["honor"] = _tam(ps.get("honor")) + onur
     saldiran["playerInfo"]["honor_points"] = _tam(saldiran["playerInfo"].get("honor_points")) + onur
     aciklama["resources"] = dict(ganimet, x=xp)
+    if kurban is not None:
+        save_session(kurban_id)
     print(f"Saldiri ganimeti: {ganimet}, {xp} XP, {onur} onur")
     return True
 
@@ -214,6 +218,8 @@ def saldiri_bitir(saldiran, args):
         altin_tavani = min(int(get_game_config()["globals"].get("MAX_GOLD_ASSAULT", 20000)),
                            BIRIM_BASINA_ALTIN * yikilan + kurban_seviye * 100 + GALIBIYET_ASGARI_ALTIN)
         altin = max(0, min(_tam(kaynaklar.get("g")), altin_tavani))
+        if kayitli:  # KAR-20: ganimet kurbandan düşülür; elinde olmayan verilmez
+            altin = min(altin, max(0, _tam(kurban["maps"][0].get("coins"))))
         xp = max(0, min(_tam(kaynaklar.get("x")), math.ceil(0.05 * altin) + yikilan + XP_PAYI))
     harita["coins"] = int(harita.get("coins", 0)) + altin
     harita["xp"] = int(harita.get("xp", 0)) + xp
@@ -235,6 +241,7 @@ def saldiri_bitir(saldiran, args):
     if not kayitli or kalkanli:
         return True
     kps = kurban["privateState"]
+    kurban["maps"][0]["coins"] = max(0, _tam(kurban["maps"][0].get("coins")) - altin)  # KAR-20
     savunma_odulu = 0
     if not kazandi:
         # OYN-17: istemci ödülü her ölen saldıran birim için ekler (Assault$/killed@393-435: FIELD_KILLED++ ve
