@@ -120,7 +120,7 @@ kapsanan satırlarda **%66 [63; 71]**. Bu bir tahmindir (◐); ham oran ölçüm
 | Hata veren komut kaydı yarım değiştirip bırakıyordu (ör. nakit düşüp eşya verilmeden hata) | `test_degismezler` eski kodda 6 başarısızlık ve 3 hata verdi (D4 ve D5) | Düzeltildi: `command()` her komuttan önce kaydın kopyasını alır, hata olursa geri yükler (~2 ms) |
 | `depo_ekle` oyunda olmayan dev id'yi kabul ediyordu: id 10⁸ → 100 milyon elemanlı liste | Değişmez D5: depo listesi en büyük eşya id'sini (50031) geçmemeli | Düzeltildi: config'te olmayan id reddedilir |
 | Sunak yokken nakitle alınan kahraman iki kez veriliyordu (depoda ve haritada) | İstemci `PopupHeroes/onBuyItem`: sunak yoksa `store_add_items` gönderir, ardından `buy_cash`'i pencere konumuyla yine gönderir | Düzeltildi: kahraman yalnızca sunak (150) varsa haritaya konur |
-| Koleksiyon ödülü yeniden yüklemede kayboluyor | İstemci `CollectableManager$/getReward` ödülü komutsuz depoya koyuyor (`storeItem(..., false)`); sunucunun `finish_collection`'ı ödül eklemiyor | Açık (BULGULAR) |
+| Koleksiyon ödülü yeniden yüklemede kayboluyor | İstemci `CollectableManager$/getReward` ödülü komutsuz depoya koyuyor (`storeItem(..., false)`); sunucunun `finish_collection`'ı ödül eklemiyor | Düzeltildi (KMT-05, #37) |
 
 ## 8. Sınırlar
 

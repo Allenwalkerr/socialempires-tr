@@ -2,6 +2,10 @@
 
 Bu dosya `araclar/config_hatti.py` ile üretilir; elle düzenlenmez.
 
+> **Geçmiş ölçüm (31.10.2026, GEC-01).** Tablo GEC-02'den önceki yamaları anlatır; GEC-02'den beri
+> `config/patch/`'te yalnızca `0-language_en`, `1-mega_patch`, `2-unit_patch`, `kompu`, `turnuva`, `yeni_icerik` var
+> (EKF-07, DNT-26). Araç upstream yama klasörünü istediği için bu ortamda yeniden üretilmedi.
+
 - C₁₄₀₇: taban + upstream `54df29e` `config/patch` (0-language_en, 1-mega_patch, 2-unit_patch) + `goals.json`.
 
 | Yama | İşlem | aynı | kapsanıyor | farklı | yeni | yolu yok | Hüküm | Farklı alanlar (işlem sayısı) |

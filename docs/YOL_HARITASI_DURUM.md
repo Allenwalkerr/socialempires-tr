@@ -28,8 +28,8 @@ her kapının nasıl sınandığı ve sonucu yazılı.
 
   Gökyüzü: 13.00 "gündüz", 20.45 "kızıllık", 23.30 "gece". "Krallığa Gir"e
   basınca oyun açıldı (Ruffle 0.7.1, yerel dosyadan).
-- Dağ ve kale silueti şimdilik satır içi SVG; manzara görselinin kimden
-  geleceği açık soru olarak duruyor.
+- ~~Dağ ve kale silueti şimdilik satır içi SVG~~: kaldırıldı (OYN-09); manzara oyunun kendi resmi, sayfada
+  SVG yok.
 - Ruffle'da ilk tıklama yalnızca odağı alıyordu; oyun açılınca odak sayfa
   tarafından verildiği için artık ilk tıklama da oyuna ulaşır.
 
@@ -74,7 +74,8 @@ Gir"e basınca indirilir; süs resimleri düşük öncelikle istenir. Mobildeki
 
 Yapılmayanlar:
 
-- **Arthur'un etkinliğe özel hedefleri bu istemciyle yapılamaz.** Yapılandırmadaki
+- ~~**Arthur'un etkinliğe özel hedefleri bu istemciyle yapılamaz.**~~ 0926 istemcisi içindi; 1.4.07'de
+  `goals` okunuyor ve bayram hedefleri GEC-07 ile yapıldı (`oyun/bayram_hedefleri.py`). Eski not: Yapılandırmadaki
   228 görev (`missions`) yalnızca metindir (başlık, açıklama, ödül); her görevin
   koşulu istemci SWF'sinin içinde görev numarasına göre gömülüdür.
   `config/patch/mission_goals.json`'daki `goals` biçimi (`built_id` gibi hedef
@@ -116,7 +117,8 @@ Yol haritasının açık soruları yanıtlandı:
 - **Oyun 1.4.07 istemcisine tam geçer** (KAR-08). Aşamalar, kabul kapıları ve
   tahminler: [YOL_HARITASI_1407.md](YOL_HARITASI_1407.md).
   Durum (11.11.2026): GEC-01 … GEC-06 kapandı (GEC-05: yeni PvP, kalkan, onur, saldırı günlüğü, mezarlık,
-  #49 … #52; GEC-06: Türkçe hedefler ve SWF metinleri, #53, #54). Sıradaki aşama GEC-07 (bayram hedefleri).
+  #49 … #52; GEC-06: Türkçe hedefler ve SWF metinleri, #53, #54). GEC-07 (bayram hedefleri, #56) ve GEC-08 (çevrimdışı paket, #57) de kapandı; öneriler ONR-04 (#58), ONR-01 (#59),
+  ONR-02 (#60). Sırada ONR-03 ve GEC-09 (kabul); açık işlerin tamamı `docs/gorev/BULGULAR.json`'da.
 
 ## Açık işler
 
@@ -132,9 +134,8 @@ Sayfadaki çizimler oyunun kendi görselleridir; oyun varlıklarıyla aynı yold
 (`/default01.static.socialpointgames.com/...`) iner, depoya konmaz:
 çam ağaçları ve giriş manzarası (`externalized/PopupLevelUp/`), iki nöbetçi,
 kılıçlı arma ve bayraklar, parşömen ve başlık şeridi, günlük ödül
-parşömeni, Kral Arthur ve haftalık turnuva afişi. Yalnızca
-gökyüzü (Güneş, Ay, bulutlar, yıldızlar) CSS ile çizilir, çünkü Güneş'in
-gerçek konumuna göre değişir.
+parşömeni, Kral Arthur ve haftalık turnuva afişi. Gökyüzü de oyunun kendi
+resmidir; Güneş'e göre CSS ile boyanan gökyüzü kaldırıldı (OYN-09).
 
 Yazı: başlıklar oyunun kendi başlıkları gibi beyaz dolgu, kalın kahverengi
 dış çizgi ve koyu gölgeyle Baloo 2 (800); metin Nunito. İkisi de OFL ve

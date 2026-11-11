@@ -1,7 +1,6 @@
 /* Oyun sayfası. Görseller yalnızca oyunun kendi resimleridir (ağaçlar, arma,
    bayraklar, parşömenler, karakterler; oyun varlıklarıyla aynı yerden iner).
-   Kendi çizilmiş figür yoktur; gökyüzü yalnızca Güneş'in konumuna göre
-   renk değiştirir. */
+   Kendi çizilmiş figür yoktur; gökyüzü de oyunun kendi resmidir (OYN-09). */
 
 /* Baloo 2 ve Nunito (OFL): ikisi de ğ, İ, ş dahil tüm Türkçe harfleri içerir.
    Lilita One, Fredoka gibi oyunsu yazı tiplerinde ğ/İ/ş yok. */

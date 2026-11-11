@@ -9,15 +9,22 @@ denetçi kullanım payı yüzünden durduruldu ve dört bulgudan sonrası yazıl
 
 ## Sayılar
 
-| Alan | Bulgu | Düzeltildi | Çürütüldü | Karar: böyle kalır | Sonraki aşamada | Denenmedi |
-|---|---:|---:|---:|---:|---:|---:|
-| Kayıt ve göç (yarım) | 4 | 3 | 0 | 0 | 0 | 1 |
-| Ekonomi ve formüller | 9 | 2 | 0 | 0 | 0 | 7 |
-| Sunucu ve komutlar | 9 | 4 | 0 | 0 | 0 | 5 |
-| Bot dünyası, PvP, turnuva | 9 | 0 | 1 | 2 | 2 | 4 |
-| Türkçe ve arayüz | 8 | 0 | 0 | 0 | 1 | 7 |
-| Dağıtım ve güvenlik | 8 | 8 | 0 | 0 | 0 | 0 |
-| **Toplam** | **47** | **17** | **1** | **2** | **3** | **24** |
+11 Kasım 2026 durumu (her bulgu `docs/gorev/BULGULAR.json`'daki karşılığıyla yeniden sayıldı):
+
+| Alan | Bulgu | Düzeltildi | Çürütüldü | Karar: böyle kalır | Açık (kitapta) |
+|---|---:|---:|---:|---:|---:|
+| Kayıt ve göç (yarım) | 4 | 3 | 0 | 0 | 1 |
+| Ekonomi ve formüller | 9 | 5 | 0 | 0 | 4 |
+| Sunucu ve komutlar | 9 | 6 | 0 | 1 | 2 |
+| Bot dünyası, PvP, turnuva | 9 | 2 | 1 | 2 | 4 |
+| Türkçe ve arayüz | 8 | 3 | 0 | 0 | 5 |
+| Dağıtım ve güvenlik | 8 | 8 | 0 | 0 | 0 |
+| **Toplam** | **47** | **27** | **1** | **3** | **16** |
+
+Açık 16 bulgunun kitaptaki karşılıkları: KYG-04 → DNT-08; EKF-04, EKF-07, EKF-08, EKF-09, SNK-06, SNK-07, DPT-05,
+DPT-07, DPT-08, DPT-09, TRA-02, TRA-04, TRA-05, TRA-06, TRA-08 → DNT-25 … DNT-39 (11.11.2026'ya kadar kitaba hiç
+yazılmamışlardı; .md taramasında bulundu). Karar: SNK-08 (giriş sayfasında yeniden okuma kalır, DNT-04),
+DPT-02 (KAR-15), DPT-03 (KAR-16). Yarım kalan kayıt alanı: DNT-40.
 
 Önem: 3 Yüksek, 13 Orta, 31 Düşük. Üç Yüksek bulgunun üçü de düzeltildi.
 
@@ -27,10 +34,10 @@ denetçi kullanım payı yüzünden durduruldu ve dört bulgudan sonrası yazıl
 |---|---|---|---|
 | KYG-01 | Kimliği sayı olan kayıt sunucunun açılışını çökertiyordu | DNT-05 | #45 |
 | KYG-03 | Yedekten (`.bak`) geri alınan kayıt güncellenmiyordu | DNT-06 | #45 |
-| KYG-02 | İçe aktarmadan önceki kayıt korunmuyordu (yalnızca `.bak`'ta kalıyor, o da eziliyordu) | DNT-07 | sıradaki |
+| KYG-02 | İçe aktarmadan önceki kayıt korunmuyordu (yalnızca `.bak`'ta kalıyor, o da eziliyordu) | DNT-07 | #46 |
 | EKF-01 | Değirmen ve madenlerde seçilen süre yok sayılıyordu (8 saatte ekranda 900, kayıtta 300) | DNT-09 | #45 |
 | SNK-01 | Seviye atlama ödülü (çoğu seviyede nakit) kayda yazılmıyordu | DNT-10 | #45 |
-| SNK-02 | Bağlantı gecikince istemcinin yeniden yolladığı komut paketi iki kez uygulanıyordu | DNT-12 | sıradaki |
+| SNK-02 | Bağlantı gecikince istemcinin yeniden yolladığı komut paketi iki kez uygulanıyordu | DNT-12 | #46 |
 
 ## Çürütülen
 
@@ -72,6 +79,7 @@ etiketlerine izin vermek. Bunu yalnızca depo sahibi yapabilir; yapılınca iş 
 
 ## Denenmeyenler
 
-Kalan 32 bulgunun çoğu Düşük önemde; raporlarda yerleri ve öneriyle duruyorlar. Sırayla yeniden üretilip kitaba
-(`docs/gorev/BULGULAR.json`) işlenecek. Öne alınacaklar: EKF-02 (çiftlikte odun düşümü), SNK-03 (eşya yokken depoya
-ekleme), KYG-04 (başka cihaza taşınan eski kayıtta görev numaraları).
+Bu bölüm 11.11.2026'da kapandı: denenmeyen bulguların hepsi kitapta açık madde (yukarıdaki "Sayılar"). Öne
+alınanlardan EKF-02 (DNT-19) ve SNK-03 (DNT-20) #47'de düzeltildi; KYG-04 DNT-08'de açık. Ayrıca düzeltilenler:
+EKF-03 (DNT-14), EKF-05 (DNT-22), EKF-06 (DNT-23), SNK-04 (DNT-24), TRA-03 (`docs/inceleme/ceviri-kapsami.md`
+GEC-06'da yeniden üretildi), TRA-07 (DNT-21), DGV-01 … DGV-08 ve SNK-05, SNK-09 (DNT-13 … DNT-18).

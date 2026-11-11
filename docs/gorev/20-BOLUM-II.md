@@ -7,20 +7,27 @@
 `BULGULAR.json`'da durumu `acik`, `onay_bekliyor`, `ertelendi` ya da `engelli` olan maddeler. Yeni işe başlamadan
 önce buradan seç; sahibinin kararı gerekenleri ona sor.
 
-| Madde  | Durum           | Ne gerekiyor                                                                      |
-| ------ | --------------- | --------------------------------------------------------------------------------- |
-| DAG-04 | onay_bekliyor   | Sahibi gerçek Android telefon ve iPad'de dener (§7.1)                             |
-| HIZ-03 | duzeltildi      | Karar verildi: kısa ekranlarda başlık sıkışık düzene geçer (PR #13) (alan oyuna)            |
-| HIZ-02 | ertelendi       | Mobil LCP 3,7 sn (yavaş 4G benzetimi); ev ağında sorun beklenmiyor                 |
-| ICR-01 | engelli         | 0926'da yapılamaz; 1.4.07'ye tam geçişte GEC-07 ile çözülecek (KAR-08)             |
-| VAR-01 | duzeltildi (◐)  | Ateş topu efektinin ekrandaki görünüşü gözle denetlenmedi (§7.2)                   |
-| KAR-05 | karar_verildi (◐) | Tema setlerinin takvim kipi için açık bir "evet" alınmadı                        |
-| GEC-01 … GEC-09 | acik   | 1.4.07'ye tam geçiş, sırayla (`docs/YOL_HARITASI_1407.md` §3)                     |
-| KAR-13 | karar_verildi | GEC-03 bitince alanlara bölünmüş bağımsız denetim (Lyraska DENETIM-2 yöntemi)     |
-| OYN-11 … OYN-13 | acik   | Küçük işler: günlük ödül başlığı, seviye/XP bilgisi, "Yedek yükle" klavye         |
-| ONR-01 … ONR-04 | acik   | Öneriler; her birinin taslak tanımı başlamadan önce sahibine onaylatılır (§5)       |
-| KYN-02, KYN-04 | acik    | Soul Mixer ve ölü yamalar geçişle (GEC-01 … GEC-03) ele alınır                      |
-| OYN-05, OYN-07, OYN-08, VAR-03, DAG-12, DNT-02 | onay_bekliyor | Sahibi 1.4.07 sürümünde tablette dener (§7.4) |
+11 Kasım 2026 durumu (.md taramasından sonra; asıl kayıt `BULGULAR.json`, çelişirse JSON geçerlidir).
+
+| Madde | Durum | Ne gerekiyor |
+| --- | --- | --- |
+| GEC-09 | acik | Kabul: uçtan uca oynanış betiği, oyunda gözle bakılmamış pencereler (notunda liste), sahibinin tablet denemesi, v0.1.0 |
+| ONR-02 | ci_bekliyor | "Sen yokken" özeti, #60 |
+| ONR-03 | acik | Android bildirimleri; "inşaat bitti" başlamadan önce sahibine sorulur (KAR-22) |
+| OYN-11, KYT-02 | acik | 1.4.07'nin 5 günlük günlük ödülü kapalı; başlığı boş pencere |
+| OYN-12, OYN-13 | acik | Seviye/XP bilgisi yenilenmiyor; "Yedek yükle" klavyeyle açılmıyor (önce yeniden üretilir) |
+| OYN-15 | acik | Turnuvada gösterilen ödül ile verilen farklı |
+| OYN-31, OYN-32 | acik | PvP: end_attack_new 11-12. argümanlar; savunmada kurtarma yönü (bayt kodundan okunacak) |
+| DNT-25 … DNT-39 | acik | Bağımsız denetimin kitaba yazılmamış 15 bulgusu (hepsi Düşük) |
+| DNT-40 | acik | Kayıt göçü denetim alanı yarım |
+| DNT-08 | acik | Başka cihaza taşınan 0.06a kayıtta görev numaraları (karar gerekebilir) |
+| TST-02, TST-06 | acik | Testsiz komutlar; mutasyon ölçümünün açık uçları |
+| KYN-07 | acik | Upstream düzeltmelerinin değerlendirilmesi |
+| BLG-01 | ci_bekliyor | Bayat belgeler (bu taramanın PR'ı) |
+| KMT-08, KMT-09, OYN-29, OYN-30 | onay_bekliyor | Sahibinin kararı: görev sınırı, Asker Toplama, Ada Ocağı ve viral teklifler, denge sabitleri |
+| DAG-04, DAG-05, DAG-12, DNT-02, OYN-05, OYN-07, OYN-08, VAR-03 | onay_bekliyor | Sahibi 1.4.07 sürümünde tablette dener (§7.4) |
+| HIZ-02 | ertelendi | Mobil LCP 3,7 sn (yavaş 4G benzetimi); ev ağında sorun beklenmiyor |
+| KAR-09 | karar_verildi | En son iş: Android imza anahtarı; ayrıca GitHub Environment ayarı (`docs/DENETIM.md`) |
 
 ## 7. Sahibinin elle yapacağı testler
 

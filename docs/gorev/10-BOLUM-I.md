@@ -13,19 +13,26 @@ Asıl kayıt `BULGULAR.json`'dur; bu tablo onun özetidir ve çelişirse JSON ge
 | Önek  | Alan                                | Maddeler              |
 | ----- | ----------------------------------- | --------------------- |
 | F0    | Faz 0 temel ve ölçüm                | F0-01 … F0-06         |
-| VAR   | Oyun varlıkları ve SWF              | VAR-01, VAR-02        |
+| VAR   | Oyun varlıkları ve SWF              | VAR-01 … VAR-03       |
 | GUV   | Güvenlik (CodeQL)                   | GUV-01 … GUV-03       |
 | HIZ   | Sayfa hızı ve kayma                 | HIZ-01 … HIZ-03       |
 | TAS   | Tasarım                             | TAS-01 … TAS-04       |
-| DAG   | Dağıtım (Windows, telefon, CI)      | DAG-01 … DAG-04       |
+| DAG   | Dağıtım (Windows, telefon, CI)      | DAG-01 … DAG-14       |
 | ICR   | Oyun içeriği                        | ICR-01                |
-| KAR   | Sahibinin kararları                 | KAR-01 … KAR-08       |
-| REG   | Oturum içinde yakalanan geri gidişler | REG-01              |
-| OYN   | Oynanış ve oyun sayfası             | OYN-01 … OYN-13       |
-| DNT   | Bağımsız denetim                    | DNT-01 … DNT-04       |
-| KYN   | Upstream ve kaynaklar               | KYN-01 … KYN-05       |
+| KAR   | Sahibinin kararları                 | KAR-01 … KAR-22       |
+| REG   | Oturum içinde yakalanan geri gidişler | REG-01 … REG-03     |
+| OYN   | Oynanış ve oyun sayfası             | OYN-01 … OYN-32       |
+| DNT   | Bağımsız denetim                    | DNT-01 … DNT-40       |
+| KYN   | Upstream ve kaynaklar               | KYN-01 … KYN-07       |
 | GEC   | 1.4.07'ye tam geçiş (`docs/YOL_HARITASI_1407.md`) | GEC-01 … GEC-09 |
 | ONR   | Sahibinin istediği öneriler         | ONR-01 … ONR-04       |
+| KMT   | 1.4.07 komutları                    | KMT-01 … KMT-09       |
+| CEV   | Çeviri                              | CEV-01 … CEV-04       |
+| KNF   | Config hattı                        | KNF-01 … KNF-04       |
+| GOR   | Görev numaraları                    | GOR-01                |
+| KYT   | Kayıt alanları                      | KYT-01 … KYT-05       |
+| TST   | Test gücü                           | TST-01 … TST-06       |
+| BLG   | Belgeler                            | BLG-01                |
 
 Çürütülenler (yeniden açma): **F0-01** (Ruffle'da haritaya tıklanıyor; eski yargı eğitim kilidinden), **VAR-02**
 ("Cargando" artık görünmüyor), **TAS-01** (ğ/İ/ş içermeyen yazı tipleri kullanılmadı).
@@ -51,7 +58,7 @@ Kabul kapısı ✔ geçti (`docs/FAZ0_OLCUMLER.md`).
 
 ### 5.2 Faz 1: Açılış sahnesi (PR #8, #10)
 
-Gökyüzü Güneş yüksekliğine göre (✔ İstanbul doğuş/batış ±1 dk, `tests/js/gokyuzu.test.js`); çerçeve oranı ✔ üç
+Gökyüzü Güneş yüksekliğine göre boyanıyordu (`tests/js/gokyuzu.test.js`); 30.10.2026'da kaldırıldı, gökyüzü oyunun kendi resmi (OYN-09). Çerçeve oranı ✔ üç
 ekranda tam 1,2667; "Krallığa Gir" ✔; Lighthouse masaüstü ✔ LCP 0,7 sn, CLS 0 (HIZ-01). Mobil LCP ertelendi (HIZ-02).
 
 ### 5.3 Faz 2: Canlı dünya (PR #8)
@@ -59,6 +66,8 @@ ekranda tam 1,2667; "Krallığa Gir" ✔; Lighthouse masaüstü ✔ LCP 0,7 sn, 
 Diyar Haberleri ✔ Λ = 1,63 olay/dk (`araclar/haber_olcumu.py`); Şeref Kürsüsü ✔ 60 sn önbellek, 2–4 ms yanıt.
 
 ### 5.4 Faz 3: Oyun içeriği (PR #8, #9)
+
+(11.11.2026: ICR-01 1.4.07'de GEC-07 ile yapıldı, aşağıdaki "engelli" eski durumdur.)
 
 Etkinlik takvimi ✔ 10 bayram tarihi (`tests/test_icerik.py`); haftalık turnuva Elo ✔ ödül yalnızca ilk 10'a;
 kayıt yedeği ✔ bayt bayt aynı. Günlük hediye sandığı yapıldı, sonra sahibinin kararıyla kaldırıldı (KAR-03).
