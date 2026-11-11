@@ -9,15 +9,15 @@ denetçi kullanım payı yüzünden durduruldu ve dört bulgudan sonrası yazıl
 
 ## Sayılar
 
-| Alan | Bulgu | Düzeltildi | Çürütüldü | Kararınızı bekliyor | Sonraki aşamada | Denenmedi |
+| Alan | Bulgu | Düzeltildi | Çürütüldü | Karar: böyle kalır | Sonraki aşamada | Denenmedi |
 |---|---:|---:|---:|---:|---:|---:|
 | Kayıt ve göç (yarım) | 4 | 3 | 0 | 0 | 0 | 1 |
-| Ekonomi ve formüller | 9 | 1 | 0 | 1 | 0 | 7 |
-| Sunucu ve komutlar | 9 | 2 | 0 | 1 | 0 | 6 |
+| Ekonomi ve formüller | 9 | 2 | 0 | 0 | 0 | 7 |
+| Sunucu ve komutlar | 9 | 4 | 0 | 0 | 0 | 5 |
 | Bot dünyası, PvP, turnuva | 9 | 0 | 1 | 2 | 2 | 4 |
 | Türkçe ve arayüz | 8 | 0 | 0 | 0 | 1 | 7 |
-| Dağıtım ve güvenlik | 8 | 0 | 0 | 1 | 0 | 7 |
-| **Toplam** | **47** | **6** | **1** | **5** | **3** | **32** |
+| Dağıtım ve güvenlik | 8 | 8 | 0 | 0 | 0 | 0 |
+| **Toplam** | **47** | **17** | **1** | **2** | **3** | **24** |
 
 Önem: 3 Yüksek, 13 Orta, 31 Düşük. Üç Yüksek bulgunun üçü de düzeltildi.
 
@@ -38,14 +38,29 @@ denetçi kullanım payı yüzünden durduruldu ve dört bulgudan sonrası yazıl
 |---|---|
 | DPT-01 (ilk hâli) | "Teslim olmak zafer sayılıyor" yanlış: istemci teslim olunca `win: 0` gönderir. Denetçinin okuma aracı (`abc_okur.cagrilar`) koşullu değeri tek sabit gibi gösteriyordu (S-63). Denetçi raporunu düzeltti. |
 
-## Kararınızı bekleyenler
+## Kararlarınız (11 Kasım 2026)
 
-| Bulgu | Soru |
+| Bulgu | Karar |
 |---|---|
-| DPT-02 | Bot akınında köylüler, şifacılar ve nakitle alınmış birimler de ölüyor. Hepsinin saldırı gücü var (köylü 6, şifacı 15), yani bu bir hata değil, denge kararı. Akınlarda yalnızca asker mi ölsün, yoksa böyle mi kalsın? |
-| DPT-03 | Turnuva puanı istemciden olduğu gibi alınıyor. Puan ancak elle hazırlanmış bir istekle şişirilebilir; hile paneli zaten var. Bir üst sınır konulsun mu? |
-| SNK-05, DGV-01 | "Ev ağı" ayarı açıkken ağdaki başka bir cihaz parolasız girip kaydı değiştirebiliyor. Bu ayar için bir parola mı istensin, yoksa bilerek açık mı kalsın? |
-| EKF-03 | Sunucu kaynak yetiyor mu diye bakmıyor; yalnızca bozuk istemci komutunda bedava kaynak çıkar. Sunucu yetmeyen alımı reddetsin mi? |
+| DPT-02 | Karar verildi (KAR-15): bot akınları böyle kalır. |
+| DPT-03 | Karar verildi (KAR-16): turnuva puanına sınır konmaz. |
+| SNK-05, DGV-01 | Karar verildi (KAR-17): ev ağı parola ister. Düzeltildi: DNT-13. |
+| EKF-03 | Karar verildi (KAR-18): kaynak yetmezse alım reddedilir. Düzeltildi: DNT-14. |
+
+## Güvenlik düzeltmeleri (KAR-17: "güvenlikle ilgili ne varsa hallet")
+
+| Bulgu | Ne yapıldı | Kitap |
+|---|---|---|
+| DGV-01, SNK-05 | Ev ağı açıkken her cihaz parola girer; parola açılışta konsola yazılır | DNT-13 |
+| DGV-02 | Wi-Fi taşımada kod başlıkta; tek cihaz yanlış denemelerle aktarımı kapatamaz | DNT-18 |
+| DGV-03 | CI imza sırları yalnızca ana dalda ve etiketlerde; eylemler SHA'ya sabit | DNT-17 |
+| DGV-04, DGV-05 | İndirilen her varlık sabit commit'in özetiyle denetlenir; uydurma adlar indirilmez | DNT-16 |
+| DGV-06, DGV-07 | Android: hata ayıklama yalnızca sınama yapısında; yedek yalnızca uygulamanın sunucusundan; bulut yedeğine günlük ve ayar girmez | DNT-17 |
+| DGV-08, SNK-09 | Bağımlılıklar sabit; gömülü Python özetle denetlenir; günlükler sınırlı; oturum anahtarı yalnızca sahibine okunur | DNT-15, DNT-17 |
+
+**Sizin yapmanız gereken tek ayar:** GitHub'da depo ayarlarından (Settings → Environments) bir "Environment"
+açıp imza sırlarını (`ANDROID_IMZA`, `ANDROID_IMZA_SIFRESI`) oraya taşımak ve yalnızca `master` ile `v*`
+etiketlerine izin vermek. Bunu yalnızca depo sahibi yapabilir; yapılınca iş akışına bir satır eklenir.
 
 ## Sonraki aşamalarda ele alınacaklar
 
