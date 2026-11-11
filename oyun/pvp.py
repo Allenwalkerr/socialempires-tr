@@ -81,8 +81,19 @@ def _birimleri_sil(harita, kayiplar):
             harita["items"].remove(esya)
 
 
-def saldiri_hakki_var(saldiran, simdi):
-    """İstemcinin Base.processAttacks hesabı: son saldırıdan geriye 6 saat."""
+LIDERLIK_HEYKELI = 366  # Constants.ID_BUILDING_LEADERSHIPSTATUE
+
+
+def saldiri_siniri(harita):
+    """IsoEngine/getNumAttacks: Config.ATTACKS_MAX, kasabada liderlik heykeli (eLeadershipStatue; IsoEngine/
+    addElement'in switch'inde ID_BUILDING_LEADERSHIPSTATUE dalı) varsa + 1 (OYN-16)."""
+    heykel = any(isinstance(e, list) and e and _tam(e[0]) == LIDERLIK_HEYKELI for e in (harita or {}).get("items", []))
+    return SALDIRI_HAKKI + (1 if heykel else 0)
+
+
+def saldiri_hakki_var(saldiran, simdi, harita=None):
+    """İstemcinin Base.processAttacks hesabı: son saldırıdan geriye 6 saat. `harita`: saldırının yapıldığı kasaba
+    (heykel orada aranır; verilmezse ilk kasaba)."""
     ps = saldiran["privateState"]
     if _tam(ps.get("attacksPack")) > 0:
         return True
@@ -92,7 +103,7 @@ def saldiri_hakki_var(saldiran, simdi):
         return True
     son = max(zamanlar)
     sayi = sum(1 for t in zamanlar if son - t < SALDIRI_PERIYODU and t > sifirlama)
-    return sayi < SALDIRI_HAKKI
+    return sayi < saldiri_siniri(harita if harita is not None else (saldiran.get("maps") or [{}])[0])
 
 
 YENI_SONUC_SURESI = 3600  # end_attack_new, aynı savaşın end_attack'ından sonra (aynı ya da sonraki pakette) gelir
@@ -181,16 +192,17 @@ def saldiri_bitir(saldiran, args):
 
     # Kurala uymayan saldırı (hak bitti / aynı hedef 4 saat içinde / hedefin
     # kalkanı var) ganimetsiz kaydedilir; kalkanlı hedefe dokunulmaz.
+    harita_no = _tam((veri.get("attacker") or {}).get("map"))
+    haritalar = saldiran["maps"]
+    harita = haritalar[harita_no] if 0 <= harita_no < len(haritalar) else haritalar[0]
+
     kalkanli = kayitli and pvp_yeni.kalkan_bitisi(kurban) > simdi  # KYT-03
-    kurala_uygun = not kalkanli and saldiri_hakki_var(saldiran, simdi) and not any(
+    kurala_uygun = not kalkanli and saldiri_hakki_var(saldiran, simdi, harita) and not any(
         isinstance(a, dict) and str(a.get("victim_id")) == kurban_id
         and simdi - _tam(a.get("time")) < AYNI_HEDEF_SURESI for a in gonderilen)
     if _tam(ps.get("attacksPack")) > 0:
         ps["attacksPack"] = _tam(ps["attacksPack"]) - 1
 
-    harita_no = _tam((veri.get("attacker") or {}).get("map"))
-    haritalar = saldiran["maps"]
-    harita = haritalar[harita_no] if 0 <= harita_no < len(haritalar) else haritalar[0]
     kaynaklar = veri.get("resources") or {}
     kurban_seviye = _tam((veri.get("victim") or {}).get("level"), 1)
     if kurban:

@@ -49,6 +49,21 @@ class SaldiriHakkiTestleri(unittest.TestCase):
         self.assertFalse(self.hak([SIMDI - 60, SIMDI - 120, SIMDI - 180]))
         self.assertFalse(self.hak([SIMDI - 60, SIMDI - 120, SIMDI - 180, SIMDI - 240]))
 
+    def test_liderlik_heykeli_bir_hak_ekler(self):
+        """OYN-16. IsoEngine/getNumAttacks: Config.ATTACKS_MAX (3), eLeadershipStatue varsa + 1; IsoEngine/
+        addElement'in switch'i Constants.ID_BUILDING_LEADERSHIPSTATUE (366) dalında eLeadershipStatue'yu kurar."""
+        from oyun import pvp
+        uc = [{"time": SIMDI - 60 * i, "victim_id": f"k{i}"} for i in range(1, 4)]
+        dort = uc + [{"time": SIMDI - 240, "victim_id": "k4"}]
+        heykelli = {"items": [[366, 5, 5, 0, 0, 0]]}
+        for saldirilar, harita, beklenen in ((uc, {"items": []}, False), (uc, heykelli, True), (dort, heykelli, False)):
+            kayit = {"privateState": {"attacksSent": saldirilar}, "maps": [harita]}
+            self.assertEqual(pvp.saldiri_hakki_var(kayit, SIMDI), beklenen)
+        # heykel saldırının yapıldığı kasabada aranır
+        kayit = {"privateState": {"attacksSent": uc}, "maps": [{"items": []}, heykelli]}
+        self.assertEqual((pvp.saldiri_hakki_var(kayit, SIMDI, kayit["maps"][0]),
+                          pvp.saldiri_hakki_var(kayit, SIMDI, kayit["maps"][1])), (False, True))
+
     def test_son_saldiridan_alti_saat_sonra_sayac_sifirlanir(self):
         # şimdi - son = 6 * 3600: "< 6 saat" değil, sayılmaz (@468 ifnlt)
         self.assertTrue(self.hak([SIMDI - 6 * SAAT] * 3))

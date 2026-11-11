@@ -1000,13 +1000,13 @@
       "baslik": "Liderlik heykelinin verdiği ek saldırı hakkı sunucuda sayılmıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
-      "kanit": "İstemci IsoEngine/getNumAttacks liderlik heykeli varsa +1 saldırı ekler; pvp.saldiri_hakki_var bunu bilmez, 4. saldırı ganimetsiz kalır (alt ajan; yeniden okunmadı).",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "İstemci IsoEngine/getNumAttacks liderlik heykeli varsa +1 saldırı ekler; pvp.saldiri_hakki_var bunu bilmez, 4. saldırı ganimetsiz kalır (alt ajan; yeniden okunmadı). 11.11.2026: IsoEngine/getNumAttacks@0-51: ATTACKS_MAX + (eLeadershipStatue != null ? 1 : 0); IsoEngine/addElement@1273-1302 switch'in ID_BUILDING_LEADERSHIPSTATUE (366) dalı (@1174) eLeadershipStatue'yu kurar. Config 366: Odin Statue.",
+      "test": "tests/test_denge.py: test_liderlik_heykeli_bir_hak_ekler",
       "pr": null,
       "onay": null,
-      "notlar": "GEC-05'te istemciden okunup düzeltilecek."
+      "notlar": "GEC-05'te istemciden okunup düzeltilecek. Düzeltme: pvp.saldiri_siniri; heykel saldırının yapıldığı kasabada aranır. 3 bozmanın 3'ü düştü."
     },
     {
       "id": "OYN-17",
