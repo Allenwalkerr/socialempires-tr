@@ -113,11 +113,14 @@ def as3_guvensizler(veri: bytes, dizeler):
 
     oyun/swf_yama.abc_dizelerini_degistir sabit havuzundaki dizeyi değiştirir; o dizeyi kullanan HER yer değişir.
     Bu yüzden bir dize ancak (1) ad olarak (ad alanı, çok adlı, yöntem/parametre adı, üst veri) geçmiyorsa,
-    (2) bir sınıf sabitinin ya da isteğe bağlı parametrenin varsayılan değeri değilse (#54 incelemesi) ve (3) bütün `pushstring` kullanımları ekran yazısına (yazi_dizeleri)
-    gidiyorsa güvenle çevrilir. Örnek: "Whirlwind" 26 yerde itilir, 10'u ekrana gider; geri kalanı eşleştirme
+    (2) bir sınıf sabitinin ya da isteğe bağlı parametrenin varsayılan değeri değilse ve (3) her `pushstring`
+    noktası (yöntem, ofset) bir ekran yazısına gidiyorsa güvenle çevrilir (#54 incelemesi: sayı karşılaştırması,
+    tek itmenin birden çok yazma noktasına gitmesiyle şişip ekran dışı bir kullanımı gizleyebilirdi). Bir ABC'de
+    çözülemeyen gövde varsa bütün adaylar güvensiz sayılır: orada ne yapıldığı bilinemez. Sınır (◐): ekrana giden
+    aynı itilmiş değer ayrıca (dup ile) karşılaştırmada da kullanılıyorsa görülmez. Örnek: "Whirlwind" 26 yerde itilir, 10'u ekrana gider; geri kalanı eşleştirme
     anahtarıdır, çevrilirse o eşleşmeler kırılır (GEC-06)."""
     dizeler = set(dizeler)
-    ad_olan, sabit, it, ekran = set(), set(), {}, {}
+    ad_olan, sabit, it, ekran, kor = set(), set(), {}, set(), False
     for abc in abc_okur.swf_abc(veri):
         havuz = abc.dizeler
 
@@ -149,22 +152,26 @@ def as3_guvensizler(veri: bytes, dizeler):
         for g in abc.govdeler.values():
             try:
                 islemler = abc.coz(g)
-            except Exception:  # gizlenmiş gövde: çözülemeyen kullanım bilinemez, sayım eksik kalabilir (◐)
+            except abc_okur.OkumaHatasi:
+                kor = True  # atlanırsa itmeler eksik sayılır, yanılgı "güvenli" yönüne olur (#54 incelemesi)
                 continue
             for isl in islemler.values():
                 if isl.ad == "pushstring":
-                    d = abc.deger(isl)
-                    it[d] = it.get(d, 0) + 1
-        for _, _, d in abc.yazi_dizeleri(YAZI_ALANLARI, YAZI_CAGRILARI):
-            ekran[d] = ekran.get(d, 0) + 1
+                    it.setdefault(abc.deger(isl), set()).add((g.yontem, isl.ofset))
+        noktalar, cozulemeyen = abc.yazi_kaynaklari(YAZI_ALANLARI, YAZI_CAGRILARI)
+        ekran |= noktalar
+        kor = kor or bool(cozulemeyen)
     cikti = {}
     for d in sorted(dizeler):
-        if d in ad_olan:
+        ekrana = {(y, o) for y, o in it.get(d, ()) if (y, o, d) in ekran}
+        if kor:
+            cikti[d] = "çözülemeyen kod gövdesi var; kullanımlar bilinemez"
+        elif d in ad_olan:
             cikti[d] = "ad olarak da geçiyor"
         elif d in sabit:
             cikti[d] = "sınıf sabitinin ya da parametre varsayılanının değeri"
-        elif it.get(d, 0) > ekran.get(d, 0):
-            cikti[d] = "%d kullanımın %d'i ekrana gidiyor" % (it.get(d, 0), ekran.get(d, 0))
+        elif len(ekrana) < len(it.get(d, ())):
+            cikti[d] = "%d kullanımın %d'i ekrana gidiyor" % (len(it.get(d, ())), len(ekrana))
     return cikti
 
 

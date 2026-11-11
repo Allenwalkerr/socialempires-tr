@@ -65,10 +65,40 @@ class As3Guvenligi(unittest.TestCase):
             dizeler=[None, "Sabit", "Varsayilan", "Ekran"], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)],
             yontemler=[{"ad": 0, "adlar": [], "secenekler": [(2, 0x01)]}], ustveriler=[],
             ornekler=[{"ozellikler": [(6, 0, 0, 0, 1, 0x01)]}], siniflar=[], betikler=[], govdeler={},
-            yazi_dizeleri=lambda *a: [("y", 0, d) for d in ("Sabit", "Varsayilan", "Ekran")])
+            yazi_kaynaklari=lambda *a: (set(), 0))
         with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [abc]):
             g = ck.as3_guvensizler(b"", ["Sabit", "Varsayilan", "Ekran"])
         self.assertEqual(set(g), {"Sabit", "Varsayilan"})
+
+    @staticmethod
+    def sahte(itmeler, ekran, coz_hatasi=False, cozulemeyen=0):
+        """itmeler: {ofset: dize} tek gövdede (yöntem 1) pushstring'ler; ekran: {(1, ofset, dize)}."""
+        import types
+        from abc_okur import Islem, OkumaHatasi
+
+        def coz(g):
+            if coz_hatasi:
+                raise OkumaHatasi("bilinmeyen işlem kodu")
+            return {o: Islem(o, "pushstring", (o,), o + 2, ()) for o in itmeler}
+        return types.SimpleNamespace(
+            dizeler=[None], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)], yontemler=[], ustveriler=[], ornekler=[],
+            siniflar=[], betikler=[], govdeler={1: types.SimpleNamespace(yontem=1)}, coz=coz,
+            deger=lambda isl: itmeler[isl.ofset], yazi_kaynaklari=lambda *a: (set(ekran), cozulemeyen))
+
+    def test_her_itme_noktasi_ekrana_gitmeli(self):
+        """#54 incelemesi: "Iki" iki yerden itilir (ofset 0, 5); yalnızca 0'daki ekrana gider (iki yazma noktasına
+        gitse de bir itme noktasıdır). 5'teki ekran dışı kullanım güvensiz kılar. "Tek" tek itmesiyle ekrana gider."""
+        abc = self.sahte({0: "Iki", 5: "Iki", 9: "Tek"}, {(1, 0, "Iki"), (1, 9, "Tek")})
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [abc]):
+            g = ck.as3_guvensizler(b"", ["Iki", "Tek"])
+        self.assertEqual(g, {"Iki": "2 kullanımın 1'i ekrana gidiyor"})
+
+    def test_cozulemeyen_govde_hepsini_guvensiz_yapar(self):
+        """#54 incelemesi: çözülemeyen gövde atlanırsa itmeler eksik sayılır, yanılgı "güvenli" yönüne olur."""
+        for abc in (self.sahte({9: "Tek"}, {(1, 9, "Tek")}, coz_hatasi=True),
+                    self.sahte({9: "Tek"}, {(1, 9, "Tek")}, cozulemeyen=1)):
+            with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri, abc=abc: [abc]):
+                self.assertIn("Tek", ck.as3_guvensizler(b"", ["Tek"]))
 
     def test_okuyucu_secenekleri_saklar(self):
         """abc_okur._yontem: HAS_OPTIONAL (0x08) bayrağında (sıra, tür) çiftleri okunur ve saklanır."""
