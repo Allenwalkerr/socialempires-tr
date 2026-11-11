@@ -204,8 +204,13 @@ def command(USERID, data):
     gunluk = []
     save = session(USERID)
     for komut_verisi in data.get("commands", []):
+        if not isinstance(komut_verisi, dict):  # SNK-04: ["buy"] gibi bozuk öğe paketi düşürmesin
+            print(f" ! Bozuk komut ogesi atlandi: {komut_verisi!r}"[:200])
+            continue
         cmd = komut_verisi.get("cmd")
         args = komut_verisi.get("args", [])
+        if not isinstance(args, list):
+            args = []
         gunluk.append([cmd, args, None])
         once = copy.deepcopy(save) if isinstance(save, dict) else None
         try:

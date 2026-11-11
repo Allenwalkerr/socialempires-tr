@@ -30,33 +30,47 @@ def bugun():
     return datetime.now(TURKIYE).date()
 
 
+_uyarildi = False
+
+
 def _hijridate_ile(yil, tur):
+    """O miladi yıla düşen bütün bayram ilk günleri (bir yıla iki bayram düşebilir: 2033'te iki Ramazan)."""
+    global _uyarildi
     try:
         from hijridate import Hijri
     except ImportError:
-        return None
+        if not _uyarildi:  # denetim EKF-05: sessizce kaybolmasın
+            _uyarildi = True
+            print(" ! hijridate kurulu degil: 2030 sonrasi bayram etkinlikleri acilmaz (pip install -r requirements.txt)")
+        return []
     ay, gun = HICRI_AY[tur]
-    # Bir miladi yıl iki hicri yıla denk gelir; o yıla düşeni seç.
     tahmin = int((yil - 622) * 33 / 32)
-    for hicri_yil in (tahmin, tahmin + 1, tahmin + 2):
+    sonuc = []
+    for hicri_yil in range(tahmin - 1, tahmin + 3):
         try:
             g = Hijri(hicri_yil, ay, gun).to_gregorian()
         except (OverflowError, ValueError):
             continue
         if g.year == yil:
-            return date(g.year, g.month, g.day)
-    return None
+            sonuc.append(date(g.year, g.month, g.day))
+    return sorted(sonuc)
+
+
+def bayramlar(yil, tur):
+    """`tur`: "ramazan" ya da "kurban". O yıla düşen bayramların ilk günleri, sırayla (bilinmiyorsa boş)."""
+    duzeltme = (ayarlar.oku().get("bayram_duzeltme") or {}).get(f"{yil}-{tur}")
+    if duzeltme:
+        return [date.fromisoformat(d) for d in (duzeltme if isinstance(duzeltme, list) else [duzeltme])]
+    tablo = RAMAZAN if tur == "ramazan" else KURBAN
+    if yil in tablo:
+        return [date(yil, *tablo[yil])]
+    return _hijridate_ile(yil, tur)
 
 
 def bayram(yil, tur):
-    """`tur`: "ramazan" ya da "kurban". O yılki bayramın ilk günü (bilinmiyorsa None)."""
-    duzeltme = (ayarlar.oku().get("bayram_duzeltme") or {}).get(f"{yil}-{tur}")
-    if duzeltme:
-        return date.fromisoformat(duzeltme)
-    tablo = RAMAZAN if tur == "ramazan" else KURBAN
-    if yil in tablo:
-        return date(yil, *tablo[yil])
-    return _hijridate_ile(yil, tur)
+    """O yılki ilk bayramın ilk günü (bilinmiyorsa None)."""
+    gunler = bayramlar(yil, tur)
+    return gunler[0] if gunler else None
 
 
 def _yukle():
@@ -70,17 +84,16 @@ def _yukle():
     return _takvim
 
 
-def _aralik(etkinlik, yil):
+def _araliklar(etkinlik, yil):
     gun = etkinlik["gun"]
     if gun in HICRI_AY:
-        merkez = bayram(yil, gun)
-        if merkez is None:
-            return None
+        merkezler = bayramlar(yil, gun)
     else:
         ay, g = (int(x) for x in gun.split("-"))
-        merkez = date(yil, ay, g)
-    baslangic = merkez - timedelta(days=int(etkinlik.get("once", 0)))
-    return baslangic, baslangic + timedelta(days=int(etkinlik.get("sure", 1)))
+        merkezler = [date(yil, ay, g)]
+    for merkez in merkezler:
+        baslangic = merkez - timedelta(days=int(etkinlik.get("once", 0)))
+        yield baslangic, baslangic + timedelta(days=int(etkinlik.get("sure", 1)))
 
 
 def etkinlikler(gun=None, ileri=60):
@@ -89,16 +102,13 @@ def etkinlikler(gun=None, ileri=60):
     sonuc = []
     for etkinlik in _yukle()["etkinlikler"]:
         for yil in (gun.year - 1, gun.year, gun.year + 1):
-            aralik = _aralik(etkinlik, yil)
-            if aralik is None:
-                continue
-            baslangic, bitis = aralik  # bitis dahil değil
-            if bitis <= gun or (baslangic - gun).days > ileri:
-                continue
-            sonuc.append({"ad": etkinlik["ad"], "setler": list(etkinlik.get("setler", [])),
-                          "baslangic": baslangic.isoformat(), "bitis": bitis.isoformat(),
-                          "son_gun": (bitis - timedelta(days=1)).isoformat(),
-                          "aktif": baslangic <= gun < bitis, "bayrak": bool(etkinlik.get("bayrak"))})
+            for baslangic, bitis in _araliklar(etkinlik, yil):  # bitis dahil değil
+                if bitis <= gun or (baslangic - gun).days > ileri:
+                    continue
+                sonuc.append({"ad": etkinlik["ad"], "setler": list(etkinlik.get("setler", [])),
+                              "baslangic": baslangic.isoformat(), "bitis": bitis.isoformat(),
+                              "son_gun": (bitis - timedelta(days=1)).isoformat(),
+                              "aktif": baslangic <= gun < bitis, "bayrak": bool(etkinlik.get("bayrak"))})
     sonuc.sort(key=lambda e: e["baslangic"])
     return sonuc
 

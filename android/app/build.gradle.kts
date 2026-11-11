@@ -74,6 +74,7 @@ chaquopy {
             install("jsonpointer==3.9")
             install("MarkupSafe==3.0.3")
             install("Werkzeug==3.1.9")
+            install("hijridate==2.6.0")
         }
     }
     sourceSets {

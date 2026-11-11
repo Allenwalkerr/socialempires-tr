@@ -39,6 +39,24 @@ def apply_config_patch(filename):
     patch = json_oku(filename)
     jsonpatch.apply_patch(__game_config, patch, in_place=True)
 
+def mod_listesi(klasor):
+    """mods.txt'teki modlar sırayla: [(ad, yol)]. '#' satırı ve boş satır atlanır; '.json' yazılmışsa ayıklanır
+    (denetim EKF-06: replace'in sonucu atılıyordu, 'x.json' satırı 'x.json.json' arıyordu)."""
+    try:
+        with open(os.path.join(klasor, "mods.txt"), encoding="utf-8-sig") as f:
+            satirlar = f.read().splitlines()
+    except OSError:
+        return []
+    sonuc = []
+    for satir in satirlar:
+        mod = satir.strip()
+        if not mod or mod.startswith("#"):
+            continue
+        mod = mod.removesuffix(".json")
+        sonuc.append((mod, os.path.join(klasor, mod + ".json")))
+    return sonuc
+
+
 def patch_game_config():
 
     # Apply patches
@@ -52,21 +70,12 @@ def patch_game_config():
 
     # Apply mods
 
-    if os.path.exists(MODS_DIR + "/mods.txt"):
-        with open(MODS_DIR + "/mods.txt", "r") as f:
-            lines = f.readlines()
-            f.close()
-
-        for line in lines:
-            mod = line.strip()
-            if mod.startswith("#"):
-                continue
-            if mod != "":
-                mod.replace(".json", "")
-                mod_path = f"{MODS_DIR}/{mod}.json"
-                if os.path.exists(mod_path):
-                    apply_config_patch(mod_path)
-                    print(" * Mod applied:", mod)
+    for mod, mod_path in mod_listesi(MODS_DIR):
+        if os.path.exists(mod_path):
+            apply_config_patch(mod_path)
+            print(" * Mod applied:", mod)
+        else:
+            print(f" ! Mod bulunamadi: {mod_path}")
 
     remove_duplicate_items()
     hedefleri_ekle()

@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KAR-13",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşti (e283bd7, Co-authored-by satırı yok). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "GEC-05",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 ve #47 birleşti. #48 (DNT-21 … DNT-24) açık; sahibine sorularak birleşir (KAR-19). GEC-05 (PvP) başladı: yardımcı ajan 8 PvP komutunun bayt kodunu araştırıyor (rapor bulut karalama klasöründe; bulgular kodlanmadan önce yeniden okunur). Kalan denetim bulguları (docs/DENETIM.md): çoğu Düşük; KYG-04 sahibinin kararını bekliyor (göç öncesi yedeği olmayan cihaza taşınan 0.06a kaydında görev numaraları). Sahibinin ayarı: imza sırları için GitHub Environment. Sonra GEC-06 (Türkçe, TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1780,11 +1780,11 @@
       "baslik": "Çiftlik hasadında istemcinin düştüğü odun sunucuda düşülmüyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim EKF-02 (docs/denetim/ekonomi-formuller.md, ◐ idi). Bayt kodu yeniden okundu (11.11.2026): IsoElement/collect @3438-3505 subcat_functional == Constants.SUBCATFUNC_BUILDING_FARM (122) ise Math.round(building.collect / 3) odun canAfford ise adjustStatByType(-odun, WOOD), komut yok; yetmezse @3576-3675 çiftlik removeElement ve CMD_KILL, yerel 12 false olduğundan yiyecek verilmez ve collect gönderilmez (@3805, @3923). Sunucu collect_new odunu düşmüyordu: yeniden açılışta odun geri geliyordu.",
       "test": "tests/test_istemci_kaynakli.py: CiftlikHasadi",
-      "pr": null,
+      "pr": "#47",
       "onay": null,
       "notlar": "Düzeltme: collect_new çiftlikte floor(collect / 3 + 0.5) odun düşer (Yetersiz ise uygulanmaz, KAR-18). Config'te subcat_functional yazıdır ('122'). 3 bozmanın 3'ü düştü (int kesme ve sayı karşılaştırması dahil)."
     },
@@ -1793,13 +1793,78 @@
       "baslik": "Depo komutları haritada ya da depoda olmayan eşyayı da ekliyordu (çoğaltma)",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim SNK-03 (docs/denetim/sunucu-komutlar.md). Yeni testler eski kodda düşüyor: aynı konuma üç store_item → gifts[1] = 3; add_unit_warehouse ve place_warehoused_item tekrarında birim çoğalıyordu. Bayt kodu (11.11.2026): Base/storeItem store_item ve store_item_frombug'ı haritadaki öğenin tx, ty'siyle yollar; haritada olmayanı ekleme yolu store_add_items'tır.",
       "test": "tests/test_komutlar.py: DepoCogaltmaz",
-      "pr": null,
+      "pr": "#47",
       "onay": null,
       "notlar": "Düzeltme: store_item ve add_unit_warehouse eşya haritada yoksa hiçbir şey yapmaz; place_warehoused_item birim depoda yoksa haritaya koymaz. test_arguman_sirasi'nin kurulumu birim deposunu doldurur (gifts gibi). 3 bozmanın 3'ü düştü."
+    },
+    {
+      "id": "KAR-19",
+      "baslik": "PR'lar her seferinde sahibine sorularak birleştirilir",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: 'Her seferinde sor' (soru: denetimler yeşil ve inceleme temizken konuşmaları kapatıp birleştirmeden önce her seferinde sorulsun mu).",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Birleştirme squash ile ve commit metni elle yazılarak yapılır (S-65: otomatik squash Co-authored-by satırı ekler). Konuşmalar düzeltmenin commit'iyle yanıtlanıp kapatılır (S-55, S-64)."
+    },
+    {
+      "id": "DNT-21",
+      "baslik": "Eski Flash sayfasında boş resim ve noopener'sız dış bağlantılar",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim TRA-07 (docs/denetim/turkce-arayuz.md). Doğrulandı (11.11.2026): templates/play.html:33-36 <img> src'siz; iki target=_blank bağlantısında rel=noopener yok; resimlerde alt yok. Yeni test eski sayfada iki kez düşüyor.",
+      "test": "tests/test_sayfa_html.py",
+      "pr": null,
+      "onay": null,
+      "notlar": "Test bütün şablonlara uygulanır: her img'de src ve alt, her target=_blank'te rel=noopener."
+    },
+    {
+      "id": "DNT-22",
+      "baslik": "2030 sonrası bayramlar sessizce yoktu; bir yıla düşen ikinci bayram bulunmuyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-05 (docs/denetim/ekonomi-formuller.md). Doğrulandı (11.11.2026): hijridate gereksinimlerde yoktu, kurulu değilken takvim.bayram 2031+ için None; _hijridate_ile yıl başına tek tarih dönüyordu. hijridate 2.6.0 (Ümmü'l-Kurâ): 2033'te 1454 ve 1455 Şevval'in 1'i (2 Ocak, 23 Aralık). Kitaplık 2026-2030'da Diyanet tablosuyla birebir aynı tarihleri verdi (bağımsız sağlama).",
+      "test": "tests/test_icerik.py: test_2030_sonrasi_bayramlar_kitapliktan, test_bir_yildaki_ikinci_bayramin_etkinligi_de_acilir, test_kitaplik_yoksa_bir_kez_uyarir",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: hijridate==2.6.0 requirements.txt ve Android Chaquopy listesinde; takvim.bayramlar yıla düşen bütün bayramları verir, etkinlikler her birini açar; kitaplık yoksa uyarı bir kez. bayram_duzeltme ayarı liste de alır. 3 bozmanın 3'ü düştü. Ümmü'l-Kurâ ile Diyanet 2031 sonrası bir gün ayrışabilir (◐); ayar elle düzeltir."
+    },
+    {
+      "id": "DNT-23",
+      "baslik": "mods.txt'te .json yazılmış mod sessizce atlanıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-06. Doğrulandı (11.11.2026): oyun/config.py patch_game_config 'mod.replace(\".json\", \"\")' sonucunu atıyordu; 'x.json' satırı 'x.json.json' arıyor, bulamayınca uyarısız geçiyordu. mods.txt'in kendi açıklaması '.json yazmanız gerekmez' diyor.",
+      "test": "tests/test_icerik.py: ModListesi",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: config.mod_listesi (saf, sınanabilir): yorum ve boş satır atlanır, .json soneki ayıklanır, dosya utf-8 okunur; bulunamayan mod uyarı basar. Bozma denemesinde test düştü."
+    },
+    {
+      "id": "DNT-24",
+      "baslik": "Bozuk ya da yanlış türde girdi sunucu hatası (500) veriyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-04 (docs/denetim/sunucu-komutlar.md). Yeni test eski kodda düşüyor: komut gövdesi [1, 2] → 500. Kayıt bozulmuyordu (genel hata işleyicisi), ama istemci hatası sunucu hatası gibi günlüğe düşüyordu.",
+      "test": "tests/test_http.py: test_bozuk_girdi_sunucu_hatasi_degil",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: servis_govdesi sözlük olmayan JSON'da {} döner; map, item_id, level_id güvenli çevrilir; komut paketi sözlük değilse ya da commands liste değilse 400; listedeki sözlük olmayan öğe atlanır; get_player_info bilinmeyen kimlikte 404."
     }
   ]
 }

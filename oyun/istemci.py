@@ -41,9 +41,18 @@ def servis_govdesi():
     if ";" in ham and not ham.lstrip().startswith("{"):
         ham = ham.split(";", 1)[1]
     try:
-        return json.loads(ham) if ham else {}
+        veri = json.loads(ham) if ham else {}
     except json.JSONDecodeError:
         return {}
+    return veri if isinstance(veri, dict) else {}  # denetim SNK-04: [1] ya da "x" gövdesi .get'te 500 veriyordu
+
+
+def _istek_tami(ad, varsayilan):
+    """İstek değerini tamsayıya çevirir; bozuksa varsayılan (SNK-04: int('abc') 500 veriyordu)."""
+    try:
+        return int(request.values.get(ad) or varsayilan)
+    except (TypeError, ValueError, OverflowError):
+        return varsayilan
 
 
 @app.route(DINAMIK + "/track_game_status.php", methods=["POST"])
@@ -67,13 +76,14 @@ def get_game_config_response():
 def get_player_info_response():
     uid = request.values.get("USERID", "")
     kullanici = request.values.get("user")
-    harita_no = int(request.values.get("map", 0) or 0)
+    harita_no = _istek_tami("map", 0)
     if kullanici is None:
         paket_gecmisini_sil(uid)
-        kayit = kayit_oturumu(uid)
-        if kayit is not None:
-            with save_lock:
-                kompu_donemini_guncelle(kayit)
+        kayit = kayit_oturumu(uid) if gecerli_uid(uid) else None
+        if kayit is None:
+            return ({"result": "error"}, 404)  # SNK-04: bilinmeyen kimlik 500 veriyordu
+        with save_lock:
+            kompu_donemini_guncelle(kayit)
         return (get_player_info(uid, harita_no), 200)
     if neighbor_session(kullanici) is None and kullanici.startswith("100000"):
         return get_quest_map(kullanici)  # görev (quest) haritası
@@ -113,6 +123,9 @@ def command_response():
         veri = json.loads(paket[65:])
     except json.JSONDecodeError as hata:
         print(f" ! Komut JSON'u cozulemedi: {hata}")
+        return ({"result": "error"}, 400)
+    if not isinstance(veri, dict) or not isinstance(veri.get("commands", []), list):  # SNK-04
+        print(" ! Komut paketi bicimi bozuk (commands listesi bekleniyordu)")
         return ({"result": "error"}, 400)
     if kayit_oturumu(uid) is None:
         return ({"result": "error"}, 404)
@@ -219,7 +232,7 @@ def register_found_item_response():
     """Kayıp hayvan/eşya bulundu (bina 91+tür haritadan kalkar). İmzasız istek."""
     uid = request.values.get("sender_id") or request.values.get("USERID", "")
     kayit = kayit_oturumu(uid)
-    tur = int(request.values.get("item_id", 1) or 1)
+    tur = _istek_tami("item_id", 1)
     if kayit is not None:
         with save_lock:
             for harita in kayit["maps"]:
@@ -258,7 +271,7 @@ def get_continent_ranking_response():
             if request.values.get("relocate") == "1":
                 Ada.yer_degistir(kayit)
             save_session(uid)
-    kita = int(request.values.get("level_id") or 0) or None
+    kita = _istek_tami("level_id", 0) or None
     return {"world_id": Ada.dunya_kimligi(kayit), "continent": Ada.kita_listesi(kayit, kita)}
 
 
