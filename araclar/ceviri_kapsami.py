@@ -113,7 +113,7 @@ def as3_guvensizler(veri: bytes, dizeler):
 
     oyun/swf_yama.abc_dizelerini_degistir sabit havuzundaki dizeyi değiştirir; o dizeyi kullanan HER yer değişir.
     Bu yüzden bir dize ancak (1) ad olarak (ad alanı, çok adlı, yöntem/parametre adı, üst veri) geçmiyorsa,
-    (2) bir sınıf sabitinin değeri değilse ve (3) bütün `pushstring` kullanımları ekran yazısına (yazi_dizeleri)
+    (2) bir sınıf sabitinin ya da isteğe bağlı parametrenin varsayılan değeri değilse (#54 incelemesi) ve (3) bütün `pushstring` kullanımları ekran yazısına (yazi_dizeleri)
     gidiyorsa güvenle çevrilir. Örnek: "Whirlwind" 26 yerde itilir, 10'u ekrana gider; geri kalanı eşleştirme
     anahtarıdır, çevrilirse o eşleşmeler kırılır (GEC-06)."""
     dizeler = set(dizeler)
@@ -135,6 +135,9 @@ def as3_guvensizler(veri: bytes, dizeler):
         for y in abc.yontemler:
             for i in [y["ad"]] + list(y["adlar"]):
                 ekle(ad_olan, i)
+            for sira, tur in y.get("secenekler", ()):
+                if tur == 0x01:  # varsayılan değer dize: pushstring'le itilmez, sayımda görünmez
+                    ekle(sabit, sira)
         for ad, ciftler in abc.ustveriler:
             for i in [ad] + [x for c in ciftler for x in c]:
                 ekle(ad_olan, i)
@@ -159,7 +162,7 @@ def as3_guvensizler(veri: bytes, dizeler):
         if d in ad_olan:
             cikti[d] = "ad olarak da geçiyor"
         elif d in sabit:
-            cikti[d] = "sınıf sabitinin değeri"
+            cikti[d] = "sınıf sabitinin ya da parametre varsayılanının değeri"
         elif it.get(d, 0) > ekran.get(d, 0):
             cikti[d] = "%d kullanımın %d'i ekrana gidiyor" % (it.get(d, 0), ekran.get(d, 0))
     return cikti

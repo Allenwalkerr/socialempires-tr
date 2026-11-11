@@ -2030,10 +2030,10 @@
       "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Ölçüm (araclar/ceviri_kapsami.py, 1.4.07): önce metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219. Taslak yardımcı ajanın (467 öğe: çevir ya da dolgu+neden); her satır gözden geçirildi: 23 şablon/şaka yazısı dolguya alındı, 2 AS3 çevirisi düzeltildi (TU ERES LA BRIGADA BRUTAL = acımasız tugay; DAİRESEL ATEŞ ŞAPLAĞI), HONOR RANKS çoğul, yazı tipinde olmayan 'â' (3 yer) kaldırıldı. Bulundu: oyun/swf_yama.abc_dizelerini_degistir sabit havuzundaki dizeyi değiştirdiği için dizenin HER kullanımı değişir; 6 ekran dizesi ekran dışında da kullanılıyor (OK ad olarak; Whirlwind 26 kullanımın 10'u, Minions 16/13, Energy Balls 15/9, Fire Balls 2/1, Dummy Attack 4/3): çevrilmedi.",
-      "test": "tests/test_ceviri_kapsami.py: As3Guvenligi (2), Dolgu",
+      "test": "tests/test_ceviri_kapsami.py: As3Guvenligi (2), Dolgu; test_sabit_ve_parametre_varsayilani, test_okuyucu_secenekleri_saklar",
       "pr": null,
       "onay": null,
-      "notlar": "Sonra: metin alanları 554/554, sabit yazılar 44/46 (kalan cash ve 'Use times' yazı tipine gömülü, çevrilemez), AS3 dizeleri 213/219 (kalan 6 güvensiz). araclar/ceviri_kapsami.as3_guvensizler: ad olarak geçen, sınıf sabiti olan ya da pushstring sayısı ekran kullanımından fazla olan dize çevrilmiş sayılmaz ve raporda listelenir. Dolgu ceviri/dolgu.json'da nedenleriyle (96). Gerçek istemciye yama uygulandı: yeni SWF okunuyor, çeviriler havuzda, güvensiz 6 dize değişmemiş. 4 bozmanın 4'ü düştü. İşaret ◐: oyunda ekran görüntüsüyle bakılmadı."
+      "notlar": "Sonra: metin alanları 554/554, sabit yazılar 44/46 (kalan cash ve 'Use times' yazı tipine gömülü, çevrilemez), AS3 dizeleri 213/219 (kalan 6 güvensiz). araclar/ceviri_kapsami.as3_guvensizler: ad olarak geçen, sınıf sabiti olan ya da pushstring sayısı ekran kullanımından fazla olan dize çevrilmiş sayılmaz ve raporda listelenir. Dolgu ceviri/dolgu.json'da nedenleriyle (96). Gerçek istemciye yama uygulandı: yeni SWF okunuyor, çeviriler havuzda, güvensiz 6 dize değişmemiş. 4 bozmanın 4'ü düştü. İşaret ◐: oyunda ekran görüntüsüyle bakılmadı. #54 incelemesi: isteğe bağlı parametrelerin varsayılan dize değerleri (method_info HAS_OPTIONAL, tür 0x01) pushstring'le itilmediği için sayılmıyordu; abc_okur._yontem artık secenekler'i saklıyor, as3_guvensizler onları sınıf sabitleri gibi güvensiz sayıyor. 1.4.07'de sonuç değişmedi (213/219). 3 bozmanın 3'ü düştü."
     }
   ]
 }

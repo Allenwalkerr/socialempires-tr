@@ -265,12 +265,13 @@ class Abc:
         turler = [o.u30() for _ in range(n)]
         ad = o.u30()
         bayrak = o.u8()
+        secenekler = []  # HAS_OPTIONAL: isteğe bağlı parametrelerin varsayılan değerleri (sıra, tür)
         if bayrak & 0x08:
             for _ in range(o.u30()):
-                o.u30()
-                o.u8()
+                secenekler.append((o.u30(), o.u8()))
         adlar = [o.u30() for _ in range(n)] if bayrak & 0x80 else []
-        return {"param": n, "donus": donus, "turler": turler, "ad": ad, "bayrak": bayrak, "adlar": adlar}
+        return {"param": n, "donus": donus, "turler": turler, "ad": ad, "bayrak": bayrak, "adlar": adlar,
+                "secenekler": secenekler}
 
     def _ozellikler(self, o):
         cikti = []

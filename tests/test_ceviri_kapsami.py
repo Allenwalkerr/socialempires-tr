@@ -55,6 +55,29 @@ class As3Guvenligi(unittest.TestCase):
         self.assertEqual(g["buy"], "2 kullanımın 0'i ekrana gidiyor")
         self.assertEqual(g["text"], "ad olarak da geçiyor")
 
+    def test_sabit_ve_parametre_varsayilani(self):
+        """#54 incelemesi: sınıf sabitinin değeri (Slot/Const, değer türü 0x01) ve isteğe bağlı parametrenin
+        varsayılan değeri (method_info HAS_OPTIONAL, tür 0x01) dize havuzuna gönderme yapar ama pushstring'le
+        itilmez. Bu dizeler ekrana gitse bile güvensizdir. Sahte ABC: dize 1 "Sabit", 2 "Varsayilan", 3 "Ekran";
+        üçü de birer kez ekrana gider."""
+        import types
+        abc = types.SimpleNamespace(
+            dizeler=[None, "Sabit", "Varsayilan", "Ekran"], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)],
+            yontemler=[{"ad": 0, "adlar": [], "secenekler": [(2, 0x01)]}], ustveriler=[],
+            ornekler=[{"ozellikler": [(6, 0, 0, 0, 1, 0x01)]}], siniflar=[], betikler=[], govdeler={},
+            yazi_dizeleri=lambda *a: [("y", 0, d) for d in ("Sabit", "Varsayilan", "Ekran")])
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [abc]):
+            g = ck.as3_guvensizler(b"", ["Sabit", "Varsayilan", "Ekran"])
+        self.assertEqual(set(g), {"Sabit", "Varsayilan"})
+
+    def test_okuyucu_secenekleri_saklar(self):
+        """abc_okur._yontem: HAS_OPTIONAL (0x08) bayrağında (sıra, tür) çiftleri okunur ve saklanır."""
+        from test_komut_imzalari import _u30
+        # 1 parametre, dönüş 0, tür 0, ad 0, bayrak HAS_OPTIONAL; 1 seçenek: sıra 5, tür 0x01 (dize)
+        veri = _u30(1) + _u30(0) + _u30(0) + _u30(0) + bytes([0x08]) + _u30(1) + _u30(5) + bytes([0x01])
+        y = ck.abc_okur.Abc._yontem(ck.abc_okur._Okur(veri))
+        self.assertEqual(y["secenekler"], [(5, 0x01)])
+
     def test_guvensiz_ceviri_cevrilmis_sayilmaz(self):
         """Ekran dizesi bir yerde ad olarak da geçerse sözlükte olsa bile çevrilmiş sayılmaz ve listelenir."""
         sozluk = {"metin_alanlari": {}, "statik_yazilar": {}, "as3_dizeleri": {"Level ": "Seviye "}}
