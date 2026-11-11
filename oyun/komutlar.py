@@ -269,7 +269,7 @@ def _gunluge_yaz(USERID, komutlar):
 
 @komut("game_status", "ping", "system_set_count_hack", "perform_city_quest",
        "spy_player", "reset_position_univers",
-       "rt_publish_achievement_unit", "start_quest", "gold_statue_conversion",
+       "rt_publish_achievement_unit", "gold_statue_conversion",
        # Quest$/start@81: argümansız, start_quest'in ardından; istemci başka bir şey değiştirmez
        "start_quest_new",
        # Yalnızca istemcideki geliştirici panelinden gelenler (reset_dragon: AdminPanel/resetPopupDragon,
@@ -277,6 +277,21 @@ def _gunluge_yaz(USERID, komutlar):
        "fast_forward", "load_map", "save_map", "reset", "clear_tiles_area", "set_variables", "reset_dragon")
 def kayitsiz(save, a):
     pass
+
+
+GOREV_ARALIGI = 21600  # Quest.DELAY_ALLOWED (sn); istemci saati de saniye (Base/clientTimestamp)
+GOREV_HAKKI = 4  # Quest.MAX_QUESTS_ON_TIME; Odin heykeli yoksa istemci 1 eksik sayar (getNumQuestsAvailable@181-212)
+
+
+@komut("start_quest")
+def start_quest(save, a):
+    """[görev, kasaba] (Quest$/start@58). KMT-08, KAR-25 (sahibi: "oyunun kuralı işlesin"): istemci kalan görev hakkını
+    map.lastQuestTimes'tan sayar (Quest$/getNumQuestsAvailable: en yeniden geriye, aralarında DELAY_ALLOWED'dan az fark
+    olanlar), ama listeye kendisi hiç yazmaz (Base/processAttacks@2085 yalnızca okur); yazan sunucudur. Sayım hakkı en çok
+    GOREV_HAKKI olduğundan son GOREV_HAKKI başlangıç yeter."""
+    h = harita(save, a.tam(1))
+    zamanlar = [t for t in (h.get("lastQuestTimes") or []) if isinstance(t, (int, float))]
+    h["lastQuestTimes"] = (zamanlar + [timestamp_now()])[-GOREV_HAKKI:]
 
 
 # ---------------------------------------------------------------------------

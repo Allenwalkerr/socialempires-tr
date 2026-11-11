@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KYT-02",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #64 birleşti. Günlük ödül (KYT-02, KAR-24) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-12, 13, kalan denetim bulguları (DNT-25 … DNT-40), GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "KMT-08",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #65 birleşti. Sahibinin kararları KAR-25 … KAR-28. KMT-08 (görev sınırı) ve kalan denetim bulguları PR'da; KMT-09 ve OYN-29 için bayt kodu araştırması sürüyor. Sonra GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -948,7 +948,7 @@
       "baslik": "Seviye atlayınca sayfanın üstündeki seviye/XP bilgisi yenilenmiyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Önceki oturumun devrinde bildirildi; bu oturumda yeniden üretilmedi.",
       "test": "tests/test_seviye.py: BaslikYenilenir, test_xp_cubugu_istemcinin_araligi",
@@ -961,7 +961,7 @@
       "baslik": "'Yedek yükle' düğmesine klavyeyle ulaşılamıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Önceki oturumun devrinde bildirildi; bu oturumda yeniden üretilmedi.",
       "test": "tests/test_diyar.py: test_yedek_dosya_secicisi_klavyeyle_ulasilir",
@@ -1221,7 +1221,7 @@
       "baslik": "Yeni günlük ödül, ilk alım teklifi, Ada Ocağı, kuyruklar ve mezarlık alanları yokken bu özellikler kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bayt kodu (31.10.2026): DailyBonusManager/initPlayerData numDayLogged/lastDayRewarded/nextDayReward, DailyBonusButton/isActive showDailyBonus; FirstOfferButton/isActive firstPurchaseTimestamp ve numDayLogged < 3; CollectGameManager collectGame; BuildingQueueManager barracksQueues; loadGraveyardState resurrectableUnits, graveyardCapacity. Alan yokken bu yollar boş ya da kapalı geçiyor; hata vermiyor (yeni imparatorluk ve göç etmiş kayıtta konsol hatası 0, GEC-02).",
       "test": "tests/test_gunluk_odul.py (6 test)",
@@ -1494,26 +1494,26 @@
       "baslik": "Görev sınırı (6 saatte 3, Odin heykeliyle 4) uygulanmıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "ci_bekliyor",
       "isaret": "✔",
       "kanit": "Quest$/getNumQuestsAvailable map.lastQuestTimes'tan sayar (DELAY_ALLOWED = 6 sa, MAX_QUESTS_ON_TIME = 4, getMaxnumOfQuests); istemci lastQuestTimes'a hiç yazmaz, sunucu da yazmıyor: görev sayısı sınırsız.",
-      "test": null,
+      "test": "tests/test_gorev_siniri.py (3 test)",
       "pr": null,
-      "onay": null,
-      "notlar": "Denge kararı sahibinde. Uygulanacaksa start_quest (kasabayı taşır) lastQuestTimes'a şimdiyi ekler, 6 saatten eskileri atar; start_quest_new'de değil (iki kez sayılır)."
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Denge kararı sahibinde. Uygulanacaksa start_quest (kasabayı taşır) lastQuestTimes'a şimdiyi ekler, 6 saatten eskileri atar; start_quest_new'de değil (iki kez sayılır). 11.11.2026 (KAR-25), bayt kodu ✔: Quest.DELAY_ALLOWED 21600 sn, MAX_QUESTS_ON_TIME 4; getNumQuestsAvailable en yeniden geriye, aralarında 6 saatten az fark olanları sayar, Odin yoksa 1 eksik; Base/processAttacks@2085 listeyi map.lastQuestTimes'tan okur, istemci yazmaz. start_quest [görev, kasaba] artık o kasabanın lastQuestTimes'ına şimdiyi ekler (son 4). 4 bozma düştü."
     },
     {
       "id": "KMT-09",
       "baslik": "Asker Toplama ödülü çevrimdışı oyunda alınamıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "✔",
       "kanit": "PopupRecruitment: işe al düğmesi si.length >= num_recruitments ise açılır; si yalnızca onFindFriend → ExternalInterface showPopupSEHelpSocialItem ile dolar, templates/js/oyun.js'te yok; btBuy hep gizli (createFotos@474).",
       "test": "tests/test_istemci_kaynakli.py: AskerToplama",
       "pr": "#38",
-      "onay": null,
-      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar."
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR."
     },
     {
       "id": "OYN-18",
@@ -2287,26 +2287,26 @@
       "baslik": "Ada Ocağı ve viral teklifler yazıldı ama oyuncuya kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "✔",
       "kanit": "docs/inceleme/1407-formuller.md iki yerde 'açılması ayrı karar'; config'te starts_at/duration 0. Komutlar GEC-03'te yazıldı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
-      "onay": null,
-      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri."
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR."
     },
     {
       "id": "OYN-30",
       "baslik": "Kaynağı olmayan denge sabitleri sahibinin kararını bekliyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "✔",
       "kanit": "TST-04 notunda düz metin: denge.GANIMET_ORANI 0,10, GANIMET_TAVANI 50000, YENI_OYUNCU_KALKANI 24 sa, pvp.GALIBIYET_ASGARI_ALTIN 25, XP_PAYI 150, elo K 32/16, BASLANGIC 1500, HAFTALIK_MAC 3, turnuva.TAKIM_BOYU 20, bot hedef aralığı 6 sa (istemci 4 sa). Ayrı madde yoktu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
-      "onay": null,
-      "notlar": "Değerler sabitlendi (testleri var); değiştirilip değiştirilmeyeceği sahibinde."
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Değerler sabitlendi (testleri var); değiştirilip değiştirilmeyeceği sahibinde. 11.11.2026: KAR-28."
     },
     {
       "id": "KYN-07",
@@ -2385,6 +2385,58 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Günlük ödül yalnızca oyunun kendi ödülüdür (KAR-03) kuralıyla uyumlu."
+    },
+    {
+      "id": "KAR-25",
+      "baslik": "Görev sınırı oyunun kuralıyla işler (6 saatte 3, Odin heykeliyle 4)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "KMT-08 soruldu: 'Oyunun kuralı işlesin / Sınırsız kalsın' → 'Oyunun kuralı işlesin'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Uygulama: komutlar.start_quest (KMT-08)."
+    },
+    {
+      "id": "KAR-26",
+      "baslik": "Asker Toplama'da botlar arkadaş yerine geçer",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "KMT-09 soruldu: 'Botlar yardım etsin / Kapalı kalsın' → 'Botlar yardım etsin'. Tek kişilik kuralıyla uyumlu: gerçek davet yok.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Önce bayt kodundan ExternalInterface yolu okunur (yardımcı araştırması)."
+    },
+    {
+      "id": "KAR-27",
+      "baslik": "Ada Ocağı ve viral teklifler açılır",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "OYN-29 soruldu: 'İkisini de aç / Yalnızca Ada Ocağı / Kapalı kalsın' → 'İkisini de aç'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Açılmadan önce bayt kodundan nasıl açıldıkları okunur; çevrimdışı oyunda çalışamayacak ya da çok oyunculu bir parça çıkarsa sahibine yeniden sorulur."
+    },
+    {
+      "id": "KAR-28",
+      "baslik": "Kaynağı olmayan denge sabitleri olduğu gibi kalır",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "OYN-30 soruldu: 'Olduğu gibi kalsın / Tek tek sor' → 'Olduğu gibi kalsın'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Değerler tests/test_denge.py ile sabit."
     }
   ]
 }
