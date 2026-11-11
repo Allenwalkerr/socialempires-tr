@@ -164,16 +164,79 @@ class UygulamaJetonu(unittest.TestCase):
 
 
 class VarlikIndirme(unittest.TestCase):
+    YOL = "bigbosses/bigboss1.jpg"  # config/varlik_ozetleri.tsv'de (sabit commit'in ağacında)
+
     def test_basarisiz_indirme_on_dakika_yeniden_denenmez(self):
         from unittest import mock
         from oyun import varliklar
         cagri = []
         with mock.patch.object(varliklar, "_indir_dene", lambda p, h: cagri.append(p) or False):
-            varliklar._basarisiz.pop("x/yok.png", None)
-            self.assertFalse(varliklar._indir("x/yok.png", "/tmp/yok.png"))
-            self.assertFalse(varliklar._indir("x/yok.png", "/tmp/yok.png"))
-        self.assertEqual(cagri, ["x/yok.png"])  # ikinci istek beklemeden döner
-        varliklar._basarisiz.pop("x/yok.png", None)
+            varliklar._basarisiz.pop(self.YOL, None)
+            self.assertFalse(varliklar._indir(self.YOL, "/tmp/yok.png"))
+            self.assertFalse(varliklar._indir(self.YOL, "/tmp/yok.png"))
+        self.assertEqual(cagri, [self.YOL])  # ikinci istek beklemeden döner
+        varliklar._basarisiz.pop(self.YOL, None)
+
+    def test_agacta_olmayan_ad_indirilmez(self):
+        """Denetim DGV-05: uydurma adla dışarıya indirme yaptırılamaz; başarısızlar sözlüğü de büyümez."""
+        from unittest import mock
+        from oyun import varliklar
+        cagri = []
+        with mock.patch.object(varliklar, "_indir_dene", lambda p, h: cagri.append(p) or False):
+            for i in range(50):
+                self.assertIsNone(varliklar.varlik_yolu(f"x/uydurma{i}.png"))
+        self.assertEqual(cagri, [])
+        self.assertFalse(any(k.startswith("x/uydurma") for k in varliklar._basarisiz))
+        self.assertEqual(varliklar.git_ozeti(self.YOL), "78b23b4551f2889001a46781916295f2f425a331")  # git ls-tree
+
+    def test_ozeti_uymayan_indirme_sunulmaz(self):
+        """Denetim DGV-04: hangi kaynaktan gelirse gelsin indirilen içerik sabit commit'in git blob özetine uymalı
+        (özet: git hash-object = SHA-1("blob <boyut>\\0" + içerik))."""
+        import hashlib
+        import io
+        import tempfile
+        from unittest import mock
+        from oyun import varliklar
+        dogru = b"\x89PNG" + b"d" * 100
+        ozet = hashlib.sha1(b"blob %d\0" % len(dogru) + dogru).hexdigest()
+        klasor = tempfile.mkdtemp()
+        hedef = os.path.join(klasor, "a.png")
+        for icerik, beklenen in ((b"\x89PNG" + b"k" * 100, False), (dogru, True)):
+            with mock.patch.object(varliklar, "git_ozeti", lambda p: ozet), \
+                    mock.patch.object(varliklar.urllib.request, "urlopen", lambda *a, **k: io.BytesIO(icerik)):
+                self.assertEqual(varliklar._indir_dene("a.png", hedef), beklenen)
+            self.assertEqual(os.path.exists(hedef), beklenen)
+        # özeti uymayan eski indirme (denetimden önce inmiş) sunulmaz
+        with open(hedef, "wb") as f:
+            f.write(b"\x89PNG" + b"e" * 100)
+        with mock.patch.object(varliklar, "git_ozeti", lambda p: ozet):
+            self.assertFalse(varliklar._indirilen_dogru("a.png", hedef))
+
+    def test_toplu_indirici_ozeti_denetler(self):
+        """varliklari_indir.py'nin HTTP yolu da indirdiğini config/varlik_ozetleri.tsv ile denetler (DGV-04)."""
+        import hashlib
+        import importlib.util
+        import io
+        import json as js
+        import tempfile
+        from unittest import mock
+        spec = importlib.util.spec_from_file_location("vi", os.path.join(KOK, "varliklari_indir.py"))
+        vi = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(vi)
+        dogru = b"d" * 100
+        ozetler = {"a/dogru.png": hashlib.sha1(b"blob 100\0" + dogru).hexdigest(),
+                   "a/yanlis.png": hashlib.sha1(b"blob 100\0" + dogru).hexdigest()}
+        agac = {"tree": [{"type": "blob", "path": "assets/a/dogru.png"}, {"type": "blob", "path": "assets/a/yanlis.png"},
+                         {"type": "blob", "path": "assets/a/listede_yok.png"}]}
+        def ac(url, timeout=None):
+            if "api.github.com" in url:
+                return io.BytesIO(js.dumps(agac).encode())
+            return io.BytesIO(dogru if url.endswith("dogru.png") else b"k" * 100)
+        klasor = tempfile.mkdtemp()
+        with mock.patch.object(vi, "KOK", klasor), mock.patch.object(vi, "_ozetler", lambda: ozetler), \
+                mock.patch.object(vi.urllib.request, "urlopen", ac):
+            vi.http_ile()
+        self.assertEqual(sorted(os.listdir(os.path.join(klasor, "assets", "a"))), ["dogru.png"])
 
 
 if __name__ == "__main__":

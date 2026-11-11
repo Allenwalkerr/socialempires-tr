@@ -23,7 +23,7 @@ from werkzeug.utils import safe_join
 from oyun import fx_yama, kaynaklar, ruffle as Ruffle
 from oyun import swf_yama
 from oyun.sunucu import OYUN_DILI, app
-from oyun.yollar import ASSETS_DIR, INDIRILEN_DIR
+from oyun.yollar import ASSETS_DIR, CONFIG_DIR, INDIRILEN_DIR
 
 STATIK = "/default01.static.socialpointgames.com/static/socialempires"
 INDIRILEN_VARLIKLAR = os.path.join(INDIRILEN_DIR, "assets")
@@ -57,6 +57,10 @@ _basarisiz = {}
 
 
 def _indir(path, hedef):
+    # DGV-05: yalnızca sabit commit'in ağacındaki dosyalar indirilir. Uydurma adlarla sunucu dışarıya indirmeye
+    # zorlanamaz (8 iş parçacığı 15'er sn bekletilirdi) ve _basarisiz en çok ağaçtaki dosya sayısı kadar büyür.
+    if git_ozeti(path) is None:
+        return False
     if time.time() < _basarisiz.get(path, 0):
         return False
     if _indir_dene(path, hedef):
@@ -77,6 +81,8 @@ def _indir_dene(path, hedef):
                 shutil.copyfileobj(yanit, f)
             if not _gecerli_dosya(gecici):
                 raise OSError("indirilen dosya gecersiz")
+            if _blob_ozeti(gecici) != git_ozeti(path):  # DGV-04: kaynağı ne olursa olsun içerik sabit commit'inki
+                raise OSError("indirilen dosyanin ozeti uymuyor")
             os.replace(gecici, hedef)  # atomik: yarım dosya sunulmaz
             print(f" [+] Varlik indirildi: {url}")
             return True
@@ -85,6 +91,28 @@ def _indir_dene(path, hedef):
             if os.path.exists(gecici):
                 os.remove(gecici)
     return False
+
+
+OZET_LISTESI = os.path.join(CONFIG_DIR, "varlik_ozetleri.tsv")
+_git_ozetleri = None
+
+
+def git_ozeti(path):
+    """Varlığın sabit commit'teki git blob özeti (config/varlik_ozetleri.tsv); ağaçta yoksa None."""
+    global _git_ozetleri
+    if _git_ozetleri is None:
+        with open(OZET_LISTESI, encoding="utf-8") as f:
+            _git_ozetleri = dict(s.rstrip("\n").split("\t") for s in f if s.strip() and not s.startswith("#"))
+    return _git_ozetleri.get(path)
+
+
+def _blob_ozeti(yol):
+    """git hash-object: SHA-1("blob <boyut>\\0" + içerik)."""
+    ozet = hashlib.sha1(b"blob %d\0" % os.path.getsize(yol))
+    with open(yol, "rb") as f:
+        for parca in iter(lambda: f.read(1 << 20), b""):
+            ozet.update(parca)
+    return ozet.hexdigest()
 
 
 # Özeti denetlenen dosyalar: istemci SWF'si (GEC-02). Uymayan dosya sunulmaz; indirilmişse silinir.
@@ -157,7 +185,7 @@ def varlik_yolu(path):
     if not indirilen:
         return None
     if os.path.isfile(indirilen):
-        if _gecerli_dosya(indirilen) and ozet_uyuyor(path, indirilen):
+        if _gecerli_dosya(indirilen) and ozet_uyuyor(path, indirilen) and _indirilen_dogru(path, indirilen):
             return indirilen
         _sil(indirilen)  # yarım, bozuk ya da özeti uymayan indirme: yeniden dene
     if not _indir(path, indirilen):
@@ -166,6 +194,29 @@ def varlik_yolu(path):
         return indirilen
     _sil(indirilen)
     return None
+
+
+_dogru_indirilen = {}
+
+
+def _indirilen_dogru(path, yol):
+    """Önceden (özet denetimi yokken) indirilmiş dosya da ağacın özetine uymalı; dosya değişmedikçe bir kez
+    hesaplanır. Ağaçta olmayan eski indirme sunulur (silinirse yeniden indirilemez)."""
+    beklenen = git_ozeti(path)
+    if beklenen is None:
+        return True
+    try:
+        st = os.stat(yol)
+        imza = (st.st_size, st.st_mtime_ns)
+        if _dogru_indirilen.get(yol) == imza:
+            return True
+        if _blob_ozeti(yol) != beklenen:
+            print(f" ! {path} indirilmis kopyasi ozete uymuyor; yeniden indirilecek")
+            return False
+    except OSError:
+        return False
+    _dogru_indirilen[yol] = imza
+    return True
 
 
 def _sil(yol):

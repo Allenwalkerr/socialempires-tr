@@ -1735,6 +1735,19 @@
       "pr": null,
       "onay": "KAR-17",
       "notlar": "Düzeltme: oyun/gunlukler.ekle bütün günlükler için: 2 MB'ta bir eski kopya (.1), tek kayıt en çok 16 KB. Oturum anahtarı 0600 yazılır, eskisi açılışta 0600'e çekilir. 4 bozmanın 4'ü düştü (ilk denemede satır sınırının testi yanlış biçimde istek gönderiyordu, düzeltildi)."
+    },
+    {
+      "id": "DNT-16",
+      "baslik": "İndirilen varlıklar özetsizdi; uydurma adlarla sunucu dışarıya indirmeye zorlanabiliyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-04, DGV-05 (docs/denetim/dagitim-guvenlik.md). Yeniden üretildi (11.11.2026): varliklar._indir her geçerli karakterli yolu iki kaynaktan (ikincisi static.socialpointgames.com, sabitlenmemiş, hâlâ 200 dönüyor) indirmeyi deniyordu; tek içerik denetimi 'boş ya da HTML değil'. Sabit commit'in ağacı içerik indirilmeden alındı (git fetch --filter=blob:none, ls-tree): 4825 dosya; istemci SWF'sinin blob özeti (fc0831af…) indirilen dosyanınkiyle aynı. Gerçek kaynaktan iki dosya (bigboss1.jpg, istemci SWF) yeni denetimden geçti.",
+      "test": "tests/test_denetim.py: VarlikIndirme",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: config/varlik_ozetleri.tsv (araclar/onindirme_listesi.py üretir) sabit commit'in git blob özetleri. Sunucu yalnızca bu listedeki adları indirir (başarısızlar sözlüğü en çok 4825); indirilen ve önceden inmiş her dosya özetle denetlenir, uymayan sunulmaz. varliklari_indir.py'nin HTTP yolu da aynı denetimi yapar. Kullanıcının elle koyduğu download_assets/ dosyalarına dokunulmaz. Çevrimdışı listedeki temp.png bu commit'te yoktu (404), çıkarıldı. 4 bozmanın 4'ü düştü."
     }
   ]
 }
