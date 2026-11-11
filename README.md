@@ -23,7 +23,7 @@ indirmek için gerekir.
   gibi); gömülü yazı tiplerine `ğ, Ğ, İ, ş, Ş` harfleri eklenir.
 - **PvP**: istemcinin kurallarıyla (6 saatte 3 saldırı, aynı rakibe 4 saatte
   bir), ganimet, onur puanı, savaş raporları ve savunma raporları.
-- **50 bot köyü** (ilk açılışta otomatik üretilir): gerçek portreler, kişilikler, öfke hafızası ve dünya
+- **50 bot köyü** (ilk açılışta otomatik üretilir): adları ve resimleri oyunun kendi birimlerinden, kişilikler, öfke hafızası ve dünya
   simülasyonu.
 - **Turnuvalar**: 4 kişilik odalar; boş koltuklar kendi ordularıyla bot
   köyleriyle dolar, birinciye turnuva ödülü verilir.
@@ -34,18 +34,20 @@ indirmek için gerekir.
   mağazaya açılır (`config/takvim.json`); bayram tarihleri Diyanet
   tablosundan. 15 Harika her zaman mağazada. Hepsini sürekli açmak için
   `ayarlar.json`'da `"magaza_tema_setleri": true`.
-- **Oyun sayfası**: Güneş'in gerçek konumuna göre boyanan gökyüzü, ekrana
-  göre ölçeklenen oyun çerçevesi, Diyar Haberleri şeridi, Şeref Kürsüsü,
+- **Oyun sayfası**: oyunun kendi manzarası, ekrana göre ölçeklenen oyun
+  çerçevesi, hız seçici (Normal … 10 kat), "Sen yokken" özeti, Diyar Haberleri şeridi, Şeref Kürsüsü,
   haftalık turnuva tablosu (Elo; hafta bitince ilk 10'a ödül) ve tek tıkla
   kayıt yedeği indirme/yükleme. Günlük ödül oyunun kendi ödülüdür.
 - **Büyücünün İksirleri**: iksir kaynatıp nadir yaratıklar kazanılan şans
   oyunu; her 30 günde yenilenir.
 - **İstemciyle birebir uyumlu komutlar**: sunucu, istemcinin gönderdiği
-  120'den fazla komutun tamamını oyun SWF'sinin bytecode'undan çıkarılan
+  158 komutun tamamını oyun SWF'sinin (1.4.07) bytecode'undan çıkarılan
   argüman sırasıyla işler; kayıt yeniden yüklendiğinde oyun aynı kalır.
+- **Bayramlar**: bayram ve özel günlerde oyuna "kutlu olsun" hedefi gelir; milli bayramlarda
+  oyunun Türk Kılıççı, Baltacı, Okçu ve Atlı birimleri mağazada açılır.
 - **Yeni içerik**: Büyük Ev, Büyük Değirmen, Büyük Kule; Süper Şövalye,
   Süper Okçu, Süper Kılıçlı ve yeni mağaza paketleri.
-- **Çevrimdışı paket**: oyun dosyaları bir kerede iner (temel ~175 MB, tam ~1,1 GB), sonra internet gerekmez.
+- **Çevrimdışı paket**: oyun dosyaları bir kerede iner (temel ~210 MB, tam ~1,1 GB), sonra internet gerekmez.
 - **Wi-Fi ile taşı**: imparatorluk, bilgisayar ile tablet arasında 6 haneli kodla aktarılır.
 - **Android uygulaması**: sunucu tabletin içinde; iki parmakla yakınlaştırma ([ANDROID.md](ANDROID.md)).
 - **Güvenli kayıt**: atomik yazım, `.bak` yedeği, günlük yedekler ve
@@ -59,6 +61,7 @@ Python kurmanız gerekmez.
 
 1. [Sürümler](https://github.com/lahmacunveayran/socialempires-tr/releases)
    sayfasından en yeni `SocialEmpiresTR-...-windows.zip` dosyasını indirin.
+   (İlk sürüm v0.1.0 henüz yayınlanmadı; o zamana kadar aşağıdaki kaynak koddan kurulum kullanılır.)
 2. Zip'i bir klasöre açın ve `Social Empires.bat` dosyasına çift tıklayın.
 3. Tarayıcı kendiliğinden açılır: <http://127.0.0.1:5050/>
 
@@ -71,7 +74,8 @@ yayınlanmadan önce temiz bir Windows makinesinde açılıp sınanır.
 ## Android telefon ve tablet
 
 Oyunun tamamı tek bir uygulamada; bilgisayar gerekmez. Sürümler sayfasındaki
-`SocialEmpiresTR-...-android.apk` dosyasını kurun. Ayrıntılar ve kayıtları taşıma:
+`SocialEmpiresTR-...-android.apk` dosyasını kurun (sürüm yayınlanana kadar APK, PR'ların
+CI çıktısındadır). Ayrıntılar ve kayıtları taşıma:
 [ANDROID.md](ANDROID.md).
 
 ## Kurulum (Windows, kaynak koddan)
@@ -83,7 +87,7 @@ Oyunun tamamı tek bir uygulamada; bilgisayar gerekmez. Sürümler sayfasındaki
    cd socialempires-tr
    ```
 3. `baslat.bat` dosyasını çalıştırın.
-   - Gerekli Python paketleri (`flask`, `jsonpatch`) eksikse otomatik kurulur.
+   - Gerekli Python paketleri (`requirements.txt`) eksikse otomatik kurulur.
    - Sunucu hazır olduğunda tarayıcı otomatik açılır:
      <http://127.0.0.1:5050/>
 4. Giriş ekranından bir köy seçin veya yeni imparatorluk kurun.
@@ -163,6 +167,10 @@ Testler gerçek `saves/` klasörüne dokunmaz; geçici bir klasör kullanır.
 | `oyun/config.py`, `oyun/turkce.py`, `oyun/zaman.py` | Oyun ayarları, çeviri, oyun hızı |
 | `oyun/pvp.py`, `oyun/dunya.py`, `oyun/denge.py` | PvP, bot dünyası, denge ayarları |
 | `oyun/turnuva.py`, `oyun/ada.py` | Turnuvalar, dünya haritası ve fetih |
+| `oyun/pvp_yeni.py`, `oyun/kaynaklar.py` | 1.4.07 PvP uçları, istemcinin kaynağı ve SHA-256 özeti |
+| `oyun/bayram_hedefleri.py`, `oyun/takvim.py` | Bayram hedefleri, etkinlik takvimi |
+| `oyun/hiz.py`, `oyun/yokken.py` | Sayfadan hız seçimi, "Sen yokken" özeti |
+| `oyun/ev_agi.py`, `oyun/tasima.py`, `oyun/kayit_yedek.py` | Ev ağı, Wi-Fi ile taşıma, yedek indir/yükle |
 | `oyun/hile.py` | Yerel hile paneli (`/cheat`) |
 | `araclar/` | Bot köyü üretimi, çeviri ve birim yaması araçları, Windows ve Android paketleri |
 | `android/` | Android uygulaması (Chaquopy + WebView) |
@@ -174,7 +182,8 @@ Testler gerçek `saves/` klasörüne dokunmaz; geçici bir klasör kullanır.
 ## Veri ve gizlilik
 
 - `saves/` altındaki oyun kayıtları **depoya dahil edilmez**.
-- Sunucu yalnızca yerel makinede dinler (`127.0.0.1:5050`).
+- Sunucu yalnızca yerel makinede dinler (`127.0.0.1:5050`). `"ev_agi": true` verilirse ev ağına
+  açılır; telefon ve tabletler parola sorar. "Wi-Fi ile taşı" 10 dakikalığına 5051 kapısını açar.
 - Gizli anahtar `SE_SECRET_KEY` ortam değişkeniyle değiştirilebilir.
 
 ---
@@ -193,7 +202,9 @@ Bu proje AcidCaos/socialemperors'tan türetilmiştir ve değiştirilmiştir (GPL
 0.04a'nın (`f642e0b`) tabanından değiştirildi. `config/patch/0-language_en.json`, `1-mega_patch.json`,
 `2-unit_patch.json` ve `config/goals.json`, upstream'in `54df29e` commit'inden olduğu gibi alındı. Bunları
 değiştiren kendi yamalarımız ayrı dosyalardadır (`kompu.json`, `turnuva.json`, `yeni_icerik.json`), değişiklik
-tarihleri depo geçmişindedir. Oyunun istemcisi (`SocialEmpires1.4.07sec_fixed.swf`) Social Point'indir, GPL
+tarihleri depo geçmişindedir. `villages/`, `config/game_config_*.json`, `araclar/make_se_unit_patch.py`,
+`araclar/se_unit_patch.csv`, `araclar/unit_templates.json` ve `templates/img/` altındaki bazı resimler de
+0.04a ile aynıdır (`docs/inceleme/2026-10-30-upstream-tarama1.md` §1, `-tarama2.md` §7). Oyunun istemcisi (`SocialEmpires1.4.07sec_fixed.swf`) Social Point'indir, GPL
 kapsamında değildir ve depoda tutulmaz.
 
 ### Teşekkürler

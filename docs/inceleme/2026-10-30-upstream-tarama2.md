@@ -1,5 +1,8 @@
 # Bağımsız denetim (2): Social Empires Türkçe ile AcidCaos/socialemperors'ın yeni işi
 
+> **Not (11.11.2026):** Buradaki "0926'da kal" önerisi KAR-08 ile geçersiz; oyun 1.4.07'ye tam geçti
+> (`docs/YOL_HARITASI_1407.md`).
+
 Tarih: 30 Ekim 2026 · Yöntem: yalnızca statik okuma ve bayt ayrıştırma · Denetçi: bağımsız (öteki denetçinin işini görmedi)
 
 **İşaretler:**

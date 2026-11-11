@@ -31,7 +31,7 @@ oynar, dener ve karar verir. Onunla her zaman **Türkçe**, sade ve adım adım 
 
 | Terim              | Anlamı                                                                                                       |
 | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| istemci            | Oyunun Flash dosyası `SocialEmpires0926bsec.swf`. Oyun mantığı onda çalışır; sunucu yalnızca kaydeder.       |
+| istemci            | Oyunun Flash dosyası `SocialEmpires1.4.07sec_fixed.swf` (KAR-08; 0926 kaldırıldı). Oyun mantığı onda çalışır; sunucu yalnızca kaydeder. |
 | komut              | İstemcinin `command.php` ile bildirdiği değişiklik (`oyun/komutlar.py`). Sunucu taklit eder, kural koymaz.   |
 | kayıt              | `saves/<kimlik>.save.json`. Atomik yazılır, `.bak` ve günlük yedek alınır.                                   |
 | varlık             | Oyunun SWF, resim ve müzik dosyaları (~1,3 GB). Depoda yok; ilk açılışta `download_assets/` altına iner.      |
@@ -40,7 +40,7 @@ oynar, dener ve karar verir. Onunla her zaman **Türkçe**, sade ve adım adım 
 | Ruffle             | Flash öykünücüsü. Sürüm 0.7.1'e sabit, `/ruffle/0.7.1/` altından sunulur (`oyun/ruffle.py`).                 |
 | bot                | 50 bilgisayar köyü (`playerInfo.bot`). Dünya simülasyonu onları oynatır.                                     |
 | dünya turu         | `oyun/dunya.py` `tek_tick`: dakikada bir bot ekonomisi, akınlar, dünya olayları, haber şeridi.               |
-| oyun sayfası       | `/play.html` (`templates/oyun.html`): gökyüzü, çerçeve, Diyar Haberleri, Şeref Kürsüsü, haftalık turnuva.     |
+| oyun sayfası       | `/play.html` (`templates/oyun.html`): oyunun manzarası, çerçeve, hız seçici, Diyar Haberleri ("Sen yokken"), Şeref Kürsüsü, haftalık turnuva. |
 | kapılar            | Push'tan önce ve CI'da çalışan denetimlerin tamamı (`KAPILAR.md`).                                           |
 
 </okuyucu>
@@ -52,12 +52,13 @@ oynar, dener ve karar verir. Onunla her zaman **Türkçe**, sade ve adım adım 
 Hepsi ✔ (bu depodan okundu ya da çalıştırıldı, 30 Ekim 2026, `master` @ `cd80a86`), aksi belirtilmedikçe.
 
 - Python 3.12 (CI) / Flask + Waitress (8 iş parçacığı); ayrıntı `oyun/sunucu.py` `calistir`. Bu ortamda Python 3.13.
-- Testler: `python -m unittest discover -s tests` → 507 test (✔ çalıştırıldı, 11 Kasım 2026, bulut oturumu, #46 ile; `requirements-test.txt` gerekir, S-50);
+- Testler: `python -m unittest discover -s tests` → 589 test (✔ çalıştırıldı, 11 Kasım 2026, bulut oturumu, #60 ile; `requirements-test.txt` gerekir, S-50);
   `node --test tests/js/*.test.js` → 3 test (✔ 6 Kasım 2026, bulut oturumu). Yeni konteynerde önce bağımlılıklar
   kurulur (`SORUN_COZUM.md` S-01, Windows'ta S-27).
 - Proje sahibinin bilgisayarında `D:\socialempires-tr` (S-25). Orada Python 3.12, Node yok (S-28), konsol cp1254 (S-26).
-- CI (`.github/workflows/`): `tests` (Python + JS testleri), CodeQL (Python, JavaScript), `windows` (paket üretir,
-  temiz Windows'ta 60 sn kapısıyla sınar, `v*` etiketinde sürüm yayınlar).
+- CI (`.github/workflows/`): `tests` (Python + JS testleri), CodeQL (Python, JavaScript, Java/Kotlin), `windows` (paket
+  üretir, temiz Windows'ta 60 sn kapısıyla sınar, `v*` etiketinde sürüm yayınlar), `android` (APK ve emülatör
+  sınaması), `claude-inceleme` (PR incelemesi).
 - Oyun sayfası Lighthouse (masaüstü): skor 100, LCP 0,7 sn, CLS 0 (✔ `lighthouse@12`, ayrıntı `docs/YOL_HARITASI_DURUM.md`).
 - Windows paketi temiz Windows'ta 1,1 sn'de hazır (✔ CI `windows / sinama`, PR #10).
 - Ortam sınırları (bu bulut oturumu): python.org'a erişim yok (Windows paketi yalnızca CI'da tam üretilir);

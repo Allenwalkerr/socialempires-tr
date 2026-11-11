@@ -160,6 +160,11 @@ Her aşamada master oynanabilir kalır. Bir aşamada eksik kalan komut, hata ver
 | OYN-11 | Günlük ödül penceresinin boş başlığı, sığmayan "250 altın" | 1.4.07'nin 5 günlük yeni penceresi eskisinin yerini alıyor. GEC-02'den sonra yeniden ölçülür; sorun yeni pencerede de varsa düzeltilir |
 | OYN-12 | Seviye atlayınca sayfanın üstündeki seviye/XP bilgisi yenilenmiyor | Sayfa bilgisi seviye atlama komutundan sonra güncellenmeli |
 | OYN-13 | "Yedek yükle" düğmesine klavyeyle ulaşılamıyor | Klavye ve ekran okuyucu erişimi |
+| OYN-15 | Turnuvada listede gösterilen ödül ile verilen ödül farklı olabilir | `turnuva.bilgi` ödülü hep 0 gösteriyor, `katil` rastgele seçiyor (11.11.2026 taramasında kodda görüldü) |
+
+Kitapta açık olan öteki işler (11.11.2026 .md taraması): KYT-02 (1.4.07'nin 5 günlük günlük ödülü kapalı), DNT-25 …
+DNT-40 (bağımsız denetimin kitaba yazılmamış bulguları ve yarım kayıt alanı), TST-02, TST-06, KYN-07, OYN-31, OYN-32;
+sahibinin kararını bekleyenler KMT-08, KMT-09, OYN-29, OYN-30, DNT-08.
 
 ## 5. Öneriler (sahibi "hepsini istiyorum" dedi)
 
@@ -167,7 +172,7 @@ Bu dört öneri önceki bir oturumda sohbette yapıldı; metinleri depoya yazıl
 kapsamdır. Sahibinin kuralı "Onayladığım öneriyi harfiyen uygula" olduğu için her biri işe başlamadan önce sahibine
 tek cümleyle onaylatılır.
 
-| Madde | Öneri | Taslak tanım (onay bekliyor) | o / m / p |
+| Madde | Öneri | Tanım (sahibi onayladı, KAR-21) | o / m / p |
 |---|---|---|---|
 | ONR-01 | Hız seçici | Oyunun hızı (`ayarlar.json` `zaman_olcegi`, şu an elle) sayfadan seçilir. Düğmeler oyunun kendi düğme resimleridir. 1.4.07'nin yeni süreleri de (kuyruk, Soul Mixer) aynı ölçekle bölünür. | 0,5 / 1 / 2 |
 | ONR-02 | "Sen yokken" özeti | Oyuncu döndüğünde, yokken olanların kısa listesi: botların akınları, kazanılan ve kaybedilen, biten inşaat ve eğitim, Diyar Haberleri. Veri imparatorluk günlüğünden ve haber şeridinden gelir, resimler oyunun kendi resimleridir. Oyunda kendi kendine biten inşaat yok; yerine üretimi hazır binalar (KAR-22). | 1 / 2 / 3 |
@@ -175,6 +180,8 @@ tek cümleyle onaylatılır.
 | ONR-04 | Oyunun Türk birimleri | Oyunun kendi "Turkish Swordsman/Axeman/Archer/Horseman" birimleri (öğe 880, 881, 882, 885; resimleri `880_tk_sword` …) oyunda kullanılabilir olur. Mağazada mı, bayramlarda mı, botlarda mı kullanılacağına sahibi karar verir. | 0,5 / 1 / 2 |
 
 Sahibi 11.11.2026'da ONR-01 … ONR-03'ün tanımlarını onayladı; ONR-04 için kararı "Milli bayramlarda" (KAR-21).
+Oyunda kendi kendine biten inşaat yok (KAR-22): ONR-02'de yerine üretim geldi; ONR-03'ün "inşaat bitti" bildirimi
+başlamadan önce sahibine yeniden sorulur.
 
 ## 6. Riskler
 

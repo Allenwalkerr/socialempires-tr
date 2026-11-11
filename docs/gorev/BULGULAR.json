@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "ONR-02",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 (ONR-01) incelemesi düzeltildi, sahibine sorularak birleşir (KAR-19). ONR-02 ('sen yokken' özeti) hazır, #59 birleşince PR açılır. Sırada ONR-03 (Android bildirimleri); sonra küçük hatalar OYN-11, 12, 13, 15 ve GEC-09 (kabul). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "BLG-01",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 birleşti. #60 (ONR-02) birleşti. .md taraması kitaba işlendi (BLG-01, DNT-25 … DNT-40 ve ötekiler), PR'da, birleştirme sahibine sorulur (KAR-19). Sırada ONR-03 ('inşaat bitti' sahibine sorulur), OYN-11/KYT-02, OYN-12, 13, 15, denetimin açık bulguları, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -753,13 +753,13 @@
       "baslik": "Mağazadaki Soul Mixer binası 0926 istemcisinde işlevsiz",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "config/patch/soulmixer_temp.json öğe 1529 'Soul Mixer'ı mağazaya ekliyor (2000 altın). 0926bsec'in AS3 dizelerinde PopupSoulMixer ve soulmixer_mix_unit yok; 1.4.07'de var (kendim doğruladım). Bina kurulabiliyor ama penceresi ve karıştırma komutu istemcide yok.",
       "test": null,
-      "pr": null,
+      "pr": "#22",
       "onay": null,
-      "notlar": "Oyunda tıklanınca ne olduğu görülmedi (?). Seçenek: mağazadan kaldırmak. 30.10.2026: 1.4.07'de PopupSoulMixer ve soulmixer_mix_unit var; tam geçişle (KAR-08) işlev kazanır. Soul Mixer komutları GEC-03'te, oynanış betiğinde sınanır."
+      "notlar": "Oyunda tıklanınca ne olduğu görülmedi (?). Seçenek: mağazadan kaldırmak. 30.10.2026: 1.4.07'de PopupSoulMixer ve soulmixer_mix_unit var; tam geçişle (KAR-08) işlev kazanır. Soul Mixer komutları GEC-03'te, oynanış betiğinde sınanır. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): kapandı. 1.4.07'de Ruh Karıştırıcı eğitim kuyruğudur (komutlar.RUH_KARISTIRICI, sm_training_time; buy_powerups PopupSoulMixer'dan); soulmixer_temp.json GEC-02'de config/patch'ten çıktı."
     },
     {
       "id": "KYN-03",
@@ -779,13 +779,13 @@
       "baslik": "0926 istemcisinin okumadığı ölü config yamaları ve bayat belgeler",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Tarama 2: mission_goals, viral_offers, viral_icons, new_daily_bonus, level_up_tips yamaları yalnızca 1.x istemciler için; 0926 bunları okumuyor. Tarama 1: VAR-01 (fx_yama) kapandığı hâlde docs/YOL_HARITASI_DURUM.md:119, docs/GELISTIRME.md:140, docs/FAZ0_OLCUMLER.md:32 hâlâ açık iş diyor.",
       "test": null,
-      "pr": "#19",
+      "pr": "#22",
       "onay": null,
-      "notlar": "Temizlik işi; davranış değiştirmez. 30.10.2026: bayat belgelerin üçü düzeltildi (#19). Ölü yamalar silinmedi: 1.4.07'ye geçişte (KAR-08) mission_goals, viral_offers, viral_icons, new_daily_bonus, level_up_tips istemcide canlanabilir; hangisinin kalacağı GEC-01'de ölçülür."
+      "notlar": "Temizlik işi; davranış değiştirmez. 30.10.2026: bayat belgelerin üçü düzeltildi (#19). Ölü yamalar silinmedi: 1.4.07'ye geçişte (KAR-08) mission_goals, viral_offers, viral_icons, new_daily_bonus, level_up_tips istemcide canlanabilir; hangisinin kalacağı GEC-01'de ölçülür. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): kapandı. Ölü yamalar GEC-02/KNF-01'de ayrıştırıldı; config/patch'te altı yama kaldı. Bayat 1407-config-hatti.md DNT-26'da."
     },
     {
       "id": "KYN-05",
@@ -928,7 +928,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026)."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): oynanış betiği (Playwright + Ruffle, her komut grubu) yazılmadı. Oyunda gözle bakılmamışlar: Ruh Kazanı, PvP, mezarlık/diriltme, eğitim kuyruğu, birlik paketi, ilk alım teklifi, koleksiyon ödülü, Ada Ocağı, yüksek seviyeli hesap (SV59), köylü yürütme ve evi yere bırakma (FAZ0 §1). ONR-03'ün tanımındaki 'inşaat bitti' KAR-22'deki gibi sahibine sorulacak."
     },
     {
       "id": "OYN-11",
@@ -993,7 +993,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Doğrulanmadı; GEC-05 turnuva işinde istemciden okunacak."
+      "notlar": "Doğrulanmadı; GEC-05 turnuva işinde istemciden okunacak. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): GEC-05 bunu okumadan kapandı, hata duruyor (✔ turnuva.bilgi tournament_reward_id hep 0, katil reward_id rastgele)."
     },
     {
       "id": "OYN-16",
@@ -1026,7 +1026,7 @@
       "baslik": "Hız seçici: oyun hızı (zaman_olcegi) sayfadan seçilir",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Önce hız yalnızca ayarlar.json'da elle (zaman_olcegi) ya da TIME_SCALE ortam değişkeniyle değişiyordu; ayarlar.py yalnızca okuyordu. 1.4.07 süreleri config.SURE_ALANLARI'nda zaten vardı (training_time: eğitim kuyruğu, sm_training_time: Ruh Kazanı).",
       "test": "tests/test_hiz.py (5 test)",
@@ -1039,7 +1039,7 @@
       "baslik": "'Sen yokken' özeti: dönüşte yokken olanların listesi",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Sahibi 30.10.2026 'hepsini istiyorum' dedi (KAR-08). Önerinin önceki oturumdaki metni depoda yok; taslak tanım docs/YOL_HARITASI_1407.md §5.",
       "test": "tests/test_yokken.py (12 test)",
@@ -1227,7 +1227,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Göç bunları bilerek eklemiyor (davranışı değiştirirler). Her biri onu işleyen komutla açılır: GEC-03 (kuyruk, collect_game, mezarlık) ve OYN-11 (1.4.07'nin 5 günlük ödül penceresi). İlk alım teklifi gerçek parayla nakit satışıdır; çevrimdışı oyunda açılıp açılmayacağı sahibine sorulur. Kaynak sınırı: initPlayerData'nın okuduğu lastDayRewarded/nextDayReward parametreden okunuyor, araç bunları bulmaz (◐). Düzeltme (31.10.2026): 'ilk alım teklifi gerçek parayla nakit satışıdır' yanlıştı. Bayt kodu (PopupFirstBuy/onBuy): oyunun kendi nakdiyle alınan paket; POPUP_FIRST_PURCHASE_OFFER_COST 28 nakit, ödül POPUP_FIRST_PURCHASE_OFFER_REWARD (Savage Draggy 2242, Scorch 2245, Shock 2248; 20000 altın; 40000 yemek); nakit yetmezse nakit sayfasına gider. Sahibi açılmasını istedi: KAR-10. Ötekiler (günlük ödül, Ada Ocağı, kuyruk, mezarlık) hâlâ kapalı."
+      "notlar": "Göç bunları bilerek eklemiyor (davranışı değiştirirler). Her biri onu işleyen komutla açılır: GEC-03 (kuyruk, collect_game, mezarlık) ve OYN-11 (1.4.07'nin 5 günlük ödül penceresi). İlk alım teklifi gerçek parayla nakit satışıdır; çevrimdışı oyunda açılıp açılmayacağı sahibine sorulur. Kaynak sınırı: initPlayerData'nın okuduğu lastDayRewarded/nextDayReward parametreden okunuyor, araç bunları bulmaz (◐). Düzeltme (31.10.2026): 'ilk alım teklifi gerçek parayla nakit satışıdır' yanlıştı. Bayt kodu (PopupFirstBuy/onBuy): oyunun kendi nakdiyle alınan paket; POPUP_FIRST_PURCHASE_OFFER_COST 28 nakit, ödül POPUP_FIRST_PURCHASE_OFFER_REWARD (Savage Draggy 2242, Scorch 2245, Shock 2248; 20000 altın; 40000 yemek); nakit yetmezse nakit sayfasına gider. Sahibi açılmasını istedi: KAR-10. Ötekiler (günlük ödül, Ada Ocağı, kuyruk, mezarlık) hâlâ kapalı. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): kuyruk, Ada Ocağı alanları, mezarlık ve ilk alım açıldı; kalan tek kapalı yol 1.4.07'nin 5 günlük günlük ödülü (showDailyBonus kayıtta yok, sunucu yazmıyor). OYN-11 buna bağlı."
     },
     {
       "id": "KYT-03",
@@ -2060,6 +2060,305 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "? doğrulanmadı: tick@469-1000'de Kereste/Maden ek yapıları varken ağaç, taş ve altın kaynaklarına ek sayaç var gibi; bu yüzden doğal kaynaklar (subcat 125-128) ve adalar (1111) sayılmaz. Zaman ölçeği aralıkta değiştiyse hesap şimdiki ölçeğe göredir."
+    },
+    {
+      "id": "DNT-25",
+      "baslik": "Denetim EKF-04: Zaman ölçeği yalnızca 4 süre alanını ölçekliyor; yüksek/düşük ölçekte bozuk değer",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) EKF-04, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur."
+    },
+    {
+      "id": "DNT-26",
+      "baslik": "Denetim EKF-07: docs/inceleme/1407-config-hatti.md depodaki yama durumuyla uyuşmuyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) EKF-07, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Belge GEC-02'den önceki 13 yamayı ölçüyor; config/patch'te 6 yama var. Geçmiş ölçüm olarak kalır, üstüne not düşülür (bu taramanın belge PR'ı)."
+    },
+    {
+      "id": "DNT-27",
+      "baslik": "Denetim EKF-08: Yükseltmede (sell + buy) XP ve fark bedeli kayda istemciden farklı yansıyor olabilir",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) EKF-08, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak."
+    },
+    {
+      "id": "DNT-28",
+      "baslik": "Denetim EKF-09: PvP sabitleri (3 hak, 6 saat) üç yerde elle kopya, config globals'tan okunmuyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) EKF-09, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "oyun/denge.py ve oyun/pvp.py aynı değerler; config ATTACKS_PERIOD_MAX/HOURS ile bugün eşit."
+    },
+    {
+      "id": "DNT-29",
+      "baslik": "Denetim SNK-06: orient/upgrade/push_unit/pop_unit binayı yalnızca (x, y) ile buluyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) SNK-06, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir."
+    },
+    {
+      "id": "DNT-30",
+      "baslik": "Denetim SNK-07: Açık kasaba bellekte; sunucu yeniden başlarsa kasaba numarasız komutlar kasaba 0'a gider",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) SNK-07, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "oyun/oyuncu.py _acik_kasabalar kayda yazılmıyor; push_queue_unit, pop_queue_unit, speed_up_queue, buy_first_purchase etkilenir."
+    },
+    {
+      "id": "DNT-31",
+      "baslik": "Denetim DPT-05: Turnuva ve haftalık ödül oyuncu kaydını save_lock dışında değiştiriyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) DPT-05, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "turnuva._bitir/_odul_ver ve diyar.hafta_ucu yalnızca turnuva.KILIT alıyor; aynı anda gelen komutla yarış olabilir."
+    },
+    {
+      "id": "DNT-32",
+      "baslik": "Denetim DPT-07: Oyuncuya bot akınının sıklığı ve toplam kaybı sınırlı değil",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) DPT-07, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde."
+    },
+    {
+      "id": "DNT-33",
+      "baslik": "Denetim DPT-08: Profil resmi kaydın içinde (~400 KB); her komutta bütün kayıt yeniden yazılıyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) DPT-08, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "oyun/profil.py kayit['profil_resmi'] base64; command() her pakette save_session (fsync). Ölçülmedi. Öneri: ayrı dosya."
+    },
+    {
+      "id": "DNT-34",
+      "baslik": "Denetim DPT-09: Lonca botu binanın bütün attrs'ini eziyor (bq, cp, hc kaybolur)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) DPT-09, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "oyun/dunya.py _lonca esya[7] = {...}; öneri esya[7].update(...)."
+    },
+    {
+      "id": "DNT-35",
+      "baslik": "Denetim TRA-02: İstemci toUpperCase/toLowerCase ile Türkçe metni bozuyor (Değirmen → DEĞIRMEN)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) TRA-02, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok."
+    },
+    {
+      "id": "DNT-36",
+      "baslik": "Denetim TRA-04: docs/RESIM_KAYNAKLARI.md silinmiş görselleri anlatıyor; templates/img'deki dosyaların kaynağı yazılı değil",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) TRA-04, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması."
+    },
+    {
+      "id": "DNT-37",
+      "baslik": "Denetim TRA-05: Üç gömülü yazı tipinde (Curse Casual JVE, Freestyle Script, Arial Narrow) Türkçe harfler yok",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) TRA-05, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Şimdilik kullanılmayan alanlarda; CEV-04'ten sonra o alanların çevrilip çevrilmediği denetlenmedi."
+    },
+    {
+      "id": "DNT-38",
+      "baslik": "Denetim TRA-06: Türkçe SWF önbelleği birikiyor; tarayıcı bir gün eski çeviriyi saklıyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) TRA-06, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "download_assets/tr/*.tr-<özet>.swf (~4,3 MB) eskisi silinmiyor; SEND_FILE_MAX_AGE_DEFAULT 86400, adres hep aynı."
+    },
+    {
+      "id": "DNT-39",
+      "baslik": "Denetim TRA-08: turkce.dogrula yalnızca #n#, etiket ve satır sonunu denetliyor; %s/{0} kaybı geçer",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim (KAR-13) TRA-08, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Bugün 4573 çeviride sorun yok (denetçi ✔); ileride eklenecek çeviriye karşı koruma yok."
+    },
+    {
+      "id": "DNT-40",
+      "baslik": "Kayıt göçü denetim alanı yarım kaldı",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "docs/denetim/kayit-goc.md başlığı 'Yarım rapor': dört bulgudan sonrası yazılmadı (surum.py göç adımları, tasima.py, kayit_yedek.py tam denetlenmedi). KAR-13 notu 'altı alanın raporu tamam' diyordu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır."
+    },
+    {
+      "id": "TST-06",
+      "baslik": "Mutasyon ölçümünün açık uçları: tests/js ölçülmedi, kalan 534 mutant tek tek okunmadı",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "docs/TEST_OLCUMU.md §8 ve §12: komutlar 180, dunya 83 mutant kaldı; komutlar oranı %62,4 → %60,8 (anlamsız fark) (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "TST-02 yalnızca testsiz komutları kapsıyor; bu ondan ayrı."
+    },
+    {
+      "id": "OYN-29",
+      "baslik": "Ada Ocağı ve viral teklifler yazıldı ama oyuncuya kapalı",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "onay_bekliyor",
+      "isaret": "✔",
+      "kanit": "docs/inceleme/1407-formuller.md iki yerde 'açılması ayrı karar'; config'te starts_at/duration 0. Komutlar GEC-03'te yazıldı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri."
+    },
+    {
+      "id": "OYN-30",
+      "baslik": "Kaynağı olmayan denge sabitleri sahibinin kararını bekliyor",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "onay_bekliyor",
+      "isaret": "✔",
+      "kanit": "TST-04 notunda düz metin: denge.GANIMET_ORANI 0,10, GANIMET_TAVANI 50000, YENI_OYUNCU_KALKANI 24 sa, pvp.GALIBIYET_ASGARI_ALTIN 25, XP_PAYI 150, elo K 32/16, BASLANGIC 1500, HAFTALIK_MAC 3, turnuva.TAKIM_BOYU 20, bot hedef aralığı 6 sa (istemci 4 sa). Ayrı madde yoktu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Değerler sabitlendi (testleri var); değiştirilip değiştirilmeyeceği sahibinde."
+    },
+    {
+      "id": "KYN-07",
+      "baslik": "Upstream'in veri ve davranış düzeltmeleri tek tek değerlendirilmedi",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "docs/inceleme/2026-10-30-upstream-tarama1.md §6 ve tarama2 §6(a): efb753b, 1a51219, ba02772, a437e92, 6f9d792 (Konak ev sınırı), e989ba1 (ejderha yuvası istismarı), 2d39fb4/d76d1ae (baskın köylüleri). Hiçbiri kitapta yok (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Veri düzeltmeleri 54df29e yamalarıyla büyük olasılıkla içeride (?); davranış düzeltmeleri bizim komutlar.py için okunmadı."
+    },
+    {
+      "id": "OYN-31",
+      "baslik": "end_attack_new'in 11. ve 12. argümanları (kurbana kalkan, yıkım yüzdesi) kullanılmıyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "docs/inceleme/1407-pvp.md §3, §10; oyun/pvp.py yeni_sonuc args[11]/args[12] okumuyor (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Kurbanlar bot olduğu için etkisi küçük olabilir; bayt kodundan anlamı okunup karar verilir."
+    },
+    {
+      "id": "OYN-32",
+      "baslik": "Savunmada kurtarılabilen birimler iki incelemede ters yazılmış (protect)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "docs/inceleme/1407-mezarlik.md:60-61 'yalnızca protect==1 kurtarılabilir', 1407-pvp.md:148 'protect==1 düşülmez'; kodda protect geçmiyor, savunmacı kaybı sabit oran (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Doğru yön bayt kodundan okunacak."
+    },
+    {
+      "id": "BLG-01",
+      "baslik": "Belgeler bayat: README, GELISTIRME, DENETIM, ANDROID, görev kitabı çekirdeği",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): README 'gerçek portreler', 'güneşe göre gökyüzü', '120'den fazla komut', eski paket boyutları, yayınlanmamış sürüm; GELISTIRME 'yere tıklanmıyor', 'turnuva kapalı', 'fotoğraf boş'; DENETIM sayıları eski; ANDROID 'başka cihaz bağlanamaz' (Wi-Fi taşıma ile çelişik); 00-CEKIRDEK 0926, 507 test; KAPILAR G∖H 31; 10-BOLUM-I/20-BOLUM-II tabloları eski; YOL_HARITASI_DURUM 'Arthur hedefleri yapılamaz', 'SVG silueti', 'sıradaki GEC-07'. RESIM_KAYNAKLARI kurala aykırı kaynakları anlatıyor.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Belge PR'ında düzeltilir; kullanılmayan dört resim silinir."
     }
   ]
 }

@@ -6,7 +6,7 @@ Oyun tam ekran açılır.
 ## Gerekenler
 
 - Android 7.0 ya da üstü; 32 ve 64 bit cihazlar (eski Galaxy Tab A'lardan yeni Tab S'lere kadar).
-- Yaklaşık 250 MB boş yer.
+- Yaklaşık 250 MB boş yer; çevrimdışı temel paketi de indirecekseniz ayrıca ~210 MB.
 - **İlk açılışta internet.** Oyunun resimleri, sesleri ve haritaları (~60 MB) bir kez indirilir; sonra
   internet gerekmez.
 
@@ -30,7 +30,7 @@ Oyun tam ekran açılır.
 
 Oyun sayfasının üstündeki **çevrimdışı paket** bağlantısı:
 
-- **Temel paket (~175 MB):** oyun, arayüz, efektler, müzik, mağazadaki bütün bina ve birimler. İnternetsiz
+- **Temel paket (~210 MB):** oyun, arayüz, efektler, müzik, mağazadaki bütün bina ve birimler. İnternetsiz
   oynamaya yeter.
 - **Tam paket (~1,1 GB):** üstüne mağazada olmayan ödül, boss ve bot binalarının çizimleri.
 
@@ -69,7 +69,8 @@ Oyun sayfasının üstündeki **çevrimdışı paket** bağlantısı:
 
 ## Teknik notlar
 
-- Sunucu yalnızca cihazın kendisine açıktır (`127.0.0.1:5050`); evdeki başka cihazlar bağlanamaz.
+- Oyun sunucusu yalnızca cihazın kendisine açıktır (`127.0.0.1:5050`); evdeki başka cihazlar oyuna bağlanamaz.
+  Tek istisna "Wi-Fi ile taşı": gönderirken 10 dakikalığına, 6 haneli kodla korunan 5051 kapısı açılır (`oyun/tasima.py`).
 - Python sunucusu [Chaquopy](https://chaquo.com/chaquopy/) (MIT) ile çalışır; oyun Android WebView'da
   [Ruffle](https://ruffle.rs/) 0.7.1 ile açılır. Ruffle uygulamayla gelir.
 - Her APK yayınlanmadan önce bir Android emülatöründe açılıp sınanır (`.github/workflows/android.yml`): yeni

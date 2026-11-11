@@ -21,8 +21,10 @@ sınırlanır.
 
 ## Komut protokolü nereden geliyor?
 
-Komut adları ve argüman sıraları oyun SWF'sinin (`SocialEmpires0926bsec.swf`)
-AVM2 bytecode'undan çıkarılmıştır. İstemcide her komut şu kalıpla kurulur:
+Komut adları ve argüman sıraları oyun SWF'sinin (`SocialEmpires1.4.07sec_fixed.swf`)
+AVM2 bytecode'undan çıkarılmıştır: `araclar/abc_okur.py` bayt kodunu okur, `araclar/komut_imzalari.py`
+istemcinin gönderdiği komutları (G = 158) sunucunun işledikleriyle (H) karşılaştırır ve
+`docs/inceleme/1407-komutlar.md` tablosunu üretir. İstemcide her komut şu kalıpla kurulur:
 
 ```
 Base.Commands.addCommand({cmd: Constants.CMD_X, args: [a0, a1, ...]})
@@ -36,8 +38,8 @@ def buy(save, a):
     """[id, x, y, yon, kasaba, kaynak_dusme(1=bedava), fiyat_carpani, tur]"""
 ```
 
-`tests/test_komutlar.py` içindeki `test_istemcinin_tum_komutlari_karsilaniyor`
-testi, istemcinin gönderdiği tüm komut adlarının kayıtlı olduğunu denetler.
+`tests/test_komut_imzalari.py` (`test_1407_*`) istemcinin gönderdiği bütün komutların bir işleyicisi
+olduğunu (`EKSIK_1407` boş) ve argüman sayılarının uyduğunu denetler.
 
 ### Yeni komut eklemek
 
@@ -139,11 +141,11 @@ biçimindedir; istemci yalnızca `data`'yı okur.
 
 ## Bilinen eksikler
 
-- Ruffle'da yere tıklama işlenmiyor: birimler yürütülemiyor, binalar
-  haritaya bırakılamıyor (orijinal İngilizce SWF'de de aynı). Saldırı ve
-  turnuva savaşları bu yüzden Ruffle'da oynanamıyor; Flash Player'da sorun yok.
-- Oyuncu fotoğrafları boş görünür (istemci Facebook adresinden yüklüyor).
-- Haftalık turnuva (tür 8) kapalı.
+- Açık işlerin tam listesi `docs/gorev/BULGULAR.json`'dadır (durumu `acik` ya da `onay_bekliyor`).
+  Eskiden burada yazan "Ruffle'da yere tıklanmıyor" (F0-01, çürütüldü), "oyuncu fotoğrafları boş"
+  (OYN-05: oyuncu kendi resmini koyar, botlarda oyunun birim resmi) ve "haftalık turnuva kapalı"
+  (KNF-04: açık) artık geçerli değil.
+- 1.4.07'nin 5 günlük günlük ödül penceresi kapalı (KYT-02, OYN-11).
 - `fx/p.miniFireball2.swf` orijinal arşivde de yok; `oyun/fx_yama.py` onu oyunun
   kendi `p.fireBall` efektinden türetir (VAR-01).
 

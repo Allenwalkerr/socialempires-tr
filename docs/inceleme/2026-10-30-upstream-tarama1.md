@@ -1,5 +1,8 @@
 # Tarama 1: socialempires-tr ile AcidCaos/socialemperors karşılaştırması
 
+> **Not (11.11.2026):** Buradaki "0926'da kal" önerisi KAR-08 ile geçersiz; oyun 1.4.07'ye tam geçti
+> (`docs/YOL_HARITASI_1407.md`).
+
 Tarih: 30 Ekim 2026. Bizim depo yalnızca okundu; hiçbir dosyası değişmedi (`git status` boş).
 
 İşaretler: **✔** okunarak ya da çalıştırılarak doğrulandı, **◐** dolaylı kanıt, **?** doğrulanmadı.
