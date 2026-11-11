@@ -25,8 +25,7 @@ from oyun.config import get_game_config, get_item_from_id
 from oyun.ekonomi import timestamp_now
 from oyun.kayit import all_saves_userid, neighbor_session, save_session
 
-SALDIRI_HAKKI = 3                 # Config.ATTACKS_MAX
-SALDIRI_PERIYODU = 6 * 3600       # Config.ATTACKS_PERIOD_HOURS
+from oyun.denge import SALDIRI_HAKKI, SALDIRI_PERIYODU  # noqa: E402  istemcinin Config.ATTACKS_MAX / _PERIOD_HOURS
 AYNI_HEDEF_SURESI = 4 * 3600      # Config.ATTACKS_SAME_PLAYER_HOURS
 BIRIM_BASINA_ALTIN = 200          # Config.MAX_GOLD_FROM_ASSAULT
 SAVUNMA_BIRIM_ODULU = 20          # birim değerinin %10'u, en çok 20

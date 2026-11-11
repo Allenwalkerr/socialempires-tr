@@ -2105,13 +2105,13 @@
       "baslik": "Denetim EKF-09: PvP sabitleri (3 hak, 6 saat) üç yerde elle kopya, config globals'tan okunmuyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-09, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_denge.py: test_saldiri_sabitleri_tek_kaynak_istemcinin",
       "pr": null,
       "onay": null,
-      "notlar": "oyun/denge.py ve oyun/pvp.py aynı değerler; config ATTACKS_PERIOD_MAX/HOURS ile bugün eşit."
+      "notlar": "oyun/denge.py ve oyun/pvp.py aynı değerler; config ATTACKS_PERIOD_MAX/HOURS ile bugün eşit. 11.11.2026, bayt kodu ✔: istemci config globals'ı değil kendi Config/<sınıf> sabitlerini okur (ATTACKS_MAX 3, ATTACKS_PERIOD_HOURS 6; Base/processAttacks@461-723, loadGameConfigSuccess'te ATTACKS_* yok). Önerilen 'config'e bağla' istemciden ayrılmaya yol açardı; yerine kopyalar tek kaynağa (denge) toplandı, pvp oradan alır. Bozma düştü."
     },
     {
       "id": "DNT-29",
@@ -2131,13 +2131,13 @@
       "baslik": "Denetim SNK-07: Açık kasaba bellekte; sunucu yeniden başlarsa kasaba numarasız komutlar kasaba 0'a gider",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-07, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_komutlar.py: test_acik_kasaba_sunucu_yeniden_baslayinca_kayittan",
       "pr": null,
       "onay": null,
-      "notlar": "oyun/oyuncu.py _acik_kasabalar kayda yazılmıyor; push_queue_unit, pop_queue_unit, speed_up_queue, buy_first_purchase etkilenir."
+      "notlar": "oyun/oyuncu.py _acik_kasabalar kayda yazılmıyor; push_queue_unit, pop_queue_unit, speed_up_queue, buy_first_purchase etkilenir. 11.11.2026: açık kasaba bellekte ve playerInfo.acik_kasaba'da; bellek boşsa kayıttan okunur, bozuk değer 0. 3 bozma düştü."
     },
     {
       "id": "DNT-31",

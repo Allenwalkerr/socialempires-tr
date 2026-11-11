@@ -707,7 +707,7 @@ def egitim_odemesi(h, birim, bina_id):
 @komut("push_queue_unit")
 def push_queue_unit(save, a):
     """[bina_x, bina_y, bina_id, birim_id, kuyruk_no, ruh_karistirici_degil] - açık kasabada."""
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     bina_id, birim_id, qid = a.tam(2), a.tam(3), str(a.tam(4))
     bina = esya_bul(h, a.tam(0), a.tam(1), bina_id)
     birim = get_item_from_id(birim_id)
@@ -748,7 +748,7 @@ def pop_queue_unit(save, a):
     """[kuyruk_no, x, y, bina_id] - sıradaki birim eğitimi bitince haritaya çıkar.
 
     Sıradakinin başlangıcı bir öncekinin bitişidir (BuildingQueueData/setData zinciri)."""
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     qid = a.metin(0)
     kuyruk, bina = _kuyruk_ve_bina(save, h, qid)
     if not kuyruk:
@@ -770,7 +770,7 @@ def unqueue_unit(save, a):
     İstemcinin iadesi (BuildingQueueData/returnCost) köylüde alınmayan yemeği, Ruh Karıştırıcı'da alınmayan bedeli
     de verir; sahibinin kararıyla sunucu yalnızca alınanı iade eder (KAR-11, KYT-04). İstemci fazlayı o oturumda
     gösterir, yeniden yüklenince kayıttaki değer görünür."""
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     qid = a.metin(0)
     kuyruk, bina = _kuyruk_ve_bina(save, h, qid)
     if not kuyruk:
@@ -788,7 +788,7 @@ def speed_up_queue(save, a):
 
     Kalan süre (BuildingQueueData/get remainingSeconds): sıradakinin kalanı + bekleyenlerin tam süresi.
     İstemci ardından her birim için pop_queue_unit gönderir."""
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     qid = a.metin(0)
     kuyruk, bina = _kuyruk_ve_bina(save, h, qid)
     if not kuyruk:
@@ -860,7 +860,7 @@ def buy_unit_pack(save, a):
     if sinir and alinan + adet > sinir:
         print(" ! birlik paketi siniri:", no)
         return
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     tur, toplam = paket_bedeli(paket, adet)
     eldeki = int(save["playerInfo"].get("cash", 0)) if tur == "c" else int(h.get("coins", 0))
     if tur is None or eldeki < toplam:
@@ -1399,7 +1399,7 @@ def buy_first_purchase(save, a):
         return
     cash_ekle(save, -bedel)
     odul = g.get("POPUP_FIRST_PURCHASE_OFFER_REWARD") or {}
-    h = harita(save, acik_kasaba(save["playerInfo"].get("pid")))
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
     for tur in ("g", "c", "w", "f", "s", "m"):
         if odul.get(tur):
             kaynak_ekle(save, h, tur, odul[tur])

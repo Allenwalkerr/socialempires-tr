@@ -186,6 +186,16 @@ class YeniOyuncuKalkaniTestleri(KomutTesti):
 # ---------------------------------------------------------------------------
 
 class BotDunyasiDengeTestleri(unittest.TestCase):
+    def test_saldiri_sabitleri_tek_kaynak_istemcinin(self):
+        """DNT-28 (EKF-09): istemci 1.4.07 Config/<sınıf> ATTACKS_MAX = 3, ATTACKS_PERIOD_HOURS = 6 sabitlerini okur
+        (Base/processAttacks@461-723); config globals'taki ATTACKS_PERIOD_* istemcide okunmaz. Sunucunun oyuncu PvP'si
+        (pvp) ile bot dünyası (denge) aynı değeri kullanır: biri değişirse öteki ayrılmasın."""
+        from oyun import denge, pvp
+        self.assertEqual((denge.SALDIRI_HAKKI, denge.SALDIRI_PERIYODU), (3, 6 * 3600))
+        self.assertEqual((pvp.SALDIRI_HAKKI, pvp.SALDIRI_PERIYODU), (denge.SALDIRI_HAKKI, denge.SALDIRI_PERIYODU))
+        with open(pvp.__file__, encoding="utf-8") as f:
+            self.assertNotRegex(f.read(), r"(?m)^SALDIRI_(HAKKI|PERIYODU) = ")  # pvp'de ikinci bir kopya yok
+
     def test_bot_alti_saatte_uc_akin(self):
         # Dunya._saldiri_hakki "orijinal oyunun kuralı": game_config globals ATTACKS_PERIOD_MAX = 3,
         # ATTACKS_PERIOD_HOURS = 6 (istemci Config.ATTACKS_MAX / ATTACKS_PERIOD_HOURS ile aynı)
