@@ -93,6 +93,14 @@ class As3Guvenligi(unittest.TestCase):
             g = ck.as3_guvensizler(b"", ["Iki", "Tek"])
         self.assertEqual(g, {"Iki": "2 kullanımın 1'i ekrana gidiyor"})
 
+    def test_iki_abc_ayni_nokta_karismaz(self):
+        """#54 incelemesi: yöntem sırası ve ofset her DoABC'de 0'dan başlar. A'da ekrana giden, B'de aynı (yöntem,
+        ofset)'te ekran dışı itilen dize güvensizdir; anahtar ABC sırasını taşımazsa A'nın kaydı B'yi örterdi."""
+        a = self.sahte({0: "Ortak"}, {(1, 0, "Ortak")})
+        b = self.sahte({0: "Ortak"}, set())
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [a, b]):
+            self.assertEqual(ck.as3_guvensizler(b"", ["Ortak"]), {"Ortak": "2 kullanımın 1'i ekrana gidiyor"})
+
     def test_cozulemeyen_govde_hepsini_guvensiz_yapar(self):
         """#54 incelemesi: çözülemeyen gövde atlanırsa itmeler eksik sayılır, yanılgı "güvenli" yönüne olur."""
         for abc in (self.sahte({9: "Tek"}, {(1, 9, "Tek")}, coz_hatasi=True),

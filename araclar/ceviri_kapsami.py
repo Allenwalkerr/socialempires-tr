@@ -121,7 +121,7 @@ def as3_guvensizler(veri: bytes, dizeler):
     anahtarıdır, çevrilirse o eşleşmeler kırılır (GEC-06)."""
     dizeler = set(dizeler)
     ad_olan, sabit, it, ekran, kor = set(), set(), {}, set(), False
-    for abc in abc_okur.swf_abc(veri):
+    for k, abc in enumerate(abc_okur.swf_abc(veri)):  # k: ABC sırası; yöntem ve ofset her ABC'de 0'dan başlar
         havuz = abc.dizeler
 
         def ekle(kume, i):
@@ -157,13 +157,13 @@ def as3_guvensizler(veri: bytes, dizeler):
                 continue
             for isl in islemler.values():
                 if isl.ad == "pushstring":
-                    it.setdefault(abc.deger(isl), set()).add((g.yontem, isl.ofset))
+                    it.setdefault(abc.deger(isl), set()).add((k, g.yontem, isl.ofset))
         noktalar, cozulemeyen = abc.yazi_kaynaklari(YAZI_ALANLARI, YAZI_CAGRILARI)
-        ekran |= noktalar
+        ekran |= {(k,) + n for n in noktalar}
         kor = kor or bool(cozulemeyen)
     cikti = {}
     for d in sorted(dizeler):
-        ekrana = {(y, o) for y, o in it.get(d, ()) if (y, o, d) in ekran}
+        ekrana = {n for n in it.get(d, ()) if n + (d,) in ekran}
         if kor:
             cikti[d] = "çözülemeyen kod gövdesi var; kullanımlar bilinemez"
         elif d in ad_olan:
