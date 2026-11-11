@@ -1709,6 +1709,19 @@
       "pr": null,
       "onay": "KAR-17",
       "notlar": "oyun/ev_agi.py: ev ağı açıkken yerel olmayan her istek parolayla açılmış oturum ister (oyunun SWF/resim dosyaları ve sayfanın css/img/js'i açık; Android jetonuyla aynı liste). Parola ayarlar.json ev_agi_parolasi (en az 8) ya da ilk açılışta üretilip .ev_agi_parolasi'nda saklanır ve konsola yazılır. Oturum parolanın özetine bağlı; 5 yanlışta 5 dakika kilit. 6 bozmanın 6'sı düştü."
+    },
+    {
+      "id": "DNT-14",
+      "baslik": "Sunucu kaynak yeterliliğine bakmıyor, bedeli 0'a kıskaçlıyordu; eksi argüman kaynak yaratıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-03 (docs/denetim/ekonomi-formuller.md). Yeni test eski kodda düşüyor: 20 odunla 30 odunluk House I alımı kayda giriyordu (odun 0); buy fiyat çarpanı -5 odun ekliyordu.",
+      "test": "tests/test_komutlar.py: test_yetersiz_alim_uygulanmaz, test_kaynak_ve_nakit_eksiye_dusmez",
+      "pr": null,
+      "onay": "KAR-18",
+      "notlar": "Düzeltme: ekonomi.bakiyeden_dus bedel bakiyeyi aşarsa Yetersiz atar (apply_cost, cash_ekle, kaynak_ekle hepsi ondan geçer); komut döngüsü komutu geri alır, konsola ve komut_gunlugu.jsonl'a 'red' yazar. Eksi fiyat çarpanı reddedilir (satış iadesi -0.05 hariç); argümandan gelen 11 nakit bedeli max(0, ...). 2 bozmanın 2'si düştü. Risk: sunucu bakiyesi istemcininkinden düşükse istemcide görünen alım kayda girmez; red satırları bunu gösterir."
     }
   ]
 }
