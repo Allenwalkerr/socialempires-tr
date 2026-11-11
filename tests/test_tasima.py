@@ -90,6 +90,24 @@ class Tasima(unittest.TestCase):
             GERCEK_GETIR("192.168.1.20", "/liste", KOD)
         self.assertEqual(giden, ["http://192.168.1.20:5051/liste"])
 
+    def test_yeni_gondericide_yanlis_kod_bir_kez_sayilir(self):
+        """#46 incelemesi: iki taraf da yeniyken yanlış kod ?kod= ile yinelenmez; sayaç 1 artar."""
+        import io
+        giden = []
+
+        def yeni_gonderici(istek, timeout=None):
+            giden.append(istek.full_url)
+            yanit = self.gonderen.get(istek.full_url.split(":5051", 1)[1],
+                                      headers={k: v for k, v in istek.header_items()})
+            if yanit.status_code != 200:
+                raise tasima.urllib.error.HTTPError(istek.full_url, yanit.status_code, "", {}, io.BytesIO(yanit.data))
+            return io.BytesIO(yanit.data)
+        with mock.patch.object(tasima._ACICI, "open", yeni_gonderici):
+            with self.assertRaises(tasima.TasimaHatasi):
+                GERCEK_GETIR("192.168.1.20", "/liste", "000000")
+            self.assertEqual((len(giden), tasima._gonderim["yanlis"]), (1, 1))
+            self.assertIn(self.uid, GERCEK_GETIR("192.168.1.20", "/liste", KOD).decode())
+
     def test_tek_cihaz_gonderimi_kapatamaz(self):
         """DGV-02: yanlış denemeler adres başına sayılır; bir cihaz 5 yanlıştan sonra yalnızca kendisi reddedilir."""
         kotu, iyi = {"REMOTE_ADDR": "192.168.1.66"}, {"REMOTE_ADDR": "192.168.1.30"}

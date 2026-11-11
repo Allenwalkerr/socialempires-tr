@@ -72,14 +72,14 @@ def _kod_dogru():
 @gonderici.route("/liste")
 def gonderici_liste():
     if not _kod_dogru():
-        return {"hata": "kod"}, 403
+        return {"hata": "kod", "baslik": True}, 403  # alıcı: bu gönderici başlığı okur, ?kod= ile yineleme
     return {"imparatorluklar": _oyuncu_kayitlari()}
 
 
 @gonderici.route("/kayit/<uid>")
 def gonderici_kayit(uid):
     if not _kod_dogru():
-        return {"hata": "kod"}, 403
+        return {"hata": "kod", "baslik": True}, 403  # alıcı: bu gönderici başlığı okur, ?kod= ile yineleme
     if uid not in {k["userid"] for k in _oyuncu_kayitlari()}:
         return {"hata": "yok"}, 404
     _gonderim["gonderilen"] += 1
@@ -157,6 +157,14 @@ class _YonlendirmeYok(urllib.request.HTTPRedirectHandler):
 _ACICI = urllib.request.build_opener(_YonlendirmeYok)
 
 
+def _yeni_gonderici(hata):
+    """403 yanıtı bu sürümün göndericisinden mi (gövdede "baslik": true)?"""
+    try:
+        return json.loads(hata.read(1024) or b"{}").get("baslik") is True
+    except (ValueError, OSError, AttributeError):
+        return False
+
+
 def _getir(adres, yol, kod):
     taban = f"http://{_ev_agi_adresi(adres)}:{PORT}{yol}"
     istekler = [urllib.request.Request(taban, headers={KOD_BASLIGI: str(kod or "")}),
@@ -167,8 +175,8 @@ def _getir(adres, yol, kod):
             with _ACICI.open(istek, timeout=ZAMAN_ASIMI) as yanit:
                 return yanit.read(kayit_yedek.EN_BUYUK + 1)
         except urllib.error.HTTPError as hata:
-            if hata.code == 403 and sira == 0:
-                continue
+            if hata.code == 403 and sira == 0 and not _yeni_gonderici(hata):
+                continue  # yanlış kod yeni göndericide iki kez sayılmasın (#46 incelemesi)
             raise TasimaHatasi("kod" if hata.code == 403 else "yok")
         except (urllib.error.URLError, OSError):
             raise TasimaHatasi("ulasilamadi")
