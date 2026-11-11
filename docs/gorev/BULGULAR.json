@@ -1993,8 +1993,8 @@
       "baslik": "Kahraman diriltmede sunucu altın düşmüyordu",
       "onem": "Orta",
       "kanit": "PopupResurrectHeroes/onBuyItem@90-176: bedel cost_unit_cash × Config.RESURRECT_MULTIPLIER (500) altın, canAfford ve adjustStatByType; komut 4 argüman [id, tx, ty, townID].",
-      "test": "tests/test_komutlar.py: test_diriltme_bedeli_istemcininki",
-      "notlar": "Düzeltme: 4 argümanlı resurrect_hero altını düşer (yetmezse uygulanmaz). adjustStatByType'ın 3. argümanı (staticData.xp) kodlanmadı (?)."
+      "test": "tests/test_komutlar.py: test_diriltme_bedeli_istemcininki; test_kahraman_diriltme_kasabanin_altiniyla",
+      "notlar": "Düzeltme: 4 argümanlı resurrect_hero altını düşer (yetmezse uygulanmaz). adjustStatByType'ın 3. argümanı (staticData.xp) kodlanmadı (?). #51 incelemesi: altın ana köyden değil komuttaki kasabadan düşülür (altın kasaba başına; town_price, büyü ve mana altını da öyle); test_kahraman_diriltme_kasabanin_altiniyla, bozma düştü."
     },
     {
       "sinif": "hata",

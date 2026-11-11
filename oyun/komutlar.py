@@ -1601,19 +1601,20 @@ def resurrect_hero(save, a):
     birim_id = a.tam(0)
     ps = save["privateState"]
     birim = get_item_from_id(birim_id) or {}
+    h = harita(save, a.tam(3))  # altın kasaba başınadır; kahraman da bu kasabaya konur (#51 incelemesi)
     if a.metin(4) == "1":
         bakiyeden_dus(ps, "potion", max(0, int(birim.get("potion", 1) or 0)))
         liste = ps.get("resurrectableUnits")
         if isinstance(liste, list) and birim_id in liste:
             liste.remove(birim_id)
     else:
-        kaynak_ekle(save, save["maps"][0], "g", -int(birim.get("cost_unit_cash", 0) or 0) * RESURRECT_MULTIPLIER)
+        kaynak_ekle(save, h, "g", -int(birim.get("cost_unit_cash", 0) or 0) * RESURRECT_MULTIPLIER)
     mezarlik = ps.get("deadHeroes")
     if isinstance(mezarlik, dict) and str(birim_id) in mezarlik:
         mezarlik[str(birim_id)] = int(mezarlik[str(birim_id)]) - 1
         if mezarlik[str(birim_id)] <= 0:
             del mezarlik[str(birim_id)]
-    esya_ekle(harita(save, a.tam(3)), birim_id, a.tam(1), a.tam(2))
+    esya_ekle(h, birim_id, a.tam(1), a.tam(2))
 
 
 # ---------------------------------------------------------------------------

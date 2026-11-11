@@ -377,6 +377,19 @@ class BuyuVeMezarlik(KomutTesti):
         self.komut("resurrect_hero", 535, 7, 7, 0)
         self.assertEqual((self.harita["coins"], self.ps["deadHeroes"].get("535")), (50000 - 1500, None))
 
+    def test_kahraman_diriltme_kasabanin_altiniyla(self):
+        """#51 incelemesi: altın kasaba başınadır (her haritanın coins'i); bedel komuttaki kasabadan (4. argüman)
+        düşer, kahraman da oraya konur. Yetmezse komut uygulanmaz (KAR-18)."""
+        import copy
+        ikinci = copy.deepcopy(self.harita)
+        ikinci.update(coins=2000, items=[])
+        self.kayit["maps"].append(ikinci)
+        self.ps["deadHeroes"] = {"535": 2}
+        self.komut("resurrect_hero", 535, 7, 7, 1)
+        self.assertEqual((ikinci["coins"], self.harita["coins"], ikinci["items"][-1][:3]), (500, 50000, [535, 7, 7]))
+        self.komutlar.command("test", {"commands": [{"cmd": "resurrect_hero", "args": [535, 8, 8, 1]}]})
+        self.assertEqual((ikinci["coins"], len(ikinci["items"]), self.ps["deadHeroes"]["535"]), (500, 1, 1))
+
 
 class GenelDavranis(KomutTesti):
     def test_bozuk_komut_digerlerini_dusurmez(self):
