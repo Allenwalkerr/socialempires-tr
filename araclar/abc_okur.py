@@ -265,12 +265,13 @@ class Abc:
         turler = [o.u30() for _ in range(n)]
         ad = o.u30()
         bayrak = o.u8()
+        secenekler = []  # HAS_OPTIONAL: isteğe bağlı parametrelerin varsayılan değerleri (sıra, tür)
         if bayrak & 0x08:
             for _ in range(o.u30()):
-                o.u30()
-                o.u8()
+                secenekler.append((o.u30(), o.u8()))
         adlar = [o.u30() for _ in range(n)] if bayrak & 0x80 else []
-        return {"param": n, "donus": donus, "turler": turler, "ad": ad, "bayrak": bayrak, "adlar": adlar}
+        return {"param": n, "donus": donus, "turler": turler, "ad": ad, "bayrak": bayrak, "adlar": adlar,
+                "secenekler": secenekler}
 
     def _ozellikler(self, o):
         cikti = []
@@ -431,7 +432,7 @@ class Abc:
             return cikan
 
         if a.startswith("push") and a not in ("pushscope", "pushwith", "pushnamespace"):
-            yigin.append(Sabit(self.deger(isl)) if a != "pushundefined" else Sabit(Tanimsiz))
+            yigin.append(Sabit(self.deger(isl), isl.ofset) if a != "pushundefined" else Sabit(Tanimsiz))
         elif a == "pushnamespace":
             yigin.append("ns")
         elif a.startswith("getlocal"):
@@ -531,7 +532,7 @@ class Abc:
                       "add_i": "+", "subtract_i": "-", "multiply_i": "*"}.get(a)
             if a == "add":  # dize birleştirmede sabitler izlenir: "Level " + n
                 yigin.append(Ifade("(%s + %s)" % (_yaz(v[0]), _yaz(v[1])), icindeki_dizeler(v[0])
-                                   + icindeki_dizeler(v[1])))
+                                   + icindeki_dizeler(v[1]), icindeki_kaynaklar(v[0]) + icindeki_kaynaklar(v[1])))
             else:
                 yigin.append("(%s %s %s)" % (_yaz(v[0]), isaret, _yaz(v[1])) if isaret
                              else "%s(%s, %s)" % (a, _yaz(v[0]), _yaz(v[1])))
@@ -622,6 +623,28 @@ class Abc:
                         cikti.append((g.yontem, p, d))
         return cikti
 
+    def yazi_kaynaklari(self, alanlar=YAZI_ALANLARI, cagrilar=YAZI_CAGRILARI):
+        """Ekrana giden sabit dizelerin itildiği yerler: ({(yöntem, itme ofseti, dize)}, çözülemeyen gövde sayısı).
+        yazi_dizeleri gibi, ama yazma noktası değil dizenin itildiği nokta; çözülemeyen gövde atlanmaz, sayılır."""
+        cikti, cozulemeyen = set(), 0
+        for g in self.govdeler.values():
+            try:
+                sonuclar = list(self.simule(g))
+            except OkumaHatasi:
+                cozulemeyen += 1
+                continue
+            for p, sonuc in sonuclar:
+                if sonuc[0] == "atama" and sonuc[1] in alanlar:
+                    degerler = [sonuc[3]]
+                elif sonuc[0] == "cagri" and sonuc[1] in cagrilar:
+                    degerler = sonuc[3]
+                else:
+                    continue
+                for v in degerler:
+                    for d, kaynak in icindeki_kaynaklar(v):
+                        cikti.add((g.yontem, kaynak, d))
+        return cikti, cozulemeyen
+
     def sabitler(self, sinif: str) -> dict:
         """Sınıfın değeri derlemede yazılmış statik sabitleri: ad -> değer (dize, sayı)."""
         cikti = {}
@@ -648,10 +671,12 @@ Tanimsiz = _Tanimsiz()
 
 
 class Sabit:
-    __slots__ = ("deger",)
+    """Sabit değer. `kaynak`: itildiği işlemin ofseti (pushstring …; eşitliğe katılmaz)."""
+    __slots__ = ("deger", "kaynak")
 
-    def __init__(self, deger):
+    def __init__(self, deger, kaynak=None):
         self.deger = deger
+        self.kaynak = kaynak
 
     def __repr__(self):
         return repr(self.deger) if self.deger is not Tanimsiz else "undefined"
@@ -666,10 +691,20 @@ class Sabit:
 class Ifade(str):
     """Okunur ifade; içine birleştirmeyle girmiş sabit dizeleri de taşır."""
 
-    def __new__(cls, metin, dizeler=()):
+    def __new__(cls, metin, dizeler=(), kaynaklar=()):
         o = super().__new__(cls, metin)
         o.dizeler = tuple(dizeler)
+        o.kaynaklar = tuple(kaynaklar)  # (dize, itildiği ofset)
         return o
+
+
+def icindeki_kaynaklar(v):
+    """Değerdeki sabit dizeler ve itildikleri ofsetler: ((dize, ofset), ...)."""
+    if isinstance(v, Sabit) and isinstance(v.deger, str):
+        return ((v.deger, v.kaynak),)
+    if isinstance(v, Ifade):
+        return v.kaynaklar
+    return ()
 
 
 def icindeki_dizeler(v):

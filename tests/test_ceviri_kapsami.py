@@ -9,6 +9,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import unittest.mock
 
 import ortak  # noqa: F401
 
@@ -41,6 +42,104 @@ class DilMetni(unittest.TestCase):
         self.assertEqual(ck.hedef_metinleri(hedefler), [
             ("goal:7:baslik", "Build a farm"), ("goal:7:aciklama", "Farms give food"),
             ("goal:7:talimat", "Click")])
+
+
+class As3Guvenligi(unittest.TestCase):
+    """GEC-06: swf_yama bir dizeyi sabit havuzunda değiştirir, o dizenin her kullanımı birlikte değişir. Deneme
+    ABC'sinde (test_komut_imzalari): "Level " bir kez itilir ve `x.text = "Level " + y` ile ekrana gider; "buy"
+    iki kez itilir (komut adı), hiç ekrana gitmez; "text" ve "cmd" çok adlıdır (özellik adı)."""
+
+    def test_guvensizler(self):
+        g = ck.as3_guvensizler(swf_kur(abc_kur()), ["Level ", "buy", "text", "cmd"])
+        self.assertEqual(set(g), {"buy", "text", "cmd"})
+        self.assertEqual(g["buy"], "2 kullanımın 0'i ekrana gidiyor")
+        self.assertEqual(g["text"], "ad olarak da geçiyor")
+
+    def test_sabit_ve_parametre_varsayilani(self):
+        """#54 incelemesi: sınıf sabitinin değeri (Slot/Const, değer türü 0x01) ve isteğe bağlı parametrenin
+        varsayılan değeri (method_info HAS_OPTIONAL, tür 0x01) dize havuzuna gönderme yapar ama pushstring'le
+        itilmez. Bu dizeler ekrana gitse bile güvensizdir. Sahte ABC: dize 1 "Sabit", 2 "Varsayilan", 3 "Ekran";
+        üçü de birer kez ekrana gider."""
+        import types
+        abc = types.SimpleNamespace(
+            dizeler=[None, "Sabit", "Varsayilan", "Ekran"], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)],
+            yontemler=[{"ad": 0, "adlar": [], "secenekler": [(2, 0x01)]}], ustveriler=[],
+            ornekler=[{"ozellikler": [(6, 0, 0, 0, 1, 0x01)]}], siniflar=[], betikler=[], govdeler={},
+            yazi_kaynaklari=lambda *a: (set(), 0))
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [abc]):
+            g = ck.as3_guvensizler(b"", ["Sabit", "Varsayilan", "Ekran"])
+        self.assertEqual(set(g), {"Sabit", "Varsayilan"})
+
+    @staticmethod
+    def sahte(itmeler, ekran, coz_hatasi=False, cozulemeyen=0):
+        """itmeler: {ofset: dize} tek gövdede (yöntem 1) pushstring'ler; ekran: {(1, ofset, dize)}."""
+        import types
+        from abc_okur import Islem, OkumaHatasi
+
+        def coz(g):
+            if coz_hatasi:
+                raise OkumaHatasi("bilinmeyen işlem kodu")
+            return {o: Islem(o, "pushstring", (o,), o + 2, ()) for o in itmeler}
+        return types.SimpleNamespace(
+            dizeler=[None], ad_alanlari=[(0, 0)], coklu_adlar=[(0,)], yontemler=[], ustveriler=[], ornekler=[],
+            # betikte bir özellik kaydı: as3_guvensizler'deki özellik döngüsü dönsün (#54: döngü değişkeni ABC
+            # sırasını ezmişti; iki ABC'nin son kaydı aynıysa anahtarlar yine karışıyordu)
+            siniflar=[], betikler=[(0, [(1, 0, 0, 0)])], govdeler={1: types.SimpleNamespace(yontem=1)}, coz=coz,
+            deger=lambda isl: itmeler[isl.ofset], yazi_kaynaklari=lambda *a: (set(ekran), cozulemeyen))
+
+    def test_her_itme_noktasi_ekrana_gitmeli(self):
+        """#54 incelemesi: "Iki" iki yerden itilir (ofset 0, 5); yalnızca 0'daki ekrana gider (iki yazma noktasına
+        gitse de bir itme noktasıdır). 5'teki ekran dışı kullanım güvensiz kılar. "Tek" tek itmesiyle ekrana gider."""
+        abc = self.sahte({0: "Iki", 5: "Iki", 9: "Tek"}, {(1, 0, "Iki"), (1, 9, "Tek")})
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [abc]):
+            g = ck.as3_guvensizler(b"", ["Iki", "Tek"])
+        self.assertEqual(g, {"Iki": "2 kullanımın 1'i ekrana gidiyor"})
+
+    def test_iki_abc_ayni_nokta_karismaz(self):
+        """#54 incelemesi: yöntem sırası ve ofset her DoABC'de 0'dan başlar. A'da ekrana giden, B'de aynı (yöntem,
+        ofset)'te ekran dışı itilen dize güvensizdir; anahtar ABC sırasını taşımazsa A'nın kaydı B'yi örterdi."""
+        a = self.sahte({0: "Ortak"}, {(1, 0, "Ortak")})
+        b = self.sahte({0: "Ortak"}, set())
+        with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri: [a, b]):
+            self.assertEqual(ck.as3_guvensizler(b"", ["Ortak"]), {"Ortak": "2 kullanımın 1'i ekrana gidiyor"})
+
+    def test_cozulemeyen_govde_hepsini_guvensiz_yapar(self):
+        """#54 incelemesi: çözülemeyen gövde atlanırsa itmeler eksik sayılır, yanılgı "güvenli" yönüne olur."""
+        for abc in (self.sahte({9: "Tek"}, {(1, 9, "Tek")}, coz_hatasi=True),
+                    self.sahte({9: "Tek"}, {(1, 9, "Tek")}, cozulemeyen=1)):
+            with unittest.mock.patch.object(ck.abc_okur, "swf_abc", lambda veri, abc=abc: [abc]):
+                self.assertIn("Tek", ck.as3_guvensizler(b"", ["Tek"]))
+
+    def test_okuyucu_secenekleri_saklar(self):
+        """abc_okur._yontem: HAS_OPTIONAL (0x08) bayrağında (sıra, tür) çiftleri okunur ve saklanır."""
+        from test_komut_imzalari import _u30
+        # 1 parametre, dönüş 0, tür 0, ad 0, bayrak HAS_OPTIONAL; 1 seçenek: sıra 5, tür 0x01 (dize)
+        veri = _u30(1) + _u30(0) + _u30(0) + _u30(0) + bytes([0x08]) + _u30(1) + _u30(5) + bytes([0x01])
+        y = ck.abc_okur.Abc._yontem(ck.abc_okur._Okur(veri))
+        self.assertEqual(y["secenekler"], [(5, 0x01)])
+
+    def test_guvensiz_ceviri_cevrilmis_sayilmaz(self):
+        """Ekran dizesi bir yerde ad olarak da geçerse sözlükte olsa bile çevrilmiş sayılmaz ve listelenir."""
+        sozluk = {"metin_alanlari": {}, "statik_yazilar": {}, "as3_dizeleri": {"Level ": "Seviye "}}
+        with unittest.mock.patch.object(ck, "as3_guvensizler", lambda veri, d: {"Level ": "ad olarak da geçiyor"}):
+            sonuc = ck.olc(swf_kur(abc_kur()), {}, [], sozluk, {})
+        self.assertEqual((sonuc["as3_dizeleri"]["cevrilen"], sonuc["as3_dizeleri"]["gereken"]), (0, 1))
+        self.assertEqual(sonuc["as3_guvensiz"], {"Level ": "ad olarak da geçiyor"})
+
+
+class Dolgu(unittest.TestCase):
+    def test_dolgu_dosyasi(self):
+        """ceviri/dolgu.json: her dolgunun bir nedeni var ve anahtar swf_yama.anahtar biçiminde (etiketsiz,
+        kırpılmış); yoksa ölçüm onu bulamaz. Dolgu dil metni sayılmaz."""
+        from oyun import swf_yama
+        dolgu = ck._dolgu_yukle()
+        self.assertGreater(len(dolgu), 0)
+        for metin, neden in dolgu.items():
+            self.assertTrue(neden.strip(), metin)
+            self.assertEqual(swf_yama.anahtar(metin), metin)
+        self.assertIn("lblScore", dolgu)  # alan adı biçiminde şablon (1.4.07 metin alanı)
+        self.assertFalse(ck.dil_metni_mi("lblScore"))
+        self.assertTrue(ck.dil_metni_mi("lblScoreX"))
 
 
 class HedefCevirisi(unittest.TestCase):

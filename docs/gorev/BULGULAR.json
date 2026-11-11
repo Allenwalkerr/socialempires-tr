@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-06",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #49 … #52 birleşti, GEC-05 kapandı. GEC-06 başladı: hedefler (CEV-03, TRA-01) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-06'nın kalanı: SWF metin alanları (404/638), sabit yazılar (44/58), AS3 dizeleri (0/219); her kalan ya çevrilir ya kanıtıyla ceviri_kapsami.DOLGU'ya girer; ekran görüntüsü denetimi. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #53 birleşti (hedefler). CEV-04 (SWF metinleri ve AS3 dizeleri) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-06'nın kalanı: oyunda ekran görüntüsüyle denetim (yeni pencereler, Türkçe harfler), kabul kapısı. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -889,7 +889,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer. 11.11.2026: hedefler (TRA-01) CEV-03 ile 410/410. Kalan: SWF metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219 (çoğu geliştirici dolgusu; tek tek kanıtla DOLGU'ya ya da çeviriye), ekran görüntüsü denetimi."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). Kalan SWF metinlerinin çoğu geliştirici dolgusu ya da kodun üzerine yazdığı yer tutucu; her biri ya çevrilir ya da kanıtıyla ceviri_kapsami.DOLGU'ya girer. 11.11.2026: hedefler (TRA-01) CEV-03 ile 410/410. Kalan: SWF metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219 (çoğu geliştirici dolgusu; tek tek kanıtla DOLGU'ya ya da çeviriye), ekran görüntüsü denetimi. 11.11.2026: CEV-04 ile SWF metin alanları 554/554, sabit yazılar 44/46, AS3 213/219 (kalanlar kanıtıyla çevrilemez). Kalan: ekran görüntüsü denetimi, yazı tiplerinde Türkçe harf denetimi."
     },
     {
       "id": "GEC-07",
@@ -2014,13 +2014,26 @@
       "baslik": "1.4.07'nin hedefleri (goals, 206 hedef, 410 metin) Türkçeleşmiyordu (denetim TRA-01)",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Denetim TRA-01 (docs/denetim/turkce-arayuz.md); ölçüm (araclar/ceviri_kapsami.py --hedefler config/goals.json): hedefler 0/410. oyun/turkce._bolum_anahtarlari config['goals']'u hiç taramıyordu.",
       "test": "tests/test_ceviri_kapsami.py: HedefCevirisi (3 test)",
-      "pr": null,
+      "pr": "#53",
       "onay": null,
       "notlar": "Düzeltme: turkce._bolum_anahtarlari hedef bölümü (anahtar goal:<id>:baslik|aciklama|talimat, ölçüm aracıyla aynı; 'none' yer tutucu çevrilmez). 410 metnin 357'si eski görevlerin birebir aynı İngilizce metninin çevirisinden alındı (aynı kaynak metin, aynı çeviri), 53'ü yeni çevrildi; adlar config'teki Türkçe eşya ve arayüz adlarıyla (Hafif Okçu, Ruh Kazanı, Konak, Asker Paketleri, Cenk Rehberi, Düşman ara…). Sonra hedefler 410/410, dogrula denetimi temiz. 4 bozmanın 4'ü düştü. Oyunda ekran görüntüsüyle bakılmadı (GEC-06 ekran denetiminde)."
+    },
+    {
+      "id": "CEV-04",
+      "baslik": "1.4.07 SWF'sinin metin alanları ve oyun kodu dizeleri Türkçe; AS3 dizesi çevirisi güvenlik denetimli",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Ölçüm (araclar/ceviri_kapsami.py, 1.4.07): önce metin alanları 404/638, sabit yazılar 44/58, AS3 dizeleri 0/219. Taslak yardımcı ajanın (467 öğe: çevir ya da dolgu+neden); her satır gözden geçirildi: 23 şablon/şaka yazısı dolguya alındı, 2 AS3 çevirisi düzeltildi (TU ERES LA BRIGADA BRUTAL = acımasız tugay; DAİRESEL ATEŞ ŞAPLAĞI), HONOR RANKS çoğul, yazı tipinde olmayan 'â' (3 yer) kaldırıldı. Bulundu: oyun/swf_yama.abc_dizelerini_degistir sabit havuzundaki dizeyi değiştirdiği için dizenin HER kullanımı değişir; 6 ekran dizesi ekran dışında da kullanılıyor (OK ad olarak; Whirlwind 26 kullanımın 10'u, Minions 16/13, Energy Balls 15/9, Fire Balls 2/1, Dummy Attack 4/3): çevrilmedi.",
+      "test": "tests/test_ceviri_kapsami.py: As3Guvenligi (2), Dolgu; test_sabit_ve_parametre_varsayilani, test_okuyucu_secenekleri_saklar; test_her_itme_noktasi_ekrana_gitmeli, test_cozulemeyen_govde_hepsini_guvensiz_yapar; test_iki_abc_ayni_nokta_karismaz",
+      "pr": null,
+      "onay": null,
+      "notlar": "Sonra: metin alanları 554/554, sabit yazılar 44/46 (kalan cash ve 'Use times' yazı tipine gömülü, çevrilemez), AS3 dizeleri 213/219 (kalan 6 güvensiz). araclar/ceviri_kapsami.as3_guvensizler: ad olarak geçen, sınıf sabiti olan ya da pushstring sayısı ekran kullanımından fazla olan dize çevrilmiş sayılmaz ve raporda listelenir. Dolgu ceviri/dolgu.json'da nedenleriyle (96). Gerçek istemciye yama uygulandı: yeni SWF okunuyor, çeviriler havuzda, güvensiz 6 dize değişmemiş. 4 bozmanın 4'ü düştü. İşaret ◐: oyunda ekran görüntüsüyle bakılmadı. #54 incelemesi: isteğe bağlı parametrelerin varsayılan dize değerleri (method_info HAS_OPTIONAL, tür 0x01) pushstring'le itilmediği için sayılmıyordu; abc_okur._yontem artık secenekler'i saklıyor, as3_guvensizler onları sınıf sabitleri gibi güvensiz sayıyor. 1.4.07'de sonuç değişmedi (213/219). 3 bozmanın 3'ü düştü. #54 incelemesi (2): sayı karşılaştırması (pushstring sayısı ≤ ekran yazma noktası sayısı) tek itmenin birden çok yazma noktasına gitmesiyle şişip ekran dışı kullanımı gizleyebilirdi; artık her pushstring noktası (yöntem, ofset) ayrı denetleniyor (abc_okur: Sabit.kaynak, Ifade.kaynaklar, yazi_kaynaklari). Çözülemeyen gövde atlanıyordu (yanılgı 'güvenli' yönüne); artık o ABC'nin bütün adayları güvensiz. 1.4.07'de sonuç değişmedi (aynı 6 güvensiz, çözülemeyen gövde yok). Sınır ◐: aynı itilmiş değer dup ile hem ekrana hem karşılaştırmaya gidiyorsa görülmez. 4 bozmanın 4'ü düştü. #54 incelemesi (3): itme noktası anahtarı ABC sırasını taşımıyordu; birden çok DoABC'de aynı (yöntem, ofset) karışabilirdi. Anahtar artık (ABC sırası, yöntem, ofset). 1.4.07'de sonuç aynı. test_iki_abc_ayni_nokta_karismaz; bozma düştü (S-67: önbellek tuzağı). #54 incelemesi (4): b96c6b9'daki ABC sırası (k) özellik döngüsünün aynı adlı değişkeniyle eziliyordu, düzeltme gerçek SWF'de işlemiyordu; sahte ABC'lerde özellik listesi boş olduğundan test görmedi. Değişken abc_no oldu, sahte ABC'ye özellik kaydı eklendi; eski hata geri konunca test düşüyor."
     }
   ]
 }
