@@ -165,6 +165,32 @@ class HttpDumanTestleri(unittest.TestCase):
         self.assertEqual(gonder("boyle-biri-yok", imza + ';{"commands": []}'), 404)
         self.assertEqual(gonder(UID, imza + ';{"commands": []}'), 200)
 
+    def test_yeniden_gonderilen_paket_bir_kez_uygulanir(self):
+        """SNK-02 (bağımsız denetim). İstemci CommandManager/sendPacket paketi first_number, commands, tries ile
+        yollar; yanıt gelmezse processCommandsTimeout aynı paketi tries + 1 ile yeniden sendPacket eder. Aynı
+        paket iki kez uygulanmamalı; yeni first_number ve kendi köyünü yeniden yüklemek (sayaç baştan) uygulanır."""
+        import json
+        from oyun.kayit import session
+        yol, imza = f"{BASE}/command.php", "0" * 64
+        harita = session(UID)["maps"][0]
+        def gonder(numara, deneme, xp):
+            veri = {"first_number": numara, "tries": deneme,
+                    "commands": [{"cmd": "rt_publish_score", "args": [xp]}, {"cmd": "store_item", "args": [0, 0, 0, 1]}]}
+            self.assertEqual(self.istemci.post(yol, data={"USERID": UID, "data": imza + ";" + json.dumps(veri)})
+                             .status_code, 200)
+        def depo():
+            g = session(UID)["privateState"].get("gifts") or []
+            return g[1] if len(g) > 1 else 0
+        once = depo()
+        gonder(900, 1, harita["xp"])
+        gonder(900, 2, harita["xp"])  # aynı paket yeniden
+        sonra = depo()
+        gonder(901, 1, harita["xp"])  # yeni paket
+        self.assertEqual(depo() - sonra, sonra - once)
+        self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": UID})
+        gonder(901, 1, harita["xp"])  # yeniden yüklemeden sonra sayaç baştan: uygulanır
+        self.assertEqual(depo() - sonra, 2 * (sonra - once))
+
     def test_birlik_paketi_rastgele_sayilari(self):
         cevap = self._servis("get_up_data.php", {"n": 3})
         self.assertEqual(cevap["result"], "success")

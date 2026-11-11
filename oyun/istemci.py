@@ -16,7 +16,7 @@ from oyun.ekonomi import timestamp_now
 from oyun.kayit import (gecerli_uid, neighbor_session, save_lock, save_session,
                         session as kayit_oturumu)
 from oyun.kayit_semasi import saldiri_sonuclari
-from oyun.komutlar import command, depo_ekle, listeye_ekle
+from oyun.komutlar import command, depo_ekle, listeye_ekle, paket_gecmisini_sil
 from oyun.oyuncu import get_neighbor_info, get_player_info, get_quest_map
 from oyun.sunucu import OYUN_DILI, app
 from oyun.yollar import SAVES_DIR
@@ -70,6 +70,7 @@ def get_player_info_response():
     kullanici = request.values.get("user")
     harita_no = int(request.values.get("map", 0) or 0)
     if kullanici is None:
+        paket_gecmisini_sil(uid)
         kayit = kayit_oturumu(uid)
         if kayit is not None:
             with save_lock:

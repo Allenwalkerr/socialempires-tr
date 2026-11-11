@@ -1631,6 +1631,19 @@
       "isaret": "✔",
       "kanit": "Bayt kodu (10.11.2026): Assault$/sendAssaultResults 'win' = bPlayerWinner ? 1 : 0, 'voluntary_end' = bVoluntaryEnd ? 1 : 0 (@217-276). Teslim olma StateAssault/onSurrenderConfirmed assaultEnd(false, false, true) çağırır: win 0 gider. Denetçinin 'sabit win: 1' okuması abc_okur.cagrilar'ın koşullu değeri tek sabite indirmesinden (S-63).",
       "notlar": "Denetimin öteki DPT bulguları (docs/denetim/dunya-pvp-turnuva.md) yeniden üretilmeyi bekliyor; cagrilar çıktısına dayananlar ayrıca denetlenecek."
+    },
+    {
+      "id": "DNT-12",
+      "baslik": "Yeniden gönderilen komut paketi iki kez uygulanıyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-02 (docs/denetim/sunucu-komutlar.md). Bayt kodu (11.11.2026): CommandManager/sendPacket paketi first_number, commands, tries ile yollar ve tries'ı artırır; CommandManager/processCommandsTimeout aynı currentPacket'i yeniden sendPacket eder. Sunucu yalnızca commands'ı okuyup her paketi uyguluyordu.",
+      "test": "tests/test_http.py: test_yeniden_gonderilen_paket_bir_kez_uygulanir",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: kullanıcı başına son paketin (first_number, komutlar) bellekte tutulması; aynısı yeniden gelirse uygulanmaz. Kendi köyünü yükleyince (get_player_info, user yok) silinir: istemcinin sayacı baştan başlar. 2 bozmanın 2'si düştü."
     }
   ]
 }

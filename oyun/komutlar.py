@@ -183,7 +183,24 @@ def globals_():
 # Ana döngü
 # ---------------------------------------------------------------------------
 
+# Son uygulanan paket: {kimlik: (first_number, komutların JSON'u)}. İstemci yanıtı zamanında alamazsa aynı paketi
+# aynı first_number ile, tries'ı artırarak yeniden yollar (CommandManager/processCommandsTimeout → sendPacket);
+# ikinci kez uygulanırsa bina, bedel ve ödül çifte yazılır (SNK-02). Bellekte: oturum başında istemcinin sayacı
+# yeniden başladığından diske yazılmaz.
+_SON_PAKET = {}
+
+
+def paket_gecmisini_sil(USERID):
+    """Oyuncu kendi köyünü yeniden yükledi: istemcinin paket sayacı baştan başlar."""
+    _SON_PAKET.pop(USERID, None)
+
+
 def command(USERID, data):
+    paket = (data.get("first_number"), json.dumps(data.get("commands", []), sort_keys=True))
+    if paket[0] is not None and _SON_PAKET.get(USERID) == paket:
+        print(f" * Ayni komut paketi yeniden geldi (first_number={paket[0]}, tries={data.get('tries')}), uygulanmadi")
+        return
+    _SON_PAKET[USERID] = paket
     gunluk = []
     save = session(USERID)
     for komut_verisi in data.get("commands", []):
