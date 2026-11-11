@@ -133,21 +133,27 @@ def yeni_sonuc(saldiran, args):
     alan = "attacksWon" if kazandi else "attacksLost"
     ps[alan] = _tam(ps.get(alan)) + 1
 
-    kurban = neighbor_session(kurban_id) if kayit.get("kayitli") else None
     aciklama = kayit.setdefault("description", {})
     if not kayit.get("ganimet_hakki"):
         aciklama["resources"] = {"g": 0, "x": 0}
         return True
-    harita = saldiran["maps"][0]
-    kurban_harita = kurban["maps"][0] if kurban else None
+    # Kayıtlı kurban (bot, kayıtlı köy) değişir; statik komşu (villages/) herkes için ortaktır, yalnızca okunur.
+    kurban = neighbor_session(kurban_id)
+    kurban_harita = kurban["maps"][0] if kurban else {}
+    dus = bool(kayit.get("kayitli")) and kurban is not None
+    haritalar = saldiran["maps"]
+    harita_no = _tam(kayit.get("harita_no"))
+    harita = haritalar[harita_no] if 0 <= harita_no < len(haritalar) else haritalar[0]  # end_attack'ın kasabası
     ganimet = {}
     for sira, (kisa, alan_adi) in enumerate((("g", "coins"), ("f", "food"), ("w", "wood"), ("s", "stone"))):
-        miktar = max(0, _tam(args[sira]))
-        if kurban_harita is not None:
-            # İstemcinin ganimet havuzu hedefin kaynaklarından hesaplanır (PvpPlayerManager.setEnemyInfo); hedefte
-            # olmayandan fazlası verilmez. Ganimet kurbandan düşülür (KAR-20, sahibinin kararı 11.11.2026).
-            mevcut = max(0, _tam(kurban_harita.get(alan_adi)))
-            miktar = min(miktar, mevcut)
+        # İstemcinin ganimet havuzu hedefin kaynaklarından hesaplanır (PvpPlayerManager.setEnemyInfo); hedefte
+        # olmayandan fazlası verilmez (okunamayan hedef: 0). Altın ayrıca eski end_attack'ın tavanıyla sınırlı.
+        # Ganimet kayıtlı kurbandan düşülür (KAR-20, sahibinin kararı 11.11.2026).
+        mevcut = max(0, _tam(kurban_harita.get(alan_adi)))
+        miktar = min(max(0, _tam(args[sira])), mevcut)
+        if kisa == "g":
+            miktar = min(miktar, max(0, _tam(kayit.get("altin_tavani"))))
+        if dus:
             kurban_harita[alan_adi] = mevcut - miktar
         harita[alan_adi] = _tam(harita.get(alan_adi)) + miktar
         ganimet[kisa] = miktar
@@ -159,7 +165,7 @@ def yeni_sonuc(saldiran, args):
     ps["honor"] = _tam(ps.get("honor")) + onur
     saldiran["playerInfo"]["honor_points"] = _tam(saldiran["playerInfo"].get("honor_points")) + onur
     aciklama["resources"] = dict(ganimet, x=xp)
-    if kurban is not None:
+    if dus:
         save_session(kurban_id)
     print(f"Saldiri ganimeti: {ganimet}, {xp} XP, {onur} onur")
     return True
@@ -212,7 +218,7 @@ def saldiri_bitir(saldiran, args):
     if kurban:
         kurban_seviye = _tam(kurban["maps"][0].get("level"), kurban_seviye)
 
-    altin = xp = 0
+    altin = xp = altin_tavani = 0
     if kurala_uygun and not belediye_yok:
         yikilan = sum(_olenler(veri.get("victim_units")).values())
         altin_tavani = min(int(get_game_config()["globals"].get("MAX_GOLD_ASSAULT", 20000)),
@@ -235,6 +241,7 @@ def saldiri_bitir(saldiran, args):
     # 1.4.07: ganimet, XP ve onur ayrı end_attack_new ile gelir (end_attack'ta literal 0); onu bu kayıtla eşler
     gonderilen.append({"time": simdi, "victim_id": kurban_id, "ganimet_hakki": bool(kurala_uygun and not belediye_yok),
                        "kayitli": bool(kayitli and not kalkanli), "yeni_sonuc": False,
+                       "altin_tavani": altin_tavani, "harita_no": harita_no,
                        "description": dict(aciklama, oponent=(_ozet(kurban) if kurban else veri.get("victim")))})
     del gonderilen[:-50]
 

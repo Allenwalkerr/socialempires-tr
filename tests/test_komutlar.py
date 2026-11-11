@@ -513,6 +513,40 @@ class PvpKomutlari(KomutTesti):
         self.yeni()  # aynı savaşın ikinci sonucu: verilmez
         self.assertEqual(self.harita["coins"] - once["coins"], 600)
 
+    def test_yeni_sonuc_kayitsiz_hedefte_sinirli(self):
+        """#50 incelemesi: statik komşu (kayıtlı değil) değişmez ama ganimet yine onun kaynağıyla ve eski
+        end_attack'ın altın tavanıyla (200 × 2 yıkılan + 5 × 100 + 25 = 925) sınırlı; XP de o altından
+        (ceil(925 × 0,05) + 2 + 150). Okunamayan hedeften hiçbir şey alınmaz."""
+        self.kurban["maps"][0].update(coins=50000, food=500, wood=0, stone=0)
+        self.pvp.all_saves_userid = lambda: ["test"]
+        kaydedilen = []
+        self.pvp.save_session = kaydedilen.append
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone", "xp")}
+        self.yeni(g=999999, f=999999, w=999999, s=999999, xp=999999)
+        self.assertEqual({k: self.harita[k] - once[k] for k in once},
+                         {"coins": 925, "food": 500, "wood": 0, "stone": 0, "xp": 47 + 2 + 150})
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], kaydedilen),
+                         (50000, 500, []))
+        del self.kayitlar["rakip"]
+        self.ps["attacksSent"] = []
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone")}
+        self.yeni(g=999999, f=999999, w=999999, s=999999)
+        self.assertEqual({k: self.harita[k] - once[k] for k in once}, {"coins": 0, "food": 0, "wood": 0, "stone": 0})
+
+    def test_yeni_sonuc_saldirinin_kasabasina(self):
+        """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
+        import copy
+        ikinci = copy.deepcopy(self.harita)
+        ikinci.update(coins=0, xp=0)
+        self.kayit["maps"].append(ikinci)
+        self.kurban["maps"][0].update(coins=1000)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0, attacker={"user_id": "test", "map": 1})
+        ana = self.harita["coins"]
+        self.yeni(g=300, f=0, w=0, s=0, xp=10)
+        self.assertEqual((ikinci["coins"], ikinci["xp"], self.harita["coins"]), (300, 10, ana))
+
     def test_yeni_sonuc_yenilgi_ve_eslesmeyen(self):
         self.yeni()  # önce end_attack gelmedi: hiçbir şey verilmez
         self.assertEqual((self.harita["coins"], self.ps.get("attacksWon", 0)), (50000, 0))

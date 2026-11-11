@@ -1891,6 +1891,32 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Uygulama: pvp.yeni_sonuc (end_attack_new) her kaynağı kurbanın elindekiyle sınırlar ve düşer, kurbanın kaydını yazar; pvp.saldiri_bitir (eski end_attack) altını kurbanın altınıyla sınırlar ve düşer. Statik komşular ve kalkanlı hedefler değişmez. Botlar kaynağı dunya._ekonomi ile yeniden üretir. 4 bozmanın 4'ü düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-20",
+      "baslik": "end_attack_new ganimetinde altın tavanı yoktu; kayıtsız hedefte hiç sınır yoktu",
+      "onem": "Orta",
+      "kanit": "#50 incelemesi (github-actions, oyun/pvp.py:153), yeniden okundu: yeni_sonuc yalnızca kayitli kurbanda kaynakla sınırlıyordu; statik komşuda (villages/, all_saves_userid dışında) args[0..3] olduğu gibi yazılıyordu, XP tavanı da altınla büyüyordu.",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_kayitsiz_hedefte_sinirli",
+      "notlar": "Düzeltme: saldiri_bitir altin_tavani'yı (MAX_GOLD_ASSAULT, 200 × yıkılan + seviye × 100 + 25) saldırı kaydına yazar; yeni_sonuc altını onunla, her kaynağı hedefin elindekiyle sınırlar (okunamayan hedef: 0). Statik komşu değişmez. 3 bozmanın 3'ü düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-21",
+      "baslik": "end_attack_new ganimeti her zaman ana kasabaya yazılıyordu",
+      "onem": "Düşük",
+      "kanit": "#50 incelemesi (oyun/pvp.py:141), yeniden okundu: saldiri_bitir attacker.map'in kasabasını kullanıyor, yeni_sonuc maps[0]'ı.",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_saldirinin_kasabasina",
+      "notlar": "Düzeltme: harita_no saldırı kaydına yazılır, yeni_sonuc aynı kasabaya yazar. 1.4.07'de PvP'nin ikinci kasabadan açılıp açılmadığı doğrulanmadı; düzeltme her iki durumda da tutarlı. 1 bozmanın 1'i düştü."
     }
   ]
 }
