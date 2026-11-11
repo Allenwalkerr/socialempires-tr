@@ -486,6 +486,41 @@ class PvpKomutlari(KomutTesti):
         veri.update(ek)
         self.komut("end_attack", json.dumps(veri), *ek_arg)
 
+    def yeni(self, g=600, f=100, w=400, s=50, kazanan="test", xp=40, hedef="rakip"):
+        """end_attack_new, PVPManager/sendEnd@328-458: [g, f, w, s, attacked_id, ad, seviye, zaman, winnerId
+        (bPlayerWinner ? sessionID : attacked_id), gönüllü, intikam, kalkan, yüzde*100, iXPGained]."""
+        self.komut("end_attack_new", g, f, w, s, hedef, "Test", 10, 2_000_000_000, kazanan, 0, 0, 0, 30, xp)
+
+    def test_yeni_sonuc_ganimeti_verir(self):
+        """1.4.07'de end_attack'ın resources ve honor'u literal 0'dır (Assault$/sendAssaultResults @137-164,
+        @284-287); ganimet ve XP end_attack_new ile gelir. Hedefin elindekinden fazlası verilmez. Onur: config
+        globals HONOR_POINT_PVP_WIN_ATTACK 15 / HONOR_POINT_PVP_LOSE_ATTACK 5."""
+        self.kurban["maps"][0].update(coins=1000, food=500, wood=300, stone=0)
+        self.saldir(resources={"g": 0, "x": 0, "w": 0, "s": 0, "f": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone", "xp")}
+        self.yeni()
+        self.assertEqual({k: self.harita[k] - once[k] for k in once},
+                         {"coins": 600, "food": 100, "wood": 300, "stone": 0, "xp": 40})
+        self.assertEqual((self.ps["attacksWon"], self.ps.get("attacksLost", 0), self.ps["honor"]), (1, 0, 15))
+        self.assertEqual(self.ps["attacksSent"][-1]["description"]["resources"],
+                         {"g": 600, "f": 100, "w": 300, "s": 0, "x": 40})
+        self.assertEqual(self.kurban["maps"][0]["coins"], 1000)  # eski end_attack gibi kurbandan düşülmez
+        self.yeni()  # aynı savaşın ikinci sonucu: verilmez
+        self.assertEqual(self.harita["coins"] - once["coins"], 600)
+
+    def test_yeni_sonuc_yenilgi_ve_eslesmeyen(self):
+        self.yeni()  # önce end_attack gelmedi: hiçbir şey verilmez
+        self.assertEqual((self.harita["coins"], self.ps.get("attacksWon", 0)), (50000, 0))
+        self.saldir(resources={"g": 0, "x": 0}, honor=0, win=0)
+        self.yeni(kazanan="rakip", g=0, f=0, w=0, s=0, xp=0)
+        self.assertEqual((self.ps.get("attacksWon", 0), self.ps["attacksLost"], self.ps["honor"]), (0, 1, 5))
+
+    def test_kural_disi_saldiri_ganimetsiz_ama_sayilir(self):
+        self.kurban["privateState"]["shieldEndTime"] = 4_000_000_000  # kalkanlı hedef (KYT-03)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        self.yeni()
+        self.assertEqual((self.harita["coins"], self.ps["attacksWon"], self.ps.get("honor", 0)), (50000, 1, 0))
+
     def test_ganimet_saldirana_kurbandan_dusulmez(self):
         self.saldir()
         self.assertEqual(self.harita["coins"], 50500)

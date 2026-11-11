@@ -14,9 +14,9 @@ Bu dosya `araclar/komut_imzalari.py` ile üretilir; elle düzenlenmez.
 | `Constants.CMD_*` sabiti / farklı değer | 185 / 183 |
 | Kodda okunan `CMD_*` sabiti | 157 |
 | Komut adı çözülemeyen çağrı | 0 |
-| H: sunucunun işlediği komut | 158 |
-| G ∩ H | 157 |
-| **G ∖ H** (eksik) | **1** |
+| H: sunucunun işlediği komut | 159 |
+| G ∩ H | 158 |
+| **G ∖ H** (eksik) | **0** |
 | İmza uyumsuzluğu (sunucu, istemcinin göndermediği sırayı okuyor) | 0 |
 | H ∖ G (istemcinin bu sürümde göndermediği) | 1 |
 
@@ -45,7 +45,7 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `assist_receive` | var | 1 | 2 | `assist_receive` (1960) | 2/2 | 1 | IACartAlly/removeBoxThrown@105: [Base.Main.townID, yerel1.building.id] |
 | `assist_send_feed` | var | 1 | 5 | `assist_send_feed` (526) | 5/5 | 4 | PopupSocialFeeds/onPost@236: [this.eBuilding.buildingReference.tx, this.eBuilding.buildingReference.ty, Base.Main.townID, this.eBuilding.buildingReference.building.id, yerel3] |
 | `attack_player` | var | 3 | 1 | `attack_player` (2114) | — | -1 | Assault$/assaultEnemy@121: [yerel1] |
-| `begin_attack_new` | var | 1 | 1 | `begin_attack_new` (2132) | 1/1 | ? | PVPManager/loadMap@51: [Base.Main.clientTimestamp()] |
+| `begin_attack_new` | var | 1 | 1 | `begin_attack_new` (2139) | 1/1 | ? | PVPManager/loadMap@51: [Base.Main.clientTimestamp()] |
 | `buy` | var | 14 | 8 | `buy` (285) | 8/8 | 6 | IsoElement/tick@1324: [yerel6, this.buildingReference.tx, this.buildingReference.ty, 1, Base.Main.townID, 0, 1, this.buildingReference.building.type] |
 | `buy_attacks_pack` | var | 1 | ? | `buy_attacks_pack` (2042) | — | -1 | PopUpBuyAssault/onBuyAttack@64: [''] |
 | `buy_cash` | var | 2 | 5 | `buy_cash` (1090) | 5/5 | 4 | PopupHeroes/onBuyItem@253: [yerel4.building.id, yerel4.tx, yerel4.ty, yerel4.frame, Base.Main.townID] |
@@ -58,7 +58,7 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `buy_offer_pack` | var | 2 | 2, 3 | `buy_offer_pack` (1312) | 2/3 | ? | PromotionPacks$/buyPack@599: [Base.Main.townID, yerel1, yerel6] |
 | `buy_powerups` | var | 1 | 1 | `buy_powerups` (809) | 1/1 | 0 | PopupSoulMixer/sendPowerUps@76: [yerel2] |
 | `buy_pvp_territory` | var | 1 | 1 | `buy_pvp_territory` (2062) | 1/1 | 0 | PopupBuyTerritoryPvp/onBuy@98: [this.position] |
-| `buy_shield` | var | 1 | 1 | `buy_shield` (2144) | 1/1 | ? | ShieldManager/buyShield@297: [yerel2.id] |
+| `buy_shield` | var | 1 | 1 | `buy_shield` (2151) | 1/1 | ? | ShieldManager/buyShield@297: [yerel2.id] |
 | `buy_si_help` | var | 4 | 4, 5 | `buy_si_help` (1980) | 4/5 | 4 | Base/countAllBuildings@686: [yerel6.tx, yerel6.ty, Base.Main.townID, yerel2, 1] |
 | `buy_spyings_pack` | var | 1 | ? | `buy_spyings_pack` (2048) | — | -1 | PopUpBuyAssault/onBuyAttack@198: [''] |
 | `buy_step_cash` | var | 1 | 1 | `buy_step_cash` (1649) | 1/1 | 0 | PopupDragons/clickGetnow@116: [yerel2] |
@@ -71,8 +71,8 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `buy_viral_offer_all` | var | 1 | 1 | `buy_viral_offer_all` (889) | 1/1 | 0 | SpecialDayOfferManager/buyAll@38: [yerel1] |
 | `buy_viral_offer_friend` | var | 2 | 1 | `buy_viral_offer_friend` (881) | 1/1 | 0 | SpecialDayOfferManager/buyFriend@48: [yerel1] |
 | `buy_warehouse_capacity_single` | var | 1 | 1 | `buy_warehouse_capacity_single` (2054) | 1/1 | 0 | PopupUnitWarehouse/onBuyMoreSlots@228: [Base.Main.townID] |
-| `clean_attack_log` | var | 1 | 0 | `clean_attack_log` (2159) | 0/0 | -1 | AdminPanel/cleanAttackLog@35: [] |
-| `clean_attacks` | var | 1 | 0 | `clean_attacks` (2171) | 0/0 | -1 | Assault$/cleanAssaults@35: [] |
+| `clean_attack_log` | var | 1 | 0 | `clean_attack_log` (2166) | 0/0 | -1 | AdminPanel/cleanAttackLog@35: [] |
+| `clean_attacks` | var | 1 | 0 | `clean_attacks` (2178) | 0/0 | -1 | Assault$/cleanAssaults@35: [] |
 | `clean_received_assists` | var | 1 | 2 | `clean_received_assists` (1971) | 2/2 | 1 | NeighbourManager$/removeNeighbourAssist@36: [yerel1, Base.Main.townID] |
 | `clear_message` | var | 1 | 0 | `clear_message` (1229) | — | -1 | yontem1486@19: [] |
 | `clear_tiles_area` | var | 1 | 6 | `kayitsiz` (276) | — | -1 | MapInitializer$/cleanAllMapTiles@309: [Base.Main.townID, 0, 0, decrement(Config.EI_MAP_WIDTH), decrement(Config.EI_MAP_HEIGHT), ''] |
@@ -93,10 +93,10 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `desactivate_dragon` | var | 1 | 0 | `desactivate_dragon` (1606) | — | -1 | PopupDragons/desactivateNest@35: [] |
 | `desactivate_monster` | var | 1 | 0 | `desactivate_monster` (1612) | — | -1 | PopupMonstersNest/desactivateNest@35: [] |
 | `end_attack` | var | 2 | 1, 2 | `end_attack` (2119) | — | -1 | Assault$/sendAssaultResults@343: [JSON.encode({'attacker': {'name': Base.Player.playerInfo.name, 'level': Base.Player.iLevel, 'user_id': Base.Commands.sessionID, 'world_id': Base.Player.worldId, 'map': Base.Main.townID, 'race': Base.Player.currentRace}, 'victim': opponentPlayer, 'resources': {'g': 0, 'w': 0, 's': 0, 'f': 0, 'x': 0}, 'resources_victim': {'g': 0}, 'attacker_units': arPlayerUnits, 'victim_units': arEnemyUnits, 'win': 1, 'duration': Math.round(((tEndAssault - tIniAssault) / 1000)), 'voluntary_end': 1, 'townhall_gold': townHallGold, 'honor': 0})] |
-| `end_attack_new` | eksik | 1 | 14 | — | — | — | PVPManager/sendEnd@463: [Base.PVP.stolenGold, Base.PVP.stolenFood, Base.PVP.stolenWood, Base.PVP.stolenStone, yerel2.user_id, PvpPlayerManager.me.player.name, PvpPlayerManager.me.player.level, Base.Main.clientTimestamp(), Base.Commands.sessionID, 1, yerel4, yerel5, (this.percentage * 100), Assault.iXPGained] |
+| `end_attack_new` | var | 1 | 14 | `end_attack_new` (2125) | 14/14 | -1 | PVPManager/sendEnd@463: [Base.PVP.stolenGold, Base.PVP.stolenFood, Base.PVP.stolenWood, Base.PVP.stolenStone, yerel2.user_id, PvpPlayerManager.me.player.name, PvpPlayerManager.me.player.level, Base.Main.clientTimestamp(), Base.Commands.sessionID, 1, yerel4, yerel5, (this.percentage * 100), Assault.iXPGained] |
 | `end_quest` | var | 17 | 1 | `end_quest` (1392) | 1/1 | 0 | QuestBossGolem/sendResults@295: [JSON.encode({'map': Base.Main.townID, 'resources': {'g': Quest.iGoldGained, 'x': Quest.iXPGained}, 'units': Quest.arPlayerUnits, 'win': 1, 'duration': Math.round(((Quest.tEndAssault - Quest.tIniAssault) / 1000)), 'voluntary_end': 1, 'quest_id': Constants.QUEST_BOSS_GOLEM, 'item_rewards': {537: 1}, 'difficulty': difficulty, 'set_unlocked_index': 1})] |
 | `end_survival` | var | 1 | 3 | `end_survival` (1427) | 3/3 | 2 | PopupSurvivalResults/givePrizes@215: [this.currentMap, this.time, JSON.encode(this.items)] |
-| `end_tournament_match` | var | 1 | 1 | `end_tournament_match` (2165) | 1/1 | -1 | TournamentManager$/shutMatch@192: [1] |
+| `end_tournament_match` | var | 1 | 1 | `end_tournament_match` (2172) | 1/1 | -1 | TournamentManager$/shutMatch@192: [1] |
 | `expand` | var | 1 | 3 | `expand` (399) | 3/3 | 2 | Base/purchaseLand@606: [yerel1, 'cash', this.townID] |
 | `fast_forward` | var | 3 | 1 | `kayitsiz` (276) | — | -1 | AdminPanel/fastForward@403: [yerel5] |
 | `finish_collection` | var | 3 | 1, 3 | `finish_collection` (1896) | 1/2 | 2 | AdminPanel/completeHeartCollection@58: [23] |
@@ -104,7 +104,7 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `finish_si` | var | 4 | 4, 7 | `finish_si` (1996) | 4/4 | 3 | IsoElement/collect@503: [this.buildingReference.tx, this.buildingReference.ty, Base.Main.townID, this.iID] |
 | `finish_si_recruitment` | var | 1 | 5 | `finish_si_recruitment` (2008) | 5/5 | 4 | PopupRecruitment/onOpenBuilding@110: [this.eBuilding.buildingReference.tx, this.eBuilding.buildingReference.ty, Base.Main.townID, this.eBuilding.iID, yerel3.id] |
 | `game_status` | var | 5 | 1, 3 | `kayitsiz` (276) | — | -1 | Base/init@1382: ['MapLoaded', 'INIT', this.spRefCat] |
-| `get_enemy_new` | var | 1 | 2 | `get_enemy_new` (2126) | 2/2 | ? | PVPManager/searchEnemy@44: [yerel1, this.searchesBeforeAttack] |
+| `get_enemy_new` | var | 1 | 2 | `get_enemy_new` (2133) | 2/2 | ? | PVPManager/searchEnemy@44: [yerel1, this.searchesBeforeAttack] |
 | `gold_statue_conversion` | var | 1 | 1 | `kayitsiz` (276) | — | -1 | IsoGoldenDynastyDragon/convertToGoldOnce@95: [this.GOLD_PER_STATUE] |
 | `graveyard_buy_potions` | var | 1 | 0 | `graveyard_buy_potions` (1521) | — | -1 | PopupBuyGraveyardPotion/onBuy@84: [] |
 | `increase_population` | var | 1 | 1 | `increase_population` (1106) | 1/1 | 0 | PopupRecruitmentPopulation/onRecruitComplete@102: [Base.Main.townID] |
@@ -131,14 +131,14 @@ en büyük argüman sırası (0'dan; -1 hiç okumaz, ? bilinemez).
 | `push_queue_unit` | var | 1 | 6 | `push_queue_unit` (687) | 6/6 | 4 | BuildingQueueManager/addUnit@259: [yerel5.building.buildingReference.tx, yerel5.building.buildingReference.ty, yerel5.building.iID, yerel2.id, <parseInt>.parseInt(yerel5.building.buildingReference.loaded.attrs['bq']), 1] |
 | `push_unit` | var | 1 | 6 | `push_unit` (579) | 6/6 | 5 | IsoBuilding/PushUnit@201: [yerel1.iLastPosSentToServerX, yerel1.iLastPosSentToServerY, yerel1.buildingReference.building.id, this.buildingReference.tx, this.buildingReference.ty, Base.Main.townID] |
 | `put_graveyard` | var | 1 | 1 | `put_graveyard` (1560) | 1/1 | 0 | PhoenixEggDelegate/onPhoenixEggDie@159: [this.phoenixUnit] |
-| `reply_attack` | var | 1 | 1 | `reply_attack` (2150) | 1/1 | 0 | PVPManager/loadMap@137: [yerel3] |
+| `reply_attack` | var | 1 | 1 | `reply_attack` (2157) | 1/1 | 0 | PVPManager/loadMap@137: [yerel3] |
 | `reset` | var | 1 | 0 | `kayitsiz` (276) | — | -1 | AdminPanel/onReset@34: [] |
 | `reset_completed_missions` | var | 1 | 0 | `reset_completed_missions` (1195) | — | -1 | GoalsManager/resetGoals@123: [] |
 | `reset_dragon` | var | 1 | 1 | `kayitsiz` (276) | — | -1 | AdminPanel/resetPopupDragon@35: [0] |
 | `reset_heavy_siege` | var | 1 | 2 | `reset_heavy_siege` (1458) | 2/2 | 1 | MapInitializer$/resetHeavySiege@424: [1, yerel4] |
 | `reset_position_univers` | var | 1 | 0 | `kayitsiz` (276) | — | -1 | ExplorationsManager/doRelocate@48: [] |
 | `reset_potions_received` | var | 1 | 0 | `reset_potions_received` (1546) | 0/0 | -1 | PopupGraveyard/onFrameConstructed@123: [] |
-| `reset_shield` | var | 3 | 0 | `reset_shield` (2138) | 0/0 | ? | AdminPanel/resetShieldState@34: [] |
+| `reset_shield` | var | 3 | 0 | `reset_shield` (2145) | 0/0 | ? | AdminPanel/resetShieldState@34: [] |
 | `reset_temple` | var | 2 | 0 | `reset_temple` (1711) | — | -1 | AdminPanel/resetBahamutTemple@85: [] |
 | `reset_warehouse` | var | 2 | 1 | `reset_warehouse` (1069) | 1/1 | 0 | Base/storeItem@453: [Base.Main.townID] |
 | `reset_world_change` | var | 1 | 0 | `reset_world_change` (1234) | — | -1 | ExplorationsManager/onContinentLoaded@431: [] |

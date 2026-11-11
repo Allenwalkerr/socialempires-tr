@@ -95,6 +95,61 @@ def saldiri_hakki_var(saldiran, simdi):
     return sayi < SALDIRI_HAKKI
 
 
+YENI_SONUC_SURESI = 3600  # end_attack_new, aynı savaşın end_attack'ından sonra (aynı ya da sonraki pakette) gelir
+
+
+def yeni_sonuc(saldiran, args):
+    """end_attack_new (PVPManager/sendEnd, 1.4.07): [g, f, w, s, saldırılan, ad, seviye, zaman, kazananın kimliği,
+    gönüllü(1|0), intikam(1|0), kalkan(1|0), yüzde*100, xp]. İstemcide end_attack'ın 'resources' ve 'honor'u literal
+    0'dır (Assault$/sendAssaultResults); ganimet, XP ve onur burada uygulanır. Ganimet istemcide yerel kaynaklara
+    eklenmez: savaştan sonra köy sunucudan yüklenir. Eşleşen end_attack kaydı yoksa hiçbir şey verilmez."""
+    if len(args) < 14:
+        print(" ! end_attack_new: eksik arguman", args)
+        return False
+    kurban_id = str(args[4])
+    kendi_id = str(saldiran["playerInfo"].get("pid", ""))
+    simdi = timestamp_now()
+    ps = saldiran["privateState"]
+    kayit = next((a for a in reversed(_liste(ps, "attacksSent")) if isinstance(a, dict)
+                  and str(a.get("victim_id")) == kurban_id and not a.get("yeni_sonuc", True)
+                  and simdi - _tam(a.get("time")) <= YENI_SONUC_SURESI), None)
+    if kayit is None or kurban_id == kendi_id:
+        print(" ! end_attack_new: eslesen saldiri yok", kurban_id)
+        return False
+    kayit["yeni_sonuc"] = True
+    kazandi = str(args[8]) == kendi_id  # winnerId = bPlayerWinner ? Commands.sessionID : attacked_id
+    # İstemci attacksWon'u yerelde artırır (Assault$/assaultEnd), attacksLost'u hiç yazmaz; ikisi de kayda geçer
+    alan = "attacksWon" if kazandi else "attacksLost"
+    ps[alan] = _tam(ps.get(alan)) + 1
+
+    kurban = neighbor_session(kurban_id) if kayit.get("kayitli") else None
+    aciklama = kayit.setdefault("description", {})
+    if not kayit.get("ganimet_hakki"):
+        aciklama["resources"] = {"g": 0, "x": 0}
+        return True
+    harita = saldiran["maps"][0]
+    kurban_harita = kurban["maps"][0] if kurban else None
+    ganimet = {}
+    for sira, (kisa, alan_adi) in enumerate((("g", "coins"), ("f", "food"), ("w", "wood"), ("s", "stone"))):
+        miktar = max(0, _tam(args[sira]))
+        if kurban_harita is not None:
+            # İstemcinin ganimet havuzu hedefin kaynaklarından hesaplanır (PvpPlayerManager.setEnemyInfo); hedefte
+            # olmayandan fazlası verilmez. Eski end_attack gibi kurbandan düşülmez (PR #5'ten beri süren davranış).
+            miktar = min(miktar, max(0, _tam(kurban_harita.get(alan_adi))))
+        harita[alan_adi] = _tam(harita.get(alan_adi)) + miktar
+        ganimet[kisa] = miktar
+    yikilan = sum(_olenler(aciklama.get("victim_units")).values())
+    xp = max(0, min(_tam(args[13]), math.ceil(0.05 * ganimet["g"]) + yikilan + XP_PAYI))
+    harita["xp"] = _tam(harita.get("xp")) + xp
+    g = get_game_config().get("globals", {})
+    onur = _tam(g.get("HONOR_POINT_PVP_WIN_ATTACK" if kazandi else "HONOR_POINT_PVP_LOSE_ATTACK"))
+    ps["honor"] = _tam(ps.get("honor")) + onur
+    saldiran["playerInfo"]["honor_points"] = _tam(saldiran["playerInfo"].get("honor_points")) + onur
+    aciklama["resources"] = dict(ganimet, x=xp)
+    print(f"Saldiri ganimeti: {ganimet}, {xp} XP, {onur} onur")
+    return True
+
+
 def saldiri_baslat(saldiran, args):
     """attack_player [kurban_id]: istemci yanıtı kullanmaz; yalnızca günlük."""
     print("Saldiri basladi:", args[0] if args else "?")
@@ -159,7 +214,9 @@ def saldiri_bitir(saldiran, args):
 
     aciklama = dict(veri)
     aciklama["resources"] = {"g": altin, "x": xp}
-    gonderilen.append({"time": simdi, "victim_id": kurban_id,
+    # 1.4.07: ganimet, XP ve onur ayrı end_attack_new ile gelir (end_attack'ta literal 0); onu bu kayıtla eşler
+    gonderilen.append({"time": simdi, "victim_id": kurban_id, "ganimet_hakki": bool(kurala_uygun and not belediye_yok),
+                       "kayitli": bool(kayitli and not kalkanli), "yeni_sonuc": False,
                        "description": dict(aciklama, oponent=(_ozet(kurban) if kurban else veri.get("victim")))})
     del gonderilen[:-50]
 

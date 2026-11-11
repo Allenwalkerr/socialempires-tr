@@ -1865,6 +1865,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: servis_govdesi sözlük olmayan JSON'da {} döner; map, item_id, level_id güvenli çevrilir; komut paketi sözlük değilse ya da commands liste değilse 400; listedeki sözlük olmayan öğe atlanır; get_player_info bilinmeyen kimlikte 404."
+    },
+    {
+      "id": "OYN-19",
+      "baslik": "1.4.07'de PvP saldırıları ganimet, XP ve onur kazandırmıyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bayt kodu (11.11.2026): Assault$/sendAssaultResults eski end_attack'ın resources {g,w,s,f,x} ve honor alanlarını literal pushbyte 0 ile gönderir (@137-164, @284-287); pvp.saldiri_bitir bunları okuyordu. Ganimet ve XP PVPManager/sendEnd'in end_attack_new komutunda gelir (14 argüman @328-458, sıra yeniden okundu): g, f, w, s, attacked_id, ad, seviye, zaman, winnerId, gönüllü, intikam, kalkan, yüzde*100, XP. Sunucuda end_attack_new işleyicisi yoktu.",
+      "test": "tests/test_komutlar.py: PvpKomutlari (test_yeni_sonuc_*, test_kural_disi_saldiri_ganimetsiz_ama_sayilir)",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: pvp.yeni_sonuc: end_attack'ın saldırı kaydına (ganimet hakkı: saldırı hakkı, aynı hedef 4 sa, kalkan, belediye) eşlenir; ganimet hedefin elindekini geçmez (kurbandan düşülmez, PR #5'ten beri); XP eski tavanla; onur config HONOR_POINT_PVP_WIN/LOSE_ATTACK 15/5; attacksWon/attacksLost yazılır (istemci attacksLost'u hiç yazmaz). Aynı savaşa ikinci sonuç verilmez. 7 bozmanın 7'si düştü. Eksik komut 0 (|G ∖ H| = 0)."
     }
   ]
 }
