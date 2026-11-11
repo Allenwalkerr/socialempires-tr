@@ -28,5 +28,7 @@ local.properties
 *.apk
 node_modules/
 .oturum_anahtari
+ayarlar.yerel.json
+.ayarlar-*.json
 .ev_agi_parolasi
 .claude/worktrees/

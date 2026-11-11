@@ -54,6 +54,11 @@
                         <option value="high">Yüksek</option>
                         <option value="best">En iyi</option>
                     </select></label>
+                {% if hiz.degisir %}<label class="ust-dugme kalite-secimi">Hız
+                    <select id="hiz" aria-label="Oyun hızı: süreler bu kat kısalır">
+                        {% for h in hiz.secenekler %}<option value="{{ h }}"{% if h == hiz.olcek %} selected{% endif %}>{{ "Normal" if h == 1 else h ~ " kat" }}</option>
+                        {% endfor %}{% if hiz.olcek not in hiz.secenekler %}<option value="{{ hiz.olcek }}" selected disabled>{{ hiz.olcek }} kat</option>{% endif %}
+                    </select></label>{% endif %}
                 <a class="ust-dugme" href="/hazine"><img src="/img/cash.png" alt="">Nakit Al</a>
                 <a class="ust-dugme" href="https://discord.gg/zW5gSbQJBw" target="_blank" rel="noopener"><img src="/img/discord.png" alt="">Discord</a>
             </nav>

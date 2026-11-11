@@ -248,7 +248,16 @@ def _oyun_sayfasi(sablon, ruffle_js=None):
                            GAMEVERSION=OYUN_SWF, SERVERIP=HOST, ruffle_js=ruffle_js,
                            statik=kok + STATIK_YOL, dinamik=kok + DINAMIK_YOL,
                            rutbe=rutbe(bilgi.get("level", 0)), varlik=STATIK_YOL,
-                           xp=_xp_araligi(bilgi), milli_bayram=takvim.milli_bayram())
+                           xp=_xp_araligi(bilgi), milli_bayram=takvim.milli_bayram(),
+                           hiz=_hiz_bilgisi())
+
+
+def _hiz_bilgisi():
+    """Sayfadaki hız seçici (ONR-01): seçenekler, şimdiki hız; yalnızca bu makinede ve ortam değişkeni yokken."""
+    from oyun import zaman
+    olcek = zaman.zaman_olcegi()
+    return {"secenekler": zaman.HIZLAR, "olcek": int(olcek) if float(olcek).is_integer() else olcek,
+            "degisir": request.remote_addr in ("127.0.0.1", "::1") and not zaman.ortamdan_mi()}
 
 
 @app.route("/play.html")
@@ -320,7 +329,7 @@ def js(path):
 
 
 # Diğer uçlar (içe aktarılınca rotalarını kaydeder)
-from oyun import diyar, ev_agi, gunluk, hile, istemci, kayit_yedek, onindirme, profil, tasima, varliklar  # noqa: E402,F401
+from oyun import diyar, ev_agi, gunluk, hile, hiz, istemci, kayit_yedek, onindirme, profil, tasima, varliklar  # noqa: E402,F401
 
 
 def yerel_ag_adresi():

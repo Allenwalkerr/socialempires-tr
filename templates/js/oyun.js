@@ -201,6 +201,22 @@
     if (document.querySelector("ruffle-player") && confirm("Kalite değişikliği için oyun yeniden açılsın mı?")) location.reload();
   });
 
+  // Oyun hızı (ONR-01): sunucunun ayarıdır; istemci süreleri açılışta okuduğu için seçimden sonra sayfa yeniden yüklenir
+  var hizKutusu = document.getElementById("hiz");
+  if (hizKutusu) {
+    var oncekiHiz = hizKutusu.value;
+    hizKutusu.addEventListener("change", function () {
+      if (!confirm("Oyun hızı " + hizKutusu.options[hizKutusu.selectedIndex].text + " olsun mu? Oyun yeniden açılır.")) {
+        hizKutusu.value = oncekiHiz;
+        return;
+      }
+      fetch("/ayar/hiz", { method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ olcek: Number(hizKutusu.value) }) })
+        .then(function (y) { if (!y.ok) throw new Error(y.status); location.reload(); })
+        .catch(function () { alert("Hız değiştirilemedi."); hizKutusu.value = oncekiHiz; });
+    });
+  }
+
   function oyunuBaslat() {
     window.RufflePlayer = window.RufflePlayer || {};
     window.RufflePlayer.config = {

@@ -38,3 +38,12 @@ def zaman_olcegi() -> float:
         return 1.0
 
     return olcek
+
+
+# ONR-01: oyun sayfasındaki hız seçicinin seçenekleri (kat). Sınır yukarıdaki 0.1-100 aralığının içinde.
+HIZLAR = (1, 2, 3, 5, 10)
+
+
+def ortamdan_mi() -> bool:
+    """Hız TIME_SCALE ortam değişkeniyle verildiyse sayfadan değiştirilemez (ortam ayar dosyasından önce gelir)."""
+    return os.environ.get("TIME_SCALE") is not None

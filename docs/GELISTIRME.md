@@ -99,7 +99,9 @@ Resim olarak çizilmiş yazılar ("BUILD", "ADD ALLY", "Add Cash") bu yolla
 
 ## Ayarlar ve veriler
 
-- `ayarlar.json`: `zaman_olcegi` (oyun hızı) ve `dunya` (bot simülasyonu).
+- `ayarlar.json`: `zaman_olcegi` (oyun hızı) ve `dunya` (bot simülasyonu). Sunucu bu dosyaya yazmaz.
+- `ayarlar.yerel.json`: sunucunun yazdığı ayarlar (sayfadan seçilen hız, `oyun/ayarlar.py`). Depoya girmez,
+  `ayarlar.json`'un üstüne biner.
 - `oyun/denge.py`: PvP ganimet oranı, kupa ve saldırı hakkı.
 - `saves/`: oyuncu ve bot kayıtları (depoya girmez). Hiç bot yoksa sunucu
   ilk açılışta 50 bot üretir (`araclar/bot_koy_uret.py`).

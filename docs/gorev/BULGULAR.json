@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "ONR-01",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #57 birleşti (GEC-08). Sahibi dört öneriyi onayladı (KAR-21). ONR-04 (Türk birimleri milli bayramlarda) PR'da. Sırada ONR-01 (hız seçici), ONR-02 ('sen yokken' özeti), ONR-03 (Android bildirimleri); sonra küçük hatalar OYN-11, 12, 13, 15 ve GEC-09 (kabul). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #58 birleşti (ONR-04). ONR-01 (hız seçici) PR'da; sahibine sorularak birleşir (KAR-19). Sırada ONR-02 ('sen yokken' özeti), ONR-03 (Android bildirimleri); sonra küçük hatalar OYN-11, 12, 13, 15 ve GEC-09 (kabul). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1026,13 +1026,13 @@
       "baslik": "Hız seçici: oyun hızı (zaman_olcegi) sayfadan seçilir",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Sahibi 30.10.2026 'hepsini istiyorum' dedi (KAR-08). Önerinin önceki oturumdaki metni depoda yok; taslak tanım docs/YOL_HARITASI_1407.md §5.",
-      "test": null,
-      "pr": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Önce hız yalnızca ayarlar.json'da elle (zaman_olcegi) ya da TIME_SCALE ortam değişkeniyle değişiyordu; ayarlar.py yalnızca okuyordu. 1.4.07 süreleri config.SURE_ALANLARI'nda zaten vardı (training_time: eğitim kuyruğu, sm_training_time: Ruh Kazanı).",
+      "test": "tests/test_hiz.py (5 test)",
+      "pr": "#59",
       "onay": null,
-      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları."
+      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları. 11.11.2026 (KAR-21): oyun sayfasının üst şeridinde Hız seçici (Normal, 2, 3, 5, 10 kat; zaman.HIZLAR), öteki düğmeler gibi oyunun altin-kutu.png çerçevesiyle. POST /ayar/hiz (oyun/hiz.py): hile paneliyle aynı koruma (yalnız 127.0.0.1, aynı köken), yalnızca izin verilen değer, TIME_SCALE varsa 409; ayarlar.yaz geçici dosya + os.replace ile, öteki ayarları korur, bozuk dosyanın üzerine yazmaz. Seçimden sonra sayfa yeniden yüklenir (istemci süreleri açılışta okur). Seçici yalnızca bu makinede ve ortam değişkeni yokken görünür. 6 bozmanın 6'sı düştü; sayfa Chromium'da görüntülendi. #59 incelemesi (11.11.2026) iki gerçek açık buldu, ikisi düzeltildi ✔: (1) ayarlar.json depoda izlenir; sunucu onu yeniden yazınca klonlanmış depoda çalışma ağacı kirlenir, git pull takılırdı. Seçilen hız artık ayarlar.yerel.json'a (.gitignore) yazılır, oku() onu ayarlar.json'un üstüne bindirir; sunucu ayarlar.json'a hiç yazmaz (test_hiz tearDown ana dosyanın baytını denetler). (2) CodeQL: 500 yanıtında hata metni (dosya yolu) dışarı veriliyordu; artık yalnızca konsolda. 5 bozma denemesinin 5'i düştü."
     },
     {
       "id": "ONR-02",
@@ -1065,11 +1065,11 @@
       "baslik": "Oyunun Türk birimleri (öğe 880, 881, 882, 885) oyunda kullanılabilir",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Config: 880 Turkish Swordsman, 881 Turkish Axeman, 882 Turkish Archer, 885 Turkish Horseman; tür u, in_store 0, mağaza kategorisi 7, bedeli nakit (8/8/4/6); hiçbir tema setinde değil. Sunucu satın almada in_store'a bakmaz (yalnızca istemci config'i değişir).",
       "test": "tests/test_bayram_hedefleri.py: TurkBirimleri (2 test)",
-      "pr": null,
+      "pr": "#58",
       "onay": null,
       "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları. 31.10.2026: dört Türk birliği oyunun kendi birlik paketlerinde (pack_category 2) var; paketler açılınca (KAR-12) rastgele gelebilir. 11.11.2026 (KAR-21): config.TURK_BIRIMLERI milli bayram günlerinde (takvim.milli_bayram) istemci config'inde in_store 1, mağaza kipinden bağımsız; önbellek anahtarına milli bayram girdi. Çizimleri temel pakete alındı (onindirme_listesi magazada kümesi; temel 215 MB). 4 bozmanın 4'ü düştü."
     },
