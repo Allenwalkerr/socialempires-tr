@@ -535,6 +535,16 @@ class PvpKomutlari(KomutTesti):
         self.yeni(g=999999, f=999999, w=999999, s=999999)
         self.assertEqual({k: self.harita[k] - once[k] for k in once}, {"coins": 0, "food": 0, "wood": 0, "stone": 0})
 
+    def test_yeni_sonuc_bozuk_sayi_kurbani_bozmaz(self):
+        """#50 incelemesi: "inf" (float'a çevrilir, int'e çevrilemez: OverflowError) gelince kurbandan düşülüp komutun
+        çökmesi olmamalı; bozuk değer 0 sayılır, geçerli olanlar uygulanır."""
+        self.kurban["maps"][0].update(coins=1000, food=500, wood=0, stone=0)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = self.harita["coins"]
+        self.yeni(g=100, f="inf", w=0, s=0, xp="inf")
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.harita["coins"] - once),
+                         (900, 500, 100))
+
     def test_yeni_sonuc_saldirinin_kasabasina(self):
         """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
         import copy

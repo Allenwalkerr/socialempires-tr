@@ -37,7 +37,7 @@ XP_PAYI = 150                     # duvar vb. 1 XP'lik yıkımlar için pay
 def _tam(deger, varsayilan=0):
     try:
         return int(float(deger))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):  # "inf", 1e400 (#50 incelemesi)
         return varsayilan
 
 
@@ -144,8 +144,9 @@ def yeni_sonuc(saldiran, args):
     haritalar = saldiran["maps"]
     harita_no = _tam(kayit.get("harita_no"))
     harita = haritalar[harita_no] if 0 <= harita_no < len(haritalar) else haritalar[0]  # end_attack'ın kasabası
+    alanlar = (("g", "coins"), ("f", "food"), ("w", "wood"), ("s", "stone"))
     ganimet = {}
-    for sira, (kisa, alan_adi) in enumerate((("g", "coins"), ("f", "food"), ("w", "wood"), ("s", "stone"))):
+    for sira, (kisa, alan_adi) in enumerate(alanlar):
         # İstemcinin ganimet havuzu hedefin kaynaklarından hesaplanır (PvpPlayerManager.setEnemyInfo); hedefte
         # olmayandan fazlası verilmez (okunamayan hedef: 0). Altın ayrıca eski end_attack'ın tavanıyla sınırlı.
         # Ganimet kayıtlı kurbandan düşülür (KAR-20, sahibinin kararı 11.11.2026).
@@ -153,15 +154,18 @@ def yeni_sonuc(saldiran, args):
         miktar = min(max(0, _tam(args[sira])), mevcut)
         if kisa == "g":
             miktar = min(miktar, max(0, _tam(kayit.get("altin_tavani"))))
-        if dus:
-            kurban_harita[alan_adi] = mevcut - miktar
-        harita[alan_adi] = _tam(harita.get(alan_adi)) + miktar
         ganimet[kisa] = miktar
     yikilan = sum(_olenler(aciklama.get("victim_units")).values())
     xp = max(0, min(_tam(args[13]), math.ceil(0.05 * ganimet["g"]) + yikilan + XP_PAYI))
-    harita["xp"] = _tam(harita.get("xp")) + xp
     g = get_game_config().get("globals", {})
     onur = _tam(g.get("HONOR_POINT_PVP_WIN_ATTACK" if kazandi else "HONOR_POINT_PVP_LOSE_ATTACK"))
+    # Önce her şey hesaplanır, sonra yazılır: komut yarıda çökerse saldıranın kaydı geri alınır ama komşu kaydı
+    # alınmaz (#50 incelemesi); kurbandan düşülüp ganimetin verilmemesi olmasın.
+    for kisa, alan_adi in alanlar:
+        if dus:
+            kurban_harita[alan_adi] = max(0, _tam(kurban_harita.get(alan_adi))) - ganimet[kisa]
+        harita[alan_adi] = _tam(harita.get(alan_adi)) + ganimet[kisa]
+    harita["xp"] = _tam(harita.get("xp")) + xp
     ps["honor"] = _tam(ps.get("honor")) + onur
     saldiran["playerInfo"]["honor_points"] = _tam(saldiran["playerInfo"].get("honor_points")) + onur
     aciklama["resources"] = dict(ganimet, x=xp)

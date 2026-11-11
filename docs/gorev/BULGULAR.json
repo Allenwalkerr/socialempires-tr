@@ -1917,6 +1917,19 @@
       "kanit": "#50 incelemesi (oyun/pvp.py:141), yeniden okundu: saldiri_bitir attacker.map'in kasabasını kullanıyor, yeni_sonuc maps[0]'ı.",
       "test": "tests/test_komutlar.py: test_yeni_sonuc_saldirinin_kasabasina",
       "notlar": "Düzeltme: harita_no saldırı kaydına yazılır, yeni_sonuc aynı kasabaya yazar. 1.4.07'de PvP'nin ikinci kasabadan açılıp açılmadığı doğrulanmadı; düzeltme her iki durumda da tutarlı. 1 bozmanın 1'i düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-22",
+      "baslik": "end_attack_new yarıda çökerse kurbandan düşülen geri alınmıyordu",
+      "onem": "Düşük",
+      "kanit": "#50 incelemesi (oyun/pvp.py:151), yeniden okundu: pvp._tam OverflowError yakalamıyordu (\"inf\", 1e400); kurbanın kaynağı döngü içinde düşülüyordu, komut sonra çökerse yalnızca saldıranın kaydı geri alınıyordu.",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_bozuk_sayi_kurbani_bozmaz",
+      "notlar": "Düzeltme: _tam OverflowError'u da yakalar (bozma denemesi düştü). Ek olarak ganimet ve XP önce hesaplanır, sonra yazılır; bu sıralama ayrıca test edilmedi (◐: çökme yolu artık kalmadığı için girdiyle tetiklenemez)."
     }
   ]
 }
