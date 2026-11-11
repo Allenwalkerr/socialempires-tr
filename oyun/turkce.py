@@ -142,6 +142,15 @@ def _bolum_anahtarlari(config):
         if isinstance(t, dict) and t.get("name"):
             kayitlar.append((f"tournament:{tid}", "turnuva", t["name"], ("tournament_type", tid, "name")))
 
+    # 13) Hedefler (1.4.07: config'in `goals` listesi, config/goals.json'dan; GEC-06, TRA-01). Anahtar
+    # araclar/ceviri_kapsami.py ile aynı: goal:<id>:baslik|aciklama|talimat. "none" metin değil, yer tutucudur.
+    for i, h in enumerate(config.get("goals", [])):
+        if not isinstance(h, dict):
+            continue
+        for alan, etiket in (("title", "baslik"), ("description", "aciklama"), ("instructions", "talimat")):
+            if h.get(alan) and h[alan] != "none":
+                kayitlar.append((f"goal:{h.get('id')}:{etiket}", "hedef", h[alan], ("goals", i, alan)))
+
     # 9) Sosyal bina işçi adları
     for i, s in enumerate(config.get("social_items", [])):
         if isinstance(s, dict) and s.get("workers"):

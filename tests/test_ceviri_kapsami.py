@@ -43,6 +43,44 @@ class DilMetni(unittest.TestCase):
             ("goal:7:talimat", "Click")])
 
 
+class HedefCevirisi(unittest.TestCase):
+    """TRA-01 (GEC-06): 1.4.07'nin hedefleri (config/goals.json → config['goals']) istemciye Türkçe gider."""
+
+    @classmethod
+    def setUpClass(cls):
+        from oyun import config, turkce
+        cls.config, cls.turkce = config, turkce
+        with open(os.path.join(ortak.KOK, "config", "goals.json"), encoding="utf-8") as f:
+            cls.hedefler = {h["id"]: h for h in json.load(f)}
+
+    def test_anahtarlar_kapsam_araciyla_ayni(self):
+        """Sunucunun çevirdiği anahtarlar ölçüm aracının saydıklarıyla aynı (iki ayrı yazım: oyun/turkce.py ve
+        araclar/ceviri_kapsami.hedef_metinleri); biri değişirse ölçüm yanlış T verirdi."""
+        sunucu = {a for a, bolum, _, _ in self.turkce._bolum_anahtarlari(self.config.get_game_config()) if bolum == "hedef"}
+        olcum = {a for a, m in ck.hedef_metinleri(list(self.hedefler.values())) if ck.dil_metni_mi(m)}
+        self.assertEqual(sunucu, olcum)
+
+    def test_hedeflerin_hepsi_cevrili(self):
+        """Kabul kapısı (docs/YOL_HARITASI_1407.md, GEC-06): hedefler T = 1; çeviri yer tutucu ve satır sonu
+        denetiminden (turkce.dogrula) geçer."""
+        ceviriler = self.turkce.cevirileri_yukle()
+        ogeler = [(a, m, a in ceviriler and not self.turkce.dogrula(m, ceviriler[a]))
+                  for a, m in ck.hedef_metinleri(list(self.hedefler.values()))]
+        self.assertEqual(ck.oran(ogeler)["kalan"], [])
+
+    def test_istemci_configinde_turkce(self):
+        """Hedef 30 'Train 5 Light Archers' (goals.json, params ids 516 …); Türkçesi birimin config'teki Türkçe
+        adını (item:516) taşır. İngilizce config değişmez."""
+        ingilizce = self.hedefler[30]["title"]
+        tr = {h["id"]: h for h in self.config.get_client_game_config("tr")["goals"]}
+        en = {h["id"]: h for h in self.config.get_client_game_config("en")["goals"]}
+        birim = self.turkce.cevirileri_yukle()["item:516"]
+        self.assertIn(birim, tr[30]["title"])
+        self.assertNotEqual(tr[30]["title"], ingilizce)
+        self.assertEqual(en[30]["title"], ingilizce)
+        self.assertEqual(tr[0]["title"], "none")  # yer tutucu çevrilmez
+
+
 class Olcum(unittest.TestCase):
     def test_dort_oran(self):
         config = {

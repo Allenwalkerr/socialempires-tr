@@ -66,9 +66,9 @@ etiketlerine izin vermek. Bunu yalnızca depo sahibi yapabilir; yapılınca iş 
 
 | Bulgu | Aşama |
 |---|---|
-| TRA-01: 206 hedefin (görev) metinleri Türkçe değil | GEC-06 (Türkçe) |
-| DPT-04: sunucunun kalkanı ile istemcinin kalkanı ayrı | GEC-05 (PvP), KYT-03 |
-| DPT-06: saldırı onuru config'ten farklı | GEC-05 |
+| TRA-01: 206 hedefin (görev) metinleri Türkçe değil | GEC-06 (Türkçe): düzeltildi, CEV-03 (410/410) |
+| DPT-04: sunucunun kalkanı ile istemcinin kalkanı ayrı | GEC-05 (PvP), KYT-03: düzeltildi, #49 |
+| DPT-06: saldırı onuru config'ten farklı | GEC-05: düzeltildi, OYN-19 (#50; onur globals HONOR_POINT_PVP_*) |
 
 ## Denenmeyenler
 
