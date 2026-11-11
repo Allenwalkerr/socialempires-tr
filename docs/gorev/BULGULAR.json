@@ -1644,6 +1644,71 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: kullanıcı başına son paketin (first_number, komutlar) bellekte tutulması; aynısı yeniden gelirse uygulanmaz. Kendi köyünü yükleyince (get_player_info, user yok) silinir: istemcinin sayacı baştan başlar. 2 bozmanın 2'si düştü."
+    },
+    {
+      "id": "KAR-15",
+      "baslik": "Bot akınında köylüler ve nakitle alınmış birimler de ölür (DPT-02)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '1. böyle kalsın' (soru docs/DENETIM.md: akınlarda yalnızca asker mi ölsün).",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Hepsinin saldırı gücü var (config: köylü 6, şifacı 15). Davranış değişmez."
+    },
+    {
+      "id": "KAR-16",
+      "baslik": "Turnuva puanına üst sınır konmaz (DPT-03)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '2. hayır'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Puan yalnızca elle hazırlanmış istekle şişer; hile paneli zaten var."
+    },
+    {
+      "id": "KAR-17",
+      "baslik": "Güvenlik önceliklidir; ev ağı kipi parola ister (DGV-01, SNK-05)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '3. güvenlik meselesi çok önemli bununla ilgili ne varsa hallet, en önemli işlerden biri de bu, parola istensin'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Denetimin bütün güvenlik bulguları (DGV-01..08, SNK-05, SNK-09) yeniden üretilip düzeltilir."
+    },
+    {
+      "id": "KAR-18",
+      "baslik": "Kaynak yetmezse sunucu alımı reddeder (EKF-03)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '4. reddetsin, zaten hile paneli var'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Bedeli karşılanamayan alım uygulanmaz; negatif çarpan ve negatif nakit argümanı reddedilir."
+    },
+    {
+      "id": "DNT-13",
+      "baslik": "Ev ağı açıkken ağdaki her cihaz parolasız girip kayıtları indirip ezebiliyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-01 ve SNK-05 (docs/denetim/dagitim-guvenlik.md, sunucu-komutlar.md). ayarlar.json'daki _ev_agi uyarısı da bunu yazıyordu. Düzeltmeden sonra gerçek sunucuyla denendi (11.11.2026, 0.0.0.0'da waitress, istek makinenin ağ adresinden): girişsiz / → 302 /ev-agi-giris, command.php → 401; doğru parolayla 200; 127.0.0.1 parola sormaz; .ev_agi_parolasi 0600.",
+      "test": "tests/test_ev_agi.py",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "oyun/ev_agi.py: ev ağı açıkken yerel olmayan her istek parolayla açılmış oturum ister (oyunun SWF/resim dosyaları ve sayfanın css/img/js'i açık; Android jetonuyla aynı liste). Parola ayarlar.json ev_agi_parolasi (en az 8) ya da ilk açılışta üretilip .ev_agi_parolasi'nda saklanır ve konsola yazılır. Oturum parolanın özetine bağlı; 5 yanlışta 5 dakika kilit. 6 bozmanın 6'sı düştü."
     }
   ]
 }

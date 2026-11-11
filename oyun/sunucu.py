@@ -320,7 +320,7 @@ def js(path):
 
 
 # Diğer uçlar (içe aktarılınca rotalarını kaydeder)
-from oyun import diyar, gunluk, hile, istemci, kayit_yedek, onindirme, profil, tasima, varliklar  # noqa: E402,F401
+from oyun import diyar, ev_agi, gunluk, hile, istemci, kayit_yedek, onindirme, profil, tasima, varliklar  # noqa: E402,F401
 
 
 def yerel_ag_adresi():
@@ -345,6 +345,7 @@ def calistir():
         if ayarlar.oku().get("ev_agi"):
             dinlenen = "0.0.0.0"
             print(f" [+] Ev agindaki telefon ve tabletler icin: http://{yerel_ag_adresi()}:{PORT}/")
+            ev_agi.baslangic_iletisi()
         try:
             from waitress import serve
         except ImportError:

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ev Ağı Parolası · Social Empires Türkçe</title>
+    <link rel="icon" type="image/gif" href="/img/icon.gif">
+    <link rel="stylesheet" href="/css/oyun.css">
+</head>
+<body>
+    <main class="giris hile">
+        <section class="panel" aria-labelledby="parola-basligi">
+            <h2><span class="serit-baslik" id="parola-basligi">Ev Ağı Parolası</span></h2>
+            <div class="icerik">
+                <p class="hile-alt">Oyun bu cihazdan ev ağı üzerinden açılıyor. Oyunun çalıştığı bilgisayarın
+                    ekranında yazan parolayı girin.</p>
+                <form method="post" action="/ev-agi-giris">
+                    <label class="yazi-oyun" for="parola">Parola</label>
+                    <input id="parola" name="parola" type="password" autocomplete="current-password"
+                           autocapitalize="none" spellcheck="false" required autofocus>
+                    <div class="hile-dugmeler"><button class="yesil-dugme" type="submit">Gir</button></div>
+                </form>
+                {% if ileti %}<p class="hile-ileti" role="alert">{{ ileti }}</p>{% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
