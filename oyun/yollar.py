@@ -29,6 +29,9 @@ MODS_DIR = os.path.join(BASE_DIR, "mods")
 SAVES_DIR = os.environ.get("SE_KAYIT_DIZINI") or os.path.join(BASE_DIR, "saves")
 INDIRILEN_DIR = os.path.join(BASE_DIR, "download_assets")
 AYARLAR = os.path.join(BASE_DIR, "ayarlar.json")
+# Sunucunun kendi yazdığı ayarlar (sayfadan seçilen hız, ONR-01). ayarlar.json depoda izlenir; sunucu onu yeniden
+# yazsaydı klonlanmış depoda `git pull` takılırdı (#59 incelemesi). Bu dosya .gitignore'da, ayarlar.json'un üstüne biner.
+AYARLAR_YEREL = os.path.join(BASE_DIR, "ayarlar.yerel.json")
 
 
 def json_oku(yol):

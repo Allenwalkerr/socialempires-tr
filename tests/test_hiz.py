@@ -1,7 +1,8 @@
 """Oyun hızı seçici (ONR-01, KAR-21; oyun/hiz.py).
 
 Beklenen değerlerin kaynağı: oyun/zaman.py'nin kuralı (süreler ölçeğe bölünür; ortam değişkeni TIME_SCALE ayar
-dosyasından önce gelir), config.SURE_ALANLARI (training_time 1.4.07'nin eğitim kuyruğu; ONR-01 tanımı), config'te
+dosyasından önce gelir; sayfadan seçilen hız depoda izlenmeyen ayarlar.yerel.json'a yazılır, ayarlar.json'a sunucu
+yazmaz: #59 incelemesi), config.SURE_ALANLARI (training_time 1.4.07'nin eğitim kuyruğu; ONR-01 tanımı), config'te
 öğe 880'in training_time'ı 510 sn; hile paneliyle aynı koruma (yalnızca 127.0.0.1, aynı köken).
 """
 
@@ -20,10 +21,15 @@ from oyun import sunucu as server
 class HizSecici(unittest.TestCase):
     def setUp(self):
         self.klasor = tempfile.mkdtemp(prefix="se-hiz-")
-        self.yol = os.path.join(self.klasor, "ayarlar.json")
+        self.ana = os.path.join(self.klasor, "ayarlar.json")
+        self.ana_metin = '{"magaza_tema_setleri": true, "zaman_olcegi": 2.0}\n'
+        with open(self.ana, "w", encoding="utf-8") as f:
+            f.write(self.ana_metin)
+        self.yol = os.path.join(self.klasor, "ayarlar.yerel.json")
         with open(self.yol, "w", encoding="utf-8") as f:
-            json.dump({"magaza_tema_setleri": True, "baska": 7}, f)
-        for yama in (mock.patch.object(yollar, "AYARLAR", self.yol), mock.patch.dict(os.environ, {}, clear=False)):
+            json.dump({"baska": 7}, f)
+        for yama in (mock.patch.object(yollar, "AYARLAR", self.ana), mock.patch.object(yollar, "AYARLAR_YEREL", self.yol),
+                     mock.patch.dict(os.environ, {}, clear=False)):
             yama.start()
             self.addCleanup(yama.stop)
         os.environ.pop("TIME_SCALE", None)
@@ -36,11 +42,17 @@ class HizSecici(unittest.TestCase):
         with open(self.yol, encoding="utf-8") as f:
             return json.load(f)
 
+    def tearDown(self):
+        with open(self.ana, encoding="utf-8") as f:
+            self.assertEqual(f.read(), self.ana_metin)  # depoda izlenen dosyaya hiç yazılmaz
+
     def test_secim_kaydedilir_ve_sureler_bolunur(self):
         cevap = self.sec(3)
         self.assertEqual((cevap.status_code, cevap.get_json()), (200, {"olcek": 3.0}))
-        self.assertEqual(self.ayar(), {"magaza_tema_setleri": True, "baska": 7, "zaman_olcegi": 3})  # ötekiler kalır
-        self.assertEqual(zaman.zaman_olcegi(), 3.0)
+        self.assertEqual(self.ayar(), {"baska": 7, "zaman_olcegi": 3})  # ötekiler kalır
+        self.assertEqual(zaman.zaman_olcegi(), 3.0)  # yerel, ayarlar.json'daki 2.0'ın önüne geçer
+        from oyun import ayarlar
+        self.assertIs(ayarlar.oku()["magaza_tema_setleri"], True)  # ana dosyanın ötekileri okunur
         birim = next(e for e in config.get_client_game_config("tr")["items"] if e["id"] == "880")
         self.assertEqual(float(birim["training_time"]), 510 / 3)
         self.sec(1)
@@ -64,9 +76,12 @@ class HizSecici(unittest.TestCase):
     def test_bozuk_ayar_dosyasinin_uzerine_yazilmaz(self):
         with open(self.yol, "w", encoding="utf-8") as f:
             f.write("{bozuk")
-        self.assertEqual(self.sec(3).status_code, 500)
+        cevap = self.sec(3)
+        self.assertEqual(cevap.status_code, 500)
+        self.assertNotIn(self.yol, cevap.get_data(as_text=True))  # CodeQL: hata ayrıntısı dışarı verilmez
         with open(self.yol, encoding="utf-8") as f:
             self.assertEqual(f.read(), "{bozuk")
+        self.assertEqual(zaman.zaman_olcegi(), 2.0)  # bozuk yerel atlanır, ana dosyadaki hız geçer
 
     def test_sayfada_secici_yalnizca_bu_makinede(self):
         uid = server.new_village()

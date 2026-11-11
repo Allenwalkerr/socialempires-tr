@@ -24,6 +24,7 @@ def hiz_sec():
         return ({"hata": "geçersiz hız"}, 400)
     try:
         ayarlar.yaz({"zaman_olcegi": olcek})
-    except ValueError as hata:
-        return ({"hata": str(hata)}, 500)
+    except (ValueError, OSError) as hata:
+        print(f" ! hiz kaydedilemedi: {hata}")  # ayrıntı yalnızca konsolda (CodeQL: hata metni dışarı verilmez)
+        return ({"hata": "ayar dosyası yazılamadı"}, 500)
     return {"olcek": zaman.zaman_olcegi()}

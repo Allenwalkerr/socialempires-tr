@@ -121,6 +121,9 @@ Ayrıntılar: [FLASH.md](FLASH.md). GNU/Linux: [LINUX.md](LINUX.md).
 `ayarlar.json` dosyasından değiştirilir (sunucuyu yeniden başlatın):
 
 - `zaman_olcegi`: oyun hızı. `3.0` üretim/inşaat sürelerini üçte bire indirir.
+  Hız oyun sayfasındaki "Hız" seçicisinden de seçilir. Sayfadan seçilen hız
+  `ayarlar.yerel.json`'a yazılır (depoya girmez) ve `ayarlar.json`'dakinin
+  önüne geçer. Elle verilen hıza dönmek için o dosyayı silin.
 - `magaza_tema_setleri`: tema setlerini mağazaya açar (`config/tema_setleri.json`).
 - `dunya`: bot köylerinin simülasyonu (saldırı sıklığı vb.).
 
