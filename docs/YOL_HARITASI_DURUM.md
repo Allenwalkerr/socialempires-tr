@@ -115,6 +115,8 @@ Yol haritasının açık soruları yanıtlandı:
   sandığı ve "Ücretsiz Hediyeler" düğmesi kaldırıldı.
 - **Oyun 1.4.07 istemcisine tam geçer** (KAR-08). Aşamalar, kabul kapıları ve
   tahminler: [YOL_HARITASI_1407.md](YOL_HARITASI_1407.md).
+  Durum (11.11.2026): GEC-01 … GEC-05 kapandı (GEC-05: yeni PvP, kalkan, onur, saldırı günlüğü, mezarlık;
+  #49 … #51). Sıradaki aşama GEC-06 (Türkçe).
 
 ## Açık işler
 
