@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-05",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 … #49 birleşti. GEC-05 ikinci parça (end_attack_new ganimeti OYN-19, liderlik heykeli OYN-16, savunma ödülü OYN-17, bot akınının yeni saldırı günlüğüne yazılması, KAR-20 ganimetin kurbandan düşülmesi) PR'da; sahibine sorularak birleşir (KAR-19). GEC-05'te kalan: turnuva maçı, onur/sıralama ekranı, mezarlık (resurrectableUnits). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Sonra kalan Düşük denetim bulguları, GEC-06 (TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #50 birleşti. GEC-05 üçüncü parça (OYN-24 onur, OYN-25 … OYN-28 mezarlık) PR'da; sahibine sorularak birleşir (KAR-19). Sonra GEC-05'in kabul kapısını ölç (G∖H = 0, 404 yok, bot dünya turu süresi) ve kapat. Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Sonra kalan Düşük denetim bulguları, GEC-06 (TRA-01). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -876,7 +876,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 31.10.2026 (GEC-03'ten): saldırıda ölen kendi birliklerin mezarlığa girişi (IsoFightingElement/kill → addUnitToResurrectableUnits, checkPutToGraveyard → Main.deadUnits) yalnızca ASSAULT kipinde; sunucuya ayrı komut gelmez, kill/sell'den çıkarılmalı. privateState.resurrectableUnits GEC-05'te. 11.11.2026 (ilk parça): yardımcı ajanın bayt kodu araştırması docs/inceleme/1407-pvp.md (kodlanan iddialar yeniden okundu; arama bedeli formülündeki ◐ çıkarım yanlıştı, düzeltildi). Bulundu: istemci yeni PvP servislerini oyunun dinamik adresine (pvp/web/app.php/pvp/...) yollar; sunucuda yoktu, 404 alıyordu: rakip aranamıyordu, saldırı başında ve sonunda senkron hatası çıkıyordu (✔ getURLWithUserID). Yazıldı: oyun/pvp_yeni.py ve /pvp/* uçları (enemy: yalnızca bot, kalkansız, son 4 saatte saldırılmamış, seviyesi yakın; pool/check; attack/begin, attack/end, pool/add, pool/del), get_enemy_new, begin_attack_new, buy_shield, reset_shield, reply_attack, clean_attack_log, end_tournament_match. G∖H = 1 (end_attack_new), imza uyumsuzluğu 0. İkinci parça: end_attack_new (1.4.07'de end_attack ganimet ve onuru literal 0 gönderir; ganimet, XP yalnızca end_attack_new'de), attacksWon/Lost, onur, yeni saldırı günlüğü PVPattacksReceived (bot akınları oraya yazılmalı; intikam), OYN-16, OYN-17. 11.11.2026 (ikinci parça): bot akınları yalnızca eski attacksReceived'a yazılıyordu; 1.4.07 saldırı günlüğü privateState.PVPattacksReceived (PlayerStatus/Init okur, PopupAttackLog gösterir, AttackLogItem kurucusu name, level, id, attackTime, attackWinner, attackResourcesLost {g,w,f,s}, reply alanlarını okur; reply == 0 ise intikam düğmesi). dunya.yeni_gunluge_ekle bot olmayan savunana kayıt yazar (en çok 50). Test: tests/test_dunya.py test_oyuncuya_akin_yeni_gunlukte_intikam_icin, test_yeni_gunluk_sinirli; 4 bozmanın 4'ü düştü (çağrı yok, kazanan ters, sınır yok, bot denetimi yok)."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 31.10.2026 (GEC-03'ten): saldırıda ölen kendi birliklerin mezarlığa girişi (IsoFightingElement/kill → addUnitToResurrectableUnits, checkPutToGraveyard → Main.deadUnits) yalnızca ASSAULT kipinde; sunucuya ayrı komut gelmez, kill/sell'den çıkarılmalı. privateState.resurrectableUnits GEC-05'te. 11.11.2026 (ilk parça): yardımcı ajanın bayt kodu araştırması docs/inceleme/1407-pvp.md (kodlanan iddialar yeniden okundu; arama bedeli formülündeki ◐ çıkarım yanlıştı, düzeltildi). Bulundu: istemci yeni PvP servislerini oyunun dinamik adresine (pvp/web/app.php/pvp/...) yollar; sunucuda yoktu, 404 alıyordu: rakip aranamıyordu, saldırı başında ve sonunda senkron hatası çıkıyordu (✔ getURLWithUserID). Yazıldı: oyun/pvp_yeni.py ve /pvp/* uçları (enemy: yalnızca bot, kalkansız, son 4 saatte saldırılmamış, seviyesi yakın; pool/check; attack/begin, attack/end, pool/add, pool/del), get_enemy_new, begin_attack_new, buy_shield, reset_shield, reply_attack, clean_attack_log, end_tournament_match. G∖H = 1 (end_attack_new), imza uyumsuzluğu 0. İkinci parça: end_attack_new (1.4.07'de end_attack ganimet ve onuru literal 0 gönderir; ganimet, XP yalnızca end_attack_new'de), attacksWon/Lost, onur, yeni saldırı günlüğü PVPattacksReceived (bot akınları oraya yazılmalı; intikam), OYN-16, OYN-17. 11.11.2026 (ikinci parça): bot akınları yalnızca eski attacksReceived'a yazılıyordu; 1.4.07 saldırı günlüğü privateState.PVPattacksReceived (PlayerStatus/Init okur, PopupAttackLog gösterir, AttackLogItem kurucusu name, level, id, attackTime, attackWinner, attackResourcesLost {g,w,f,s}, reply alanlarını okur; reply == 0 ise intikam düğmesi). dunya.yeni_gunluge_ekle bot olmayan savunana kayıt yazar (en çok 50). Test: tests/test_dunya.py test_oyuncuya_akin_yeni_gunlukte_intikam_icin, test_yeni_gunluk_sinirli; 4 bozmanın 4'ü düştü (çağrı yok, kazanan ters, sınır yok, bot denetimi yok). 11.11.2026 (üçüncü parça): turnuva (HTTP uçları ve end_tournament_match), mezarlık komutları ve sıralama servisleri zaten karşılanıyor. Mezarlık: OYN-25 … OYN-28 (yardımcı ajanın raporu docs/inceleme/1407-mezarlik.md; kodlanan iddialar yeniden okundu). Onur: OYN-24. Açık: ajanın notu, recoverEnemyUnits@283-288'de protect==1 birim düşülmüyor; 1407-pvp.md'deki ifadeyle ters (? doğrulanmadı)."
     },
     {
       "id": "GEC-06",
@@ -1943,6 +1943,71 @@
       "kanit": "#50 incelemesi (oyun/pvp.py:248), yeniden okundu: end_attack resources.g > 0 ile (eski istemci biçimi ya da elle yazılmış paket) altın verdiyse kayda yine ganimet_hakki=True ve tavanın tamamı yazılıyordu; end_attack_new ikinci kez altın, XP ve kaynak veriyordu. 1.4.07 istemcisi end_attack'ta resources'u 0 gönderir (OYN-19), olağan oyunda olmaz.",
       "test": "tests/test_komutlar.py: test_yeni_sonuc_eski_ganimetin_ustune_vermez",
       "notlar": "Düzeltme: end_attack altın ya da XP verdiyse ganimet_hakki False yazılır. 1 bozmanın 1'i düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-24",
+      "baslik": "Aynı savaşa end_attack ve end_attack_new ikisi de onur verebiliyordu",
+      "onem": "Düşük",
+      "kanit": "#50 son incelemesinin yorum olarak yazılmayan notu, yeniden okundu: OYN-23'ün düzeltmesi yalnızca altın ve XP'ye bakıyordu; end_attack ganimetsiz ama honor > 0 ile gelirse end_attack_new onuru (15/5) ikinci kez veriyordu. Yalnızca eski biçimli ya da elle yazılmış paketle olur.",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_eski_onurun_ustune_vermez",
+      "notlar": "Düzeltme: end_attack onur da verdiyse ganimet_hakki False. 1 bozmanın 1'i düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-25",
+      "baslik": "Mezarlık listesi (resurrectableUnits) sunucuda hiç yazılmıyordu; yeniden yüklemede mezarlık boştu",
+      "onem": "Orta",
+      "kanit": "Bayt kodu (11.11.2026, yeniden okundu): PopupGraveyard/refreshItems ve 'get resurrectableUnits' Base.Main.resurrectableUnits'i gösterir; Base/loadGraveyardState@51-155 onu privateState.resurrectableUnits'ten yükler; addUnitToResurrectableUnits'in tek çağıranı IsoFightingElement/kill@870-894. Sunucu yalnızca deadHeroes'u yazıyordu.",
+      "test": "tests/test_komutlar.py: test_olen_birlik_mezarlik_listesine",
+      "notlar": "Düzeltme: komutlar.mezarliga_ekle listeye de yazar (GRAVEYARD_MAX_CAPACITY sınırı); kahraman ve anka yumurtası (put_graveyard) listeye girmez; sell'de 'KILL' nedeniyle gelen kahraman (mezarliga=0) deadHeroes'a işlenir. Bozmalar düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-26",
+      "baslik": "Mezarlıktan diriltmede sunucu iksiri hep 1 düşüyordu; istemci birimin config 'potion'unu düşer",
+      "onem": "Orta",
+      "kanit": "PopupGraveyard/onBuyItem@149-165: iPotions -= staticData.potion; komut [id, tx, ty, townID, '1']. Config'te birim iksir bedelleri 1-45 (çoğu 2-5). Sunucu 1 düştüğü için iksir çoğalıyordu; listeden de çıkarmıyordu (resurrectUnit@123-138 ilk eşleşeni çıkarır).",
+      "test": "tests/test_komutlar.py: test_diriltme_bedeli_istemcininki",
+      "notlar": "Düzeltme: iksir config 'potion' kadar düşülür (yetmezse uygulanmaz, KAR-18), listeden bir tane çıkar."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-27",
+      "baslik": "Kahraman diriltmede sunucu altın düşmüyordu",
+      "onem": "Orta",
+      "kanit": "PopupResurrectHeroes/onBuyItem@90-176: bedel cost_unit_cash × Config.RESURRECT_MULTIPLIER (500) altın, canAfford ve adjustStatByType; komut 4 argüman [id, tx, ty, townID].",
+      "test": "tests/test_komutlar.py: test_diriltme_bedeli_istemcininki; test_kahraman_diriltme_kasabanin_altiniyla",
+      "notlar": "Düzeltme: 4 argümanlı resurrect_hero altını düşer (yetmezse uygulanmaz). adjustStatByType'ın 3. argümanı (staticData.xp) kodlanmadı (?). #51 incelemesi: altın ana köyden değil komuttaki kasabadan düşülür (altın kasaba başına; town_price, büyü ve mana altını da öyle); test_kahraman_diriltme_kasabanin_altiniyla, bozma düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-28",
+      "baslik": "PvP'de ölen kendi birlikleri mezarlığa girmiyordu",
+      "onem": "Orta",
+      "kanit": "IsoFightingElement/kill@714-894: SELF birimi ASSAULT'ta checkPutToGraveyard ise yerelde addUnitToResurrectableUnits; aynı yerdeki sell CommandManager/addCommand@16-99'da yalnızca NORMAL kipte (ya da zorla) kuyruğa girer: sunucuya hiçbir şey gitmez.",
+      "test": "tests/test_komutlar.py: test_saldirida_olen_birlik_mezarliga",
+      "notlar": "Düzeltme: pvp.saldiri_bitir haritadan gerçekten silinen net kaybı (ölen − kurtarılan) mezarlığa ekler; köylü, hayvan (subcat 74/75/88/90) ve mavi anka (775, ◐) girmez; kahraman deadHeroes'a. Ajanın raporu docs/inceleme/1407-mezarlik.md."
     }
   ]
 }

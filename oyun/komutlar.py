@@ -321,6 +321,10 @@ def sell(save, a):
         satis_iadesi(save, h, esya_id)
     if a.tam(6):
         mezarliga_ekle(save, esya_id)
+    elif a.metin(5) == SELL_REASON_KILL and esya_id in KAHRAMANLAR:
+        # IsoFightingElement/checkPutToGraveyard@295-390: kahraman Main.deadHeroes[id]++ ile ayrı mezarlığa girer ve
+        # false döner, komutun mezarliga_git'i 0 gider (kill@774-797); sunucu bunu nedenden ve kimlikten çıkarır.
+        mezarliga_ekle(save, esya_id, listeye=False)
 
 
 @komut("kill")
@@ -1548,33 +1552,69 @@ def reset_potions_received(save, a):
     save["privateState"]["potionsReceived"] = 0
 
 
-def mezarliga_ekle(save, birim_id):
-    """Mezarlık: privateState.deadHeroes = {"birim_id": adet}."""
-    mezarlik = save["privateState"].get("deadHeroes")
+# Constants (1.4.07): ID_UNIT_RANGER 535, XENA 533, ARTHUR 534, MERLIN 550, VALKIRIA 554, WALLACE 555, THOR 556,
+# HIGHELF 557; IsoFightingElement/checkPutToGraveyard@181-295 bunları kahraman mezarlığına (deadHeroes) ayırır.
+KAHRAMANLAR = frozenset((533, 534, 535, 550, 554, 555, 556, 557))
+SELL_REASON_KILL = "KILL"  # Constants.SELL_REASON_KILL
+RESURRECT_MULTIPLIER = 500  # Config.RESURRECT_MULTIPLIER; PopupResurrectHeroes/onBuyItem@90-101
+
+
+def mezarliga_ekle(save, birim_id, adet=1, listeye=None):
+    """Mezarlık iki alandır (Base/processAttacks@1728-2010, Base/loadGraveyardState@51-155):
+    privateState.deadHeroes = {"birim_id": adet} (yüklemede kahramanlar Main.deadHeroes'a, diğerleri Main.deadUnits'e
+    bölünür) ve privateState.resurrectableUnits = [birim_id, ...] (mezarlık penceresinin listesi; PopupGraveyard/
+    refreshItems Base.resurrectableUnits'i gösterir). Önce ikincisi hiç yazılmıyordu: yeniden yüklemede mezarlık boştu.
+    Kahramanlar listeye girmez (checkPutToGraveyard false döner, addUnitToResurrectableUnits çağrılmaz, kill@870-894).
+    Liste GRAVEYARD_MAX_CAPACITY ile sınırlı: pencere fazlasını göstermez (PopupGraveyard/init@86-93)."""
+    adet = max(0, int(adet))
+    if adet == 0:
+        return
+    ps = save["privateState"]
+    mezarlik = ps.get("deadHeroes")
     if not isinstance(mezarlik, dict):
-        mezarlik = save["privateState"]["deadHeroes"] = {}
-    mezarlik[str(birim_id)] = int(mezarlik.get(str(birim_id), 0)) + 1
+        mezarlik = ps["deadHeroes"] = {}
+    mezarlik[str(birim_id)] = int(mezarlik.get(str(birim_id), 0) or 0) + adet
+    if listeye is None:
+        listeye = int(birim_id) not in KAHRAMANLAR
+    if listeye:
+        liste = ps.get("resurrectableUnits")
+        if not isinstance(liste, list):
+            liste = ps["resurrectableUnits"] = []
+        sinir = int(globals_().get("GRAVEYARD_MAX_CAPACITY", 10000) or 10000)
+        liste.extend([int(birim_id)] * max(0, min(adet, sinir - len(liste))))
 
 
 @komut("put_graveyard")
 def put_graveyard(save, a):
-    """[birim_id] - ölen anka kuşu mezarlığa."""
-    mezarliga_ekle(save, a.tam(0))
+    """[birim_id] - ölen anka yumurtası (PhoenixEggDelegate/onPhoenixEggDie@132-145: addToDeadUnits ve bu komut;
+    addUnitToResurrectableUnits'in tek çağıranı IsoFightingElement/kill olduğundan listeye girmez)."""
+    mezarliga_ekle(save, a.tam(0), listeye=False)
 
 
 @komut("resurrect_hero")
 def resurrect_hero(save, a):
-    """[birim_id, x, y, kasaba, (iksir_ile '1'|'0')]"""
+    """[birim_id, x, y, kasaba, (iksir_ile '1')]. İki pencereden gelir:
+    - PopupGraveyard/onBuyItem@149-395: 5 argüman, son '1'; istemci iPotions'tan birimin config 'potion'unu düşer
+      (önce sunucu her zaman 1 düşüyordu) ve resurrectUnit@123-138 listeden ilk eşleşeni çıkarır.
+    - PopupResurrectHeroes/onBuyItem@90-302: 4 argüman; bedel cost_unit_cash × RESURRECT_MULTIPLIER altın (canAfford,
+      adjustStatByType; önce sunucu hiç düşmüyordu). Yetmezse komut uygulanmaz (KAR-18)."""
     birim_id = a.tam(0)
     ps = save["privateState"]
+    birim = get_item_from_id(birim_id) or {}
+    h = harita(save, a.tam(3))  # altın kasaba başınadır; kahraman da bu kasabaya konur (#51 incelemesi)
+    if a.metin(4) == "1":
+        bakiyeden_dus(ps, "potion", max(0, int(birim.get("potion", 1) or 0)))
+        liste = ps.get("resurrectableUnits")
+        if isinstance(liste, list) and birim_id in liste:
+            liste.remove(birim_id)
+    else:
+        kaynak_ekle(save, h, "g", -int(birim.get("cost_unit_cash", 0) or 0) * RESURRECT_MULTIPLIER)
     mezarlik = ps.get("deadHeroes")
     if isinstance(mezarlik, dict) and str(birim_id) in mezarlik:
         mezarlik[str(birim_id)] = int(mezarlik[str(birim_id)]) - 1
         if mezarlik[str(birim_id)] <= 0:
             del mezarlik[str(birim_id)]
-    if a.metin(4) == "1":
-        ps["potion"] = max(0, int(ps.get("potion", 0)) - 1)
-    esya_ekle(harita(save, a.tam(3)), birim_id, a.tam(1), a.tam(2))
+    esya_ekle(h, birim_id, a.tam(1), a.tam(2))
 
 
 # ---------------------------------------------------------------------------
