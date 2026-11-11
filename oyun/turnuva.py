@@ -20,9 +20,11 @@ from oyun import elo
 from oyun.config import get_game_config, get_item_from_id
 from oyun.ekonomi import timestamp_now
 from oyun.komutlar import depo_ekle
-from oyun.kayit import all_saves_userid, save_session, session
+from oyun.kayit import all_saves_userid, save_lock, save_session, session
 from oyun.yollar import SAVES_DIR
 
+# Kilit sırası hep KILIT → elo.KILIT → save_lock (DPT-05, DNT-31): oyuncu kaydına yazan her yer save_lock alır; save_lock
+# tutan hiçbir yol (komutlar, dünya turu) turnuva ya da Elo kilidine gitmez, bu yüzden kilitlenme olmaz.
 KILIT = threading.RLock()
 TAKIM_BOYU = 20
 _turnuvalar = None
@@ -71,6 +73,15 @@ def turler():
 
 def _tur(tur_id):
     return turler().get(str(tur_id)) or next(iter(turler().values()))
+
+
+def siradaki_odul(tur_id, tur=None):
+    """Bu türde bugün açılacak turnuvanın ödül sırası (prize[sıra]). OYN-15: istemci listede
+    tournament_reward_id[tür]'ü gösterir, katılınca turnuvanın reward_id'sini (TournamentManager$/
+    getTournamentRewardIndex); ikisi aynı olsun diye ödül güne göre döner (Türkiye günü, takvim.bugun)."""
+    from oyun import takvim
+    oduller = (tur or _tur(tur_id)).get("prize") or []
+    return takvim.bugun().toordinal() % len(oduller) if oduller else 0
 
 
 def _savasci_mi(birim_id):
@@ -165,16 +176,17 @@ def _bitir(turnuva, simdi):
         return
     birinci = max(adaylar, key=lambda o: _puan(o)[:2])
     turnuva["winner_id"] = birinci["user_id"]
-    kayit = session(birinci["user_id"])
-    if not kayit or kayit["playerInfo"].get("bot"):
-        return
     oduller = _tur(turnuva["tournament_type_id"]).get("prize") or []
     odul = oduller[turnuva["reward_id"] % len(oduller)] if oduller else {}
-    kayit["maps"][0]["coins"] = int(kayit["maps"][0].get("coins", 0)) + int(odul.get("g", 0) or 0)
-    kayit["playerInfo"]["cash"] = int(kayit["playerInfo"].get("cash", 0)) + int(odul.get("c", 0) or 0)
-    for birim_id, adet in (odul.get("u") or {}).items():
-        depo_ekle(kayit, int(birim_id), int(adet))
-    save_session(birinci["user_id"])
+    with save_lock:  # aynı anda gelen komut ya da dünya turu ödülü ezmesin (DNT-31)
+        kayit = session(birinci["user_id"])
+        if not kayit or kayit["playerInfo"].get("bot"):
+            return
+        kayit["maps"][0]["coins"] = int(kayit["maps"][0].get("coins", 0)) + int(odul.get("g", 0) or 0)
+        kayit["playerInfo"]["cash"] = int(kayit["playerInfo"].get("cash", 0)) + int(odul.get("c", 0) or 0)
+        for birim_id, adet in (odul.get("u") or {}).items():
+            depo_ekle(kayit, int(birim_id), int(adet))
+        save_session(birinci["user_id"])
 
 
 def _guncelle(turnuva, simdi):
@@ -215,7 +227,7 @@ def bilgi(uid):
         return {
             "tournament": _istemci_bicimi(turnuva),
             "tournament_friends": [],
-            "tournament_reward_id": {str(k): 0 for k in turler()},
+            "tournament_reward_id": {str(k): siradaki_odul(k, t) for k, t in turler().items()},
             "tournament_weekly": {str(k): {"open": "0", "full": "0", "timeLeft": 0}
                                   for k, t in turler().items() if int(t.get("weekly_tournaments") or 0)},
         }
@@ -236,7 +248,7 @@ def katil(uid, tur_id, takim):
         turnuva = {
             "tournament_id": uuid.uuid4().hex[:12],
             "tournament_type_id": int(tur["id"]),
-            "reward_id": random.randrange(max(1, len(tur.get("prize") or []))),
+            "reward_id": siradaki_odul(tur["id"], tur),  # listede gösterilenle aynı (OYN-15)
             "owner": kayit["playerInfo"].get("name", "Oyuncu"),
             "owner_id": str(uid),
             "private": "0",
@@ -307,10 +319,11 @@ def bot_reytingleri():
 
 
 def _odul_ver(uid, esya, adet):
-    kayit = session(uid)
-    if kayit:
-        depo_ekle(kayit, esya, adet)
-        save_session(uid)
+    with save_lock:  # DNT-31
+        kayit = session(uid)
+        if kayit:
+            depo_ekle(kayit, esya, adet)
+            save_session(uid)
 
 
 def haftayi_guncelle(simdi=None):
@@ -319,20 +332,21 @@ def haftayi_guncelle(simdi=None):
 
 
 def _reyting_isle(uid, kurban_id, puan, simdi=None):
-    kayit, kurban = session(uid), session(kurban_id)
-    if not kayit or kayit["playerInfo"].get("bot"):
-        return
-    durum = kayit["privateState"].setdefault("elo", {"puan": elo.BASLANGIC, "mac": 0})
-    bot = bool(kurban and kurban["playerInfo"].get("bot"))
-    if kurban is None:
-        rakip = elo.BASLANGIC
-    elif bot:
-        rakip = _bot_reytingi(kurban)
-    else:
-        rakip = float(kurban["privateState"].get("elo", {}).get("puan", elo.BASLANGIC))
-    durum["puan"] = round(elo.guncelle(float(durum["puan"]), rakip, float(puan) / 100, durum["mac"], bot), 2)
-    durum["mac"] += 1
-    save_session(uid)
+    with save_lock:  # DNT-31
+        kayit, kurban = session(uid), session(kurban_id)
+        if not kayit or kayit["playerInfo"].get("bot"):
+            return
+        durum = kayit["privateState"].setdefault("elo", {"puan": elo.BASLANGIC, "mac": 0})
+        bot = bool(kurban and kurban["playerInfo"].get("bot"))
+        if kurban is None:
+            rakip = elo.BASLANGIC
+        elif bot:
+            rakip = _bot_reytingi(kurban)
+        else:
+            rakip = float(kurban["privateState"].get("elo", {}).get("puan", elo.BASLANGIC))
+        durum["puan"] = round(elo.guncelle(float(durum["puan"]), rakip, float(puan) / 100, durum["mac"], bot), 2)
+        durum["mac"] += 1
+        save_session(uid)
     simdi = simdi or elo.turkiye_saati()
     haftayi_guncelle(simdi)
     elo.mac_kaydet(str(uid), kayit["playerInfo"].get("name", "Oyuncu"), puan, simdi)

@@ -784,6 +784,17 @@ class LoncaVeriTestleri(DunyaTesti):
         self.assertEqual(len(bot["maps"][0]["items"][-1]), 6)
         self.assertEqual(d.olaylar[-1]["tur"], "lonca")
 
+    def test_lonca_binanin_oteki_ozelliklerini_silmez(self):
+        """DPT-09 (DNT-34): attrs'teki bq (eğitim kuyruğu, komutlar._kuyruk_ve_bina) ve cp (üretim seçimi, istemci
+        IsoElement kurucusu attrs.cp) lonca işçileri eklenince kaybolmamalı."""
+        oyuncu = koy("p", bot=False, birim=1)
+        oyuncu["maps"][0]["items"].append([SOSYAL, 30, 30, 0, 0, 0, [], {"bq": "7", "cp": 2, "workers": 0}])
+        d = self.kur(p=oyuncu)
+        self.assertEqual(d._lonca(SIMDI), "p")
+        attrs = oyuncu["maps"][0]["items"][-1][7]
+        self.assertEqual((attrs["bq"], attrs["cp"], attrs["guild"]), ("7", 2, 1))
+        self.assertGreater(attrs["workers"], 0)
+
     def test_panel_verisi(self):
         """Kalkan alanı kalan süredir; sonraki tur = son güncelleme + tick_saniye; toplamlar kayıtların toplamı;
         konum yorumu: '9 sütunlu ızgara + kişiye özgü küçük sapma: köyler üst üste binmez'."""

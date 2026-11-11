@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "ONR-03",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59, #60, #61 birleşti. ONR-03 (Android bildirimleri, KAR-23) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, 15, denetimin açık bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "OYN-15",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #62 birleşti (dört öneri bitti). Küçük hatalar PR'ı: OYN-15, DNT-34, DNT-31; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, kalan denetim bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -987,13 +987,13 @@
       "baslik": "Turnuvada listede gösterilen ödül ile verilen ödül farklı olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "İstemci listeyi tournament_reward_id[tür]'e göre gösterir; turnuva.bilgi orada hep 0 gönderir, katil ise reward_id'yi rastgele seçer (denge testlerini yazan alt ajan; bayt kodu yeniden okunmadı).",
-      "test": null,
+      "test": "tests/test_denge.py: test_listede_gosterilen_odul_verilen_odul",
       "pr": null,
       "onay": null,
-      "notlar": "Doğrulanmadı; GEC-05 turnuva işinde istemciden okunacak. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): GEC-05 bunu okumadan kapandı, hata duruyor (✔ turnuva.bilgi tournament_reward_id hep 0, katil reward_id rastgele)."
+      "notlar": "Doğrulanmadı; GEC-05 turnuva işinde istemciden okunacak. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): GEC-05 bunu okumadan kapandı, hata duruyor (✔ turnuva.bilgi tournament_reward_id hep 0, katil reward_id rastgele). 11.11.2026, bayt kodundan okundu ✔: TournamentManager$/getTournamentRewardIndex oyuncu turnuvada değilken tournament_reward_id[tür]'ü (for-in, anahtar tür kimliğine eşitse), turnuvadayken tournament.reward_id'yi gösterir; getRewardData prize[sıra]. Sunucu listede hep 0 yollayıp katılınca rastgele seçiyordu. Artık turnuva.siradaki_odul: ödül sırası Türkiye gününe göre döner (gün % prize sayısı); liste ve katılım aynı değeri kullanır. 3 bozma düştü."
     },
     {
       "id": "OYN-16",
@@ -1052,7 +1052,7 @@
       "baslik": "Bildirimler: Android'de inşaat/eğitim bitti, saldırı, kalkan bitiyor",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Sahibi 30.10.2026 'hepsini istiyorum' dedi (KAR-08). Önerinin önceki oturumdaki metni depoda yok; taslak tanım docs/YOL_HARITASI_1407.md §5.",
       "test": "tests/test_bildirim.py (13 test)",
@@ -2144,13 +2144,13 @@
       "baslik": "Denetim DPT-05: Turnuva ve haftalık ödül oyuncu kaydını save_lock dışında değiştiriyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-05, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_denge.py: test_oyuncu_kaydina_kilitle_yazilir",
       "pr": null,
       "onay": null,
-      "notlar": "turnuva._bitir/_odul_ver ve diyar.hafta_ucu yalnızca turnuva.KILIT alıyor; aynı anda gelen komutla yarış olabilir."
+      "notlar": "turnuva._bitir/_odul_ver ve diyar.hafta_ucu yalnızca turnuva.KILIT alıyor; aynı anda gelen komutla yarış olabilir. 11.11.2026: turnuva._bitir, _odul_ver ve _reyting_isle oyuncu kaydını save_lock altında yazar. Kilit sırası KILIT → elo.KILIT → save_lock; save_lock tutan yol (command, dunya.tek_tick) turnuva/Elo kilidine gitmez (grep ile denetlendi), kilitlenme yok. 3 bozma düştü."
     },
     {
       "id": "DNT-32",
@@ -2183,13 +2183,13 @@
       "baslik": "Denetim DPT-09: Lonca botu binanın bütün attrs'ini eziyor (bq, cp, hc kaybolur)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-09, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_dunya.py: test_lonca_binanin_oteki_ozelliklerini_silmez",
       "pr": null,
       "onay": null,
-      "notlar": "oyun/dunya.py _lonca esya[7] = {...}; öneri esya[7].update(...)."
+      "notlar": "oyun/dunya.py _lonca esya[7] = {...}; öneri esya[7].update(...). 11.11.2026: _lonca attrs'i yalnızca günceller (bq, cp kalır). Bozma düştü."
     },
     {
       "id": "DNT-35",
