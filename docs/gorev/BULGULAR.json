@@ -1569,16 +1569,16 @@
     },
     {
       "sinif": "hata",
-      "test": null,
+      "test": "tests/test_kayit_gocu.py: test_ice_aktarmadan_onceki_hal_kalici_yedekte",
       "pr": null,
       "onay": null,
       "id": "DNT-07",
       "baslik": "Yedek içe aktarma ya da taşıma öncesi hâl yalnızca .bak'ta, o da ilk kayıtta eziliyor",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır.",
-      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek."
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır. Yeniden üretildi (11.11.2026): yeni test eski kodda düşüyor (backups/'ta önceki hâlin kopyası yok; iki kayıttan sonra .bak içe aktarılan hâl).",
+      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek. Düzeltme: geri_yukle (yedek yükleme ve Wi-Fi taşıma) üzerine yazmadan önce canlı kaydı backups/<kimlik>.ice-aktarma-<zaman>.save.json olarak da saklar; ad '<kimlik>-' ile başlamadığı için budanmaz."
     },
     {
       "sinif": "hata",

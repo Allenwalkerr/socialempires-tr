@@ -234,6 +234,32 @@ class YuklemeDayanikliligi(unittest.TestCase):
         with open(yol, encoding="utf-8") as f, open(yol + ".bak", encoding="utf-8") as g:
             self.assertEqual(json.load(f), json.load(g))
 
+    def test_ice_aktarmadan_onceki_hal_kalici_yedekte(self):
+        """KYG-02 (bağımsız denetim): içe aktarılan yedeğin ezdiği kayıt yalnızca .bak'ta kalıyordu, .bak da ilk
+        kayıtta eziliyordu. Önceki hâl backups/ altında adlı bir dosyada kalmalı; yedek budaması onu silmemeli."""
+        import glob
+        from oyun import kayit_yedek
+        uid = kayit.new_village()
+        yol = self._yol(uid)
+        kayit.session(uid)["maps"][0]["coins"] = 999999
+        kayit.save_session(uid)
+        with open(yol, "rb") as f:
+            onceki = f.read()
+        yeni = json.loads(onceki)
+        yeni["maps"][0]["coins"] = 5
+        kayit_yedek.geri_yukle(uid, json.dumps(yeni).encode("utf-8"))
+        desen = os.path.join(kayit.BACKUP_DIR, f"{uid}.ice-aktarma-*.save.json")
+        self.addCleanup(lambda: [os.remove(y) for y in glob.glob(desen)])
+        kayit.save_session(uid)
+        kayit.save_session(uid)  # .bak artık içe aktarılan hâl
+        for _ in range(kayit.MAX_BACKUPS + 1):
+            kayit.backup_session(uid)  # budama
+        yedekler = glob.glob(desen)
+        self.assertEqual(len(yedekler), 1)
+        with open(yedekler[0], "rb") as f:
+            self.assertEqual(f.read(), onceki)
+        self.assertEqual(kayit.session(uid)["maps"][0]["coins"], 5)
+
     def test_bak_ile_geri_alinan_eski_kayit_da_gocer(self):
         yol = self._yol("bakgoc")
         with open(yol, "w", encoding="utf-8") as f:
