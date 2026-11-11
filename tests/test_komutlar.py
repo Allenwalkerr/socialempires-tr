@@ -556,6 +556,16 @@ class PvpKomutlari(KomutTesti):
         self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.ps["attacksWon"]),
                          (49500, 500, 1))
 
+    def test_yeni_sonuc_eski_onurun_ustune_vermez(self):
+        """#50 incelemesinin notu (OYN-24): end_attack ganimetsiz ama honor > 0 ile geldiyse (eski biçim) aynı savaşın
+        end_attack_new'i onuru ikinci kez vermez. Onur tavanı eski yolda 10 (saldiri_bitir)."""
+        self.saldir(resources={"g": 0, "x": 0}, honor=4)
+        self.yeni()
+        self.assertEqual((self.ps["honor"], self.saldiran_onur()), (4, 4))
+
+    def saldiran_onur(self):
+        return self.kayit["playerInfo"].get("honor_points", 0)
+
     def test_yeni_sonuc_saldirinin_kasabasina(self):
         """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
         import copy

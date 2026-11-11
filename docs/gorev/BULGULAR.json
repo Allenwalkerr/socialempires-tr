@@ -1943,6 +1943,19 @@
       "kanit": "#50 incelemesi (oyun/pvp.py:248), yeniden okundu: end_attack resources.g > 0 ile (eski istemci biçimi ya da elle yazılmış paket) altın verdiyse kayda yine ganimet_hakki=True ve tavanın tamamı yazılıyordu; end_attack_new ikinci kez altın, XP ve kaynak veriyordu. 1.4.07 istemcisi end_attack'ta resources'u 0 gönderir (OYN-19), olağan oyunda olmaz.",
       "test": "tests/test_komutlar.py: test_yeni_sonuc_eski_ganimetin_ustune_vermez",
       "notlar": "Düzeltme: end_attack altın ya da XP verdiyse ganimet_hakki False yazılır. 1 bozmanın 1'i düştü."
+    },
+    {
+      "sinif": "hata",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "pr": null,
+      "onay": null,
+      "id": "OYN-24",
+      "baslik": "Aynı savaşa end_attack ve end_attack_new ikisi de onur verebiliyordu",
+      "onem": "Düşük",
+      "kanit": "#50 son incelemesinin yorum olarak yazılmayan notu, yeniden okundu: OYN-23'ün düzeltmesi yalnızca altın ve XP'ye bakıyordu; end_attack ganimetsiz ama honor > 0 ile gelirse end_attack_new onuru (15/5) ikinci kez veriyordu. Yalnızca eski biçimli ya da elle yazılmış paketle olur.",
+      "test": "tests/test_komutlar.py: test_yeni_sonuc_eski_onurun_ustune_vermez",
+      "notlar": "Düzeltme: end_attack onur da verdiyse ganimet_hakki False. 1 bozmanın 1'i düştü."
     }
   ]
 }
