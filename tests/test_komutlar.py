@@ -787,9 +787,16 @@ class IlkAlimTeklifi(KomutTesti):
         from oyun import oyuncu
         ikinci = dict(self.harita, id=1, coins=0, food=0)
         self.kayit["maps"].append(ikinci)
+        yazilan = []
+        self.ps.update(numDayLogged=9, lastDayRewarded=9)  # günlük ödül yok: kayıt yalnızca kasaba için yazılmalı
+        self.kayit["playerInfo"]["last_logged_in"] = self.komutlar.timestamp_now()  # aynı gün
         with mock.patch.object(oyuncu, "session", lambda u: self.kayit), \
-                mock.patch.object(oyuncu, "neighbors", lambda u: []):
+                mock.patch.object(oyuncu, "neighbors", lambda u: []), \
+                mock.patch.object(oyuncu, "save_session", yazilan.append):
             oyuncu.get_player_info("test", 1)
+            self.assertEqual(yazilan, ["test"])  # #66 incelemesi: hemen diske (komuttan önce yeniden başlayabilir)
+            oyuncu.get_player_info("test", 1)
+            self.assertEqual(yazilan, ["test"])  # değişmediyse yeniden yazılmaz
         self.assertEqual(self.kayit["playerInfo"]["acik_kasaba"], 1)
         oyuncu._acik_kasabalar.pop("test", None)  # sunucu yeniden başladı
         self.komut("set_first_purchase_timestamp")

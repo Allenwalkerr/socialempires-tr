@@ -1498,7 +1498,7 @@
       "isaret": "✔",
       "kanit": "Quest$/getNumQuestsAvailable map.lastQuestTimes'tan sayar (DELAY_ALLOWED = 6 sa, MAX_QUESTS_ON_TIME = 4, getMaxnumOfQuests); istemci lastQuestTimes'a hiç yazmaz, sunucu da yazmıyor: görev sayısı sınırsız.",
       "test": "tests/test_gorev_siniri.py (3 test)",
-      "pr": null,
+      "pr": "#66",
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Denge kararı sahibinde. Uygulanacaksa start_quest (kasabayı taşır) lastQuestTimes'a şimdiyi ekler, 6 saatten eskileri atar; start_quest_new'de değil (iki kez sayılır). 11.11.2026 (KAR-25), bayt kodu ✔: Quest.DELAY_ALLOWED 21600 sn, MAX_QUESTS_ON_TIME 4; getNumQuestsAvailable en yeniden geriye, aralarında 6 saatten az fark olanları sayar, Odin yoksa 1 eksik; Base/processAttacks@2085 listeyi map.lastQuestTimes'tan okur, istemci yazmaz. start_quest [görev, kasaba] artık o kasabanın lastQuestTimes'ına şimdiyi ekler (son 4). 4 bozma düştü."
     },
@@ -2109,7 +2109,7 @@
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-09, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_denge.py: test_saldiri_sabitleri_tek_kaynak_istemcinin",
-      "pr": null,
+      "pr": "#66",
       "onay": null,
       "notlar": "oyun/denge.py ve oyun/pvp.py aynı değerler; config ATTACKS_PERIOD_MAX/HOURS ile bugün eşit. 11.11.2026, bayt kodu ✔: istemci config globals'ı değil kendi Config/<sınıf> sabitlerini okur (ATTACKS_MAX 3, ATTACKS_PERIOD_HOURS 6; Base/processAttacks@461-723, loadGameConfigSuccess'te ATTACKS_* yok). Önerilen 'config'e bağla' istemciden ayrılmaya yol açardı; yerine kopyalar tek kaynağa (denge) toplandı, pvp oradan alır. Bozma düştü."
     },
@@ -2135,9 +2135,9 @@
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-07, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_komutlar.py: test_acik_kasaba_sunucu_yeniden_baslayinca_kayittan",
-      "pr": null,
+      "pr": "#66",
       "onay": null,
-      "notlar": "oyun/oyuncu.py _acik_kasabalar kayda yazılmıyor; push_queue_unit, pop_queue_unit, speed_up_queue, buy_first_purchase etkilenir. 11.11.2026: açık kasaba bellekte ve playerInfo.acik_kasaba'da; bellek boşsa kayıttan okunur, bozuk değer 0. 3 bozma düştü."
+      "notlar": "oyun/oyuncu.py _acik_kasabalar kayda yazılmıyor; push_queue_unit, pop_queue_unit, speed_up_queue, buy_first_purchase etkilenir. 11.11.2026: açık kasaba bellekte ve playerInfo.acik_kasaba'da; bellek boşsa kayıttan okunur, bozuk değer 0. 3 bozma düştü. #66 incelemesi (gerçek, düzeltildi ✔): değer yalnızca bellekteki kayda yazılıyordu; kasaba değişince kayıt hemen diske yazılır. Testin ilk hâli günlük ödülün kaydı da yazması yüzünden bozmayı görmüyordu; günlük ödül testte kapatıldı, bozma düştü."
     },
     {
       "id": "DNT-31",

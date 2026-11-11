@@ -58,10 +58,12 @@ def get_player_info(USERID, map_number=0):
     if goster:  # KAR-24: bugünün ödülü verildi; pencere yalnızca bu yanıtla açılır (showDailyBonus kayda yazılmaz)
         ozel = dict(ozel, showDailyBonus=1)
     kayit["playerInfo"]["last_logged_in"] = ts_now
-    if odul:
-        save_session(USERID)  # ödül ve lastDayRewarded hemen kalıcı olsun
-    _acik_kasabalar[str(USERID)] = map_number if 0 <= map_number < len(kayit["maps"]) else 0
-    kayit["playerInfo"]["acik_kasaba"] = _acik_kasabalar[str(USERID)]
+    yeni = map_number if 0 <= map_number < len(kayit["maps"]) else 0
+    _acik_kasabalar[str(USERID)] = yeni
+    kasaba_degisti = kayit["playerInfo"].get("acik_kasaba") != yeni
+    kayit["playerInfo"]["acik_kasaba"] = yeni
+    if odul or kasaba_degisti:
+        save_session(USERID)  # ödül / açık kasaba hemen kalıcı olsun (sunucu bir komuttan önce yeniden başlayabilir)
     return {
         "result": "ok",
         "processed_errors": 0,
