@@ -2120,6 +2120,13 @@ def end_attack(save, a):
     pvp.saldiri_bitir(save, a.liste)
 
 
+
+@komut("end_attack_new")
+def end_attack_new(save, a):
+    """[g, f, w, s, saldırılan, ad, seviye, zaman, kazanan, gönüllü, intikam, kalkan, yüzde*100, xp] - PVPManager/sendEnd."""
+    pvp.yeni_sonuc(save, a.liste)
+
+
 # --- 1.4.07'nin yeni PvP'si (GEC-05; kaynakları oyun/pvp_yeni.py'de) ---
 
 @komut("get_enemy_new")

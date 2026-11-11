@@ -486,17 +486,117 @@ class PvpKomutlari(KomutTesti):
         veri.update(ek)
         self.komut("end_attack", json.dumps(veri), *ek_arg)
 
-    def test_ganimet_saldirana_kurbandan_dusulmez(self):
+    def yeni(self, g=600, f=100, w=400, s=50, kazanan="test", xp=40, hedef="rakip"):
+        """end_attack_new, PVPManager/sendEnd@328-458: [g, f, w, s, attacked_id, ad, seviye, zaman, winnerId
+        (bPlayerWinner ? sessionID : attacked_id), gönüllü, intikam, kalkan, yüzde*100, iXPGained]."""
+        self.komut("end_attack_new", g, f, w, s, hedef, "Test", 10, 2_000_000_000, kazanan, 0, 0, 0, 30, xp)
+
+    def test_yeni_sonuc_ganimeti_verir(self):
+        """1.4.07'de end_attack'ın resources ve honor'u literal 0'dır (Assault$/sendAssaultResults @137-164,
+        @284-287); ganimet ve XP end_attack_new ile gelir. Hedefin elindekinden fazlası verilmez. Onur: config
+        globals HONOR_POINT_PVP_WIN_ATTACK 15 / HONOR_POINT_PVP_LOSE_ATTACK 5."""
+        self.kurban["maps"][0].update(coins=1000, food=500, wood=300, stone=0)
+        self.saldir(resources={"g": 0, "x": 0, "w": 0, "s": 0, "f": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone", "xp")}
+        kaydedilen = []
+        self.pvp.save_session = kaydedilen.append
+        self.yeni()
+        self.assertEqual({k: self.harita[k] - once[k] for k in once},
+                         {"coins": 600, "food": 100, "wood": 300, "stone": 0, "xp": 40})
+        self.assertEqual((self.ps["attacksWon"], self.ps.get("attacksLost", 0), self.ps["honor"]), (1, 0, 15))
+        self.assertEqual(self.ps["attacksSent"][-1]["description"]["resources"],
+                         {"g": 600, "f": 100, "w": 300, "s": 0, "x": 40})
+        # KAR-20 (sahibinin kararı, 11.11.2026): ganimet kurbandan düşülür; 300 isteyen odunun hepsi gider
+        self.assertEqual({k: self.kurban["maps"][0][k] for k in ("coins", "food", "wood", "stone")},
+                         {"coins": 400, "food": 400, "wood": 0, "stone": 0})
+        self.assertEqual(kaydedilen, ["rakip"])
+        self.yeni()  # aynı savaşın ikinci sonucu: verilmez
+        self.assertEqual(self.harita["coins"] - once["coins"], 600)
+
+    def test_yeni_sonuc_kayitsiz_hedefte_sinirli(self):
+        """#50 incelemesi: statik komşu (kayıtlı değil) değişmez ama ganimet yine onun kaynağıyla ve eski
+        end_attack'ın altın tavanıyla (200 × 2 yıkılan + 5 × 100 + 25 = 925) sınırlı; XP de o altından
+        (ceil(925 × 0,05) + 2 + 150). Okunamayan hedeften hiçbir şey alınmaz."""
+        self.kurban["maps"][0].update(coins=50000, food=500, wood=0, stone=0)
+        self.pvp.all_saves_userid = lambda: ["test"]
+        kaydedilen = []
+        self.pvp.save_session = kaydedilen.append
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone", "xp")}
+        self.yeni(g=999999, f=999999, w=999999, s=999999, xp=999999)
+        self.assertEqual({k: self.harita[k] - once[k] for k in once},
+                         {"coins": 925, "food": 500, "wood": 0, "stone": 0, "xp": 47 + 2 + 150})
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], kaydedilen),
+                         (50000, 500, []))
+        del self.kayitlar["rakip"]
+        self.ps["attacksSent"] = []
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = {k: self.harita[k] for k in ("coins", "food", "wood", "stone")}
+        self.yeni(g=999999, f=999999, w=999999, s=999999)
+        self.assertEqual({k: self.harita[k] - once[k] for k in once}, {"coins": 0, "food": 0, "wood": 0, "stone": 0})
+
+    def test_yeni_sonuc_bozuk_sayi_kurbani_bozmaz(self):
+        """#50 incelemesi: "inf" (float'a çevrilir, int'e çevrilemez: OverflowError) gelince kurbandan düşülüp komutun
+        çökmesi olmamalı; bozuk değer 0 sayılır, geçerli olanlar uygulanır."""
+        self.kurban["maps"][0].update(coins=1000, food=500, wood=0, stone=0)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        once = self.harita["coins"]
+        self.yeni(g=100, f="inf", w=0, s=0, xp="inf")
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.harita["coins"] - once),
+                         (900, 500, 100))
+
+    def test_yeni_sonuc_eski_ganimetin_ustune_vermez(self):
+        """#50 incelemesi: end_attack resources.g > 0 ile (eski istemci biçimi) ganimet verdiyse aynı savaşın
+        end_attack_new'i ikinci kez altın, XP ya da kaynak vermez; kurbandan da ikinci kez düşülmez."""
+        self.kurban["maps"][0].update(coins=50000, food=500)
+        self.saldir()  # resources g 500, x 30
+        once = {k: self.harita[k] for k in ("coins", "food", "xp")}
+        self.yeni(g=999999, f=500, w=0, s=0, xp=999999)
+        self.assertEqual({k: self.harita[k] for k in once}, once)
+        self.assertEqual((self.kurban["maps"][0]["coins"], self.kurban["maps"][0]["food"], self.ps["attacksWon"]),
+                         (49500, 500, 1))
+
+    def test_yeni_sonuc_saldirinin_kasabasina(self):
+        """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
+        import copy
+        ikinci = copy.deepcopy(self.harita)
+        ikinci.update(coins=0, xp=0)
+        self.kayit["maps"].append(ikinci)
+        self.kurban["maps"][0].update(coins=1000)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0, attacker={"user_id": "test", "map": 1})
+        ana = self.harita["coins"]
+        self.yeni(g=300, f=0, w=0, s=0, xp=10)
+        self.assertEqual((ikinci["coins"], ikinci["xp"], self.harita["coins"]), (300, 10, ana))
+
+    def test_yeni_sonuc_yenilgi_ve_eslesmeyen(self):
+        self.yeni()  # önce end_attack gelmedi: hiçbir şey verilmez
+        self.assertEqual((self.harita["coins"], self.ps.get("attacksWon", 0)), (50000, 0))
+        self.saldir(resources={"g": 0, "x": 0}, honor=0, win=0)
+        self.yeni(kazanan="rakip", g=0, f=0, w=0, s=0, xp=0)
+        self.assertEqual((self.ps.get("attacksWon", 0), self.ps["attacksLost"], self.ps["honor"]), (0, 1, 5))
+
+    def test_kural_disi_saldiri_ganimetsiz_ama_sayilir(self):
+        self.kurban["privateState"]["shieldEndTime"] = 4_000_000_000  # kalkanlı hedef (KYT-03)
+        self.saldir(resources={"g": 0, "x": 0}, honor=0)
+        self.yeni()
+        self.assertEqual((self.harita["coins"], self.ps["attacksWon"], self.ps.get("honor", 0)), (50000, 1, 0))
+
+    def test_ganimet_kurbandan_saldirana_gecer(self):
+        """KAR-20 (sahibinin kararı, 11.11.2026): PvP ganimeti kurbandan düşülür; elinde olmayan verilmez."""
         self.saldir()
         self.assertEqual(self.harita["coins"], 50500)
         self.assertEqual(self.harita["xp"], 30)
-        self.assertEqual(self.kurban["maps"][0]["coins"], 50000)
+        self.assertEqual(self.kurban["maps"][0]["coins"], 49500)
         self.assertEqual(self.ps["honor"], 4)
         rapor = self.kurban["privateState"]["attacksReceived"][0]
         self.assertEqual(rapor["attacker_id"], "test")
         self.assertEqual(rapor["viewPending"], 1)
         self.assertEqual(rapor["description"]["oponent"]["name"], "Test")
         self.assertEqual(self.ps["attacksSent"][0]["description"]["oponent"]["name"], "Rakip")
+        self.kurban["maps"][0]["coins"] = 120
+        self.ps["attacksSent"] = []
+        self.saldir()  # kurbanda 120 altın var: 500 değil 120 alınır
+        self.assertEqual((self.harita["coins"], self.kurban["maps"][0]["coins"]), (50620, 0))
 
     def test_ganimet_istemci_formuluyle_sinirli(self):
         # 2 birim yıkıldı, kurban seviye 5: en çok 200*2 + 500 + 25 = 925
@@ -529,8 +629,9 @@ class PvpKomutlari(KomutTesti):
 
     def test_kaybedince_savunan_odullenir(self):
         self.saldir(win=0, resources={"g": 0, "x": 0}, resources_victim={"g": 9999})
-        # saldıranın 1 birimi kalıcı öldü -> en çok 20 altın
-        self.assertEqual(self.kurban["maps"][0]["coins"], 50020)
+        # saldıranın satırı [512, 4, 2, 1]: 2 birim öldü (1'i sonra kurtarıldı). İstemci ödülü her ölen için ekler
+        # (Assault$/killed@393-435; recoverPlayerUnits yalnızca FIELD_RECOVERED'ı ayarlar, OYN-17): en çok 2 × 20
+        self.assertEqual(self.kurban["maps"][0]["coins"], 50040)
 
     def test_kalici_kayiplar_haritadan_silinir(self):
         self.harita["items"] += [[512, 1, 1, 0, 0, 0], [512, 2, 2, 0, 0, 0]]

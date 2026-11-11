@@ -159,6 +159,33 @@ def kaynak_ekle(save, kaynak, miktar):
     harita[kaynak] = int(harita.get(kaynak, 0)) + int(miktar)
 
 
+YENI_GUNLUK_SINIRI = 50
+
+
+def yeni_gunluge_ekle(hedef, saldiran, zaman, kazandi, kayip):
+    """1.4.07'nin saldırı günlüğü (privateState.PVPattacksReceived; PlayerStatus/Init okur, PopupAttackLog gösterir):
+    anahtar attackTime olan sözlük. AttackLogItem: name, level, id (saldıran), attackTime (sn), attackWinner
+    (== id ise saldıran kazandı, 'intikam' düğmesi), attackResourcesLost {g, w, f, s}, reply (0 ise düğme görünür;
+    reply_attack 1 yapar). Önce bot akınları yalnızca eski attacksReceived'a yazılıyordu: intikam alınamıyordu."""
+    ps = hedef.setdefault("privateState", {})
+    gunluk = ps.get("PVPattacksReceived")
+    if not isinstance(gunluk, dict):
+        gunluk = ps["PVPattacksReceived"] = {}
+    saldiran_id = str(saldiran.get("playerInfo", {}).get("pid", ""))
+    gunluk[str(int(zaman))] = {
+        "name": saldiran.get("playerInfo", {}).get("name", "Bot"),
+        "level": int(saldiran["maps"][0].get("level", 1)),
+        "id": saldiran_id,
+        "attackTime": int(zaman),
+        "attackWinner": saldiran_id if kazandi else str(hedef.get("playerInfo", {}).get("pid", "")),
+        "attackResourcesLost": {k: int(kayip.get(alan, 0)) for k, alan in
+                                (("g", "coins"), ("w", "wood"), ("f", "food"), ("s", "stone"))},
+        "reply": 0,
+    }
+    for eski in sorted(gunluk, key=lambda k: int(k) if str(k).lstrip("-").isdigit() else 0)[:-YENI_GUNLUK_SINIRI]:
+        del gunluk[eski]
+
+
 def rapor_ekle(hedef, saldiran, veri):
     """Savunanın attacksReceived listesine rapor ekler."""
     ps = hedef.setdefault("privateState", {})
@@ -708,6 +735,8 @@ class Dunya:
             "time": simdi,
         }
         rapor_ekle(hedef, saldiran, rapor)
+        if not hedef.get("playerInfo", {}).get("bot"):  # oyuncu: yeni günlükte görünsün, intikam alınabilsin
+            yeni_gunluge_ekle(hedef, saldiran, simdi, kazandi, ganimet)
         saldiran.setdefault("privateState", {}).setdefault("attacksSent", []).append(
             {"victim_id": str(hedef_id), "time": simdi}
         )
