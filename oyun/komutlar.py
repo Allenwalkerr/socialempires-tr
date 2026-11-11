@@ -233,6 +233,8 @@ def command(USERID, data):
                 save.update(once)
     _gunluge_yaz(USERID, gunluk)
     save_session(USERID)
+    from oyun import yokken
+    yokken.etkinlik_kaydet(USERID, timestamp_now())  # ONR-02: kaydın dışında (komut değişmezleri bozulmasın)
 
 
 def do_command(USERID, cmd, args):

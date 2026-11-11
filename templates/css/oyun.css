@@ -672,3 +672,13 @@ body.oyun-modu.ekran-doldur .oyun-kutusu {
 }
 body.ekran-doldur:not(.oyun-modu) .oyun-kutusu { min-width: 760px; min-height: 600px; }
 body.ekran-doldur .tam-cik { left: auto; right: 8px; }
+
+/* ================= Sen yokken (ONR-02) ================= */
+.yokken { margin-bottom: 10px; }
+.yokken h3 { margin: 0 0 6px; font: 800 15px var(--baslik-yazi); }
+.yokken-liste { list-style: none; margin: 0; padding: 0; }
+.yokken-liste li {
+  display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; margin-bottom: 5px; padding: 3px 4px;
+  border: 7px solid transparent; border-image: var(--kart); font: 700 13px/1.3 var(--metin-yazi); color: var(--murekkep);
+}
+.yokken-liste img { width: 36px; height: 36px; object-fit: contain; }

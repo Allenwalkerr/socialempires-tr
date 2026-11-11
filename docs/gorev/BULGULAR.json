@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "ONR-01",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #58 birleşti (ONR-04). ONR-01 (hız seçici) PR'da; sahibine sorularak birleşir (KAR-19). Sırada ONR-02 ('sen yokken' özeti), ONR-03 (Android bildirimleri); sonra küçük hatalar OYN-11, 12, 13, 15 ve GEC-09 (kabul). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "ONR-02",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 (ONR-01) incelemesi düzeltildi, sahibine sorularak birleşir (KAR-19). ONR-02 ('sen yokken' özeti) hazır, #59 birleşince PR açılır. Sırada ONR-03 (Android bildirimleri); sonra küçük hatalar OYN-11, 12, 13, 15 ve GEC-09 (kabul). Sahibine sorulacak: KYG-04. Sahibinin ayarı: imza sırları için GitHub Environment. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1039,13 +1039,13 @@
       "baslik": "'Sen yokken' özeti: dönüşte yokken olanların listesi",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Sahibi 30.10.2026 'hepsini istiyorum' dedi (KAR-08). Önerinin önceki oturumdaki metni depoda yok; taslak tanım docs/YOL_HARITASI_1407.md §5.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_yokken.py (12 test)",
+      "pr": "#60",
       "onay": null,
-      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları."
+      "notlar": "Uygulamadan önce taslak tanım sahibine onaylatılır (önerinin harfiyen uygulanması kuralı). Görseller yalnızca oyunun kendi dosyaları. 11.11.2026 (KAR-21, KAR-22): Diyar Haberleri panelinin başında 'Sen yokken (süre)' kartları (oyun/yokken.py). Aralık: son komut paketinin zamanı ile şimdi; zaman kayıtta değil SAVES_DIR/son_etkinlik.json'da (kayda yazılınca komut değişmezleri D1/D4 düştü, test gevşetilmedi), dosya en çok dakikada bir yazılır; 15 dakikadan kısa ara özet göstermez. Akınlar privateState.attacksReceived'dan (püskürtülen, kaybedilen altın, savunma ödülü, son 5 akın); biten eğitim barracksQueues'tan (k. birim ts + k × süre; Ruh Karıştırıcı'da sm_training_time); üretimi hazır binalar item[4] + activation'dan (COLLECT_VARIABLE_IDS'te attrs.cp ile COLLECT_MINUTES, ölçeklenmez; doğal kaynak ve adalar sayılmaz); Diyar Haberleri dunya.etkin.olaylar'dan (en çok 8). Resimler: red_shield.png, buildingthumbs/<img_name>.jpg, thumbrey.jpg; kartlar haber şeridinin çerçevesiyle. 20 bozma denemesinin 20'si düştü (ilk turda boştaki değirmen bozması sağ kaldı, test verisi güçlendirildi). Sayfa Chromium'da görüntülendi; ilk görüntüde resimler küçülmüyordu, ayrı liste biçimi verildi. #60 incelemesi (engelleyici değil): ceviri/tr.json her sayfa açılışında okunuyordu; artık yalnızca özet gösterilecekse (ozet'e işlev verilir). Bozma (erken okuma) düştü."
     },
     {
       "id": "ONR-03",
@@ -2047,6 +2047,19 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Tanımlar harfiyen uygulanır (sahibinin kuralı). ONR-04: milli bayram = config/takvim.json bayrak: true (23 Nisan, 19 Mayıs, 30 Ağustos, 29 Ekim)."
+    },
+    {
+      "id": "KAR-22",
+      "baslik": "'Sen yokken' özetinde biten inşaat yerine üretimi hazır binalar",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "1.4.07 bayt kodu (yardımcı ajan okudu, ana oturum özetini denetledi): IsoElement kurucusu inConstruction'ı yalnızca staticData.build_time > 0 ise kurar; StaticData build_time = parseInt(config.build_time). Config'lerde (20120723, 20120826, 4399, config/patch, mods) build_time yok, yani NaN > 0 yanlış: hiçbir bina yüklemede inşaatta değil. Yeni konan binanın 10 sn'lik çubuğu (setGraphicConstruction, FauxBar3) yalnızca görüntü, endConstruction sunucuya komut yollamaz. 'Yokken biten inşaat' hesaplanacak bir şey değil. Üretim ise kayıttan bellidir: Base/processMap collected_at = timestamp − item[4], IsoElement/canCollect collected_at >= activation; COLLECT_VARIABLE_IDS'te süre attrs.cp ile Config.COLLECT_MINUTES. Sahibine iki seçenek soruldu (üretim hazır / inşaatı çıkar): 'Üretim hazır olsun'.",
+      "test": "tests/test_yokken.py: Ozet.test_uretimi_hazir_binalar",
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "? doğrulanmadı: tick@469-1000'de Kereste/Maden ek yapıları varken ağaç, taş ve altın kaynaklarına ek sayaç var gibi; bu yüzden doğal kaynaklar (subcat 125-128) ve adalar (1111) sayılmaz. Zaman ölçeği aralıkta değiştiyse hesap şimdiki ölçeğe göredir."
     }
   ]
 }

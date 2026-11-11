@@ -170,7 +170,7 @@ tek cümleyle onaylatılır.
 | Madde | Öneri | Taslak tanım (onay bekliyor) | o / m / p |
 |---|---|---|---|
 | ONR-01 | Hız seçici | Oyunun hızı (`ayarlar.json` `zaman_olcegi`, şu an elle) sayfadan seçilir. Düğmeler oyunun kendi düğme resimleridir. 1.4.07'nin yeni süreleri de (kuyruk, Soul Mixer) aynı ölçekle bölünür. | 0,5 / 1 / 2 |
-| ONR-02 | "Sen yokken" özeti | Oyuncu döndüğünde, yokken olanların kısa listesi: botların akınları, kazanılan ve kaybedilen, biten inşaat ve eğitim, Diyar Haberleri. Veri imparatorluk günlüğünden ve haber şeridinden gelir, resimler oyunun kendi resimleridir. | 1 / 2 / 3 |
+| ONR-02 | "Sen yokken" özeti | Oyuncu döndüğünde, yokken olanların kısa listesi: botların akınları, kazanılan ve kaybedilen, biten inşaat ve eğitim, Diyar Haberleri. Veri imparatorluk günlüğünden ve haber şeridinden gelir, resimler oyunun kendi resimleridir. Oyunda kendi kendine biten inşaat yok; yerine üretimi hazır binalar (KAR-22). | 1 / 2 / 3 |
 | ONR-03 | Bildirimler | Android'de uygulama kapalıyken yerel bildirim: inşaat, eğitim ya da kuyruk bitti, kalkan bitiyor, saldırıya uğradın. Zamanlar formül defterindeki sürelerden hesaplanır. Simge oyunun kendi simgesidir (`templates/img/simge-192.png`). Bildirim internetsiz çalışır. | 2 / 3 / 5 |
 | ONR-04 | Oyunun Türk birimleri | Oyunun kendi "Turkish Swordsman/Axeman/Archer/Horseman" birimleri (öğe 880, 881, 882, 885; resimleri `880_tk_sword` …) oyunda kullanılabilir olur. Mağazada mı, bayramlarda mı, botlarda mı kullanılacağına sahibi karar verir. | 0,5 / 1 / 2 |
 
