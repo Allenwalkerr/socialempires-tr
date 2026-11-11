@@ -76,7 +76,7 @@ Uygulama kapalıyken ya da arka plandayken telefon şunları bildirir:
 - **Kalkan bitiyor:** kalkanın bitmesine bir saat kala.
 - **Saldırıya uğradın:** uygulama arka plandayken bir bot akın ederse.
 
-İnternet gerekmez. Birbirine 10 dakikadan yakın olaylar tek bildirimde toplanır. Oyunu açınca bekleyen
+İnternet gerekmez. Birbirine 10 dakikadan yakın olaylar tek bildirimde toplanır; bildirim içlerinden sonuncusu hazır olunca gelir. Oyunu açınca bekleyen
 bildirimler kalkar. Android 13 ve sonrasında uygulama ilk açılışta bildirim izni ister. İzni sonradan
 **Ayarlar → Uygulamalar → Social Empires → Bildirimler**'den açıp kapatabilirsiniz.
 

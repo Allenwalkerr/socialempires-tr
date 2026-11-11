@@ -69,15 +69,20 @@ def _metin(grup, ceviriler):
 
 
 def yaklasan(kayit, simdi, ceviriler=None):
-    """[{kimlik, zaman, metin}]: kurulacak bildirimler. GRUP içinde kalan olaylar ilkinin zamanında birleşir."""
-    gruplar = []
+    """[{kimlik, zaman, metin}]: kurulacak bildirimler. Grubun ilk olayından GRUP içinde kalan üretim ve eğitim olayları
+    tek bildirimde birleşir; bildirim grubun SON olayının zamanında gelir, böylece "hazır/bitti" dediği her şey o anda
+    gerçekten hazırdır (#62 incelemesi; en çok GRUP kadar gecikir). Kalkan uyarısı birleşmez, kendi zamanında gelir."""
+    gruplar, kalkanlar = [], []
     for olay in olaylar(kayit, simdi, ceviriler):
-        if gruplar and olay[0] - gruplar[-1][0][0] < GRUP:
+        if olay[1] == "kalkan":
+            kalkanlar.append([olay])
+        elif gruplar and olay[0] - gruplar[-1][0][0] < GRUP:
             gruplar[-1].append(olay)
         else:
             gruplar.append([olay])
-    return [{"kimlik": i + 1, "zaman": grup[0][0], "metin": _metin(grup, ceviriler or {})}
-            for i, grup in enumerate(gruplar[:EN_COK])]
+    hepsi = sorted(gruplar + kalkanlar, key=lambda g: g[-1][0])[:EN_COK]
+    return [{"kimlik": i + 1, "zaman": grup[-1][0], "metin": _metin(grup, ceviriler or {})}
+            for i, grup in enumerate(hepsi)]
 
 
 def android_listesi():

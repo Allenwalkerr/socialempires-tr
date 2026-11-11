@@ -49,13 +49,29 @@ class Yaklasan(unittest.TestCase):
         ])
 
     def test_yakin_olaylar_birlesir(self):
-        """GRUP (10 dk) içindekiler ilkinin zamanında tek bildirim; grup ilk olaydan ölçülür, zincirlenmez
-        (500 ve 1000 sn sonrakiler birbirine 10 dk'dan yakın ama ilkine 1000 sn uzak)."""
+        """GRUP (10 dk) içindekiler tek bildirim; grup ilk olaydan ölçülür, zincirlenmez (500 ve 1000 sn sonrakiler
+        birbirine 10 dk'dan yakın ama ilkine 1000 sn uzak). Bildirim grubun SON olayında gelir: "2 Değirmen I hazır"
+        dediği anda ikisi de hazırdır (#62 incelemesi)."""
         k = kayit(degirmenler=[T0, T0 + 500, T0 + 1000])
         self.assertEqual(bildirim.yaklasan(k, T0, TR), [
-            {"kimlik": 1, "zaman": T0 + 3600, "metin": "Üretim hazır: 2 Değirmen I."},
+            {"kimlik": 1, "zaman": T0 + 4100, "metin": "Üretim hazır: 2 Değirmen I."},
             {"kimlik": 2, "zaman": T0 + 4600, "metin": "Üretim hazır: 1 Değirmen I."},
         ])
+
+    def test_bildirim_aninda_soyledigi_her_sey_hazir(self):
+        """Değirmenler T0+3600, +3720, +4000'de hazır; kuyruk T0+2600 + 2 × 510 = T0+3620'de biter; hepsi ilkinden
+        10 dk içinde: tek bildirim, sonuncusunun anında (T0+4000). Kalkan T0+7400'de biter: uyarı birleşmez, bir saat
+        önce (T0+3800) ayrı gelir; metindeki bitiş T0+7400 = 29.10.2026 23:56 TSİ. Değişmez: bildirim anında saydığı
+        her şey hazırdır."""
+        k = kayit(degirmenler=[T0, T0 + 120, T0 + 400], kuyruk={"ts": T0 + 2600, "amount": 2, "unit": 880},
+                  kalkan=T0 + 7400)
+        sonuc = bildirim.yaklasan(k, T0, TR)
+        self.assertEqual(sonuc, [
+            {"kimlik": 1, "zaman": T0 + 3800, "metin": "Kalkan bitiyor (bitiş 23:56)."},
+            {"kimlik": 2, "zaman": T0 + 4000, "metin": "Üretim hazır: 3 Değirmen I. Eğitim bitti: 2 Türk Kılıççısı."},
+        ])
+        son = sonuc[-1]["zaman"]
+        self.assertTrue(all(z <= son for z, tur, _, _ in bildirim.olaylar(k, T0, TR) if tur != "kalkan"))
 
     def test_gecmis_ve_cok_yakin_olay_kurulmaz_sinir(self):
         k = kayit(degirmenler=[T0 - 4000, T0 - 3600 + bildirim.EN_YAKIN - 1, T0 - 3600 + bildirim.EN_YAKIN])
