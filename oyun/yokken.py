@@ -29,7 +29,7 @@ import os
 import threading
 from datetime import datetime
 
-from oyun import gunluk, yollar
+from oyun import yollar  # gunluk ozet() içinde: oyun.diyar → oyun.sunucu döngüsü (S-46, #62 sinama)
 from oyun.config import get_item_from_id
 from oyun.takvim import TURKIYE
 
@@ -62,6 +62,13 @@ def _yukle():
 def son_etkinlik(uid):
     with _kilit:
         return _yukle().get(str(uid), 0)
+
+
+def son_oyuncu():
+    """En son komut gönderen oyuncunun kimliği (ONR-03: bildirimler onun için), yoksa None."""
+    with _kilit:
+        bellek = _yukle()
+        return max(bellek, key=bellek.get) if bellek else None
 
 
 def etkinlik_kaydet(uid, zaman):
@@ -98,27 +105,30 @@ def sure_yazisi(saniye):
     return " ".join(parcalar) or "1 dakikadan az"
 
 
-def biten_egitimler(kayit, bas, son):
-    """{birim kimliği: adet}: (bas, son] aralığında eğitimi biten birimler."""
+def kuyruklar(kayit):
+    """(birim kimliği, ts, adet, süre): eğitim kuyrukları; k. birim ts + k × süre'de biter."""
     from oyun.komutlar import RUH_KARISTIRICI, egitim_suresi
     binalar = {}
     for harita in kayit.get("maps", []):
         for e in harita.get("items", []):
             if len(e) > 7 and isinstance(e[7], dict) and e[7].get("bq"):
                 binalar[e[7]["bq"]] = e
-    cikti = {}
     for qid, kuyruk in ((kayit.get("privateState") or {}).get("barracksQueues") or {}).items():
         if not isinstance(kuyruk, dict):
             continue
         birim = get_item_from_id(_tam(kuyruk.get("unit"))) or {}
         bina = binalar.get(qid)
         sure = egitim_suresi(birim, bool(bina) and bina[0] == RUH_KARISTIRICI)
-        if sure <= 0:
-            continue
-        ts, adet = _tam(kuyruk.get("ts")), _tam(kuyruk.get("amount"))
+        if sure > 0:
+            yield _tam(kuyruk.get("unit")), _tam(kuyruk.get("ts")), _tam(kuyruk.get("amount")), sure
+
+
+def biten_egitimler(kayit, bas, son):
+    """{birim kimliği: adet}: (bas, son] aralığında eğitimi biten birimler."""
+    cikti = {}
+    for kimlik, ts, adet, sure in kuyruklar(kayit):
         biten = sum(1 for k in range(1, adet + 1) if bas < ts + k * sure <= son)
         if biten:
-            kimlik = _tam(kuyruk.get("unit"))
             cikti[kimlik] = cikti.get(kimlik, 0) + biten
     return cikti
 
@@ -142,11 +152,10 @@ def uretim_suresi(esya, bina, degiskenler):
     return float(f"{sabit / olcek:.6g}") if olcek != 1.0 else sabit
 
 
-def hazir_uretimler(kayit, bas, son):
-    """{bina kimliği: adet}: üretimi (bas, son] aralığında hazır olan binalar (bütün kasabalarda)."""
+def uretimler(kayit):
+    """(bina kimliği, hazır olma anı): üreten binalar, bütün kasabalarda."""
     from oyun.config import get_game_config
     degiskenler = {_tam(i) for i in get_game_config().get("globals", {}).get("COLLECT_VARIABLE_IDS") or []}
-    cikti = {}
     for harita in kayit.get("maps", []):
         for e in harita.get("items", []):
             if not isinstance(e, list) or len(e) < 5:
@@ -155,8 +164,16 @@ def hazir_uretimler(kayit, bas, son):
             if bina.get("type") != "b" or str(bina.get("subcat_functional")) in DOGAL_KAYNAKLAR:
                 continue
             sure = uretim_suresi(e, bina, degiskenler)
-            if sure > 0 and bas < _tam(e[4]) + sure <= son:
-                cikti[_tam(e[0])] = cikti.get(_tam(e[0]), 0) + 1
+            if sure > 0:
+                yield _tam(e[0]), _tam(e[4]) + sure
+
+
+def hazir_uretimler(kayit, bas, son):
+    """{bina kimliği: adet}: üretimi (bas, son] aralığında hazır olan binalar (bütün kasabalarda)."""
+    cikti = {}
+    for kimlik, hazir in uretimler(kayit):
+        if bas < hazir <= son:
+            cikti[kimlik] = cikti.get(kimlik, 0) + 1
     return cikti
 
 
@@ -169,6 +186,7 @@ def ozet(kayit, simdi, bas, olaylar=(), ceviriler=None):
     """Özet sözlüğü ya da None (gösterilecek bir şey yoksa). `bas`: son etkinlik zamanı (son_etkinlik); `olaylar`:
     haber şeridinin olayları; `ceviriler`: ceviri/tr.json'un çevirileri (birim adları için) ya da onları döndüren işlev;
     işlev yalnızca özet gösterilecekse çağrılır (300 KB'lık dosya her sayfa açılışında okunmasın, #60 incelemesi)."""
+    from oyun import gunluk
     bas = _tam(bas)
     if bas <= 0 or simdi - bas < ESIK:
         return None

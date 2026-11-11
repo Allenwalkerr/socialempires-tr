@@ -750,6 +750,9 @@ class Dunya:
         hedef_ad = hedef.get("playerInfo", {}).get("name", hedef_id)
         saldiran_ad = saldiran.get("playerInfo", {}).get("name", saldiran_id)
         toplam = sum(ganimet.values())
+        if not hedef.get("playerInfo", {}).get("bot"):
+            from oyun import bildirim
+            bildirim.saldiri(saldiran_ad, kazandi, toplam)  # ONR-03: uygulama arka plandaysa Android bildirimi
         if kazandi:
             self.olay("savas", f"{saldiran_ad} → {hedef_ad}: kazandı, {toplam} kaynak ganimet")
         else:
