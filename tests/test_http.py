@@ -165,6 +165,27 @@ class HttpDumanTestleri(unittest.TestCase):
         self.assertEqual(gonder("boyle-biri-yok", imza + ';{"commands": []}'), 404)
         self.assertEqual(gonder(UID, imza + ';{"commands": []}'), 200)
 
+    def test_bozuk_girdi_sunucu_hatasi_degil(self):
+        """Denetim SNK-04: bozuk ya da yanlış türde girdi 500 (sunucu hatası) veriyordu; istemci hatasıdır: 400/404,
+        ya da yok sayılan alan. Kayıt değişmez."""
+        import json
+        from oyun.kayit import session
+        once = json.dumps(session(UID), sort_keys=True)
+        yol, imza = f"{BASE}/command.php", "0" * 64
+        for govde in ("[1, 2]", '"x"', '{"commands": "abc"}', '{"commands": 5}'):
+            cevap = self.istemci.post(yol, data={"USERID": UID, "data": imza + ";" + govde})
+            self.assertEqual(cevap.status_code, 400, govde)
+        cevap = self.istemci.post(yol, data={"USERID": UID, "data": imza + ';{"commands": ["buy", 7]}'})
+        self.assertEqual(cevap.status_code, 200)
+        self.assertEqual(json.dumps(session(UID), sort_keys=True), once)
+        self.assertEqual(self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": "kimse-yok"}).status_code, 404)
+        self.assertEqual(self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": UID, "map": "abc"}).status_code, 200)
+        from oyun.kayit import new_village
+        baska = new_village()  # gövde artık geçerli sayılıp işlenir: ortak köyün (UID) sayaçları değişmesin
+        for uc in ("kompu_try.php", "get_up_data.php"):
+            self.assertNotEqual(self.istemci.post(f"{BASE}/{uc}?USERID={baska}", data={"data": "[1]"}).status_code,
+                                500, uc)
+
     def test_yeniden_gonderilen_paket_bir_kez_uygulanir(self):
         """SNK-02 (bağımsız denetim). İstemci CommandManager/sendPacket paketi first_number, commands, tries ile
         yollar; yanıt gelmezse processCommandsTimeout aynı paketi tries + 1 ile yeniden sendPacket eder. Aynı

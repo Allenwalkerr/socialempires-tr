@@ -1852,6 +1852,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Düzeltme: config.mod_listesi (saf, sınanabilir): yorum ve boş satır atlanır, .json soneki ayıklanır, dosya utf-8 okunur; bulunamayan mod uyarı basar. Bozma denemesinde test düştü."
+    },
+    {
+      "id": "DNT-24",
+      "baslik": "Bozuk ya da yanlış türde girdi sunucu hatası (500) veriyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-04 (docs/denetim/sunucu-komutlar.md). Yeni test eski kodda düşüyor: komut gövdesi [1, 2] → 500. Kayıt bozulmuyordu (genel hata işleyicisi), ama istemci hatası sunucu hatası gibi günlüğe düşüyordu.",
+      "test": "tests/test_http.py: test_bozuk_girdi_sunucu_hatasi_degil",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: servis_govdesi sözlük olmayan JSON'da {} döner; map, item_id, level_id güvenli çevrilir; komut paketi sözlük değilse ya da commands liste değilse 400; listedeki sözlük olmayan öğe atlanır; get_player_info bilinmeyen kimlikte 404."
     }
   ]
 }
