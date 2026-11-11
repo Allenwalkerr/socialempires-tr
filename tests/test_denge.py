@@ -310,6 +310,48 @@ class TurnuvaKuralTestleri(unittest.TestCase):
                     self.assertEqual(sum(self.u1["privateState"].get("gifts", [])), 0)
                 self.assertEqual(self.u1["maps"][0]["coins"], coins)  # ADVANCED ödülünde altın yok
 
+    def test_listede_gosterilen_odul_verilen_odul(self):
+        """OYN-15. TournamentManager$/getTournamentRewardIndex: oyuncu turnuvada değilken listede
+        tournament_reward_id[tür] (for-in, anahtar tür kimliğine eşitse), turnuvadayken tournament.reward_id
+        gösterilir; getRewardData prize[o sıra]'yı okur. Katılınca verilecek ödül listede gösterilenle aynı olmalı.
+        Tür 2 (ADVANCED) ödülleri farklı olan iki günde de."""
+        from datetime import date
+        from oyun import takvim
+        tur = self.t.turler()["2"]
+        gorulen = set()
+        for gun in (date(2026, 11, 11), date(2026, 11, 12)):
+            with self.subTest(gun=gun), unittest.mock.patch.object(takvim, "bugun", lambda gun=gun: gun):
+                self.hazirla()
+                liste = self.t.bilgi("u1")["tournament_reward_id"]["2"]
+                self.assertIn(liste, range(len(tur["prize"])))
+                self.t.katil("u1", 2, [512] + [0] * 19)
+                self.assertEqual(self.t._kullanicinin("u1")["reward_id"], liste)
+                self.assertEqual(self.t.bilgi("u1")["tournament"]["reward_id"], liste)
+                gorulen.add(liste)
+        self.assertEqual(len(gorulen), 2)  # ödül günden güne döner (hep ilk ödül değil)
+
+    def test_oyuncu_kaydina_kilitle_yazilir(self):
+        """DPT-05 (DNT-31): turnuva ödülü, Elo ve haftalık ödül oyuncu kaydını save_lock altında yazar; komutlar ve
+        dünya turu aynı kilidi kullanır (oyun/istemci.py command, dunya.tek_tick). Her save_session kilit tutulurken."""
+        class SayanKilit:
+            derinlik = 0
+
+            def __enter__(self):
+                self.derinlik += 1
+
+            def __exit__(self, *_):
+                self.derinlik -= 1
+        kilit, yazimlar = SayanKilit(), []
+        with unittest.mock.patch.object(self.t, "save_lock", kilit), \
+                unittest.mock.patch.object(self.t, "save_session", lambda uid: yazimlar.append((uid, kilit.derinlik))):
+            turnuva = self.kur(tur_id=2)
+            for mac in turnuva["players"][0]["matches"]:
+                self.oyna(mac["victim_id"], "100.00", 60)  # botlar 30 puanda: u1 kazanır, ödül yazılır
+            self.assertEqual(turnuva["winner_id"], "u1")
+            self.t._odul_ver("u1", 861, 1)
+        self.assertGreaterEqual(len(yazimlar), 5)  # 3 maçın Elo'su, turnuva ödülü, haftalık ödül
+        self.assertEqual([y for y in yazimlar if y[1] < 1], [])
+
     def test_terk_eden_kazanamaz(self):
         turnuva = self.kur()
         mac1, mac2, _ = turnuva["players"][0]["matches"]

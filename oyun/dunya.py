@@ -378,11 +378,10 @@ class Dunya:
                 while len(esya) < 8:
                     esya.append([] if len(esya) == 6 else {})
                 isimler = [i.strip() for i in str(bilgi.get("workers", "")).split(",") if i.strip()]
-                esya[7] = {
-                    "workers": gerekli,
-                    "hired": isimler[:gerekli],
-                    "guild": 1,
-                }
+                if not isinstance(esya[7], dict):
+                    esya[7] = {}
+                # DPT-09 (DNT-34): yalnızca işçi alanları; bq (eğitim kuyruğu), cp (üretim seçimi) gibi ötekiler kalır
+                esya[7].update(workers=gerekli, hired=isimler[:gerekli], guild=1)
                 esya[4] = simdi
                 ad = kayit.get("playerInfo", {}).get("name", uid)
                 self.olay("lonca", f"Kardeşlik Loncası, {ad} köyündeki {turkce_ad(esya_id)} için usta işçi gönderdi")
