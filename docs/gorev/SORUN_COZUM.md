@@ -36,6 +36,7 @@ Oturum başında göz gezdirilir. Yeni bir sorunla karşılaşınca ya da bir so
 | S-61 | #43 ile depo köküne ilgisiz `ids.txt` girdi | 5 Kasım'da bir alt ajan dosyayı asıl depoya yazmış; commit `git add -A` ile yapıldı, liste okunmadı | #44'te silindi. Kural: commit'ten önce `git status --short` okunur, dosyalar adlarıyla eklenir | ✔ 10.11.2026 |
 | S-62 | Devir notuna ve `BULGULAR.json`'a yardımcı ajanın model adı yazıldı (CLAUDE.md yasağı) | Sahibinin mesajındaki adı kitaba aynen taşıdım | Otomatik inceleme yakaladı; #44'te "yardımcı ajan" yapıldı. Ayrıca #43 otomatik birleştirmede denetimler bitmeden birleşti (zorunlu denetim yok): PR'ı açmadan önce farkı kendin oku | ✔ 10.11.2026 |
 | S-63 | Denetçi `end_attack`'ın `win: 1` ile sabit gönderildiğini yazdı; bayt kodunda `bPlayerWinner ? 1 : 0` | `abc_okur.cagrilar` simgesel yığında koşullu değeri (iki dal) tek sabite indiriyor | Argümanı koşula bağlı olabilecek bir çağrıyı `cagrilar` çıktısıyla değil gövdenin kendisiyle (`coz`) oku. Denetimin `cagrilar`'a dayanan bulguları yeniden üretilir | ✔ 10.11.2026 |
+| S-64 | #45 bütün denetimleri yeşilken birleşmedi (`mergeable_state: blocked`) | master'ın koruması `required_conversation_resolution: true`: açık inceleme konuşması birleştirmeyi durdurur | Sahibinin onayıyla (11.11.2026) her konuşmaya düzeltmenin commit'i yazılıp kapatıldı; PR kendiliğinden birleşti. Konuşma kapatmak her seferinde sahibine sorulur (S-55) | ✔ 11.11.2026 |
 
 ## Ağ, GitHub ve upstream
 
