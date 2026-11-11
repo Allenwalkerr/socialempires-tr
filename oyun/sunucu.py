@@ -249,7 +249,19 @@ def _oyun_sayfasi(sablon, ruffle_js=None):
                            statik=kok + STATIK_YOL, dinamik=kok + DINAMIK_YOL,
                            rutbe=rutbe(bilgi.get("level", 0)), varlik=STATIK_YOL,
                            xp=_xp_araligi(bilgi), milli_bayram=takvim.milli_bayram(),
-                           hiz=_hiz_bilgisi())
+                           hiz=_hiz_bilgisi(), yokken=_yokken_ozeti(uid))
+
+
+def _yokken_ozeti(uid):
+    """ONR-02: oyuncu yokken olanlar (oyun.yokken); sayfa ilk komuttan önce kurulduğu için son_etkinlik eskidir."""
+    from oyun import dunya, turkce, yokken
+    etkin = dunya.etkin
+    try:
+        return yokken.ozet(kayit_oturumu(uid), timestamp_now(), yokken.son_etkinlik(uid),
+                           list(etkin.olaylar) if etkin else [], turkce.cevirileri_yukle())
+    except Exception:  # özet sayfayı düşürmesin
+        traceback.print_exc()
+        return None
 
 
 def _hiz_bilgisi():

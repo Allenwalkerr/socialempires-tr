@@ -104,6 +104,17 @@
         <aside class="panel panel-haber" aria-labelledby="haber-basligi">
             <h2><span class="serit-baslik" id="haber-basligi">Diyar Haberleri</span></h2>
             <div class="icerik">
+                {% if yokken %}<section class="yokken" aria-labelledby="yokken-basligi">
+                    <h3 id="yokken-basligi">Sen yokken ({{ yokken.sure }})</h3>
+                    <ul class="yokken-liste">
+                        {% if yokken.akin %}<li><img src="{{ V }}externalized/popup_elements/popup_pvp/red_shield.png" alt=""><span>{{ yokken.akin }} akına uğradın, {{ yokken.puskurtulen }} tanesini püskürttün.{% if yokken.kayip %} Kaybedilen: {{ yokken.kayip }} altın.{% endif %}{% if yokken.savunma_odulu %} Savunma ödülü: {{ yokken.savunma_odulu }} altın.{% endif %}</span></li>
+                        {% for a in yokken.akinlar %}<li><img src="{{ V }}externalized/popup_elements/popup_pvp/red_shield.png" alt=""><span>{{ a.tarih }} · {{ a.rakip }}: {% if a.zafer %}püskürtüldü{% if a.altin %}, +{{ a.altin }} altın{% endif %}{% else %}yağmaladı{% if a.altin %}, −{{ a.altin }} altın{% endif %}{% endif %}</span></li>
+                        {% endfor %}{% endif %}{% for e in yokken.egitim %}<li><img src="{% if e.resim %}{{ V }}buildingthumbs/{{ e.resim }}.jpg{% else %}{{ V }}images_new/thumbrey.jpg{% endif %}" alt=""><span>Eğitimi bitti: {{ e.adet }} {{ e.ad }}</span></li>
+                        {% endfor %}{% if yokken.uretim %}<li><img src="{% if yokken.uretim[0].resim %}{{ V }}buildingthumbs/{{ yokken.uretim[0].resim }}.jpg{% else %}{{ V }}images_new/thumbrey.jpg{% endif %}" alt=""><span>Üretimi hazır: {% for u in yokken.uretim %}{{ u.adet }} {{ u.ad }}{{ ", " if not loop.last }}{% endfor %}</span></li>
+                        {% endif %}{% for h in yokken.haberler %}<li><img src="{{ V }}images_new/thumbrey.jpg" alt=""><span>{{ h.saat }} · {{ h.metin }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </section>{% endif %}
                 <div class="etkinlik" id="etkinlik"></div>
                 <div class="panel-arac">
                     <span class="canli">canlı</span>
