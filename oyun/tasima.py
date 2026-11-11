@@ -27,11 +27,14 @@ from oyun.surum import version_name
 
 PORT = 5051
 SURE = 10 * 60
-EN_COK_YANLIS = 10
+EN_COK_YANLIS = 30  # toplam: aşılınca kod geçersiz, gönderim kapanır (tahmin olasılığı 30/10^6)
+ADRES_BASINA_YANLIS = 5  # tek cihaz bunu aşınca yalnızca o reddedilir; tek başına gönderimi kapatamaz (DGV-02)
+KOD_BASLIGI = "X-Tasima-Kodu"  # kod adres satırında değil başlıkta: günlüklere ve ara cihazlara yazılmasın
 ZAMAN_ASIMI = 15
 
 _kilit = threading.Lock()
-_gonderim = {"sunucu": None, "kod": None, "bitis": 0, "yanlis": 0, "gonderilen": 0, "zamanlayici": None}
+_gonderim = {"sunucu": None, "kod": None, "bitis": 0, "yanlis": 0, "gonderilen": 0, "zamanlayici": None,
+             "adres_yanlis": {}}
 
 
 def _oyuncu_kayitlari():
@@ -45,11 +48,17 @@ gonderici = Flask("tasima")
 
 
 def _kod_dogru():
-    kod = request.args.get("kod", "")
+    # Eski sürümlü alıcı kodu ?kod= ile yollar; yenisi yalnızca başlıkla
+    kod = request.headers.get(KOD_BASLIGI) or request.args.get("kod", "")
+    adres = request.remote_addr or "?"
     with _kilit:
+        adres_yanlis = _gonderim.setdefault("adres_yanlis", {})
+        if adres_yanlis.get(adres, 0) >= ADRES_BASINA_YANLIS:
+            return False
         beklenen = _gonderim["kod"]
         if beklenen and time.time() < _gonderim["bitis"] and hmac.compare_digest(kod, beklenen):
             return True
+        adres_yanlis[adres] = adres_yanlis.get(adres, 0) + 1
         _gonderim["yanlis"] += 1
         if _gonderim["yanlis"] < EN_COK_YANLIS:
             return False
@@ -63,14 +72,14 @@ def _kod_dogru():
 @gonderici.route("/liste")
 def gonderici_liste():
     if not _kod_dogru():
-        return {"hata": "kod"}, 403
+        return {"hata": "kod", "baslik": True}, 403  # alıcı: bu gönderici başlığı okur, ?kod= ile yineleme
     return {"imparatorluklar": _oyuncu_kayitlari()}
 
 
 @gonderici.route("/kayit/<uid>")
 def gonderici_kayit(uid):
     if not _kod_dogru():
-        return {"hata": "kod"}, 403
+        return {"hata": "kod", "baslik": True}, 403  # alıcı: bu gönderici başlığı okur, ?kod= ile yineleme
     if uid not in {k["userid"] for k in _oyuncu_kayitlari()}:
         return {"hata": "yok"}, 404
     _gonderim["gonderilen"] += 1
@@ -84,7 +93,8 @@ def gonderimi_baslat():
             sunucu = create_server(gonderici, host="0.0.0.0", port=PORT, threads=2)
             threading.Thread(target=sunucu.run, name="tasima-gonderici", daemon=True).start()
             _gonderim["sunucu"] = sunucu
-        _gonderim.update(kod=f"{secrets.randbelow(10**6):06d}", bitis=time.time() + SURE, yanlis=0, gonderilen=0)
+        _gonderim.update(kod=f"{secrets.randbelow(10**6):06d}", bitis=time.time() + SURE, yanlis=0, gonderilen=0,
+                         adres_yanlis={})
         if _gonderim["zamanlayici"] is not None:
             _gonderim["zamanlayici"].cancel()  # her başlatma 10 dakikalık bir iş parçacığı bırakmasın
         zamanlayici = threading.Timer(SURE, _suresi_doldu, args=(_gonderim["bitis"],))
@@ -147,16 +157,29 @@ class _YonlendirmeYok(urllib.request.HTTPRedirectHandler):
 _ACICI = urllib.request.build_opener(_YonlendirmeYok)
 
 
-def _getir(adres, yol, kod):
-    url = f"http://{_ev_agi_adresi(adres)}:{PORT}{yol}?kod={urllib.request.quote(kod or '')}"
+def _yeni_gonderici(hata):
+    """403 yanıtı bu sürümün göndericisinden mi (gövdede "baslik": true)?"""
     try:
-        with _ACICI.open(url, timeout=ZAMAN_ASIMI) as yanit:
-            return yanit.read(kayit_yedek.EN_BUYUK + 1)
-    except urllib.error.HTTPError as hata:
-        raise TasimaHatasi("kod" if hata.code == 403 else "yok")
-    except (urllib.error.URLError, OSError):
-        raise TasimaHatasi("ulasilamadi")
+        return json.loads(hata.read(1024) or b"{}").get("baslik") is True
+    except (ValueError, OSError, AttributeError):
+        return False
 
+
+def _getir(adres, yol, kod):
+    taban = f"http://{_ev_agi_adresi(adres)}:{PORT}{yol}"
+    istekler = [urllib.request.Request(taban, headers={KOD_BASLIGI: str(kod or "")}),
+                # Bu sürümden önceki gönderici kodu yalnızca ?kod= ile okur (#46 incelemesi): 403'te bir kez o biçimle
+                urllib.request.Request(f"{taban}?kod={urllib.request.quote(str(kod or ''))}")]
+    for sira, istek in enumerate(istekler):
+        try:
+            with _ACICI.open(istek, timeout=ZAMAN_ASIMI) as yanit:
+                return yanit.read(kayit_yedek.EN_BUYUK + 1)
+        except urllib.error.HTTPError as hata:
+            if hata.code == 403 and sira == 0 and not _yeni_gonderici(hata):
+                continue  # yanlış kod yeni göndericide iki kez sayılmasın (#46 incelemesi)
+            raise TasimaHatasi("kod" if hata.code == 403 else "yok")
+        except (urllib.error.URLError, OSError):
+            raise TasimaHatasi("ulasilamadi")
 
 HATALAR = {
     "adres": "Adres, gönderen cihazın ekranındaki 192.168.x.x biçiminde olmalı.",

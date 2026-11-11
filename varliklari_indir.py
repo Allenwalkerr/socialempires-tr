@@ -14,6 +14,7 @@ Kullanım:
     python varliklari_indir.py
 """
 
+import hashlib
 import json
 import os
 import shutil
@@ -69,6 +70,21 @@ def git_ile():
         shutil.rmtree(gecici, ignore_errors=True)
 
 
+def _ozetler():
+    """config/varlik_ozetleri.tsv: sabit commit'in git blob özetleri (ağdan değil depodan)."""
+    with open(os.path.join(KOK, "config", "varlik_ozetleri.tsv"), encoding="utf-8") as f:
+        return dict(s.rstrip("\n").split("\t") for s in f if s.strip() and not s.startswith("#"))
+
+
+def _blob_ozeti(yol):
+    """git hash-object: SHA-1("blob <boyut>\\0" + içerik)."""
+    ozet = hashlib.sha1(b"blob %d\0" % os.path.getsize(yol))
+    with open(yol, "rb") as f:
+        for parca in iter(lambda: f.read(1 << 20), b""):
+            ozet.update(parca)
+    return ozet.hexdigest()
+
+
 def http_ile():
     print("[1/2] Dosya listesi aliniyor...")
     url = f"https://api.github.com/repos/{DEPO}/git/trees/{COMMIT}?recursive=1"
@@ -76,6 +92,7 @@ def http_ile():
         agac = json.load(yanit)
     dosyalar = [o["path"] for o in agac["tree"]
                 if o["type"] == "blob" and o["path"].startswith("assets/")]
+    ozetler = _ozetler()
     print(f"[2/2] {len(dosyalar)} dosya kontrol ediliyor...")
     yeni = 0
     for i, yol in enumerate(dosyalar, 1):
@@ -88,6 +105,9 @@ def http_ile():
         try:
             with urllib.request.urlopen(ham, timeout=60) as yanit, open(gecici, "wb") as f:
                 shutil.copyfileobj(yanit, f)
+            beklenen = ozetler.get(yol[len("assets/"):])
+            if beklenen is None or _blob_ozeti(gecici) != beklenen:  # denetim DGV-04
+                raise OSError("ozet uymuyor ya da dosya sabit listede yok")
             os.replace(gecici, hedef)
             yeni += 1
         except OSError as hata:

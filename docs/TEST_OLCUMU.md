@@ -178,7 +178,7 @@ olcum-ortami\Scripts\python -m pip install -r requirements-test.txt cosmic-ray==
 olcum-ortami\Scripts\python araclar/mutasyon_olc.py --ornek 2000 --tohum 20261105 --isci 14 --cikti olcum
 ```
 
-Yalnızca işlenmiş (commit'li) kod ölçülür. 16 çekirdekli makinede 14 işçiyle yaklaşık 1,5 saat sürer. Kalan
+Yalnızca işlenmiş (commit'li) kod ölçülür. 16 çekirdekli makinede 14 işçiyle yaklaşık 1,5 saat, 4 çekirdekli bulutta 3 işçiyle 82 dakika sürer. Kalan
 mutantlar farklarıyla `olcum/kalanlar.txt`'ye yazılır. Aynı tohum aynı örneklemi seçer; iki ölçüm arasında kod
 değiştiyse mutant listesi de değişir, karşılaştırma oran üzerinden yapılır.
 
@@ -191,3 +191,45 @@ değiştiyse mutant listesi de değişir, karşılaştırma oran üzerinden yap�
 - Beklenen değerin kaynağı yazılır: istemcinin bayt kodu (yöntem adıyla), belge, config ya da değişmez.
 - Uygulamanın kendi çıktısı ya da kendi formülü beklenen değer yapılmaz.
 - Sıra, kasaba ve koordinat gibi karışabilecek değerler birbirinden farklı seçilir (x ≠ y, iki kasaba).
+
+## 12. Zayıf alanlardan sonra (TST-04)
+
+Kod: `da09896` (#39'un kaynaklı testleri: `test_denge`, `test_swf_yama`, `test_dunya`; üstüne #40, OYN-14). Aynı araç,
+aynı tohum (`20261105`), aynı örneklem büyüklüğü (2000), aynı kapsam kuralı. Bulut oturumu: 4 çekirdek, 3 işçi,
+82 dakika. Mutant 16 452 (önce 16 142). Satır kapsamı %89 (5053/5675 satır, 1518/1904 dal; önce %76).
+
+| Modül | n | Öldü | Kaldı | Kapsam dışı | Öldürme oranı (%95) | §9 | z | p |
+|---|---:|---:|---:|---:|---|---|---:|---|
+| komutlar | 526 | 320 | 180 | 26 | %60,8 [56,6; 64,9] | %62,4 | −0,52 | 0,6 |
+| dunya | 292 | 205 | 83 | 4 | %70,2 [64,7; 75,2] | %22,5 | 11,3 | < 0,001 |
+| swf_font | 277 | 261 | 16 | 0 | %94,2 [90,8; 96,4] | %28,6 | 15,3 | < 0,001 |
+| swf_yama | 115 | 107 | 7 | 1 | %93,0 [86,9; 96,4] | %23,7 | 11,3 | < 0,001 |
+| istemci | 96 | 57 | 25 | 14 | %59,4 [49,4; 68,7] | %58,1 | 0,17 | 0,87 |
+| fx_yama | 71 | 39 | 23 | 9 | %54,9 [43,4; 66,0] | %66,3 | −1,48 | 0,14 |
+| pvp | 65 | 45 | 19 | 1 | %69,2 [57,2; 79,1] | %62,7 | 0,79 | 0,43 |
+| turnuva | 60 | 38 | 22 | 0 | %63,3 [50,7; 74,4] | %37,5 | 2,78 | 0,005 |
+| kayit | 45 | 24 | 17 | 4 | %53,3 [39,1; 67,1] | %61,2 | −0,77 | 0,44 |
+| elo | 35 | 27 | 8 | 0 | %77,1 [61,0; 87,9] | %68,3 | 0,86 | 0,39 |
+| diğer 25 modül | 418 | 213 | 134 | 71 | %51,0 [46,2; 55,7] | %54,0 | −0,88 | 0,38 |
+| **Toplam** | **2000** | **1336** | **534** | **130** | **%66,8 [64,7; 68,8]** | **%47,8** | **12,2** | **< 0,001** |
+
+Yalnızca kapsanan satırlarda: 1336/1870 = **%71,4 [69,4; 73,4]** (önce %59,6; z ≈ 7,3, p < 0,001).
+
+Okuma:
+
+- **Toplam** 19 puan arttı (iki bağımsız örneklemin oran farkı sınaması, z ≈ 12,2). Artışın hemen hepsi TST-04'ün
+  hedeflediği üç modülden: `swf_font` ve `swf_yama` %25 civarından %93'ün üstüne, `dunya` %22,5'ten %70'e. `turnuva`
+  da anlamlı arttı (z ≈ 2,8); `test_denge` onun sabitlerini de sınıyor.
+- Öteki modüllerdeki farklar aralıkların içinde; örneklem gürültüsünden ayırt edilemez. `fx_yama` ve `kayit`'teki düşüş
+  de anlamlı değil (p 0,14 ve 0,44).
+- **Kapsanan satırlarda da arttı** (%59,6 → %71,4). §9'dakinin tersine artış yalnızca hiç çalışmayan kodun artık
+  çalışmasından gelmiyor: kaynaklı testler davranışı sınıyor. Kapsam dışı mutant 397 → 130.
+- Kalan 534 mutantın türleri: sayı değiştirme 215, ikili işlem 138, karşılaştırma 98, tekli işlem 27, `not` ekleme 18,
+  `or`/`and` 16, `True`/`False` 16, döngü 6. Modüle göre: komutlar 180, dunya 83, istemci 25, fx_yama 23, turnuva 22.
+  Sayı değiştirmelerin çoğu kaynağı olmayan denge sabitleri (TST-04 notu, sahibinin kararı) ve varsayılan değerler;
+  tek tek okunmadı.
+- Ölçüm #39'un tek başına etkisi değil: `da09896` #40'ı da (OYN-14, 9 test) içerir. #40 `config`, `dunya`, `komutlar`,
+  `hile` ve `sunucu`'nun seviye yollarına dokunur; `dunya`'daki artışın küçük bir payı oradan gelebilir (ayrılmadı).
+
+Not: aynı ölçüm daha önce iki kez yarıda kaldı (6.11'de 350/1873'te bilerek, 10.11'de 450/1872'de konteyner yeniden
+başladığı için; S-56, S-60). Yarım ölçümler sonuç sayılmadı.

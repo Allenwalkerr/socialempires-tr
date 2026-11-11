@@ -121,14 +121,38 @@ class EsyaKomutlari(KomutTesti):
 
 class Kaynaklar(KomutTesti):
     def test_kaynak_ve_nakit_eksiye_dusmez(self):
+        """Eksiye düşmez; sahibinin kararı KAR-18 (11.11.2026): bedel bakiyeyi aşarsa reddedilir (önce 0'a
+        kıskaçlanıyordu, bu bedava alım demekti)."""
+        from oyun.ekonomi import Yetersiz
         self.kayit["playerInfo"]["cash"] = 5
-        self.komutlar.cash_ekle(self.kayit, -8)
-        self.komutlar.kaynak_ekle(self.kayit, self.harita, "w", -5000)
         self.ps["mana"] = 2
-        self.komutlar.kaynak_ekle(self.kayit, self.harita, "m", -3)
-        self.assertEqual((self.cash, self.harita["wood"], self.ps["mana"]), (0, 0, 0))
+        for yap in (lambda: self.komutlar.cash_ekle(self.kayit, -8),
+                    lambda: self.komutlar.kaynak_ekle(self.kayit, self.harita, "w", -5000),
+                    lambda: self.komutlar.kaynak_ekle(self.kayit, self.harita, "m", -3)):
+            with self.assertRaises(Yetersiz):
+                yap()
+        self.assertEqual((self.cash, self.harita["wood"], self.ps["mana"]), (5, 1000, 2))
+        self.komutlar.cash_ekle(self.kayit, -5)  # tam bakiye yeter
         self.komutlar.kaynak_ekle(self.kayit, self.harita, "c", 7)
         self.assertEqual(self.cash, 7)
+
+    def test_yetersiz_alim_uygulanmaz(self):
+        """KAR-18: bedeli karşılanamayan buy kayda girmez; paketteki öteki komutlar uygulanır. Eksi fiyat çarpanı
+        (denetim EKF-03: kaynak yaratıyordu) da reddedilir. Config: 1 (House I) 30 odun."""
+        from oyun.config import get_item_from_id
+        ev = get_item_from_id(1)
+        self.assertEqual((ev["cost_type"], int(ev["cost"])), ("w", 30))
+        self.harita["wood"] = 20
+        esya = len(self.harita["items"])
+        self.komutlar.command("test", {"commands": [
+            {"cmd": "buy", "args": [1, 30, 30, 0, 0, 0, 1, 0]},  # 30 odun, 20 var
+            {"cmd": "buy", "args": [1, 31, 31, 0, 0, 0, -5, 0]},  # eksi çarpan
+            {"cmd": "buy", "args": [1, 32, 32, 0, 0, 0, -0.05, 0]},  # satış iadesinin çarpanı (#46 incelemesi)
+            {"cmd": "rt_publish_score", "args": [7]}]})
+        self.assertEqual((self.harita["wood"], len(self.harita["items"]), self.harita["xp"]), (20, esya, 7))
+        self.harita["wood"] = 30
+        self.komutlar.command("test", {"commands": [{"cmd": "buy", "args": [1, 30, 30, 0, 0, 0, 1, 0]}]})
+        self.assertEqual((self.harita["wood"], len(self.harita["items"])), (0, esya + 1))
 
 
 class UretimKomutlari(KomutTesti):

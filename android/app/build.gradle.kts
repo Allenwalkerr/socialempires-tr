@@ -63,9 +63,17 @@ chaquopy {
     defaultConfig {
         version = "3.11"
         pip {
-            install("flask")
-            install("waitress")
-            install("jsonpatch")
+            // requirements.txt ile aynı sürümler (DGV-08); brotli Android'de yok (gzip yeter)
+            install("flask==3.1.3")
+            install("waitress==3.0.2")
+            install("jsonpatch==1.43")
+            install("blinker==1.9.0")
+            install("click==8.5.0")
+            install("itsdangerous==2.2.0")
+            install("Jinja2==3.1.6")
+            install("jsonpointer==3.9")
+            install("MarkupSafe==3.0.3")
+            install("Werkzeug==3.1.9")
         }
     }
     sourceSets {

@@ -15,13 +15,13 @@ import math
 import os
 import traceback
 
-from oyun import pvp
+from oyun import gunlukler, pvp
 from oyun.config import (en_yuksek_seviye, get_game_config, get_item_from_id, get_item_from_subcat_functional,
                          get_level_from_xp, get_xp_from_level)
-from oyun.ekonomi import apply_collect, apply_collect_xp, apply_cost, timestamp_now
+from oyun.ekonomi import Yetersiz, apply_collect, apply_collect_xp, apply_cost, bakiyeden_dus, timestamp_now
 from oyun.kayit import all_saves_userid, neighbor_session, save_session, session
 from oyun.oyuncu import acik_kasaba
-from oyun.yollar import SAVES_DIR, VILLAGES_DIR
+from oyun.yollar import VILLAGES_DIR
 from oyun.zaman import zaman_olcegi
 
 KOMUTLAR = {}
@@ -120,8 +120,8 @@ def ozellikler(esya):
 
 
 def cash_ekle(save, miktar):
-    pi = save["playerInfo"]
-    pi["cash"] = max(0, int(pi.get("cash", 0)) + int(miktar))
+    """Eksi miktar bedeldir: bakiyeyi aşarsa Yetersiz (KAR-18), komut uygulanmaz."""
+    bakiyeden_dus(save["playerInfo"], "cash", -int(miktar))
 
 
 def kaynak_ekle(save, h, tur, miktar):
@@ -130,11 +130,9 @@ def kaynak_ekle(save, h, tur, miktar):
     if tur == "c":
         cash_ekle(save, miktar)
     elif tur == "m":
-        ps = save["privateState"]
-        ps["mana"] = max(0, int(ps.get("mana", 0)) + miktar)
+        bakiyeden_dus(save["privateState"], "mana", -miktar)
     elif tur in KAYNAK_ALANI:
-        alan = KAYNAK_ALANI[tur]
-        h[alan] = max(0, int(h.get(alan, 0)) + miktar)
+        bakiyeden_dus(h, KAYNAK_ALANI[tur], -miktar)
 
 
 def depo_ekle(save, esya_id, adet=1):
@@ -162,8 +160,9 @@ def depo_cikar(save, esya_id):
 def satis_iadesi(save, h, esya_id):
     """Satılan eşyanın %5'i iade edilir (cash ile alınanlar hariç)."""
     esya = get_item_from_id(esya_id)
-    if esya and esya.get("cost_type") != "c":
-        apply_cost(save["playerInfo"], h, esya_id, -0.05)
+    alan = KAYNAK_ALANI.get((esya or {}).get("cost_type"))
+    if alan:
+        bakiyeden_dus(h, alan, -int(0.05 * int(esya.get("cost") or 0)))
 
 
 def listeye_ekle(kap, anahtar, deger):
@@ -183,16 +182,41 @@ def globals_():
 # Ana döngü
 # ---------------------------------------------------------------------------
 
+# Son uygulanan paket: {kimlik: (first_number, komutların JSON'u)}. İstemci yanıtı zamanında alamazsa aynı paketi
+# aynı first_number ile, tries'ı artırarak yeniden yollar (CommandManager/processCommandsTimeout → sendPacket);
+# ikinci kez uygulanırsa bina, bedel ve ödül çifte yazılır (SNK-02). Bellekte: oturum başında istemcinin sayacı
+# yeniden başladığından diske yazılmaz.
+_SON_PAKET = {}
+
+
+def paket_gecmisini_sil(USERID):
+    """Oyuncu kendi köyünü yeniden yükledi: istemcinin paket sayacı baştan başlar."""
+    _SON_PAKET.pop(USERID, None)
+
+
 def command(USERID, data):
+    paket = (data.get("first_number"), json.dumps(data.get("commands", []), sort_keys=True))
+    if paket[0] is not None and _SON_PAKET.get(USERID) == paket:
+        print(f" * Ayni komut paketi yeniden geldi (first_number={paket[0]}, tries={data.get('tries')}), uygulanmadi")
+        return
+    _SON_PAKET[USERID] = paket
     gunluk = []
     save = session(USERID)
     for komut_verisi in data.get("commands", []):
         cmd = komut_verisi.get("cmd")
         args = komut_verisi.get("args", [])
-        gunluk.append((cmd, args))
+        gunluk.append([cmd, args, None])
         once = copy.deepcopy(save) if isinstance(save, dict) else None
         try:
             do_command(USERID, cmd, args)
+        except Yetersiz as neden:
+            # KAR-18: bedel karşılanamıyor; komut uygulanmaz. İstemci normalde göndermez (kendisi denetler):
+            # buraya düşmesi sunucu ile istemcinin bakiyesinin ayrıştığını gösterir, günlüğe yazılır.
+            print(f" ! YETERSIZ KAYNAK, uygulanmadi: {cmd} args={args} ({neden})")
+            gunluk[-1][2] = f"yetersiz: {neden}"
+            if once is not None:
+                save.clear()
+                save.update(once)
         except Exception:
             # Bozuk tek bir komut aynı paketteki diğerlerini düşürmesin; yarım bıraktığı değişiklik de kalmasın
             # (ör. nakit düşüp eşya verilmeden hata). Komşu kayıtlarına yazılan geri alınmaz.
@@ -219,15 +243,16 @@ def _gunluge_yaz(USERID, komutlar):
     """Paketteki komutları saves/komut_gunlugu.jsonl'a yazar (hata ayıklama)."""
     if not komutlar:
         return
-    try:
-        os.makedirs(SAVES_DIR, exist_ok=True)
-        simdi = timestamp_now()
-        with open(os.path.join(SAVES_DIR, "komut_gunlugu.jsonl"), "a", encoding="utf-8") as f:
-            for cmd, args in komutlar:
-                f.write(json.dumps({"ts": simdi, "user": str(USERID), "cmd": cmd, "args": args},
-                                   ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    simdi = timestamp_now()
+    for cmd, args, red in komutlar:
+        satir = {"ts": simdi, "user": str(USERID), "cmd": cmd, "args": args}
+        if red:
+            satir["red"] = red
+        metin = json.dumps(satir, ensure_ascii=False)
+        if len(metin) >= gunlukler.SATIR_SINIRI:  # uzun argüman kısaltılır; satır geçerli JSON kalır (#46 incelemesi)
+            satir["args"] = f"[kesildi: {len(metin)} karakter]"
+            metin = json.dumps(satir, ensure_ascii=False)
+        gunlukler.ekle("komut_gunlugu.jsonl", metin + "\n")  # sınır her komuta ayrı
 
 
 # ---------------------------------------------------------------------------
@@ -332,14 +357,14 @@ def sell_gift(save, a):
 @komut("buy_stored_item_cash")
 def buy_stored_item_cash(save, a):
     """[kasaba, id, cash]"""
-    cash_ekle(save, -a.tam(2))
+    cash_ekle(save, -max(0, a.tam(2)))
     depo_ekle(save, a.tam(1))
 
 
 @komut("add_items_store")
 def add_items_store(save, a):
     """[json id listesi, cash]"""
-    cash_ekle(save, -a.tam(1))
+    cash_ekle(save, -max(0, a.tam(1)))
     for esya_id in a.json(0, []) or []:
         depo_ekle(save, int(esya_id))
 
@@ -455,7 +480,7 @@ def collect_new(save, a):
     carpan = max(1, min(a.tam(5, 1), 10))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
     apply_collect(save["playerInfo"], h, esya_id, carpan, toplama_miktari(esya, esya_id, carpan, a.tam(4, 0)))
-    cash_ekle(save, -a.tam(6))
+    cash_ekle(save, -max(0, a.tam(6)))
     if esya and len(esya) > 4:
         esya[4] = timestamp_now()
 
@@ -1292,7 +1317,7 @@ def buy_super_offer_pack(save, a):
     for parca in a.metin(2).split(","):
         if parca.strip().isdigit():
             depo_ekle(save, int(parca))
-    cash_ekle(save, -a.tam(3))
+    cash_ekle(save, -max(0, a.tam(3)))
 
 
 # İlk alım teklifi (PopupFirstBuy, KYT-02). Teklif penceresi ilk açıldığında firstPurchaseTimestamp konur;
@@ -1394,7 +1419,7 @@ def end_survival(save, a):
 @komut("add_survival_vida_extra")
 def add_survival_vida_extra(save, a):
     """[cash]"""
-    cash_ekle(save, -a.tam(0))
+    cash_ekle(save, -max(0, a.tam(0)))
     ps = save["privateState"]
     ps["survivalVidasExtra"] = int(ps.get("survivalVidasExtra", 0)) + 1
 
@@ -1402,7 +1427,7 @@ def add_survival_vida_extra(save, a):
 @komut("buy_survival_map")
 def buy_survival_map(save, a):
     """[harita_id, cash]"""
-    cash_ekle(save, -a.tam(1))
+    cash_ekle(save, -max(0, a.tam(1)))
     save["privateState"].setdefault("survivalMaps", {})[a.metin(0)] = {"ts": 0, "tp": 0}
 
 
@@ -1605,14 +1630,14 @@ def next_monster(save, a):
 @komut("buy_step_cash")
 def buy_step_cash(save, a):
     """[cash]"""
-    cash_ekle(save, -a.tam(0))
+    cash_ekle(save, -max(0, a.tam(0)))
     save["privateState"]["timeStampTakeCare"] = -1
 
 
 @komut("buy_monster_step_cash")
 def buy_monster_step_cash(save, a):
     """[cash]"""
-    cash_ekle(save, -a.tam(0))
+    cash_ekle(save, -max(0, a.tam(0)))
     save["privateState"]["timeStampTakeCareMonster"] = -1
 
 
@@ -1624,7 +1649,7 @@ def finish_dragon_help(save, a):
 @komut("rider_buy_step_cash")
 def rider_buy_step_cash(save, a):
     """[cash]"""
-    cash_ekle(save, -a.tam(0))
+    cash_ekle(save, -max(0, a.tam(0)))
     save["privateState"]["riderTimeStamp"] = -1
 
 
@@ -1660,7 +1685,7 @@ def next_temple_step(save, a):
 @komut("buy_temple_step_cash")
 def buy_temple_step_cash(save, a):
     """[cash]"""
-    cash_ekle(save, -a.tam(0))
+    cash_ekle(save, -max(0, a.tam(0)))
     save["privateState"]["timeStampTemple"] = 0
 
 
@@ -1858,7 +1883,7 @@ def finish_collection(save, a):
     collections[c][0] == 1'den kurulur, Base/processAttacks) ve sıfırdan büyük her parça bir azalır."""
     c = a.tam(0)
     if a.tam(1) == 1:
-        cash_ekle(save, -a.tam(2))
+        cash_ekle(save, -max(0, a.tam(2)))
     odul = KOLEKSIYON_ODULU.get(c)
     if odul is None:
         return

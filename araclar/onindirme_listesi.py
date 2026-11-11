@@ -32,6 +32,7 @@ sys.path.insert(0, KOK)
 
 from oyun.kaynaklar import COMMIT, DEPO_URL as DEPO, HAM_KOK as HAM, ISTEMCI_YOLU  # noqa: E402
 CIKTI = os.path.join(KOK, "config", "onindirme.tsv")
+OZETLER = os.path.join(KOK, "config", "varlik_ozetleri.tsv")
 OYUN_DOSYALARI = {"flash/SELoader.swf", ISTEMCI_YOLU}
 
 
@@ -40,8 +41,16 @@ def arsiv_dosyalari():
     with tempfile.TemporaryDirectory(prefix="se-liste-") as gecici:
         for komut in (["init", "-q"], ["fetch", "-q", "--depth", "1", "--filter=blob:none", DEPO, COMMIT]):
             subprocess.run(["git", "-C", gecici, *komut], check=True)
-        adlar = subprocess.run(["git", "-C", gecici, "ls-tree", "-r", "--name-only", "FETCH_HEAD", "assets"],
-                               check=True, capture_output=True, text=True).stdout.split("\n")
+        agac = subprocess.run(["git", "-C", gecici, "ls-tree", "-r", "FETCH_HEAD", "assets"],
+                              check=True, capture_output=True, text=True).stdout.splitlines()
+    # "<kip> blob <özet>\t<yol>": git blob özeti içerik indirilmeden gelir; sunucu indirdiğini bununla denetler
+    # (oyun/varliklar.py, denetim DGV-04)
+    ozetler = sorted((y[len("assets/"):], ust.split()[2]) for ust, y in (s.split("\t", 1) for s in agac))
+    with open(OZETLER, "w", encoding="utf-8", newline="\n") as f:
+        f.write(f"# Varlıkların git blob özetleri (SHA-1, AcidCaos/socialemperors@{COMMIT} assets/). "
+                "araclar/onindirme_listesi.py üretir. yol<TAB>özet\n")
+        f.writelines(f"{y}\t{o}\n" for y, o in ozetler)
+    adlar = ["assets/" + y for y, _ in ozetler]
 
     def boyut(yol):
         istek = urllib.request.Request(HAM + urllib.parse.quote(yol), method="HEAD")

@@ -11,6 +11,7 @@ from oyun import kayit, tasima
 from oyun import sunucu as server
 
 KOD = "123456"
+GERCEK_GETIR = tasima._getir  # setUp sahtesiyle değiştirir; gerçek alıcıyı sınayan testler bunu çağırır
 
 
 class Tasima(unittest.TestCase):
@@ -18,7 +19,7 @@ class Tasima(unittest.TestCase):
         self.uid = kayit.new_village()
         self.gonderen = tasima.gonderici.test_client()
         self.istemci = server.app.test_client()
-        tasima._gonderim.update(kod=KOD, bitis=tasima.time.time() + 60, yanlis=0, gonderilen=0)
+        tasima._gonderim.update(kod=KOD, bitis=tasima.time.time() + 60, yanlis=0, gonderilen=0, adres_yanlis={})
 
         def getir(adres, yol, kod):
             tasima._ev_agi_adresi(adres)
@@ -48,6 +49,77 @@ class Tasima(unittest.TestCase):
         self.assertFalse(uidler & set(botlar))
         if botlar:
             self.assertEqual(self.gonderen.get(f"/kayit/{botlar[0]}?kod={KOD}").status_code, 404)
+
+    def test_kod_basliktan_okunur(self):
+        """Denetim DGV-02: kod adres satırında (günlüklere yazılır) değil başlıkta gider."""
+        self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD}).status_code, 200)
+        self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: "000000"}).status_code, 403)
+
+    def test_alici_kodu_baslikla_yollar(self):
+        giden = []
+
+        class Yanit:
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+            def read(self, n):
+                return b"{}"
+        with mock.patch.object(tasima._ACICI, "open", lambda istek, timeout=None: giden.append(istek) or Yanit()):
+            GERCEK_GETIR("192.168.1.20", "/liste", KOD)
+        self.assertNotIn("kod", giden[0].full_url)
+        self.assertEqual(giden[0].get_header(tasima.KOD_BASLIGI.capitalize()), KOD)
+
+    def test_eski_gondericiden_de_alinir(self):
+        """#46 incelemesi: bu sürümden önceki gönderici kodu yalnızca ?kod= ile okur; yeni alıcı 403'te o biçimle
+        bir kez yineler. Yeni gönderici başlıkla ilk istekte yanıt verir (adres satırına kod düşmez)."""
+        import io
+        giden = []
+
+        def eski_gonderici(istek, timeout=None):
+            giden.append(istek.full_url)
+            if "kod=" + KOD not in istek.full_url:
+                raise tasima.urllib.error.HTTPError(istek.full_url, 403, "kod", {}, io.BytesIO(b""))
+            return io.BytesIO(b"{}")
+        with mock.patch.object(tasima._ACICI, "open", eski_gonderici):
+            self.assertEqual(GERCEK_GETIR("192.168.1.20", "/liste", KOD), b"{}")
+        self.assertEqual(len(giden), 2)
+        giden.clear()
+        with mock.patch.object(tasima._ACICI, "open", lambda istek, timeout=None: giden.append(istek.full_url)
+                               or io.BytesIO(b"{}")):
+            GERCEK_GETIR("192.168.1.20", "/liste", KOD)
+        self.assertEqual(giden, ["http://192.168.1.20:5051/liste"])
+
+    def test_yeni_gondericide_yanlis_kod_bir_kez_sayilir(self):
+        """#46 incelemesi: iki taraf da yeniyken yanlış kod ?kod= ile yinelenmez; sayaç 1 artar."""
+        import io
+        giden = []
+
+        def yeni_gonderici(istek, timeout=None):
+            giden.append(istek.full_url)
+            yanit = self.gonderen.get(istek.full_url.split(":5051", 1)[1],
+                                      headers={k: v for k, v in istek.header_items()})
+            if yanit.status_code != 200:
+                raise tasima.urllib.error.HTTPError(istek.full_url, yanit.status_code, "", {}, io.BytesIO(yanit.data))
+            return io.BytesIO(yanit.data)
+        with mock.patch.object(tasima._ACICI, "open", yeni_gonderici):
+            with self.assertRaises(tasima.TasimaHatasi):
+                GERCEK_GETIR("192.168.1.20", "/liste", "000000")
+            self.assertEqual((len(giden), tasima._gonderim["yanlis"]), (1, 1))
+            self.assertIn(self.uid, GERCEK_GETIR("192.168.1.20", "/liste", KOD).decode())
+
+    def test_tek_cihaz_gonderimi_kapatamaz(self):
+        """DGV-02: yanlış denemeler adres başına sayılır; bir cihaz 5 yanlıştan sonra yalnızca kendisi reddedilir."""
+        kotu, iyi = {"REMOTE_ADDR": "192.168.1.66"}, {"REMOTE_ADDR": "192.168.1.30"}
+        with mock.patch.object(tasima, "gonderimi_durdur") as durdur:
+            for _ in range(40):
+                self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: "999999"}, environ_base=kotu)
+            self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD},
+                                               environ_base=kotu).status_code, 403)
+            self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD},
+                                               environ_base=iyi).status_code, 200)
+        self.assertFalse(durdur.called)
+        self.assertEqual(tasima._gonderim["yanlis"], tasima.ADRES_BASINA_YANLIS)
 
     def test_cok_yanlis_kod_gonderimi_kapatir(self):
         with mock.patch.object(tasima, "gonderimi_durdur") as durdur, mock.patch.object(tasima, "EN_COK_YANLIS", 3):

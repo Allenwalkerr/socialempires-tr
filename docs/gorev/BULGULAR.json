@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "GEC-04",
-    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan. GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı yardımcı ajanda; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
+    "madde": "KAR-13",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #46 (güvenlik, denetim, ölçüm §12) sahibinin onayıyla, commit metni elle yazılarak birleşecek (S-65). Sonra: sahibinin ayarı (imza sırlarını yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak; yapılınca android.yml'e environment satırı eklenir); denetimin denenmemiş 24 bulgusu (docs/DENETIM.md; öne: EKF-02 çiftlik odunu, SNK-03, KYG-04); GEC-05 (PvP); GEC-06 (Türkçe, TRA-01 hedef metinleri). Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -857,11 +857,11 @@
       "baslik": "Kayıt: ~30 yeni alan, şema ve değişmezlikli göç",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. 10.11.2026: kabul kapısı testle: tests/test_kayit_gocu.py gerçek biçimli 5 köy (villages/, sürümsüz) ve en küçük kaydın 1.4.07 öncesi 7 sürümü (0.01a..0.07a; depo ve mezarlık dolu) bütün yükleme yolundan geçer: I(g(s)) = I(s) (belgedeki 12 değer), g(g(s)) = g(s) (ikinci yükleme kaydı ve dosyayı değiştirmez, .bak'ı ezmez), geri dönüş (.bak eski dosyanın baytları, göç öncesi yedek eski kaydın kendisi). 7 bozmanın 7'si düştü. Değişmezlik testi bir hata buldu: KYT-05.",
       "test": "tests/test_kayit_gocu.py; tests/test_kayit_semasi.py; tests/test_gorev_gocu.py",
-      "pr": null,
+      "pr": "#43",
       "onay": null,
       "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi. 10.11.2026: geri dönüş testi yazıldı; kabul kapısının üç koşulu testte."
     },
@@ -1305,7 +1305,7 @@
       "test": null,
       "pr": null,
       "onay": "Sahibi, 31 Ekim 2026",
-      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor)."
+      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor). 11.11.2026: altı alanın raporu tamam (docs/denetim/, özet docs/DENETIM.md). Güvenlik bulguları DNT-13..DNT-18 ile düzeltildi."
     },
     {
       "id": "KAR-14",
@@ -1396,7 +1396,7 @@
       "test": "tests/test_denge.py, tests/test_dunya.py, tests/test_swf_yama.py",
       "pr": "#39",
       "onay": null,
-      "notlar": "Doğru değer istemcinin Config'i ya da sahibinin denge kararı olmadan teste yazılmaz; kodun kendi çıktısı beklenen değer yapılmaz. Config'ten gelenler istemciden okunup kaynağıyla sabitlenebilir. 6.11.2026 (PR #39): üç alt ajan, ayrı çalışma ağaçlarında, kaynaklı testler yazdı; her dosya okunup kaynakları (istemci Config: ATTACKS_MAX 3, ATTACKS_PERIOD_HOURS 6, ATTACKS_SAME_PLAYER_HOURS 4, MAX_GOLD_FROM_ASSAULT 200; game_config MAX_GOLD_ASSAULT 20000, TIME/tournament_type) yeniden okunarak doğrulandı. test_denge 24 test (32 bozmanın 28'i öldü; kalan 4'ü kaynağı olmayan sabit), test_swf_yama 37 test (el yapımı SWF'ler, 63 bozmanın 61'i; kalan 2'si eşdeğer), test_dunya 50 test (52 bozmanın 46'sı; 4'ü eşdeğer, 2'si kaynaksız sabit). Kaynağı olmadığı için sabitlenmeyen, sahibinin kararını bekleyenler: denge.GANIMET_ORANI 0,10, GANIMET_TAVANI 50000, YENI_OYUNCU_KALKANI 24 sa; pvp.GALIBIYET_ASGARI_ALTIN 25, XP_PAYI 150, onur tavanı 10 (game_config HONOR_POINT_PVP_WIN/LOSE 15/5 farklı); elo K 32/16, BASLANGIC 1500, HAFTALIK_MAC 3; turnuva TAKIM_BOYU 20 ve bot puan aralıkları; bot dünyasının güç, ekonomi, savaş ve hedef ağırlıkları; bot dünyasında aynı hedefe 6 sa (istemci oyuncu için 4 sa). Yeniden ölçüm sonucu docs/TEST_OLCUMU.md §12. 6.11.2026: yeniden ölçüm (3fdc33b, tohum 20261105, 2000 örneklem; kapsam dışı 397 → 127) 350/1873 mutantta durduruldu: sahibi işi buluta devretti. Yarım ölçüm sonuç sayılmaz; bulutta docs/TEST_OLCUMU.md §10'daki komutla baştan koşulup §12'ye yazılacak."
+      "notlar": "Doğru değer istemcinin Config'i ya da sahibinin denge kararı olmadan teste yazılmaz; kodun kendi çıktısı beklenen değer yapılmaz. Config'ten gelenler istemciden okunup kaynağıyla sabitlenebilir. 6.11.2026 (PR #39): üç alt ajan, ayrı çalışma ağaçlarında, kaynaklı testler yazdı; her dosya okunup kaynakları (istemci Config: ATTACKS_MAX 3, ATTACKS_PERIOD_HOURS 6, ATTACKS_SAME_PLAYER_HOURS 4, MAX_GOLD_FROM_ASSAULT 200; game_config MAX_GOLD_ASSAULT 20000, TIME/tournament_type) yeniden okunarak doğrulandı. test_denge 24 test (32 bozmanın 28'i öldü; kalan 4'ü kaynağı olmayan sabit), test_swf_yama 37 test (el yapımı SWF'ler, 63 bozmanın 61'i; kalan 2'si eşdeğer), test_dunya 50 test (52 bozmanın 46'sı; 4'ü eşdeğer, 2'si kaynaksız sabit). Kaynağı olmadığı için sabitlenmeyen, sahibinin kararını bekleyenler: denge.GANIMET_ORANI 0,10, GANIMET_TAVANI 50000, YENI_OYUNCU_KALKANI 24 sa; pvp.GALIBIYET_ASGARI_ALTIN 25, XP_PAYI 150, onur tavanı 10 (game_config HONOR_POINT_PVP_WIN/LOSE 15/5 farklı); elo K 32/16, BASLANGIC 1500, HAFTALIK_MAC 3; turnuva TAKIM_BOYU 20 ve bot puan aralıkları; bot dünyasının güç, ekonomi, savaş ve hedef ağırlıkları; bot dünyasında aynı hedefe 6 sa (istemci oyuncu için 4 sa). Yeniden ölçüm sonucu docs/TEST_OLCUMU.md §12. 6.11.2026: yeniden ölçüm (3fdc33b, tohum 20261105, 2000 örneklem; kapsam dışı 397 → 127) 350/1873 mutantta durduruldu: sahibi işi buluta devretti. Yarım ölçüm sonuç sayılmaz; bulutta docs/TEST_OLCUMU.md §10'daki komutla baştan koşulup §12'ye yazılacak. 11.11.2026: yeniden ölçüm tamamlandı (da09896, bulut, 4 çekirdek 3 işçi, 82 dk; docs/TEST_OLCUMU.md §12): toplam %47,8 → %66,8 [64,7; 68,8] (z ≈ 12,2); swf_font %28,6 → %94,2, swf_yama %23,7 → %93,0, dunya %22,5 → %70,2, turnuva %37,5 → %63,3; öteki modüllerde anlamlı fark yok. Kapsanan satırlarda %59,6 → %71,4; kapsam dışı 397 → 130."
     },
     {
       "id": "TST-05",
@@ -1533,23 +1533,23 @@
       "baslik": "Yükleme, seviyesi XP'sinden yüksek kaydın seviyesini düşürüyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Çalıştırıldı (10.11.2026, master da09896): villages/Arthur30.json (seviye 53, 69 467 XP) kayıt olarak yüklenince 'seviye duzeltildi: 53 -> 34'. kayit._seviyeyi_duzelt seviyeyi her yüklemede get_level_from_xp'ye eşitliyordu. İstemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp) ve kayıttakini length - 1'e kadar olduğu gibi alır (PlayerStatus/Init; OYN-14'te okundu).",
       "test": "tests/test_kayit_gocu.py: SeviyeDuzeltmesi, test_degismezlik",
-      "pr": null,
+      "pr": "#43",
       "onay": null,
       "notlar": "Düzeltme: seviye XP'nin altındaysa yükselir (bozuk XP'li seviye 0 kaydı için eski amaç korunur), 99'un üstündeyse 99'a iner, XP'den yüksekse dokunulmaz. Bağımsız denetimin kayıt alanı (KAR-13, yarım rapor) aynı yolun pid'i sayı olan kayıtta sunucuyu düşürdüğünü yazdı; o bulgu ayrıca yeniden üretilecek."
     },
     {
       "sinif": "hata",
       "test": "tests/test_kayit_gocu.py: YuklemeDayanikliligi",
-      "pr": null,
+      "pr": "#45",
       "onay": null,
       "id": "DNT-05",
       "baslik": "Kimliği sayı olan kayıt sunucunun açılışını düşürüyordu",
       "onem": "Yüksek",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim KYG-01 (docs/denetim/kayit-goc.md). Yeniden üretildi (10.11.2026, master 1a54553): saves/777.save.json, playerInfo.pid = 777, sürüm 0.05a; load_saved_villages göçten sonra save_session(777) → session'ın str denetimi AssertionError, yükleme yarıda. Yedek zarfı (kayit_yedek.zarfi_ac) kimliği str(...) ile denetlediği için böyle kaydı içeri alıyordu.",
       "notlar": "Düzeltme: yükleme sayı kimliği str'ye çevirip kaydeder; kayıt başına düzeltme ve yazım hatası yakalanır (tek kayıt bütün yüklemeyi düşürmez); zarfi_ac kimliğin str olmasını şart koşar. Testler eski kodda 3'ü de düşüyor."
@@ -1557,28 +1557,28 @@
     {
       "sinif": "hata",
       "test": "tests/test_kayit_gocu.py: test_bak_ile_geri_alinan_eski_kayit_da_gocer",
-      "pr": null,
+      "pr": "#45",
       "onay": null,
       "id": "DNT-06",
       "baslik": "Bozuk kayıt .bak'tan geri alınınca göç atlanıyordu",
       "onem": "Yüksek",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim KYG-03. Yeniden üretildi (10.11.2026): canlı dosya yarım ('{\"yarim'), .bak 0.05a; yüklemeden sonra bellekte ve dosyada sürüm 0.05a. Neden: `save.pop('_bak_kullanildi') or _yukleme_duzeltmeleri(save)` kısa devresi.",
       "notlar": "Düzeltme: ikisi de çalışır; .bak'tan gelen kayıt göç öncesi yedeği alınıp göçer ve kaydedilir."
     },
     {
       "sinif": "hata",
-      "test": null,
+      "test": "tests/test_kayit_gocu.py: test_ice_aktarmadan_onceki_hal_kalici_yedekte",
       "pr": null,
       "onay": null,
       "id": "DNT-07",
       "baslik": "Yedek içe aktarma ya da taşıma öncesi hâl yalnızca .bak'ta, o da ilk kayıtta eziliyor",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır.",
-      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek."
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır. Yeniden üretildi (11.11.2026): yeni test eski kodda düşüyor (backups/'ta önceki hâlin kopyası yok; iki kayıttan sonra .bak içe aktarılan hâl).",
+      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek. Düzeltme: geri_yukle (yedek yükleme ve Wi-Fi taşıma) üzerine yazmadan önce canlı kaydı backups/<kimlik>.ice-aktarma-<zaman>.save.json olarak da saklar; ad '<kimlik>-' ile başlamadığı için budanmaz."
     },
     {
       "sinif": "hata",
@@ -1596,12 +1596,12 @@
     {
       "sinif": "hata",
       "test": "tests/test_istemci_kaynakli.py: UretimSecimliToplama",
-      "pr": null,
+      "pr": "#45",
       "onay": null,
       "id": "DNT-09",
       "baslik": "Üretim süresi seçilen binada toplama, seçimi ve içerideki birimleri yok sayıyordu",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim EKF-01 (docs/denetim/ekonomi-formuller.md). Yeniden üretildi (10.11.2026): istemci IsoElement/collect @3170-3365 çarpanı Config.COLLECT_MULTIPLIER[cp - 1] = [0.5, 1, 2, 3] (Config/<sınıf> @1915) ile, içerideki birimi MULTIPLIER_PEASANTS 0,2 ile uygular; seçimli binalar globals.COLLECT_VARIABLE_IDS (Base/init, PopupCollect$/doShit). collect_new argümanları [tx, ty, townID, id, iUnitsContainedWhenHarvested, getResourceMultiplier, nakit] (@3941). Sunucu Mill II 8 saatte 300 yazıyordu, istemci 900 gösterir.",
       "notlar": "Düzeltme: komutlar.toplama_miktari istemcinin formülü. 6 bozmanın 6'sı düştü. cp yoksa sunucu 1 sayar (istemcide parseInt(undefined) NaN olurdu, ◐)."
@@ -1609,12 +1609,12 @@
     {
       "sinif": "hata",
       "test": "tests/test_seviye.py: test_seviye_odulu_kayda_yazilir",
-      "pr": null,
+      "pr": "#45",
       "onay": null,
       "id": "DNT-10",
       "baslik": "Seviye atlama ödülü kayda yazılmıyordu",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim SNK-01 (docs/denetim/sunucu-komutlar.md). Yeniden üretildi: istemci PopupLevel/<kurucu> @256-328 arLevelList[iLevel - 1].reward_amount'ı Player.adjustStatByType ile kendisi ekler, komut göndermez; rt_level_up yalnızca seviyeyi yazıyordu. Config: 96 seviyede nakit, 2 odun, 1 taş, 1 yemek.",
       "notlar": "Düzeltme: rt_level_up atlanan her seviyenin ödülünü verir; aynı komut yeniden gelirse vermez. 3 bozmanın 3'ü düştü. Daha önce birikmiş kayıp ödüller geri verilmez."
@@ -1631,6 +1631,149 @@
       "isaret": "✔",
       "kanit": "Bayt kodu (10.11.2026): Assault$/sendAssaultResults 'win' = bPlayerWinner ? 1 : 0, 'voluntary_end' = bVoluntaryEnd ? 1 : 0 (@217-276). Teslim olma StateAssault/onSurrenderConfirmed assaultEnd(false, false, true) çağırır: win 0 gider. Denetçinin 'sabit win: 1' okuması abc_okur.cagrilar'ın koşullu değeri tek sabite indirmesinden (S-63).",
       "notlar": "Denetimin öteki DPT bulguları (docs/denetim/dunya-pvp-turnuva.md) yeniden üretilmeyi bekliyor; cagrilar çıktısına dayananlar ayrıca denetlenecek."
+    },
+    {
+      "id": "DNT-12",
+      "baslik": "Yeniden gönderilen komut paketi iki kez uygulanıyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-02 (docs/denetim/sunucu-komutlar.md). Bayt kodu (11.11.2026): CommandManager/sendPacket paketi first_number, commands, tries ile yollar ve tries'ı artırır; CommandManager/processCommandsTimeout aynı currentPacket'i yeniden sendPacket eder. Sunucu yalnızca commands'ı okuyup her paketi uyguluyordu.",
+      "test": "tests/test_http.py: test_yeniden_gonderilen_paket_bir_kez_uygulanir",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: kullanıcı başına son paketin (first_number, komutlar) bellekte tutulması; aynısı yeniden gelirse uygulanmaz. Kendi köyünü yükleyince (get_player_info, user yok) silinir: istemcinin sayacı baştan başlar. 2 bozmanın 2'si düştü."
+    },
+    {
+      "id": "KAR-15",
+      "baslik": "Bot akınında köylüler ve nakitle alınmış birimler de ölür (DPT-02)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '1. böyle kalsın' (soru docs/DENETIM.md: akınlarda yalnızca asker mi ölsün).",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Hepsinin saldırı gücü var (config: köylü 6, şifacı 15). Davranış değişmez."
+    },
+    {
+      "id": "KAR-16",
+      "baslik": "Turnuva puanına üst sınır konmaz (DPT-03)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '2. hayır'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Puan yalnızca elle hazırlanmış istekle şişer; hile paneli zaten var."
+    },
+    {
+      "id": "KAR-17",
+      "baslik": "Güvenlik önceliklidir; ev ağı kipi parola ister (DGV-01, SNK-05)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '3. güvenlik meselesi çok önemli bununla ilgili ne varsa hallet, en önemli işlerden biri de bu, parola istensin'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Denetimin bütün güvenlik bulguları (DGV-01..08, SNK-05, SNK-09) yeniden üretilip düzeltilir."
+    },
+    {
+      "id": "KAR-18",
+      "baslik": "Kaynak yetmezse sunucu alımı reddeder (EKF-03)",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi 11.11.2026: '4. reddetsin, zaten hile paneli var'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 11 Kasım 2026",
+      "notlar": "Bedeli karşılanamayan alım uygulanmaz; negatif çarpan ve negatif nakit argümanı reddedilir."
+    },
+    {
+      "id": "DNT-13",
+      "baslik": "Ev ağı açıkken ağdaki her cihaz parolasız girip kayıtları indirip ezebiliyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-01 ve SNK-05 (docs/denetim/dagitim-guvenlik.md, sunucu-komutlar.md). ayarlar.json'daki _ev_agi uyarısı da bunu yazıyordu. Düzeltmeden sonra gerçek sunucuyla denendi (11.11.2026, 0.0.0.0'da waitress, istek makinenin ağ adresinden): girişsiz / → 302 /ev-agi-giris, command.php → 401; doğru parolayla 200; 127.0.0.1 parola sormaz; .ev_agi_parolasi 0600.",
+      "test": "tests/test_ev_agi.py",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "oyun/ev_agi.py: ev ağı açıkken yerel olmayan her istek parolayla açılmış oturum ister (oyunun SWF/resim dosyaları ve sayfanın css/img/js'i açık; Android jetonuyla aynı liste). Parola ayarlar.json ev_agi_parolasi (en az 8) ya da ilk açılışta üretilip .ev_agi_parolasi'nda saklanır ve konsola yazılır. Oturum parolanın özetine bağlı; 5 yanlışta 5 dakika kilit. 6 bozmanın 6'sı düştü."
+    },
+    {
+      "id": "DNT-14",
+      "baslik": "Sunucu kaynak yeterliliğine bakmıyor, bedeli 0'a kıskaçlıyordu; eksi argüman kaynak yaratıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-03 (docs/denetim/ekonomi-formuller.md). Yeni test eski kodda düşüyor: 20 odunla 30 odunluk House I alımı kayda giriyordu (odun 0); buy fiyat çarpanı -5 odun ekliyordu.",
+      "test": "tests/test_komutlar.py: test_yetersiz_alim_uygulanmaz, test_kaynak_ve_nakit_eksiye_dusmez",
+      "pr": null,
+      "onay": "KAR-18",
+      "notlar": "Düzeltme: ekonomi.bakiyeden_dus bedel bakiyeyi aşarsa Yetersiz atar (apply_cost, cash_ekle, kaynak_ekle hepsi ondan geçer); komut döngüsü komutu geri alır, konsola ve komut_gunlugu.jsonl'a 'red' yazar. Eksi fiyat çarpanı reddedilir (satış iadesi -0.05 hariç); argümandan gelen 11 nakit bedeli max(0, ...). 2 bozmanın 2'si düştü. Risk: sunucu bakiyesi istemcininkinden düşükse istemcide görünen alım kayda girmez; red satırları bunu gösterir."
+    },
+    {
+      "id": "DNT-15",
+      "baslik": "Günlükler sınırsız büyüyordu; oturum anahtarı herkese okunur yazılıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-09, DGV-07 (günlük kısmı), DGV-08 (anahtar izni). Yeniden üretildi (11.11.2026): komut_gunlugu.jsonl, http_gunlugu.jsonl, istemci_hatalari.jsonl, sunucu_hatalari.log hiç döndürülmüyordu, report_error gövdesi olduğu gibi yazılıyordu; .oturum_anahtari open(..., 'w') ile 0644.",
+      "test": "tests/test_gunlukler.py; tests/test_denetim.py: test_oturum_anahtari_yalnizca_sahibine_okunur",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: oyun/gunlukler.ekle bütün günlükler için: 2 MB'ta bir eski kopya (.1), tek kayıt en çok 16 KB. Oturum anahtarı 0600 yazılır, eskisi açılışta 0600'e çekilir. 4 bozmanın 4'ü düştü (ilk denemede satır sınırının testi yanlış biçimde istek gönderiyordu, düzeltildi)."
+    },
+    {
+      "id": "DNT-16",
+      "baslik": "İndirilen varlıklar özetsizdi; uydurma adlarla sunucu dışarıya indirmeye zorlanabiliyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-04, DGV-05 (docs/denetim/dagitim-guvenlik.md). Yeniden üretildi (11.11.2026): varliklar._indir her geçerli karakterli yolu iki kaynaktan (ikincisi static.socialpointgames.com, sabitlenmemiş, hâlâ 200 dönüyor) indirmeyi deniyordu; tek içerik denetimi 'boş ya da HTML değil'. Sabit commit'in ağacı içerik indirilmeden alındı (git fetch --filter=blob:none, ls-tree): 4825 dosya; istemci SWF'sinin blob özeti (fc0831af…) indirilen dosyanınkiyle aynı. Gerçek kaynaktan iki dosya (bigboss1.jpg, istemci SWF) yeni denetimden geçti.",
+      "test": "tests/test_denetim.py: VarlikIndirme",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: config/varlik_ozetleri.tsv (araclar/onindirme_listesi.py üretir) sabit commit'in git blob özetleri. Sunucu yalnızca bu listedeki adları indirir (başarısızlar sözlüğü en çok 4825); indirilen ve önceden inmiş her dosya özetle denetlenir, uymayan sunulmaz. varliklari_indir.py'nin HTTP yolu da aynı denetimi yapar. Kullanıcının elle koyduğu download_assets/ dosyalarına dokunulmaz. Çevrimdışı listedeki temp.png bu commit'te yoktu (404), çıkarıldı. 4 bozmanın 4'ü düştü."
+    },
+    {
+      "id": "DNT-17",
+      "baslik": "CI sırları PR koduyla çalışıyordu; eylemler sabitsiz; Android hata ayıklama ve yedek açıkları; bağımlılıklar sabitsiz",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-03, DGV-06, DGV-07, DGV-08 (docs/denetim/dagitim-guvenlik.md). Yardımcı ajan düzeltti (ayrı çalışma ağacı, 1c09af9); okunup denetlendi: 7 eylem SHA'sı git ls-remote ile resmî etiketlere karşı doğrulandı (11.11.2026). Gradle/emülatör bu ortamda yok: debug APK ile sınama ilk CI koşusunda görülecek (◐). CI (#46, 14c5b2a): apk işi debug ve imzasız sürüm APK'larını derledi, sinama işi debug APK ile emülatörde oyunu açtı (ikisi de başarılı). İlk koşuda Android lint dahil olmayan ayarlar.json'un dışlanmasını hata saydı, düzeltildi.",
+      "test": "tests/test_dagitim_guvenlik.py; tests/test_android.py",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "İmza sırları yalnızca master ve v* etiketinde; pull_request'te imzasız derleme. Eylemler tam SHA'ya sabit, bağlam değerleri env üzerinden. 'sinama' ek değeri yalnızca debuggable yapıda; sınama debug APK ile. yedekIndir yalnızca http://127.0.0.1:<kapı>/, yönlendirmesiz, 64 MB sınırlı. Android yedeği günlükleri (ve .1 kopyalarını) ve ayarlar.json'u dışlar (ayarlar yeni cihaza taşınmaz). requirements.txt ve Chaquopy sürümleri == ile sabit; gömülü Python zip'i SHA-256 ile denetlenir (özet python.org'dan indirilip hesaplandı, bağımsız çapraz doğrulama yok). Kalan: sırlar depo düzeyinde; aynı depodan PR açabilen biri iş akışını değiştirip okuyabilir. Kesin çözüm sahibinin ayarı: sırları yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak. --require-hashes yapılmadı (Chaquopy kendi wheel'lerini kullanıyor)."
+    },
+    {
+      "id": "DNT-18",
+      "baslik": "Wi-Fi taşımada kod adres satırındaydı; tek cihaz yanlış denemelerle aktarımı kapatabiliyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-02 (docs/denetim/dagitim-guvenlik.md). Kod okunarak doğrulandı (11.11.2026): _getir kodu ?kod= ile yolluyordu; _kod_dogru bütün yanlışları tek sayaçta topluyordu (10'da gönderim kapanıyordu).",
+      "test": "tests/test_tasima.py: test_kod_basliktan_okunur, test_alici_kodu_baslikla_yollar, test_tek_cihaz_gonderimi_kapatamaz",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: kod X-Tasima-Kodu başlığında (gönderen eski sürüm alıcılar için ?kod='u da kabul eder); yanlışlar adres başına 5'te o adresi reddeder, toplam 30'da gönderim kapanır (tahmin olasılığı 30/10^6). 3 bozmanın 3'ü düştü. Kabul edilen risk: aktarım ev ağında düz HTTP; 6 haneli koddan türeyen şifreleme kolay kırılacağı için eklenmedi. Gönderim yalnızca sahibinin başlattığı 10 dakikada açık."
     }
   ]
 }

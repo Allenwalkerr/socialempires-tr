@@ -3,7 +3,7 @@
 Yedek bir JSON dosyasıdır: kayıt dosyasının kendisi metin olarak durur,
 yanında SHA-256 özeti bulunur. Böylece geri yüklenen kayıt orijinaliyle bayt
 bayt aynı olur. Yükleme sırasında özet, şema ve kimlik çakışması denetlenir;
-eski kayıt otomatik olarak .bak dosyasına alınır.
+eski kayıt otomatik olarak .bak dosyasına ve backups/<kimlik>.ice-aktarma-<zaman>.save.json'a alınır.
 """
 
 import hashlib
@@ -15,7 +15,7 @@ from datetime import datetime
 from flask import request, session
 from werkzeug.utils import safe_join
 
-from oyun.kayit import (all_saves_userid, gecerli_uid, kaydi_dogrula, load_saved_villages,
+from oyun.kayit import (BACKUP_DIR, all_saves_userid, gecerli_uid, kaydi_dogrula, load_saved_villages,
                         save_lock)
 from oyun import kaynaklar
 from oyun.sunucu import app
@@ -87,10 +87,19 @@ def zarfi_ac(veri, oturum_uid):
 
 
 def geri_yukle(kimlik, ham):
-    yol = _yol(kimlik)
+    yol = _yol(kimlik) if isinstance(kimlik, str) and gecerli_uid(kimlik) else None
+    if yol is None:  # zarfi_ac denetler; Wi-Fi taşıma gibi öteki çağıranlar için de burada
+        raise YedekHatasi("kimlik")
     with save_lock:
         if os.path.exists(yol):
             shutil.copyfile(yol, yol + ".bak")  # copy2 değil: Android öznitelik kopyalamayı reddeder
+            # .bak ilk kayıtta ezilir (DNT-07): önceki hâl adlı bir yedekte de kalır. Ad `<kimlik>-` ile başlamaz,
+            # en fazla MAX_BACKUPS kuralı onu silmez (göç öncesi yedek gibi).
+            os.makedirs(BACKUP_DIR, exist_ok=True)
+            yedek = safe_join(BACKUP_DIR, f"{kimlik}.ice-aktarma-{datetime.now():%Y%m%d-%H%M%S-%f}.save.json")
+            if yedek is None:
+                raise YedekHatasi("kimlik")
+            shutil.copyfile(yol, yedek)
         gecici = yol + ".tmp"
         with open(gecici, "wb") as f:
             f.write(ham)
