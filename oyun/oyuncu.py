@@ -49,8 +49,8 @@ def get_player_info(USERID, map_number=0):
     giris_gunu_say(kayit, ts_now)
     from oyun import gunluk_odul
     ozel = kayit["privateState"]
-    odul = gunluk_odul.isle(kayit)
-    if odul:  # KAR-24: bugünün ödülü verildi; pencere yalnızca bu yanıtla açılır (showDailyBonus kayda yazılmaz)
+    odul, goster = gunluk_odul.isle(kayit)
+    if goster:  # KAR-24: bugünün ödülü verildi; pencere yalnızca bu yanıtla açılır (showDailyBonus kayda yazılmaz)
         ozel = dict(ozel, showDailyBonus=1)
     kayit["playerInfo"]["last_logged_in"] = ts_now
     if odul:

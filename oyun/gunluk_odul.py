@@ -19,6 +19,11 @@ lastDayRewarded == numDayLogged olduğundan istemci ödülü bir kez daha vermez
 
 from oyun.config import get_game_config
 
+# DailyBonusManager/<sınıf>@18-20: NUM_FIRST_PAGE = 5. PopupNewDailyBonus/init@103-271: lastDayRewarded >= 5 iken pencere
+# 2. sayfaya geçer ve başlangıcı nextDayReward - 2 alır; 5 günlük tabloda nextDayReward 1 döner (getter), başlangıç -1,
+# rewards[-1] okunur (Vector: RangeError). Bu yüzden 5. günün ödülü verilir ama o gün pencere açılmaz (#65 incelemesi).
+ILK_SAYFA = 5
+
 
 def tablo():
     """config `daily_bonus`: [{id, reward_day, reward: {g|w|f|s|c|p|u: değer}, img}] (Base/loadGameConfigSuccess)."""
@@ -36,16 +41,17 @@ def _ver(kayit, odul):
 
 
 def isle(kayit):
-    """get_player_info'da, giris_gunu_say'dan sonra. Pencere bugün açılacaksa True (ödül o anda verildi)."""
+    """get_player_info'da, giris_gunu_say'dan sonra. (verildi, goster): bugünün ödülü kayda yazıldıysa verildi;
+    pencere bu yanıtla açılacaksa goster (5. gün ve sonrasında açılmaz, ILK_SAYFA)."""
     ps = kayit["privateState"]
     gun = int(ps.get("numDayLogged") or 1)
     son = ps.get("lastDayRewarded")
     son = son if isinstance(son, int) else 0
     if gun <= son:
-        return False
+        return False, False
     ps["lastDayRewarded"] = gun  # 5. günden sonra da: pencere (lastDayRewarded == 0 koşuluyla) bir daha açılmaz
     kaydi = next((t for t in tablo() if int(t.get("reward_day", 0)) == gun), None)
     if kaydi is None:
-        return False
+        return False, False
     _ver(kayit, kaydi.get("reward"))
-    return True
+    return True, gun < ILK_SAYFA

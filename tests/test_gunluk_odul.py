@@ -39,12 +39,12 @@ class Isle(unittest.TestCase):
         k = kayit(1)
         h, ps = k["maps"][0], k["privateState"]
         once = (h["coins"], h["wood"], h["food"], h["stone"])
-        self.assertTrue(gunluk_odul.isle(k))
+        self.assertEqual(gunluk_odul.isle(k)[0], True)
         self.assertEqual((h["coins"], h["wood"], h["food"], h["stone"]), tuple(x + 250 for x in once))
-        self.assertFalse(gunluk_odul.isle(k))  # aynı gün ikinci kez: yok
+        self.assertEqual(gunluk_odul.isle(k), (False, False))  # aynı gün ikinci kez: yok
         self.assertEqual(h["coins"], once[0] + 250)
         ps["numDayLogged"] = 2
-        self.assertTrue(gunluk_odul.isle(k))
+        self.assertEqual(gunluk_odul.isle(k)[0], True)
         self.assertEqual(ps["gifts"][722], 1)
         ps["numDayLogged"] = 3
         nakit = k["playerInfo"]["cash"]
@@ -62,7 +62,7 @@ class Isle(unittest.TestCase):
     def test_bes_gunden_sonra_pencere_acilmaz(self):
         k = kayit(6, son=5)
         once = json_kopya(k)
-        self.assertFalse(gunluk_odul.isle(k))
+        self.assertEqual(gunluk_odul.isle(k), (False, False))
         self.assertEqual(k["privateState"]["lastDayRewarded"], 6)
         once["privateState"]["lastDayRewarded"] = 6
         self.assertEqual(k, once)  # ödül yok
@@ -72,7 +72,7 @@ class Isle(unittest.TestCase):
         """numDayLogged ayrı giriş günü sayısıdır (raporda ✔); 3. gündeyken lastDayRewarded yoksa yalnızca 3. gün."""
         k = kayit(3)
         nakit = k["playerInfo"]["cash"]
-        self.assertTrue(gunluk_odul.isle(k))
+        self.assertEqual(gunluk_odul.isle(k)[0], True)
         self.assertEqual((k["playerInfo"]["cash"], k["privateState"].get("gifts")), (nakit + 10, []))
 
 
@@ -107,6 +107,18 @@ class Yanit(unittest.TestCase):
         ikinci = self.bilgi()["privateState"]  # aynı gün yeniden açılış (kasaba değişimi, sayfa yenileme)
         self.assertFalse(istemci_acar_mi(ikinci))
         self.assertEqual(self.kayitlar["t"]["privateState"]["gifts"][722], 1)
+
+    def test_besinci_gun_odul_verilir_pencere_acilmaz(self):
+        """#65 incelemesi, bayt kodu: PopupNewDailyBonus/init@103-271 lastDayRewarded >= NUM_FIRST_PAGE (5) iken
+        başlangıcı nextDayReward - 2 alır; 5 günlük tabloda nextDayReward 1 (getter), başlangıç -1 → rewards[-1]
+        (RangeError). 5. gün ödül kayda yazılır ama yanıt pencereyi açmaz; 4. gün açar."""
+        self.kayitlar["t"] = kayit(5, son=4)
+        ps = self.bilgi()["privateState"]
+        self.assertEqual(self.kayitlar["t"]["privateState"]["gifts"][714], 1)  # ödül verildi
+        self.assertEqual(self.yazilan, ["t"])  # ve kalıcı
+        self.assertFalse(istemci_acar_mi(ps))
+        self.kayitlar["t"] = kayit(4, son=3)
+        self.assertTrue(istemci_acar_mi(self.bilgi()["privateState"]))
 
     def test_eski_hata_lastDayRewarded_yokken_her_giriste_birim(self):
         """Düzeltmeden önceki durum: lastDayRewarded yok → istemci pencereyi açar ve 2. günün birimini verir. Artık
