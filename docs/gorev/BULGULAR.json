@@ -1748,6 +1748,19 @@
       "pr": null,
       "onay": "KAR-17",
       "notlar": "Düzeltme: config/varlik_ozetleri.tsv (araclar/onindirme_listesi.py üretir) sabit commit'in git blob özetleri. Sunucu yalnızca bu listedeki adları indirir (başarısızlar sözlüğü en çok 4825); indirilen ve önceden inmiş her dosya özetle denetlenir, uymayan sunulmaz. varliklari_indir.py'nin HTTP yolu da aynı denetimi yapar. Kullanıcının elle koyduğu download_assets/ dosyalarına dokunulmaz. Çevrimdışı listedeki temp.png bu commit'te yoktu (404), çıkarıldı. 4 bozmanın 4'ü düştü."
+    },
+    {
+      "id": "DNT-17",
+      "baslik": "CI sırları PR koduyla çalışıyordu; eylemler sabitsiz; Android hata ayıklama ve yedek açıkları; bağımlılıklar sabitsiz",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Bağımsız denetim DGV-03, DGV-06, DGV-07, DGV-08 (docs/denetim/dagitim-guvenlik.md). Yardımcı ajan düzeltti (ayrı çalışma ağacı, 1c09af9); okunup denetlendi: 7 eylem SHA'sı git ls-remote ile resmî etiketlere karşı doğrulandı (11.11.2026). Gradle/emülatör bu ortamda yok: debug APK ile sınama ilk CI koşusunda görülecek (◐).",
+      "test": "tests/test_dagitim_guvenlik.py; tests/test_android.py",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "İmza sırları yalnızca master ve v* etiketinde; pull_request'te imzasız derleme. Eylemler tam SHA'ya sabit, bağlam değerleri env üzerinden. 'sinama' ek değeri yalnızca debuggable yapıda; sınama debug APK ile. yedekIndir yalnızca http://127.0.0.1:<kapı>/, yönlendirmesiz, 64 MB sınırlı. Android yedeği günlükleri (ve .1 kopyalarını) ve ayarlar.json'u dışlar (ayarlar yeni cihaza taşınmaz). requirements.txt ve Chaquopy sürümleri == ile sabit; gömülü Python zip'i SHA-256 ile denetlenir (özet python.org'dan indirilip hesaplandı, bağımsız çapraz doğrulama yok). Kalan: sırlar depo düzeyinde; aynı depodan PR açabilen biri iş akışını değiştirip okuyabilir. Kesin çözüm sahibinin ayarı: sırları yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak. --require-hashes yapılmadı (Chaquopy kendi wheel'lerini kullanıyor)."
     }
   ]
 }

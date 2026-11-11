@@ -121,7 +121,10 @@ class AndroidYedekKurallari(unittest.TestCase):
         for ad, xml in self.kurallar().items():
             kopya = 2 if ad == "yedek.xml" else 1  # yedek.xml: cloud-backup ve device-transfer bölümleri
             for g in gunlukler:
-                self.assertEqual(xml.count(f'<exclude domain="file" path="socialempires/saves/{g}" />'), kopya, f"{ad}: {g}")
+                # oyun/gunlukler.py döndürürken bir eski kopyayı "<ad>.1" olarak tutar: o da dışlanır
+                for dosya in (g, g + ".1"):
+                    self.assertEqual(xml.count(f'<exclude domain="file" path="socialempires/saves/{dosya}" />'),
+                                     kopya, f"{ad}: {dosya}")
             self.assertEqual(xml.count('<exclude domain="file" path="socialempires/ayarlar.json" />'), kopya, ad)
             self.assertNotIn('<include domain="file" path="socialempires/ayarlar.json"', xml, ad)
 

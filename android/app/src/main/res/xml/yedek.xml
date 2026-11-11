@@ -8,9 +8,13 @@
         <exclude domain="file" path="socialempires/saves/gunluk_yedek/" />
         <!-- Sınırsız büyüyen günlükler ve ayarlar.json (ev_agi gibi güvenlik seçenekleri) yedeğe girmez (DGV-07) -->
         <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl" />
+        <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/http_gunlugu.jsonl" />
+        <exclude domain="file" path="socialempires/saves/http_gunlugu.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/istemci_hatalari.jsonl" />
+        <exclude domain="file" path="socialempires/saves/istemci_hatalari.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log" />
+        <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log.1" />
         <exclude domain="file" path="socialempires/ayarlar.json" />
     </cloud-backup>
     <device-transfer>
@@ -20,9 +24,13 @@
         <exclude domain="file" path="socialempires/saves/gunluk_yedek/" />
         <!-- Sınırsız büyüyen günlükler ve ayarlar.json (ev_agi gibi güvenlik seçenekleri) yedeğe girmez (DGV-07) -->
         <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl" />
+        <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/http_gunlugu.jsonl" />
+        <exclude domain="file" path="socialempires/saves/http_gunlugu.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/istemci_hatalari.jsonl" />
+        <exclude domain="file" path="socialempires/saves/istemci_hatalari.jsonl.1" />
         <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log" />
+        <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log.1" />
         <exclude domain="file" path="socialempires/ayarlar.json" />
     </device-transfer>
 </data-extraction-rules>
