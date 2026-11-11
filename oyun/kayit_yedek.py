@@ -87,14 +87,19 @@ def zarfi_ac(veri, oturum_uid):
 
 
 def geri_yukle(kimlik, ham):
-    yol = _yol(kimlik)
+    yol = _yol(kimlik) if isinstance(kimlik, str) and gecerli_uid(kimlik) else None
+    if yol is None:  # zarfi_ac denetler; Wi-Fi taşıma gibi öteki çağıranlar için de burada
+        raise YedekHatasi("kimlik")
     with save_lock:
         if os.path.exists(yol):
             shutil.copyfile(yol, yol + ".bak")  # copy2 değil: Android öznitelik kopyalamayı reddeder
             # .bak ilk kayıtta ezilir (DNT-07): önceki hâl adlı bir yedekte de kalır. Ad `<kimlik>-` ile başlamaz,
             # en fazla MAX_BACKUPS kuralı onu silmez (göç öncesi yedek gibi).
             os.makedirs(BACKUP_DIR, exist_ok=True)
-            shutil.copyfile(yol, os.path.join(BACKUP_DIR, f"{kimlik}.ice-aktarma-{datetime.now():%Y%m%d-%H%M%S-%f}.save.json"))
+            yedek = safe_join(BACKUP_DIR, f"{kimlik}.ice-aktarma-{datetime.now():%Y%m%d-%H%M%S-%f}.save.json")
+            if yedek is None:
+                raise YedekHatasi("kimlik")
+            shutil.copyfile(yol, yedek)
         gecici = yol + ".tmp"
         with open(gecici, "wb") as f:
             f.write(ham)

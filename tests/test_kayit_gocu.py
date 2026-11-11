@@ -260,6 +260,14 @@ class YuklemeDayanikliligi(unittest.TestCase):
             self.assertEqual(f.read(), onceki)
         self.assertEqual(kayit.session(uid)["maps"][0]["coins"], 5)
 
+    def test_geri_yukleme_kotu_kimligi_reddeder(self):
+        """CodeQL (#46): yedek yolu kimlikten kurulur; yol geçişi taşıyan kimlik hiçbir dosyaya yazılmaz."""
+        from oyun import kayit_yedek
+        for kotu in ("../disari", "a/b", "", 777, "x" * 65):
+            with self.assertRaises(kayit_yedek.YedekHatasi):
+                kayit_yedek.geri_yukle(kotu, b"{}")
+        self.assertFalse(os.path.exists(os.path.join(os.path.dirname(SAVES_DIR), "disari.save.json")))
+
     def test_bak_ile_geri_alinan_eski_kayit_da_gocer(self):
         yol = self._yol("bakgoc")
         with open(yol, "w", encoding="utf-8") as f:
