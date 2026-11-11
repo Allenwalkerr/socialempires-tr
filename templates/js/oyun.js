@@ -470,7 +470,7 @@
   haftaYukle();
   setInterval(gorunurken(haftaYukle), 60000);
   setInterval(gorunurken(sayac), 1000);
-  function panelleriTazele() { yokla(); kursuYukle(); haftaYukle(); sayac(); }
+  function panelleriTazele() { yokla(); kursuYukle(); haftaYukle(); sayac(); baslikYenile(); }  // OYN-12: oyun modundan çıkınca başlık da hemen
   document.addEventListener("visibilitychange", function () { if (!panellerGizli()) panelleriTazele(); });
 
   // --- Etkinlik takvimi

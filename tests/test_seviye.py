@@ -85,6 +85,11 @@ class BaslikYenilenir(unittest.TestCase):
             self.assertIn('id="%s"' % kimlik, sayfa)
             self.assertIn('getElementById("%s")' % kimlik, js)
         self.assertIn('fetch("/oyuncu/baslik"', js)
+        # #65 incelemesi: oyun modundan çıkınca ve sekme öne gelince (panelleriTazele) başlık da hemen yenilenir;
+        # yalnızca 30 sn'lik aralıkla olsaydı tam ekranda atlanan seviye bir süre eski görünürdü
+        import re
+        tazele = re.search(r"function panelleriTazele\(\) \{([^}]*)\}", js).group(1)
+        self.assertIn("baslikYenile()", tazele)
 
 
 class RtLevelUp(KomutTesti):

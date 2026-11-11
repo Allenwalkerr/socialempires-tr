@@ -954,7 +954,7 @@
       "test": "tests/test_seviye.py: BaslikYenilenir, test_xp_cubugu_istemcinin_araligi",
       "pr": "#65",
       "onay": null,
-      "notlar": "Önce yeniden üretilecek (S-19: görmeden çürütme yok). 11.11.2026: kodda doğrulandı ✔: başlıktaki seviye/XP/rütbe yalnızca sayfa açılırken yazılıyordu, yenileyen kod yoktu. Yeni /oyuncu/baslik (kaydın şimdiki hâli), oyun.js 30 sn'de bir yoklar (sayfa görünürken); XP doluluğu sunucuda tek yerde (_xp_araligi oran, şablonun eski formülü). Chromium'da taklit yanıtla başlık 30 sn içinde yenilendi. 4 bozma düştü."
+      "notlar": "Önce yeniden üretilecek (S-19: görmeden çürütme yok). 11.11.2026: kodda doğrulandı ✔: başlıktaki seviye/XP/rütbe yalnızca sayfa açılırken yazılıyordu, yenileyen kod yoktu. Yeni /oyuncu/baslik (kaydın şimdiki hâli), oyun.js 30 sn'de bir yoklar (sayfa görünürken); XP doluluğu sunucuda tek yerde (_xp_araligi oran, şablonun eski formülü). Chromium'da taklit yanıtla başlık 30 sn içinde yenilendi. 4 bozma düştü. #65 incelemesi (gerçek, düzeltildi ✔): oyun modundayken yoklama atlanıyordu, çıkışta yalnızca öteki paneller tazeleniyordu; baslikYenile panelleriTazele'ye eklendi. Bozma düştü."
     },
     {
       "id": "OYN-13",
