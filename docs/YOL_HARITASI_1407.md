@@ -41,6 +41,8 @@ Sahibinin 30 Ekim 2026 kararları:
 | GEC-05'in sonu (11.11.2026): G, H, eksik, imza uyumsuzluğu | ✔ 158, 159, **0**, 0 (`araclar/komut_imzalari.py`, istemci SHA-256 `0e4cc178…6a15`) | GEC-05, #49 … #51 |
 | GEC-05'in sonu: istemcinin dizelerindeki `.php` ve `pvp/web/...` uçları | ✔ 37 uçtan 36'sı 200; `get_continent.php` 404, ama `Config.SERVICE_LOAD_CONTINENT`'i kullanan yöntem yok (istemci istemez) | GEC-05 |
 | GEC-05'in sonu: bot dünya turu (50 bot, 300 tur, 7 tekrarın ortancası; 5 ölçüm) | ◐ önce (`5147fcd`) 0,891 ms, şimdi 0,915 ms; en iyi 0,821 / 0,825 ms. Fark tekrarlar arasındaki oynamadan (±%15) küçük: eşit sayıldı | GEC-05 |
+| GEC-06'nın sonu (11.11.2026): SWF metin alanı / sabit yazı / AS3 / config loc / hedef | ✔ 554/554 = 1 / 44/46 = 0,957 / 213/219 = 0,973 / 1976/1976 = 1 / 410/410 = 1. Kalanlar kanıtıyla çevrilemez: `cash` ve `Use times` yazı tipine gömülü; 6 AS3 dizesi ekran dışında da kullanılıyor (çevrilirse oyun kırılır). 96 dolgu `ceviri/dolgu.json`'da | GEC-06, CEV-03, CEV-04, #53, #54 |
+| GEC-06 ekran denetimi (Ruffle, yeni imparatorluk, eğitimin ilk adımı) | ◐ Eğitim penceresi, Konak, komşu şeridi (YARDIM!, Seçim Karesi), ejderha adları Türkçe; İ, ş, ğ, ı doğru çiziliyor; konsolda hata 0. `Add Cash`, `BUILD`, `ADD ALLY` resim (KAR-01). Yeni pencereler (Ruh Kazanı, PvP, mezarlık) tek tek açılıp bakılmadı | GEC-06 |
 | Türkçe SWF yamasının 1.4.07'de eşlediği alan | ✔ 521 alan (sözlük anahtarlarının 404/455'i) | KYN-01 |
 | Upstream varlık ağacı `54df29e` ile `f642e0b` | ✔ 4.825 / 4.479 dosya | bu oturum, `git ls-tree` |
 | Ortak 4.478 dosyanın içerik farkı | ✔ **0** (git blob kimlikleri birebir aynı) | bu oturum |
