@@ -15,7 +15,8 @@ def bakiyeden_dus(kap: dict, alan: str, bedel: int) -> None:
 
 
 def apply_cost(playerInfo: dict, map: dict, id: int, price_multiplier: int) -> None:
-    if price_multiplier < 0 and price_multiplier != -0.05:  # -0.05: satış iadesi (komutlar.satis_iadesi)
+    """Bedel; eksi çarpan hiçbir durumda kabul edilmez (iade ayrı yoldan: komutlar.satis_iadesi, #46 incelemesi)."""
+    if price_multiplier < 0:
         raise Yetersiz(f"eksi fiyat carpani {price_multiplier}")
     cost = int(price_multiplier * int(get_attribute_from_item_id(id, "cost")))
     cost_type = get_attribute_from_item_id(id, "cost_type")

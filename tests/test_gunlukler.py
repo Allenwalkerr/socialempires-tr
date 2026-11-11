@@ -45,6 +45,19 @@ class Gunlukler(unittest.TestCase):
         self.assertEqual(cevap.status_code, 200)
         self.assertLessEqual(self.boyut("istemci_hatalari.jsonl"), 300 + 20)
 
+    def test_komut_paketinin_her_satiri_ayri_ve_gecerli_json(self):
+        """#46 incelemesi: satır sınırı paketin tamamına uygulanıyordu; uzun bir argüman sonraki komutları, KAR-18'in
+        'red' satırı dahil, günlükten düşürürdü ve kesilen satır bozuk JSON kalırdı."""
+        from oyun import komutlar
+        with mock.patch.object(gunlukler, "EN_BUYUK", 10 ** 6):
+            komutlar._gunluge_yaz("test", [["store_add_items", ["9" * 1000], None],
+                                           ["buy", [1, 2, 3], "yetersiz: wood: 0 < 30"]])
+        with open(os.path.join(self.klasor, "komut_gunlugu.jsonl"), encoding="utf-8") as f:
+            satirlar = [json.loads(s) for s in f]
+        self.assertEqual([s["cmd"] for s in satirlar], ["store_add_items", "buy"])
+        self.assertTrue(satirlar[0]["args"].startswith("[kesildi"))
+        self.assertEqual(satirlar[1]["red"], "yetersiz: wood: 0 < 30")
+
     def test_komut_gunlugu_de_sinirli(self):
         from oyun import komutlar
         for _ in range(60):

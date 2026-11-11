@@ -68,6 +68,24 @@ class EvAgiParolasi(unittest.TestCase):
         self.assertEqual(self.post(t, "/ev-agi-giris", data={"parola": "dogru-parola-1"}).status_code, 429)
         self.assertEqual(self.komut(t).status_code, 401)
 
+    def test_ayardaki_bosluklu_parola_ile_girilir(self):
+        """#46 incelemesi: formdaki parola kırpılıyordu, ayardaki kırpılmıyordu; boşluklu parolayla hiç girilemezdi."""
+        self.ayar["ev_agi_parolasi"] = " bosluklu-parola "
+        t = self.tablet()
+        self.assertEqual(self.post(t, "/ev-agi-giris", data={"parola": "bosluklu-parola"}).status_code, 302)
+        self.assertEqual(self.komut(t).status_code, 200)
+
+    def test_kisa_parola_uyarisi_bir_kez(self):
+        import contextlib
+        import io
+        self.ayar["ev_agi_parolasi"] = "kisa"
+        cikti = io.StringIO()
+        with mock.patch.object(ev_agi, "_uretilen", "uretilen-parola"), mock.patch.object(ev_agi, "_kisa_uyarildi", False), \
+                contextlib.redirect_stdout(cikti):
+            for _ in range(5):
+                ev_agi.parola()
+        self.assertEqual(cikti.getvalue().count("en az"), 1)
+
     def test_parola_degisince_eski_giris_gecersiz(self):
         t = self.tablet()
         self.post(t, "/ev-agi-giris", data={"parola": "dogru-parola-1"})

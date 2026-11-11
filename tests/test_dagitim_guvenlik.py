@@ -125,8 +125,11 @@ class AndroidYedekKurallari(unittest.TestCase):
                 for dosya in (g, g + ".1"):
                     self.assertEqual(xml.count(f'<exclude domain="file" path="socialempires/saves/{dosya}" />'),
                                      kopya, f"{ad}: {dosya}")
-            self.assertEqual(xml.count('<exclude domain="file" path="socialempires/ayarlar.json" />'), kopya, ad)
-            self.assertNotIn('<include domain="file" path="socialempires/ayarlar.json"', xml, ad)
+            # ayarlar.json (ev ağı parolası) yedeğe girmez: hiçbir include onu kapsamaz. Android lint, dahil olmayan
+            # yolu dışlamayı hata sayar (FullBackupContent, CI apk işi), bu yüzden ayrı exclude yazılmaz.
+            for yol in re.findall(r'<include domain="file" path="([^"]*)"', xml):
+                self.assertFalse("socialempires/ayarlar.json".startswith(yol), f"{ad}: {yol}")
+            self.assertNotIn('path="socialempires/ayarlar.json"', xml, ad)
 
     def test_onceki_dislamalar_korunur(self):
         for ad, xml in self.kurallar().items():

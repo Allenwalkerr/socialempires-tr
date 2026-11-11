@@ -4,7 +4,7 @@
     <include domain="file" path="socialempires/saves/" />
     <exclude domain="file" path="socialempires/saves/backups/" />
     <exclude domain="file" path="socialempires/saves/gunluk_yedek/" />
-    <!-- Sınırsız büyüyen günlükler ve ayarlar.json (ev_agi gibi güvenlik seçenekleri) yedeğe girmez (DGV-07) -->
+    <!-- Sınırsız büyüyen günlükler yedeğe girmez (DGV-07). ayarlar.json (ev ağı parolası) dahil edilmez; dahil olmayan yolu dışlamak lint hatasıdır -->
     <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl" />
     <exclude domain="file" path="socialempires/saves/komut_gunlugu.jsonl.1" />
     <exclude domain="file" path="socialempires/saves/http_gunlugu.jsonl" />
@@ -13,5 +13,4 @@
     <exclude domain="file" path="socialempires/saves/istemci_hatalari.jsonl.1" />
     <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log" />
     <exclude domain="file" path="socialempires/saves/sunucu_hatalari.log.1" />
-    <exclude domain="file" path="socialempires/ayarlar.json" />
 </full-backup-content>

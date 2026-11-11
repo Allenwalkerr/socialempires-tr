@@ -160,8 +160,9 @@ def depo_cikar(save, esya_id):
 def satis_iadesi(save, h, esya_id):
     """Satılan eşyanın %5'i iade edilir (cash ile alınanlar hariç)."""
     esya = get_item_from_id(esya_id)
-    if esya and esya.get("cost_type") != "c":
-        apply_cost(save["playerInfo"], h, esya_id, -0.05)
+    alan = KAYNAK_ALANI.get((esya or {}).get("cost_type"))
+    if alan:
+        bakiyeden_dus(h, alan, -int(0.05 * int(esya.get("cost") or 0)))
 
 
 def listeye_ekle(kap, anahtar, deger):
@@ -243,13 +244,15 @@ def _gunluge_yaz(USERID, komutlar):
     if not komutlar:
         return
     simdi = timestamp_now()
-    satirlar = []
     for cmd, args, red in komutlar:
         satir = {"ts": simdi, "user": str(USERID), "cmd": cmd, "args": args}
         if red:
             satir["red"] = red
-        satirlar.append(json.dumps(satir, ensure_ascii=False) + "\n")
-    gunlukler.ekle("komut_gunlugu.jsonl", "".join(satirlar))
+        metin = json.dumps(satir, ensure_ascii=False)
+        if len(metin) >= gunlukler.SATIR_SINIRI:  # uzun argüman kısaltılır; satır geçerli JSON kalır (#46 incelemesi)
+            satir["args"] = f"[kesildi: {len(metin)} karakter]"
+            metin = json.dumps(satir, ensure_ascii=False)
+        gunlukler.ekle("komut_gunlugu.jsonl", metin + "\n")  # sınır her komuta ayrı
 
 
 # ---------------------------------------------------------------------------

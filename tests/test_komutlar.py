@@ -147,6 +147,7 @@ class Kaynaklar(KomutTesti):
         self.komutlar.command("test", {"commands": [
             {"cmd": "buy", "args": [1, 30, 30, 0, 0, 0, 1, 0]},  # 30 odun, 20 var
             {"cmd": "buy", "args": [1, 31, 31, 0, 0, 0, -5, 0]},  # eksi çarpan
+            {"cmd": "buy", "args": [1, 32, 32, 0, 0, 0, -0.05, 0]},  # satış iadesinin çarpanı (#46 incelemesi)
             {"cmd": "rt_publish_score", "args": [7]}]})
         self.assertEqual((self.harita["wood"], len(self.harita["items"]), self.harita["xp"]), (20, esya, 7))
         self.harita["wood"] = 30

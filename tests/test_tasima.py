@@ -11,6 +11,7 @@ from oyun import kayit, tasima
 from oyun import sunucu as server
 
 KOD = "123456"
+GERCEK_GETIR = tasima._getir  # setUp sahtesiyle değiştirir; gerçek alıcıyı sınayan testler bunu çağırır
 
 
 class Tasima(unittest.TestCase):
@@ -55,8 +56,6 @@ class Tasima(unittest.TestCase):
         self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: "000000"}).status_code, 403)
 
     def test_alici_kodu_baslikla_yollar(self):
-        self.yama.stop()
-        self.addCleanup(self.yama.start)
         giden = []
 
         class Yanit:
@@ -67,9 +66,29 @@ class Tasima(unittest.TestCase):
             def read(self, n):
                 return b"{}"
         with mock.patch.object(tasima._ACICI, "open", lambda istek, timeout=None: giden.append(istek) or Yanit()):
-            tasima._getir("192.168.1.20", "/liste", KOD)
+            GERCEK_GETIR("192.168.1.20", "/liste", KOD)
         self.assertNotIn("kod", giden[0].full_url)
         self.assertEqual(giden[0].get_header(tasima.KOD_BASLIGI.capitalize()), KOD)
+
+    def test_eski_gondericiden_de_alinir(self):
+        """#46 incelemesi: bu sürümden önceki gönderici kodu yalnızca ?kod= ile okur; yeni alıcı 403'te o biçimle
+        bir kez yineler. Yeni gönderici başlıkla ilk istekte yanıt verir (adres satırına kod düşmez)."""
+        import io
+        giden = []
+
+        def eski_gonderici(istek, timeout=None):
+            giden.append(istek.full_url)
+            if "kod=" + KOD not in istek.full_url:
+                raise tasima.urllib.error.HTTPError(istek.full_url, 403, "kod", {}, io.BytesIO(b""))
+            return io.BytesIO(b"{}")
+        with mock.patch.object(tasima._ACICI, "open", eski_gonderici):
+            self.assertEqual(GERCEK_GETIR("192.168.1.20", "/liste", KOD), b"{}")
+        self.assertEqual(len(giden), 2)
+        giden.clear()
+        with mock.patch.object(tasima._ACICI, "open", lambda istek, timeout=None: giden.append(istek.full_url)
+                               or io.BytesIO(b"{}")):
+            GERCEK_GETIR("192.168.1.20", "/liste", KOD)
+        self.assertEqual(giden, ["http://192.168.1.20:5051/liste"])
 
     def test_tek_cihaz_gonderimi_kapatamaz(self):
         """DGV-02: yanlış denemeler adres başına sayılır; bir cihaz 5 yanlıştan sonra yalnızca kendisi reddedilir."""

@@ -158,16 +158,20 @@ _ACICI = urllib.request.build_opener(_YonlendirmeYok)
 
 
 def _getir(adres, yol, kod):
-    url = f"http://{_ev_agi_adresi(adres)}:{PORT}{yol}"
-    istek = urllib.request.Request(url, headers={KOD_BASLIGI: str(kod or "")})
-    try:
-        with _ACICI.open(istek, timeout=ZAMAN_ASIMI) as yanit:
-            return yanit.read(kayit_yedek.EN_BUYUK + 1)
-    except urllib.error.HTTPError as hata:
-        raise TasimaHatasi("kod" if hata.code == 403 else "yok")
-    except (urllib.error.URLError, OSError):
-        raise TasimaHatasi("ulasilamadi")
-
+    taban = f"http://{_ev_agi_adresi(adres)}:{PORT}{yol}"
+    istekler = [urllib.request.Request(taban, headers={KOD_BASLIGI: str(kod or "")}),
+                # Bu sürümden önceki gönderici kodu yalnızca ?kod= ile okur (#46 incelemesi): 403'te bir kez o biçimle
+                urllib.request.Request(f"{taban}?kod={urllib.request.quote(str(kod or ''))}")]
+    for sira, istek in enumerate(istekler):
+        try:
+            with _ACICI.open(istek, timeout=ZAMAN_ASIMI) as yanit:
+                return yanit.read(kayit_yedek.EN_BUYUK + 1)
+        except urllib.error.HTTPError as hata:
+            if hata.code == 403 and sira == 0:
+                continue
+            raise TasimaHatasi("kod" if hata.code == 403 else "yok")
+        except (urllib.error.URLError, OSError):
+            raise TasimaHatasi("ulasilamadi")
 
 HATALAR = {
     "adres": "Adres, gönderen cihazın ekranındaki 192.168.x.x biçiminde olmalı.",

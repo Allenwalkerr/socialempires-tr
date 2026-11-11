@@ -62,15 +62,18 @@ def _uret():
 
 
 _uretilen = None
+_kisa_uyarildi = False
 
 
 def parola() -> str:
     """Geçerli parola: ayarlardaki, yoksa dosyadaki, yoksa yeni üretilen."""
-    global _uretilen
-    ayardaki = str(ayarlar.oku().get("ev_agi_parolasi") or "")
+    global _uretilen, _kisa_uyarildi
+    # Formdaki giriş de kırpılır (giris): baştaki/sondaki boşluk iki yolda aynı sayılsın (#46 incelemesi)
+    ayardaki = str(ayarlar.oku().get("ev_agi_parolasi") or "").strip()
     if len(ayardaki) >= EN_KISA:
         return ayardaki
-    if ayardaki:
+    if ayardaki and not _kisa_uyarildi:  # her istekte değil, bir kez
+        _kisa_uyarildi = True
         print(f" ! ayarlar.json ev_agi_parolasi en az {EN_KISA} karakter olmali; uretilen parola kullaniliyor")
     with _kilit:
         if _uretilen is None:

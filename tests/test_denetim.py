@@ -219,6 +219,7 @@ class VarlikIndirme(unittest.TestCase):
         import io
         import json as js
         import tempfile
+        import urllib.parse
         from unittest import mock
         spec = importlib.util.spec_from_file_location("vi", os.path.join(KOK, "varliklari_indir.py"))
         vi = importlib.util.module_from_spec(spec)
@@ -229,7 +230,7 @@ class VarlikIndirme(unittest.TestCase):
         agac = {"tree": [{"type": "blob", "path": "assets/a/dogru.png"}, {"type": "blob", "path": "assets/a/yanlis.png"},
                          {"type": "blob", "path": "assets/a/listede_yok.png"}]}
         def ac(url, timeout=None):
-            if "api.github.com" in url:
+            if urllib.parse.urlsplit(url).hostname == "api.github.com":
                 return io.BytesIO(js.dumps(agac).encode())
             return io.BytesIO(dogru if url.endswith("dogru.png") else b"k" * 100)
         klasor = tempfile.mkdtemp()
