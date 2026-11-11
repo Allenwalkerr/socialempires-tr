@@ -21,8 +21,9 @@ from oyun.yollar import CEVIRI_DIR
 
 TR_DOSYASI = os.path.join(CEVIRI_DIR, "tr.json")
 
-# Çeviri sırasında korunması gereken yer tutucular: #0#, #1# ...
-YER_TUTUCU = re.compile(r"#\d+#")
+# Çeviri sırasında korunması gereken yer tutucular: #0#, #1# ..., %s / %d ve {0} (TRA-08, DNT-39; çeviri kapsamı
+# aracının tanımıyla aynı: araclar/ceviri_kapsami.py _YER_TUTUCU). "%50" gibi yüzde yazısı yer tutucu değildir.
+YER_TUTUCU = re.compile(r"#\d+#|%[sd]|\{\d+\}")
 ETIKET = re.compile(r"<[^>]+>")
 
 
@@ -186,7 +187,7 @@ def dogrula(kaynak, ceviri):
     """Çeviride yer tutucu / HTML etiketi kaybı var mı diye bakar."""
     sorunlar = []
     if sorted(YER_TUTUCU.findall(kaynak)) != sorted(YER_TUTUCU.findall(ceviri)):
-        sorunlar.append("yer tutucular birebir korunmamış (#0# gibi)")
+        sorunlar.append("yer tutucular birebir korunmamış (#0#, %s, {0} gibi)")
     if sorted(ETIKET.findall(kaynak)) != sorted(ETIKET.findall(ceviri)):
         sorunlar.append("HTML etiketleri birebir korunmamış")
     if kaynak.count("\n") != ceviri.count("\n"):

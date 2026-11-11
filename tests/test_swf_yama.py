@@ -350,12 +350,18 @@ class OnbellekTestleri(unittest.TestCase):
         with mock.patch("builtins.print"):
             yeni = swf_yama.onbellekli_turkcelestir(self.kaynak, onbellek)
         self.assertNotEqual(yeni, yol)
+        baska = os.path.join(onbellek, "uibaska.tr-0123456789ab.swf")  # başka bir SWF'nin kopyası
+        yedek = os.path.join(onbellek, "ui.tr-0123456789ab.swf.yedek")  # adı uyan ama kopya olmayan dosya
+        for y in (baska, yedek):
+            with open(y, "wb") as f:
+                f.write(b"x")
         with open(self.kaynak, "wb") as f:  # kaynak SWF değişince de yenilenir
             f.write(_swf(_etiket(37, _edit_text(2, "Cancel")[0]), _etiket(1, b"")))
         with mock.patch("builtins.print"):
             ucuncu = swf_yama.onbellekli_turkcelestir(self.kaynak, onbellek)
         self.assertNotIn(ucuncu, (yol, yeni))
-        self.assertEqual(sorted(os.listdir(onbellek)), sorted(os.path.basename(y) for y in (yol, yeni, ucuncu)))
+        # TRA-06 (DNT-38): eski kopyalar (her biri ~4 MB) birikmez; yalnızca son kalır, başka SWF'ninkine dokunulmaz
+        self.assertEqual(sorted(os.listdir(onbellek)), sorted(os.path.basename(y) for y in (ucuncu, baska, yedek)))
 
 
 # --- swf_font: DefineFont3 -------------------------------------------------------------------------------

@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "OYN-15",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #62 birleşti (dört öneri bitti). Küçük hatalar PR'ı: OYN-15, DNT-34, DNT-31; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, kalan denetim bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-38",
+    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #62 birleşti (dört öneri bitti). #63 (OYN-15, DNT-34, DNT-31) birleşti. DNT-38, DNT-39 PR'da; birleştirme sahibine sorulur (KAR-19). Sırada OYN-11/KYT-02 (5 günlük günlük ödül), OYN-12, 13, kalan denetim bulguları DNT-25 … DNT-40, GEC-09. Sahibine sorulacak: DNT-08, KMT-08, KMT-09, OYN-29, OYN-30. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -987,11 +987,11 @@
       "baslik": "Turnuvada listede gösterilen ödül ile verilen ödül farklı olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "İstemci listeyi tournament_reward_id[tür]'e göre gösterir; turnuva.bilgi orada hep 0 gönderir, katil ise reward_id'yi rastgele seçer (denge testlerini yazan alt ajan; bayt kodu yeniden okunmadı).",
       "test": "tests/test_denge.py: test_listede_gosterilen_odul_verilen_odul",
-      "pr": null,
+      "pr": "#63",
       "onay": null,
       "notlar": "Doğrulanmadı; GEC-05 turnuva işinde istemciden okunacak. 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): GEC-05 bunu okumadan kapandı, hata duruyor (✔ turnuva.bilgi tournament_reward_id hep 0, katil reward_id rastgele). 11.11.2026, bayt kodundan okundu ✔: TournamentManager$/getTournamentRewardIndex oyuncu turnuvada değilken tournament_reward_id[tür]'ü (for-in, anahtar tür kimliğine eşitse), turnuvadayken tournament.reward_id'yi gösterir; getRewardData prize[sıra]. Sunucu listede hep 0 yollayıp katılınca rastgele seçiyordu. Artık turnuva.siradaki_odul: ödül sırası Türkiye gününe göre döner (gün % prize sayısı); liste ve katılım aynı değeri kullanır. 3 bozma düştü."
     },
@@ -2144,11 +2144,11 @@
       "baslik": "Denetim DPT-05: Turnuva ve haftalık ödül oyuncu kaydını save_lock dışında değiştiriyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-05, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_denge.py: test_oyuncu_kaydina_kilitle_yazilir",
-      "pr": null,
+      "pr": "#63",
       "onay": null,
       "notlar": "turnuva._bitir/_odul_ver ve diyar.hafta_ucu yalnızca turnuva.KILIT alıyor; aynı anda gelen komutla yarış olabilir. 11.11.2026: turnuva._bitir, _odul_ver ve _reyting_isle oyuncu kaydını save_lock altında yazar. Kilit sırası KILIT → elo.KILIT → save_lock; save_lock tutan yol (command, dunya.tek_tick) turnuva/Elo kilidine gitmez (grep ile denetlendi), kilitlenme yok. 3 bozma düştü."
     },
@@ -2183,11 +2183,11 @@
       "baslik": "Denetim DPT-09: Lonca botu binanın bütün attrs'ini eziyor (bq, cp, hc kaybolur)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-09, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_dunya.py: test_lonca_binanin_oteki_ozelliklerini_silmez",
-      "pr": null,
+      "pr": "#63",
       "onay": null,
       "notlar": "oyun/dunya.py _lonca esya[7] = {...}; öneri esya[7].update(...). 11.11.2026: _lonca attrs'i yalnızca günceller (bq, cp kalır). Bozma düştü."
     },
@@ -2235,26 +2235,26 @@
       "baslik": "Denetim TRA-06: Türkçe SWF önbelleği birikiyor; tarayıcı bir gün eski çeviriyi saklıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-06, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_swf_yama.py: test_uretir_yeniden_kullanir_sozluk_degisince_yeniler",
       "pr": null,
       "onay": null,
-      "notlar": "download_assets/tr/*.tr-<özet>.swf (~4,3 MB) eskisi silinmiyor; SEND_FILE_MAX_AGE_DEFAULT 86400, adres hep aynı."
+      "notlar": "download_assets/tr/*.tr-<özet>.swf (~4,3 MB) eskisi silinmiyor; SEND_FILE_MAX_AGE_DEFAULT 86400, adres hep aynı. 11.11.2026: yeni Türkçe SWF üretilince aynı SWF'nin eski kopyaları (<ad>.tr-<12 hex>.swf) silinir; başka SWF'lere ve adı uyup biçimi uymayanlara dokunulmaz. Testin eski beklentisi (üç kopya kalır) bulgunun kendisiydi, bilerek değişti. Tarayıcının 1 gün eski çeviriyi saklaması (aynı adres, max-age 86400) bu işte çözülmedi, açık. 3 bozma düştü."
     },
     {
       "id": "DNT-39",
       "baslik": "Denetim TRA-08: turkce.dogrula yalnızca #n#, etiket ve satır sonunu denetliyor; %s/{0} kaybı geçer",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-08, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_sistemler.py: test_yer_tutucular_korunur, test_yer_tutucu_kurali_hicbir_ceviriyi_dusurmez",
       "pr": null,
       "onay": null,
-      "notlar": "Bugün 4573 çeviride sorun yok (denetçi ✔); ileride eklenecek çeviriye karşı koruma yok."
+      "notlar": "Bugün 4573 çeviride sorun yok (denetçi ✔); ileride eklenecek çeviriye karşı koruma yok. 11.11.2026: turkce.YER_TUTUCU artık #n#, %s/%d ve {n} (araclar/ceviri_kapsami.py ile aynı tanım). Önce ölçüldü: bugünkü 4983 çevirinin hiçbiri yeni kurala takılmıyor (İngilizce kalan olmaz). Bozma düştü."
     },
     {
       "id": "DNT-40",

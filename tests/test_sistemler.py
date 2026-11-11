@@ -379,6 +379,24 @@ class CeviriTestleri(unittest.TestCase):
     def test_yer_tutucular_korunur(self):
         from oyun.turkce import dogrula
         self.assertEqual(dogrula("Hi #0#, you have #1# gold", "Merhaba #0#, #1# altının var"), [])
+        # TRA-08 (DNT-39): %s/%d ve {0} kaybı da yakalanır (araclar/ceviri_kapsami.py _YER_TUTUCU ile aynı tanım);
+        # "%50" yüzde yazısıdır, yer tutucu değil
+        for kaynak, ceviri in (("You got %s gold", "Altın kazandın"), ("Level %d", "Seviye"),
+                               ("{0} attacked {1}", "{0} saldırdı")):
+            self.assertTrue(dogrula(kaynak, ceviri), kaynak)
+        self.assertEqual(dogrula("Get %s for %d", "%d karşılığında %s al"), [])  # sıra değişebilir
+        self.assertEqual(dogrula("50% off", "%50 indirim"), [])
+
+    def test_yer_tutucu_kurali_hicbir_ceviriyi_dusurmez(self):
+        """TRA-08 değişikliği: bugünkü çevirilerin hiçbiri yeni kurala takılıp İngilizce kalmamalı (denetçinin ölçümü:
+        4573 çeviride %s/{0} farkı yok)."""
+        import copy
+        from oyun.config import get_game_config
+        from oyun.turkce import _bolum_anahtarlari, cevirileri_yukle, dogrula
+        ceviri = cevirileri_yukle()
+        bozuk = [k for k, _b, m, _y in _bolum_anahtarlari(copy.deepcopy(get_game_config()))
+                 if k in ceviri and dogrula(m, ceviri[k])]
+        self.assertEqual(bozuk, [])
 
     def test_1407_hedefleri_ve_resimleri(self):
         from oyun.config import get_game_config
