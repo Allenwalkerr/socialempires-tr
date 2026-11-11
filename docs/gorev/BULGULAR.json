@@ -1013,13 +1013,13 @@
       "baslik": "Savunma ödülü geri kazanılan birimleri düşüyor olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
-      "kanit": "İstemci Assault$/killed kurbana her ölen saldıran birim için öder; sunucu kalıcı kaybı (ölen − kurtarılan) sayıyor; attacker_units'in 4. alanının 'kurtarılan' olduğu doğrulanmadı (alt ajan).",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "İstemci Assault$/killed kurbana her ölen saldıran birim için öder; sunucu kalıcı kaybı (ölen − kurtarılan) sayıyor; attacker_units'in 4. alanının 'kurtarılan' olduğu doğrulanmadı (alt ajan). 11.11.2026: Assault$/killed@393-435 ölen her saldıran birim için FIELD_KILLED++ ve iGoldGainedVictim += ceil(değer*0.1); Assault$/recoverPlayerUnits@79-104 FIELD_RECOVERED = FIELD_KILLED yapar, sonra yalnızca RECOVERED'ı düşer. Ödül brüt ölümle; pvp.py tavanı net ölümle (kurtarılan düşülmüş) kuruyordu.",
+      "test": "tests/test_denge.py: test_savunma_odulu_kurtarilanlar_dahil; tests/test_komutlar.py: test_kaybedince_savunan_odullenir",
       "pr": null,
       "onay": null,
-      "notlar": "GEC-05'te doğrulanacak."
+      "notlar": "GEC-05'te doğrulanacak. Düzeltme: savunma ödülü tavanı brüt ölümle (satır[2]); kalıcı birim silme net kalır. test_komutlar'ın eski beklentisi (net, 20) istemcinin kaynağıyla güncellendi (brüt 2 birim, 40). Yeni testler eski kodda 2 kez düşüyor."
     },
     {
       "id": "ONR-01",

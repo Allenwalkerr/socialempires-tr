@@ -149,6 +149,14 @@ class PvpSonucTestleri(KomutTesti):
                         resources_victim={"g": gelen})
             self.assertEqual(harita["coins"] - 50000, beklenen)
 
+    def test_savunma_odulu_kurtarilanlar_dahil(self):
+        # OYN-17: tavan brüt ölümle; satır [id, başlangıç, ölen, kurtarılan], kurtarma ölen alanını azaltmaz
+        # (Assault$/recoverPlayerUnits FIELD_RECOVERED = FIELD_KILLED, sonra yalnızca RECOVERED düşer).
+        harita = self.kurban["maps"][0]
+        harita["coins"] = 50000
+        self.saldir(win=0, resources={"g": 0, "x": 0}, attacker_units=[[512, 5, 3, 3]], resources_victim={"g": 9999})
+        self.assertEqual(harita["coins"] - 50000, 3 * 20)
+
 
 class YeniOyuncuKalkaniTestleri(KomutTesti):
     """Yeni köy kalkanla başlar (KYT-03: new_village shield_until = şimdi + YENI_OYUNCU_KALKANI).

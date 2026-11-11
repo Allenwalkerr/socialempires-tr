@@ -564,8 +564,9 @@ class PvpKomutlari(KomutTesti):
 
     def test_kaybedince_savunan_odullenir(self):
         self.saldir(win=0, resources={"g": 0, "x": 0}, resources_victim={"g": 9999})
-        # saldıranın 1 birimi kalıcı öldü -> en çok 20 altın
-        self.assertEqual(self.kurban["maps"][0]["coins"], 50020)
+        # saldıranın satırı [512, 4, 2, 1]: 2 birim öldü (1'i sonra kurtarıldı). İstemci ödülü her ölen için ekler
+        # (Assault$/killed@393-435; recoverPlayerUnits yalnızca FIELD_RECOVERED'ı ayarlar, OYN-17): en çok 2 × 20
+        self.assertEqual(self.kurban["maps"][0]["coins"], 50040)
 
     def test_kalici_kayiplar_haritadan_silinir(self):
         self.harita["items"] += [[512, 1, 1, 0, 0, 0], [512, 2, 2, 0, 0, 0]]

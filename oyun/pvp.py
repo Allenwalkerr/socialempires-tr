@@ -237,7 +237,11 @@ def saldiri_bitir(saldiran, args):
     kps = kurban["privateState"]
     savunma_odulu = 0
     if not kazandi:
-        olduren = sum(_olenler(veri.get("attacker_units")).values())
+        # OYN-17: istemci ödülü her ölen saldıran birim için ekler (Assault$/killed@393-435: FIELD_KILLED++ ve
+        # iGoldGainedVictim += ceil(değer*0.1)); kurtarma (recoverPlayerUnits) yalnızca FIELD_RECOVERED'ı ayarlar.
+        # Tavan brüt ölümle (satır[2]); kalıcı birim silme net kalır (_olenler).
+        olduren = sum(max(0, _tam(satir[2])) for satir in (veri.get("attacker_units") or [])
+                      if isinstance(satir, list) and len(satir) >= 3)
         savunma_odulu = max(0, min(_tam((veri.get("resources_victim") or {}).get("g")),
                                    SAVUNMA_BIRIM_ODULU * olduren))
         kurban["maps"][0]["coins"] = int(kurban["maps"][0].get("coins", 0)) + savunma_odulu
