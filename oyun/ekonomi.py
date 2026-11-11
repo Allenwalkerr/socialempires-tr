@@ -16,8 +16,8 @@ def apply_cost(playerInfo: dict, map: dict, id: int, price_multiplier: int) -> N
     elif cost_type == "f":
         map["food"] = max(map["food"] - cost, 0)
 
-def apply_collect(playerInfo: dict, map: dict, id: int, resource_multiplier: int) -> None:
-    collect = int(resource_multiplier * int(get_attribute_from_item_id(id, "collect")))
+def apply_collect(playerInfo: dict, map: dict, id: int, resource_multiplier: int, miktar: int = None) -> None:
+    collect = int(resource_multiplier * int(get_attribute_from_item_id(id, "collect"))) if miktar is None else miktar
     collect_type = get_attribute_from_item_id(id, "collect_type")
     apply_collect_xp(map, id)
     if collect_type == "w":

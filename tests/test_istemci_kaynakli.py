@@ -242,5 +242,37 @@ class AskerToplama(KomutTesti):
         self.assertEqual(self.ps["recruitmentPrices"], [1])
 
 
+
+class UretimSecimliToplama(KomutTesti):
+    """EKF-01 (bağımsız denetim). İstemci IsoElement/collect (1.4.07): taban = floor(collect) *
+    getResourceMultiplier; bina globals.COLLECT_VARIABLE_IDS'teyse (PopupCollect$/doShit) çarpan
+    Config.COLLECT_MULTIPLIER[cp - 1] = [0.5, 1, 2, 3][cp - 1] (Config/<sınıf>); içerideki birim > 1 ise
+    floor(floor(taban + (birim - 1) * taban * MULTIPLIER_PEASANTS) * çarpan), MULTIPLIER_PEASANTS = 0.2. Komut
+    argümanları [tx, ty, townID, id, iUnitsContainedWhenHarvested, getResourceMultiplier, nakit]. Mill II (6):
+    config collect 300 yemek, COLLECT_VARIABLE_IDS'te."""
+
+    def topla(self, cp, birim, kaynak_carpani=1, esya_id=6):
+        self.harita["items"] = [[esya_id, 30, 30, 0, 0, 0, [], {}]]
+        if cp:
+            self.komut("activate", 30, 30, 0, esya_id, cp)
+        once = self.harita["food"]
+        self.komut("collect_new", 30, 30, 0, esya_id, birim, kaynak_carpani, 0)
+        return self.harita["food"] - once
+
+    def test_secilen_sure_carpani(self):
+        self.assertEqual([self.topla(cp, 1) for cp in (1, 2, 3, 4)], [150, 300, 600, 900])
+
+    def test_icerideki_birimler(self):
+        # 3 birim, 8 saat: floor(floor(300 + 2 * 300 * 0.2) * 3) = 1260; 1 birim: 900
+        self.assertEqual((self.topla(4, 3), self.topla(4, 1), self.topla(4, 0)), (1260, 900, 900))
+        # #45 incelemesi: birim sayısı istemciden gelir, config unit_capacity (Mill II: 4) ile sınırlı:
+        # floor(floor(300 + 3 * 300 * 0.2) * 3) = 1440
+        self.assertEqual((self.topla(4, 10 ** 9), self.topla(4, 4)), (1440, 1440))
+
+    def test_kaynak_carpani_ve_secimsiz_bina(self):
+        self.assertEqual(self.topla(2, 1, kaynak_carpani=2), 600)
+        self.assertEqual(self.topla(0, 1), 300)  # cp yok: sunucu 1 sayar (istemcide parseInt(undefined) NaN olurdu, ◐)
+
+
 if __name__ == "__main__":
     unittest.main()

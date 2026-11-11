@@ -1,10 +1,10 @@
 {
   "surum": "0.08a",
-  "guncelleme": "2026-11-06",
+  "guncelleme": "2026-11-10",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "OYN-14",
-    "sonraki_adim": "Bulut oturumu 6.11.2026 (2). #39 birleşti (7afe6fd). OYN-14 düzeltildi, PR #40 açık (claude/keen-keller-83oji2): sahibinin onayıyla birleşir. TST-04 yeniden ölçümü bulutta 7afe6fd üzerinde koşuyor (4 çekirdek, 3 işçi, ~2,5 saat); bitince docs/TEST_OLCUMU.md §12'ye yazılıp ayrı PR açılır. Sonra KAR-13 bağımsız denetim (başlamadan önce sahibine kullanım payı hatırlatılır), GEC-04'ün kalanı ve GEC-05. Sahibinden kararlar: KMT-08, KMT-09, denge sabitleri (TST-04 notları), ONR-01..04, v0.1.0 (GEC-09)."
+    "madde": "GEC-04",
+    "sonraki_adim": "Bulut oturumu 10.11.2026. Sahibi otomatik birleştirmeyi açtı; bundan sonra tek yardımcı ajan. GEC-04 geri dönüş testi ve KYT-05 PR'da. KAR-13: kayıt alanının yarım raporu (KYG-01..04, ✔ yazıyor) yeniden üretilecek; ekonomi alanı yardımcı ajanda; kalan alanlar (sunucu-komutlar, dunya-pvp-turnuva, turkce-arayuz, dagitim-guvenlik) sırayla aynı ajana. TST-04 ölçümü da09896 üzerinde baştan koşuyor (~2,5 saat); bitince docs/TEST_OLCUMU.md §12. Sonra GEC-05."
   },
   "maddeler": [
     {
@@ -857,13 +857,13 @@
       "baslik": "Kayıt: ~30 yeni alan, şema ve değişmezlikli göç",
       "sinif": "ozellik",
       "onem": "Yüksek",
-      "durum": "acik",
-      "isaret": "?",
-      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da.",
-      "test": null,
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Plan: docs/YOL_HARITASI_1407.md §3; kabul kapısı orada yazılı. Başlangıç ölçümleri KYN-05 ve bu PR'da. 10.11.2026: kabul kapısı testle: tests/test_kayit_gocu.py gerçek biçimli 5 köy (villages/, sürümsüz) ve en küçük kaydın 1.4.07 öncesi 7 sürümü (0.01a..0.07a; depo ve mezarlık dolu) bütün yükleme yolundan geçer: I(g(s)) = I(s) (belgedeki 12 değer), g(g(s)) = g(s) (ikinci yükleme kaydı ve dosyayı değiştirmez, .bak'ı ezmez), geri dönüş (.bak eski dosyanın baytları, göç öncesi yedek eski kaydın kendisi). 7 bozmanın 7'si düştü. Değişmezlik testi bir hata buldu: KYT-05.",
+      "test": "tests/test_kayit_gocu.py; tests/test_kayit_semasi.py; tests/test_gorev_gocu.py",
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). İlk parça GOR-01 (31.10.2026): kayıt 0.07a, görev numaralarının göçü; migrate_loaded_save artık göç öncesi yedekten okunan eski numaraları alır (kayit.eski_gorev_numaralari). Sıradaki parça: yeni privateState alanları. İkinci parça KYT-01 (31.10.2026): kayıt 0.08a, 1.4.07'nin yokluğunda bozulduğu alanlar; şema oyun/kayit_semasi.py; kaydi_dogrula eksik alanı reddeder. Kalan: geri dönüş testi. 10.11.2026: geri dönüş testi yazıldı; kabul kapısının üç koşulu testte."
     },
     {
       "id": "GEC-05",
@@ -974,7 +974,7 @@
       "baslik": "Bot dünyası seviye eşiğini sunucunun geri kalanından bir kaydırarak okuyor",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "oyun/dunya.py:535 _ekonomi levels[n].exp_required'ı n. seviyenin eşiği sayar; config.get_level_from_xp (kayit._seviyeyi_duzelt her yüklemede) levels[i]'yi i+1'in eşiği sayar (test_komutlar: 'eşikler 0, 29, 60: 29 xp ile 2. seviye'). Alt ajan iki yolu çalıştırarak gösterdi; kod okunarak doğrulandı. 6.11.2026: istemcinin kuralı bayt kodundan okundu (araclar/abc_okur.py, SocialEmpires1.4.07sec_fixed.swf, SHA-256 doğrulandı): PlayerStatus/checkForLevelUp iExperience >= arLevelList[iLevel].exp_required ise iLevel + 1; PlayerStatus/Init XP çubuğu arLevelList[iLevel - 1] .. arLevelList[iLevel], iLevel >= length ise length - 1. Yani levels[i] (i+1). seviyenin eşiği: config.get_level_from_xp istemciyle aynı; dunya._ekonomi, rt_level_up, sunucu._xp_araligi, hile paneli ve get_xp_from_level bir kayıktı.",
       "test": "tests/test_seviye.py; tests/test_dunya.py: test_bot_istemcinin_esiginde_seviye_atlar",
@@ -1305,7 +1305,7 @@
       "test": null,
       "pr": null,
       "onay": "Sahibi, 31 Ekim 2026",
-      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır."
+      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor)."
     },
     {
       "id": "KAR-14",
@@ -1520,13 +1520,117 @@
       "baslik": "Seviye atlayan oyuncu kayıt yeniden açılınca bir seviye daha atlıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Çalıştırıldı (6.11.2026, master 7afe6fd): seviye 1, 29 XP; rt_level_up [2] sonrası xp 60 (levels[2]); kayit._seviyeyi_duzelt 'seviye duzeltildi: 2 -> 3'. Hile panelindeki '+1 seviye' de XP'yi bir sonraki eşiğe koyuyordu (aynı sonuç); 'En yüksek seviye' XP'yi 2016089205 yapıyordu. Kök neden OYN-14.",
       "test": "tests/test_seviye.py: RtLevelUp, HilePaneliSeviye",
       "pr": "#40",
       "onay": null,
       "notlar": "Etkilenmiş eski kayıtlar düzeltilmez: XP'si eşiğe çekilmiş oyuncunun fazladan seviyesi kalır (geri almak kazanılmış seviyeyi silerdi). Sahibi isterse ayrı karar."
+    },
+    {
+      "id": "KYT-05",
+      "baslik": "Yükleme, seviyesi XP'sinden yüksek kaydın seviyesini düşürüyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Çalıştırıldı (10.11.2026, master da09896): villages/Arthur30.json (seviye 53, 69 467 XP) kayıt olarak yüklenince 'seviye duzeltildi: 53 -> 34'. kayit._seviyeyi_duzelt seviyeyi her yüklemede get_level_from_xp'ye eşitliyordu. İstemci seviyeyi yalnızca yukarı taşır (PlayerStatus/checkForLevelUp) ve kayıttakini length - 1'e kadar olduğu gibi alır (PlayerStatus/Init; OYN-14'te okundu).",
+      "test": "tests/test_kayit_gocu.py: SeviyeDuzeltmesi, test_degismezlik",
+      "pr": null,
+      "onay": null,
+      "notlar": "Düzeltme: seviye XP'nin altındaysa yükselir (bozuk XP'li seviye 0 kaydı için eski amaç korunur), 99'un üstündeyse 99'a iner, XP'den yüksekse dokunulmaz. Bağımsız denetimin kayıt alanı (KAR-13, yarım rapor) aynı yolun pid'i sayı olan kayıtta sunucuyu düşürdüğünü yazdı; o bulgu ayrıca yeniden üretilecek."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_kayit_gocu.py: YuklemeDayanikliligi",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-05",
+      "baslik": "Kimliği sayı olan kayıt sunucunun açılışını düşürüyordu",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-01 (docs/denetim/kayit-goc.md). Yeniden üretildi (10.11.2026, master 1a54553): saves/777.save.json, playerInfo.pid = 777, sürüm 0.05a; load_saved_villages göçten sonra save_session(777) → session'ın str denetimi AssertionError, yükleme yarıda. Yedek zarfı (kayit_yedek.zarfi_ac) kimliği str(...) ile denetlediği için böyle kaydı içeri alıyordu.",
+      "notlar": "Düzeltme: yükleme sayı kimliği str'ye çevirip kaydeder; kayıt başına düzeltme ve yazım hatası yakalanır (tek kayıt bütün yüklemeyi düşürmez); zarfi_ac kimliğin str olmasını şart koşar. Testler eski kodda 3'ü de düşüyor."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_kayit_gocu.py: test_bak_ile_geri_alinan_eski_kayit_da_gocer",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-06",
+      "baslik": "Bozuk kayıt .bak'tan geri alınınca göç atlanıyordu",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim KYG-03. Yeniden üretildi (10.11.2026): canlı dosya yarım ('{\"yarim'), .bak 0.05a; yüklemeden sonra bellekte ve dosyada sürüm 0.05a. Neden: `save.pop('_bak_kullanildi') or _yukleme_duzeltmeleri(save)` kısa devresi.",
+      "notlar": "Düzeltme: ikisi de çalışır; .bak'tan gelen kayıt göç öncesi yedeği alınıp göçer ve kaydedilir."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-07",
+      "baslik": "Yedek içe aktarma ya da taşıma öncesi hâl yalnızca .bak'ta, o da ilk kayıtta eziliyor",
+      "onem": "Yüksek",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim KYG-02 (denetçi ✔ yazdı; bu oturumda yeniden üretilmedi): kayit_yedek.geri_yukle ve tasima önceki kaydı .bak'a kopyalar, ilk save_session .bak'ı ezer; backups/ boş kalır.",
+      "notlar": "Yeniden üretilecek. Öneri: üzerine yazmadan önce adlı, budanmayan bir yedek."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-08",
+      "baslik": "0.06a kaydın görev numarası çevirisi göç öncesi yedeğin bulunduğu makineye bağlı",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim KYG-04 (denetçi ✔ yazdı; yeniden üretilmedi): kayit.eski_gorev_numaralari yalnızca yerel backups/<uid>.goc-*.save.json'a bakar; içe aktarılan 0.06a kayıtta eski numaralar çevrilmez.",
+      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır)."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_istemci_kaynakli.py: UretimSecimliToplama",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-09",
+      "baslik": "Üretim süresi seçilen binada toplama, seçimi ve içerideki birimleri yok sayıyordu",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim EKF-01 (docs/denetim/ekonomi-formuller.md). Yeniden üretildi (10.11.2026): istemci IsoElement/collect @3170-3365 çarpanı Config.COLLECT_MULTIPLIER[cp - 1] = [0.5, 1, 2, 3] (Config/<sınıf> @1915) ile, içerideki birimi MULTIPLIER_PEASANTS 0,2 ile uygular; seçimli binalar globals.COLLECT_VARIABLE_IDS (Base/init, PopupCollect$/doShit). collect_new argümanları [tx, ty, townID, id, iUnitsContainedWhenHarvested, getResourceMultiplier, nakit] (@3941). Sunucu Mill II 8 saatte 300 yazıyordu, istemci 900 gösterir.",
+      "notlar": "Düzeltme: komutlar.toplama_miktari istemcinin formülü. 6 bozmanın 6'sı düştü. cp yoksa sunucu 1 sayar (istemcide parseInt(undefined) NaN olurdu, ◐)."
+    },
+    {
+      "sinif": "hata",
+      "test": "tests/test_seviye.py: test_seviye_odulu_kayda_yazilir",
+      "pr": null,
+      "onay": null,
+      "id": "DNT-10",
+      "baslik": "Seviye atlama ödülü kayda yazılmıyordu",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim SNK-01 (docs/denetim/sunucu-komutlar.md). Yeniden üretildi: istemci PopupLevel/<kurucu> @256-328 arLevelList[iLevel - 1].reward_amount'ı Player.adjustStatByType ile kendisi ekler, komut göndermez; rt_level_up yalnızca seviyeyi yazıyordu. Config: 96 seviyede nakit, 2 odun, 1 taş, 1 yemek.",
+      "notlar": "Düzeltme: rt_level_up atlanan her seviyenin ödülünü verir; aynı komut yeniden gelirse vermez. 3 bozmanın 3'ü düştü. Daha önce birikmiş kayıp ödüller geri verilmez."
+    },
+    {
+      "sinif": "hata",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "id": "DNT-11",
+      "baslik": "Gönüllü bitirilen saldırının zafer sayıldığı iddiası (denetim DPT-01)",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "✔",
+      "kanit": "Bayt kodu (10.11.2026): Assault$/sendAssaultResults 'win' = bPlayerWinner ? 1 : 0, 'voluntary_end' = bVoluntaryEnd ? 1 : 0 (@217-276). Teslim olma StateAssault/onSurrenderConfirmed assaultEnd(false, false, true) çağırır: win 0 gider. Denetçinin 'sabit win: 1' okuması abc_okur.cagrilar'ın koşullu değeri tek sabite indirmesinden (S-63).",
+      "notlar": "Denetimin öteki DPT bulguları (docs/denetim/dunya-pvp-turnuva.md) yeniden üretilmeyi bekliyor; cagrilar çıktısına dayananlar ayrıca denetlenecek."
     }
   ]
 }

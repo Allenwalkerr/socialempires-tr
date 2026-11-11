@@ -78,8 +78,8 @@ def zarfi_ac(veri, oturum_uid):
         kaydi_dogrula(kayit)  # sunucunun bir sonraki açılışını bozacak kayıt içeri alınmaz
     except ValueError:
         raise YedekHatasi("sema")
-    kimlik = str(kayit["playerInfo"].get("pid", ""))
-    if kimlik != zarf_.get("kimlik") or not gecerli_uid(kimlik):
+    kimlik = kayit["playerInfo"].get("pid")
+    if not isinstance(kimlik, str) or kimlik != zarf_.get("kimlik") or not gecerli_uid(kimlik):  # KYG-01
         raise YedekHatasi("kimlik")
     if kimlik != oturum_uid and kimlik in all_saves_userid():
         raise YedekHatasi("cakisma")
