@@ -334,4 +334,18 @@ def onbellekli_turkcelestir(kaynak_yol: str, onbellek_klasoru: str) -> str:
                 f.write(yeni)
             os.replace(gecici, hedef)
             print(f" [+] {ad}.swf Turkcelestirildi ({degisen} metin alani)")
+            _eskileri_sil(onbellek_klasoru, ad, hedef)
     return hedef
+
+
+def _eskileri_sil(klasor, ad, kalacak):
+    """Aynı SWF'nin önceki sözlükle üretilmiş kopyaları (her biri ~4 MB) birikmesin (TRA-06, DNT-38). Yalnızca
+    `<ad>.tr-<12 hex>.swf`; başka SWF'lerin kopyalarına dokunulmaz. Silinemeyen (ör. Windows'ta açık) dosya kalır."""
+    desen = re.compile(re.escape(ad) + r"\.tr-[0-9a-f]{12}\.swf")
+    for dosya in os.listdir(klasor):
+        yol = os.path.join(klasor, dosya)
+        if desen.fullmatch(dosya) and yol != kalacak:
+            try:
+                os.remove(yol)
+            except OSError as hata:
+                print(f" ! Eski Turkce SWF silinemedi ({dosya}): {hata}")
