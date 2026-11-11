@@ -286,6 +286,9 @@ def new_village() -> str:
     village["maps"][0]["timestamp"] = timestamp_now()
     village["privateState"]["dartsRandomSeed"] = abs(int((2**16 - 1) * random.random()))
     village["privateState"]["shield_until"] = timestamp_now() + denge.YENI_OYUNCU_KALKANI
+    # KYT-03: istemci kalkanı yalnızca shieldEndTime'dan okur (ShieldManager/setPlayerShieldState); yeni oyuncu
+    # koruması oyunda da görünsün. Oyuncu saldırınca begin_attack_new ikisini de kaldırır.
+    village["privateState"]["shieldEndTime"] = village["privateState"]["shield_until"]
     eksikleri_tamamla(village["privateState"])
     # Memory saves
     __saves[USERID] = village

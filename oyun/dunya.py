@@ -15,7 +15,7 @@ import random
 import threading
 import time
 
-from oyun import ayarlar, denge
+from oyun import ayarlar, denge, pvp_yeni
 from oyun.config import get_game_config, get_level_from_xp
 from oyun.kayit import all_saves_userid, save_lock, save_session, session
 from oyun.turkce import cevirileri_yukle
@@ -431,7 +431,7 @@ class Dunya:
                 # Oyuncuya akınlar da aralıklı ve kalkana saygılı
                 yarim = int(self.ayar.get("oyuncu_saldiri_araligi", 600)) // 2
                 if (simdi - self._son_oyuncu_saldiri < yarim or int(hedef["maps"][0].get("level", 1)) < 6
-                        or int(hedef.get("privateState", {}).get("shield_until", 0) or 0) > simdi):
+                        or pvp_yeni.kalkan_bitisi(hedef) > simdi):
                     continue
             uyeler = [(u, k) for u, k in botlar
                       if u != sefer["hedef"] and self._ittifak(u, k) == sefer["ittifak"]
@@ -615,7 +615,7 @@ class Dunya:
                 for u, k in oyuncu_hedefleri:
                     if int(k["maps"][0].get("level", 1)) < 6:
                         continue
-                    if int(k.get("privateState", {}).get("shield_until", 0) or 0) > simdi:
+                    if pvp_yeni.kalkan_bitisi(k) > simdi:  # satın alınan kalkan da (KYT-03)
                         continue
                     guc = ordu_gucu(birim_sayilari(k)) + kule_gucu(k) * 0.6
                     adaylar.append((u, k, max(0.05, (kendi_guc / max(1.0, guc)) ** 0.8 * 0.8)))
@@ -797,7 +797,7 @@ class Dunya:
                 "kaynaklar": {k: int(harita.get(k, 0)) for k in ("coins", "wood", "stone", "food")},
                 "birim": sum(birimler.values()),
                 "ofke": len(ofke),
-                "kalkan": max(0, int(kayit.get("privateState", {}).get("shield_until", 0) or 0) - int(time.time())),
+                "kalkan": max(0, pvp_yeni.kalkan_bitisi(kayit) - int(time.time())),
                 "konum": {"x": round(x, 1), "y": round(y, 1)},
                 "ittifak": self.ittifak_adi(uid, kayit) if pi.get("bot") else "",
             })

@@ -147,6 +147,8 @@ class YeniOyuncuKalkaniTestleri(KomutTesti):
         uid = kayit.new_village()
         yeni = kayit.session(uid)
         self.assertGreater(int(yeni["privateState"]["shield_until"]), timestamp_now())
+        # KYT-03: istemci kalkanı shieldEndTime'dan okur (ShieldManager/setPlayerShieldState): oyunda da görünür
+        self.assertEqual(yeni["privateState"]["shieldEndTime"], yeni["privateState"]["shield_until"])
         self.kayitlar["yeni"] = yeni
         veri = {"attacker": {"user_id": "test", "map": 0}, "victim": {"user_id": "yeni", "level": 1},
                 "resources": {"g": 500, "x": 0}, "resources_victim": {"g": 0},

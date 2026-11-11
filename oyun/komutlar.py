@@ -15,7 +15,7 @@ import math
 import os
 import traceback
 
-from oyun import gunlukler, pvp
+from oyun import gunlukler, pvp, pvp_yeni
 from oyun.config import (en_yuksek_seviye, get_game_config, get_item_from_id, get_item_from_subcat_functional,
                          get_level_from_xp, get_xp_from_level)
 from oyun.ekonomi import Yetersiz, apply_collect, apply_collect_xp, apply_cost, bakiyeden_dus, timestamp_now
@@ -2118,6 +2118,53 @@ def attack_player(save, a):
 @komut("end_attack")
 def end_attack(save, a):
     pvp.saldiri_bitir(save, a.liste)
+
+
+# --- 1.4.07'nin yeni PvP'si (GEC-05; kaynakları oyun/pvp_yeni.py'de) ---
+
+@komut("get_enemy_new")
+def get_enemy_new(save, a):
+    """[arama_bedeli, aramaSayisi] - PVPManager/searchEnemy; rakip pvp/enemy ucundan gelir."""
+    pvp_yeni.arama(save, a, kaynak_ekle)
+
+
+@komut("begin_attack_new")
+def begin_attack_new(save, a):
+    """[zaman] - PVPManager/loadMap; saldıranın kalkanı kalkar."""
+    pvp_yeni.saldiri_basladi(save, a)
+
+
+@komut("reset_shield")
+def reset_shield(save, a):
+    """[] - ShieldManager/disableShield, _checkCoolDown."""
+    pvp_yeni.kalkan_sifirla(save, a)
+
+
+@komut("buy_shield")
+def buy_shield(save, a):
+    """[kalkan_id] - ShieldManager/buyShield."""
+    pvp_yeni.kalkan_al(save, a, kaynak_ekle)
+
+
+@komut("reply_attack")
+def reply_attack(save, a):
+    """[attackTime] - PVPManager/loadMap (intikam): günlükteki o saldırı intikam alınmış sayılır
+    (AttackLogItem kaydın 'reply' alanını okur)."""
+    gunluk = save["privateState"].get("PVPattacksReceived")
+    if isinstance(gunluk, dict) and isinstance(gunluk.get(str(a.tam(0))), dict):
+        gunluk[str(a.tam(0))]["reply"] = 1
+
+
+@komut("clean_attack_log")
+def clean_attack_log(save, a):
+    """[] - yalnızca AdminPanel/cleanAttackLog gönderir: yeni saldırı günlüğü boşalır."""
+    save["privateState"]["PVPattacksReceived"] = {}
+
+
+@komut("end_tournament_match")
+def end_tournament_match(save, a):
+    """[kazandi(1|0)] - TournamentManager$/shutMatch; sonucu aynı yöntemin çağırdığı
+    tournaments/finish_tournament_match.php işler (turnuva.mac_bitir). Komut kayda bir şey yazmaz."""
 
 
 @komut("clean_attacks")
