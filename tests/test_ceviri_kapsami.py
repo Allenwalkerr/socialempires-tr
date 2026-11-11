@@ -9,6 +9,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import unittest.mock
 
 import ortak  # noqa: F401
 
@@ -41,6 +42,41 @@ class DilMetni(unittest.TestCase):
         self.assertEqual(ck.hedef_metinleri(hedefler), [
             ("goal:7:baslik", "Build a farm"), ("goal:7:aciklama", "Farms give food"),
             ("goal:7:talimat", "Click")])
+
+
+class As3Guvenligi(unittest.TestCase):
+    """GEC-06: swf_yama bir dizeyi sabit havuzunda değiştirir, o dizenin her kullanımı birlikte değişir. Deneme
+    ABC'sinde (test_komut_imzalari): "Level " bir kez itilir ve `x.text = "Level " + y` ile ekrana gider; "buy"
+    iki kez itilir (komut adı), hiç ekrana gitmez; "text" ve "cmd" çok adlıdır (özellik adı)."""
+
+    def test_guvensizler(self):
+        g = ck.as3_guvensizler(swf_kur(abc_kur()), ["Level ", "buy", "text", "cmd"])
+        self.assertEqual(set(g), {"buy", "text", "cmd"})
+        self.assertEqual(g["buy"], "2 kullanımın 0'i ekrana gidiyor")
+        self.assertEqual(g["text"], "ad olarak da geçiyor")
+
+    def test_guvensiz_ceviri_cevrilmis_sayilmaz(self):
+        """Ekran dizesi bir yerde ad olarak da geçerse sözlükte olsa bile çevrilmiş sayılmaz ve listelenir."""
+        sozluk = {"metin_alanlari": {}, "statik_yazilar": {}, "as3_dizeleri": {"Level ": "Seviye "}}
+        with unittest.mock.patch.object(ck, "as3_guvensizler", lambda veri, d: {"Level ": "ad olarak da geçiyor"}):
+            sonuc = ck.olc(swf_kur(abc_kur()), {}, [], sozluk, {})
+        self.assertEqual((sonuc["as3_dizeleri"]["cevrilen"], sonuc["as3_dizeleri"]["gereken"]), (0, 1))
+        self.assertEqual(sonuc["as3_guvensiz"], {"Level ": "ad olarak da geçiyor"})
+
+
+class Dolgu(unittest.TestCase):
+    def test_dolgu_dosyasi(self):
+        """ceviri/dolgu.json: her dolgunun bir nedeni var ve anahtar swf_yama.anahtar biçiminde (etiketsiz,
+        kırpılmış); yoksa ölçüm onu bulamaz. Dolgu dil metni sayılmaz."""
+        from oyun import swf_yama
+        dolgu = ck._dolgu_yukle()
+        self.assertGreater(len(dolgu), 0)
+        for metin, neden in dolgu.items():
+            self.assertTrue(neden.strip(), metin)
+            self.assertEqual(swf_yama.anahtar(metin), metin)
+        self.assertIn("lblScore", dolgu)  # alan adı biçiminde şablon (1.4.07 metin alanı)
+        self.assertFalse(ck.dil_metni_mi("lblScore"))
+        self.assertTrue(ck.dil_metni_mi("lblScoreX"))
 
 
 class HedefCevirisi(unittest.TestCase):

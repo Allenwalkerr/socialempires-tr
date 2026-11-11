@@ -42,9 +42,19 @@ YAZI_ALANLARI = {"text", "htmlText", "noElementsText", "STR_TEXT_DESC", "require
 YAZI_CAGRILARI = {"setHTML", "setText", "appendText", "failAlert", "say", "setTextAssault", "confirm",
                   "withAttackName", "withCantMessage"}
 
-# Geliştiricinin bıraktığı, oyunda görünmeyen ya da hemen üzerine yazılan dolgu metinleri. Ölçümle
-# bulunur ve buraya tek tek yazılır; her biri `docs/inceleme/ceviri-kapsami.md`'de listelenir.
-DOLGU = set()
+# Geliştiricinin bıraktığı dolgu, şablon ya da dile bağlı olmayan metinler: {metin: neden}. Ölçümle bulunur,
+# `ceviri/dolgu.json`'a nedeniyle tek tek yazılır; hepsi `docs/inceleme/ceviri-kapsami.md`'de listelenir (GEC-06).
+DOLGU_DOSYASI = os.path.join(KOK, "ceviri", "dolgu.json")
+
+
+def _dolgu_yukle(yol=DOLGU_DOSYASI):
+    if not os.path.exists(yol):
+        return {}
+    with open(yol, encoding="utf-8") as f:
+        return dict(json.load(f).get("dolgu", {}))
+
+
+DOLGU = _dolgu_yukle()
 
 _ETIKET = re.compile(r"<[^>]+>")
 _YER_TUTUCU = re.compile(r"#\d+#|%[sd]|\{\d+\}")
@@ -96,6 +106,63 @@ def as3_dizeleri(veri: bytes):
     for abc in abc_okur.swf_abc(veri):
         dizeler |= {d for _, _, d in abc.yazi_dizeleri(YAZI_ALANLARI, YAZI_CAGRILARI)}
     return sorted(dizeler)
+
+
+def as3_guvensizler(veri: bytes, dizeler):
+    """Çevrilmesi oyunu bozabilecek dizeler: {dize: neden}.
+
+    oyun/swf_yama.abc_dizelerini_degistir sabit havuzundaki dizeyi değiştirir; o dizeyi kullanan HER yer değişir.
+    Bu yüzden bir dize ancak (1) ad olarak (ad alanı, çok adlı, yöntem/parametre adı, üst veri) geçmiyorsa,
+    (2) bir sınıf sabitinin değeri değilse ve (3) bütün `pushstring` kullanımları ekran yazısına (yazi_dizeleri)
+    gidiyorsa güvenle çevrilir. Örnek: "Whirlwind" 26 yerde itilir, 10'u ekrana gider; geri kalanı eşleştirme
+    anahtarıdır, çevrilirse o eşleşmeler kırılır (GEC-06)."""
+    dizeler = set(dizeler)
+    ad_olan, sabit, it, ekran = set(), set(), {}, {}
+    for abc in abc_okur.swf_abc(veri):
+        havuz = abc.dizeler
+
+        def ekle(kume, i):
+            if 0 < i < len(havuz):
+                kume.add(havuz[i])
+
+        for _, i in abc.ad_alanlari[1:]:
+            ekle(ad_olan, i)
+        for m in abc.coklu_adlar[1:]:
+            if m[0] in (abc_okur.QNAME, abc_okur.QNAME_A):
+                ekle(ad_olan, m[2])
+            elif m[0] in (abc_okur.RTQNAME, abc_okur.RTQNAME_A, abc_okur.MULTINAME, abc_okur.MULTINAME_A):
+                ekle(ad_olan, m[1])
+        for y in abc.yontemler:
+            for i in [y["ad"]] + list(y["adlar"]):
+                ekle(ad_olan, i)
+        for ad, ciftler in abc.ustveriler:
+            for i in [ad] + [x for c in ciftler for x in c]:
+                ekle(ad_olan, i)
+        for liste in ([o["ozellikler"] for o in abc.ornekler] + [s[1] for s in abc.siniflar]
+                      + [b[1] for b in abc.betikler]):
+            for k in liste:
+                if k[0] in (0, 6) and k[4] and k[5] == 0x01:  # Slot/Const, değer türü dize
+                    ekle(sabit, k[4])
+        for g in abc.govdeler.values():
+            try:
+                islemler = abc.coz(g)
+            except Exception:  # gizlenmiş gövde: çözülemeyen kullanım bilinemez, sayım eksik kalabilir (◐)
+                continue
+            for isl in islemler.values():
+                if isl.ad == "pushstring":
+                    d = abc.deger(isl)
+                    it[d] = it.get(d, 0) + 1
+        for _, _, d in abc.yazi_dizeleri(YAZI_ALANLARI, YAZI_CAGRILARI):
+            ekran[d] = ekran.get(d, 0) + 1
+    cikti = {}
+    for d in sorted(dizeler):
+        if d in ad_olan:
+            cikti[d] = "ad olarak da geçiyor"
+        elif d in sabit:
+            cikti[d] = "sınıf sabitinin değeri"
+        elif it.get(d, 0) > ekran.get(d, 0):
+            cikti[d] = "%d kullanımın %d'i ekrana gidiyor" % (it.get(d, 0), ekran.get(d, 0))
+    return cikti
 
 
 def config_kur(yama_klasorleri, taban=TABAN_CONFIG):
@@ -155,8 +222,11 @@ def olc(swf_veri, config, hedefler=None, sozluk=None, ceviriler=None):
     sonuc = {
         "swf_metin_alanlari": oran([(k, k, k in alanlar) for k in swf["metin_alanlari"]]),
         "swf_statik_yazilar": oran([(k, k, k in statik) for k in swf["statik_yazilar"]]),
-        "as3_dizeleri": oran([(d, d, d in as3) for d in as3_dizeleri(swf_veri)]),
     }
+    adaylar = as3_dizeleri(swf_veri)
+    guvensiz = {d: n for d, n in as3_guvensizler(swf_veri, adaylar).items() if dil_metni_mi(d)}
+    sonuc["as3_dizeleri"] = oran([(d, d, d in as3 and d not in guvensiz) for d in adaylar])
+    sonuc["as3_guvensiz"] = guvensiz  # çevrilmemeli; sözlükte varsa çevrilmiş sayılmaz
     bolumler = {}
     for anahtar, bolum, metin in config_metinleri(config):
         c = anahtar in ceviriler and not turkce.dogrula(metin, ceviriler[anahtar])
@@ -207,8 +277,13 @@ def markdown(olcumler, notlar=()):
                 kalan = kalan[:60]
             satir += ["- `%s`" % _hucre(a) if a == m else "- `%s`: %s" % (_hucre(a), _hucre(m))
                       for a, m in kalan]
-    satir += ["", "## Dolgu (hariç tutulan, %d)" % len(DOLGU), ""]
-    satir += ["- `%s`" % _hucre(d) for d in sorted(DOLGU)] or ["yok"]
+    for baslik, o in olcumler:
+        guvensiz = o.get("as3_guvensiz", {})
+        satir += ["", "## Çevrilmeyecek AS3 dizeleri: %s (%d)" % (baslik, len(guvensiz)), "",
+                  "Sabit havuzundaki dize her kullanımda birlikte değişir; bunlar ekran dışında da kullanılıyor.", ""]
+        satir += ["- `%s`: %s" % (_hucre(d), n) for d, n in guvensiz.items()] or ["yok"]
+    satir += ["", "## Dolgu (hariç tutulan, %d; `ceviri/dolgu.json`)" % len(DOLGU), ""]
+    satir += ["- `%s`: %s" % (_hucre(d), _hucre(n)) for d, n in sorted(DOLGU.items())] or ["yok"]
     return "\n".join(satir) + "\n"
 
 
