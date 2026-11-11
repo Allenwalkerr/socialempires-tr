@@ -18,7 +18,7 @@ class Tasima(unittest.TestCase):
         self.uid = kayit.new_village()
         self.gonderen = tasima.gonderici.test_client()
         self.istemci = server.app.test_client()
-        tasima._gonderim.update(kod=KOD, bitis=tasima.time.time() + 60, yanlis=0, gonderilen=0)
+        tasima._gonderim.update(kod=KOD, bitis=tasima.time.time() + 60, yanlis=0, gonderilen=0, adres_yanlis={})
 
         def getir(adres, yol, kod):
             tasima._ev_agi_adresi(adres)
@@ -48,6 +48,41 @@ class Tasima(unittest.TestCase):
         self.assertFalse(uidler & set(botlar))
         if botlar:
             self.assertEqual(self.gonderen.get(f"/kayit/{botlar[0]}?kod={KOD}").status_code, 404)
+
+    def test_kod_basliktan_okunur(self):
+        """Denetim DGV-02: kod adres satırında (günlüklere yazılır) değil başlıkta gider."""
+        self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD}).status_code, 200)
+        self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: "000000"}).status_code, 403)
+
+    def test_alici_kodu_baslikla_yollar(self):
+        self.yama.stop()
+        self.addCleanup(self.yama.start)
+        giden = []
+
+        class Yanit:
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+            def read(self, n):
+                return b"{}"
+        with mock.patch.object(tasima._ACICI, "open", lambda istek, timeout=None: giden.append(istek) or Yanit()):
+            tasima._getir("192.168.1.20", "/liste", KOD)
+        self.assertNotIn("kod", giden[0].full_url)
+        self.assertEqual(giden[0].get_header(tasima.KOD_BASLIGI.capitalize()), KOD)
+
+    def test_tek_cihaz_gonderimi_kapatamaz(self):
+        """DGV-02: yanlış denemeler adres başına sayılır; bir cihaz 5 yanlıştan sonra yalnızca kendisi reddedilir."""
+        kotu, iyi = {"REMOTE_ADDR": "192.168.1.66"}, {"REMOTE_ADDR": "192.168.1.30"}
+        with mock.patch.object(tasima, "gonderimi_durdur") as durdur:
+            for _ in range(40):
+                self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: "999999"}, environ_base=kotu)
+            self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD},
+                                               environ_base=kotu).status_code, 403)
+            self.assertEqual(self.gonderen.get("/liste", headers={tasima.KOD_BASLIGI: KOD},
+                                               environ_base=iyi).status_code, 200)
+        self.assertFalse(durdur.called)
+        self.assertEqual(tasima._gonderim["yanlis"], tasima.ADRES_BASINA_YANLIS)
 
     def test_cok_yanlis_kod_gonderimi_kapatir(self):
         with mock.patch.object(tasima, "gonderimi_durdur") as durdur, mock.patch.object(tasima, "EN_COK_YANLIS", 3):

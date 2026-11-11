@@ -1305,7 +1305,7 @@
       "test": null,
       "pr": null,
       "onay": "Sahibi, 31 Ekim 2026",
-      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor)."
+      "notlar": "Plan: 6 alan (sunucu ve komutlar; kayıt ve göç; ekonomi ve formüller; bot dünyası, PvP ve turnuva; Türkçe ve arayüz; Android, dağıtım ve güvenlik). Her denetçi salt okunur bir commit'i görür; BULGULAR.json, devlog ve PR'lar okuma yasağında. Ortak kurallar docs/denetim/BRIEF.md, raporlar docs/denetim/<alan>.md, sahibine özet docs/DENETIM.md; bulgular BULGULAR.json'a işlenir. Sınır: denetçiler aynı model ailesinden; insan denetçi kadar bağımsız değil. Başlamadan önce kullanım payı sahibine hatırlatılır. 10.11.2026: bağımsız denetim yeniden başladı; sahibinin isteğiyle tek yardımcı ajanla, alanlar sırayla. Raporlar docs/denetim/: kayit-goc (yarım, 4 bulgu → DNT-05..08), ekonomi-formuller (9 bulgu, yeniden üretilmeyi bekliyor). 11.11.2026: altı alanın raporu tamam (docs/denetim/, özet docs/DENETIM.md). Güvenlik bulguları DNT-13..DNT-18 ile düzeltildi."
     },
     {
       "id": "KAR-14",
@@ -1761,6 +1761,19 @@
       "pr": null,
       "onay": "KAR-17",
       "notlar": "İmza sırları yalnızca master ve v* etiketinde; pull_request'te imzasız derleme. Eylemler tam SHA'ya sabit, bağlam değerleri env üzerinden. 'sinama' ek değeri yalnızca debuggable yapıda; sınama debug APK ile. yedekIndir yalnızca http://127.0.0.1:<kapı>/, yönlendirmesiz, 64 MB sınırlı. Android yedeği günlükleri (ve .1 kopyalarını) ve ayarlar.json'u dışlar (ayarlar yeni cihaza taşınmaz). requirements.txt ve Chaquopy sürümleri == ile sabit; gömülü Python zip'i SHA-256 ile denetlenir (özet python.org'dan indirilip hesaplandı, bağımsız çapraz doğrulama yok). Kalan: sırlar depo düzeyinde; aynı depodan PR açabilen biri iş akışını değiştirip okuyabilir. Kesin çözüm sahibinin ayarı: sırları yalnızca master ve v* etiketine izinli bir GitHub Environment'a taşımak. --require-hashes yapılmadı (Chaquopy kendi wheel'lerini kullanıyor)."
+    },
+    {
+      "id": "DNT-18",
+      "baslik": "Wi-Fi taşımada kod adres satırındaydı; tek cihaz yanlış denemelerle aktarımı kapatabiliyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Bağımsız denetim DGV-02 (docs/denetim/dagitim-guvenlik.md). Kod okunarak doğrulandı (11.11.2026): _getir kodu ?kod= ile yolluyordu; _kod_dogru bütün yanlışları tek sayaçta topluyordu (10'da gönderim kapanıyordu).",
+      "test": "tests/test_tasima.py: test_kod_basliktan_okunur, test_alici_kodu_baslikla_yollar, test_tek_cihaz_gonderimi_kapatamaz",
+      "pr": null,
+      "onay": "KAR-17",
+      "notlar": "Düzeltme: kod X-Tasima-Kodu başlığında (gönderen eski sürüm alıcılar için ?kod='u da kabul eder); yanlışlar adres başına 5'te o adresi reddeder, toplam 30'da gönderim kapanır (tahmin olasılığı 30/10^6). 3 bozmanın 3'ü düştü. Kabul edilen risk: aktarım ev ağında düz HTTP; 6 haneli koddan türeyen şifreleme kolay kırılacağı için eklenmedi. Gönderim yalnızca sahibinin başlattığı 10 dakikada açık."
     }
   ]
 }
