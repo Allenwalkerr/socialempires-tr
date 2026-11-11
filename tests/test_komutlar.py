@@ -119,6 +119,29 @@ class EsyaKomutlari(KomutTesti):
         self.assertEqual(len(self.kayit["playerInfo"]["map_names"]), 2)
 
 
+class DepoCogaltmaz(KomutTesti):
+    """DNT-20 (denetim SNK-03). İstemci Base/storeItem store_item'ı (ve _frombug'ı) haritadaki öğenin tx, ty'siyle
+    yollar; haritada olmayanı depoya eklemek için ayrı komut (store_add_items) vardır. Tekrarlanan ya da bozuk komut
+    eşya/birim çoğaltmamalı. bos_kayit haritası: (10, 10)'da 1 (House I)."""
+
+    def test_store_item_yalnizca_haritadakini_depolar(self):
+        for _ in range(3):
+            self.komut("store_item", 10, 10, 0, 1)
+        self.assertEqual(self.ps["gifts"][1], 1)
+        self.assertNotIn(1, [e[0] for e in self.harita["items"]])
+        self.komut("store_item_frombug", 50, 50, 0, 19)  # orada 19 yok
+        self.assertEqual(sum(self.ps["gifts"]), 1)
+
+    def test_birim_deposu_cogaltmaz(self):
+        self.harita["items"].append([512, 30, 30, 0, 0, 0])
+        for _ in range(2):
+            self.komut("add_unit_warehouse", 30, 30, 0, 512)
+        self.assertEqual(self.harita["warehousedUnits"], [512])
+        for _ in range(2):
+            self.komut("place_warehoused_item", 512, 31, 31, 0, 0)
+        self.assertEqual(([e[0] for e in self.harita["items"]].count(512), self.harita["warehousedUnits"]), (1, []))
+
+
 class Kaynaklar(KomutTesti):
     def test_kaynak_ve_nakit_eksiye_dusmez(self):
         """Eksiye düşmez; sahibinin kararı KAR-18 (11.11.2026): bedel bakiyeyi aşarsa reddedilir (önce 0'a

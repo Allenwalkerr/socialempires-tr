@@ -36,6 +36,7 @@ NEST_PRICE_GOLD = 100000
 COLLECT_MINUTES = [5, 60, 240, 480]
 COLLECT_MULTIPLIER = [0.5, 1, 2, 3]  # istemci Config/<sınıf>: COLLECT_MINUTES ile aynı sırada (EKF-01)
 MULTIPLIER_PEASANTS = 0.2  # istemci Config.MULTIPLIER_PEASANTS
+SUBCATFUNC_BUILDING_FARM = "122"  # istemci Constants.SUBCATFUNC_BUILDING_FARM; config'te alt kategori yazıdır
 
 KAYNAK_ALANI = {"g": "coins", "w": "wood", "f": "food", "s": "stone"}
 
@@ -333,8 +334,12 @@ def store_item(save, a):
     esya_id = a.tam(3)
     h = harita(save, a.tam(2))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
-    if esya:
-        h["items"].remove(esya)
+    if not esya:
+        # DNT-20 (denetim SNK-03): istemci Base/storeItem bunu (ve _frombug'ı) haritadaki öğenin tx, ty'siyle yollar;
+        # haritada olmayanı depoya eklemek için store_add_items vardır. Bulunmayan eşya çoğaltılmaz.
+        print(f" ! store_item: ({a.tam(0)}, {a.tam(1)}) konumunda {esya_id} yok, depoya eklenmedi")
+        return
+    h["items"].remove(esya)
     depo_ekle(save, esya_id)
 
 
@@ -479,6 +484,12 @@ def collect_new(save, a):
     h = harita(save, a.tam(2))
     carpan = max(1, min(a.tam(5, 1), 10))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
+    bina = get_item_from_id(esya_id) or {}
+    if str(bina.get("subcat_functional")) == SUBCATFUNC_BUILDING_FARM:
+        # DNT-19 (denetim EKF-02): istemci IsoElement/collect @3438-3505 çiftlik hasadında
+        # Math.round(building.collect / 3) odunu kendisi düşer, komut göndermez. Odun yetmezse çiftliği kaldırıp
+        # yalnızca kill yollar, collect yollamaz; buraya o durumda gelinmez (gelirse Yetersiz, KAR-18).
+        bakiyeden_dus(h, "wood", math.floor(float(bina.get("collect") or 0) / 3 + 0.5))
     apply_collect(save["playerInfo"], h, esya_id, carpan, toplama_miktari(esya, esya_id, carpan, a.tam(4, 0)))
     cash_ekle(save, -max(0, a.tam(6)))
     if esya and len(esya) > 4:
@@ -1031,8 +1042,9 @@ def add_unit_warehouse(save, a):
     h = harita(save, a.tam(2))
     birim_id = a.tam(3)
     birim = esya_bul(h, a.tam(0), a.tam(1), birim_id)
-    if birim:
-        h["items"].remove(birim)
+    if not birim:  # DNT-20: haritada olmayan birim depoya girmez (tekrarlanan komut çoğaltmasın)
+        return
+    h["items"].remove(birim)
     h.setdefault("warehousedUnits", []).append(birim_id)
 
 
@@ -1042,8 +1054,9 @@ def place_warehoused_item(save, a):
     h = harita(save, a.tam(4))
     birim_id = a.tam(0)
     depodaki = h.setdefault("warehousedUnits", [])
-    if birim_id in depodaki:
-        depodaki.remove(birim_id)
+    if birim_id not in depodaki:  # DNT-20: depoda olmayan birim haritaya konmaz (place_gift'in sayaç denetimi gibi)
+        return
+    depodaki.remove(birim_id)
     esya_ekle(h, birim_id, a.tam(1), a.tam(2), a.tam(3))
 
 

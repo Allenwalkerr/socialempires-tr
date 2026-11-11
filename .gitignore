@@ -29,3 +29,4 @@ local.properties
 node_modules/
 .oturum_anahtari
 .ev_agi_parolasi
+.claude/worktrees/

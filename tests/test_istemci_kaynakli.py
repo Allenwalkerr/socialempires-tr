@@ -274,5 +274,33 @@ class UretimSecimliToplama(KomutTesti):
         self.assertEqual(self.topla(0, 1), 300)  # cp yok: sunucu 1 sayar (istemcide parseInt(undefined) NaN olurdu, ◐)
 
 
+
+class CiftlikHasadi(KomutTesti):
+    """DNT-19 (denetim EKF-02). İstemci IsoElement/collect: building.subcat_functional ==
+    Constants.SUBCATFUNC_BUILDING_FARM (122) ise Math.round(building.collect / 3) odun canAfford ise
+    adjustStatByType(-odun, WOOD) ile düşülür; yetmezse çiftlik kaldırılır, yalnızca kill gider (collect gitmez).
+    Config: 10 Farm Land collect 15 yiyecek, 9 Eggplant Field 35, 200 Carrot Field 40, 201 Watermelon Field 45 (alt kategori "122");
+    19 ağaç çiftlik değil."""
+
+    def topla(self, esya_id, odun):
+        self.harita.update(wood=odun, food=0, items=[[esya_id, 30, 30, 0, 0, 0, [], {}]])
+        self.komut("collect_new", 30, 30, 0, esya_id, 0, 1, 0)
+        return self.harita["wood"], self.harita["food"]
+
+    def test_hasat_odunu_duser(self):
+        # Math.round: 15/3 = 5, 35/3 = 11,67 → 12, 40/3 = 13,33 → 13, 45/3 = 15
+        self.assertEqual([self.topla(i, 100) for i in (10, 9, 200, 201)], [(95, 15), (88, 35), (87, 40), (85, 45)])
+
+    def test_odun_yetmezse_hasat_uygulanmaz(self):
+        self.harita.update(wood=4, food=0, items=[[10, 30, 30, 0, 0, 0, [], {}]])
+        self.komutlar.command("test", {"commands": [{"cmd": "collect_new", "args": [30, 30, 0, 10, 0, 1, 0]}]})
+        self.assertEqual((self.harita["wood"], self.harita["food"]), (4, 0))
+
+    def test_ciftlik_olmayan_bina_odun_dusmez(self):
+        self.harita.update(wood=100, items=[[19, 30, 30, 0, 0, 0, [], {}]])
+        self.komut("collect_new", 30, 30, 0, 19, 0, 1, 0)
+        self.assertEqual(self.harita["wood"], 120)  # config 19 Tree: collect "20", collect_type "w"; odun düşülmez
+
+
 if __name__ == "__main__":
     unittest.main()
