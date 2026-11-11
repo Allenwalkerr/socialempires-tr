@@ -34,6 +34,8 @@ TOWN_PRICE_GOLD = 100000
 NEST_PRICE_CASH = 50
 NEST_PRICE_GOLD = 100000
 COLLECT_MINUTES = [5, 60, 240, 480]
+COLLECT_MULTIPLIER = [0.5, 1, 2, 3]  # istemci Config/<sınıf>: COLLECT_MINUTES ile aynı sırada (EKF-01)
+MULTIPLIER_PEASANTS = 0.2  # istemci Config.MULTIPLIER_PEASANTS
 
 KAYNAK_ALANI = {"g": "coins", "w": "wood", "f": "food", "s": "stone"}
 
@@ -425,15 +427,35 @@ def unlock_building(save, a):
 # Üretim ve toplama
 # ---------------------------------------------------------------------------
 
+def toplama_miktari(esya, esya_id, kaynak_carpani, birim):
+    """İstemcinin IsoElement/collect hesabı (EKF-01). taban = floor(collect) * kaynak çarpanı. Bina
+    globals.COLLECT_VARIABLE_IDS'teyse (PopupCollect$/doShit) seçilen üretim süresinin çarpanı
+    COLLECT_MULTIPLIER[cp - 1]; içinde birden çok birim varsa her fazla birim tabana MULTIPLIER_PEASANTS katar:
+    floor(floor(taban + (birim - 1) * taban * 0.2) * çarpan), yoksa floor(taban * çarpan)."""
+    esya_bilgi = get_item_from_id(esya_id) or {}
+    taban = int(float(esya_bilgi.get("collect") or 0)) * kaynak_carpani
+    # Birim sayısı istemciden gelir; binanın kapasitesini (config unit_capacity) aşamaz (#45 incelemesi)
+    birim = max(0, min(birim, int(float(esya_bilgi.get("unit_capacity") or 0))))
+    secim = 1
+    degiskenler = get_game_config().get("globals", {}).get("COLLECT_VARIABLE_IDS") or []
+    if esya_id in [int(i) for i in degiskenler] and esya is not None:
+        cp = ozellikler(esya).get("cp")
+        if isinstance(cp, int) and 1 <= cp <= len(COLLECT_MULTIPLIER):
+            secim = COLLECT_MULTIPLIER[cp - 1]
+    if birim > 1:
+        return int(int(taban + (birim - 1) * taban * MULTIPLIER_PEASANTS) * secim)
+    return int(taban * secim)
+
+
 @komut("collect_new")
 def collect_new(save, a):
     """[x, y, kasaba, id, (icindeki_birim, carpan, cash)]"""
     esya_id = a.tam(3)
     h = harita(save, a.tam(2))
     carpan = max(1, min(a.tam(5, 1), 10))
-    apply_collect(save["playerInfo"], h, esya_id, carpan)
-    cash_ekle(save, -a.tam(6))
     esya = esya_bul(h, a.tam(0), a.tam(1), esya_id)
+    apply_collect(save["playerInfo"], h, esya_id, carpan, toplama_miktari(esya, esya_id, carpan, a.tam(4, 0)))
+    cash_ekle(save, -a.tam(6))
     if esya and len(esya) > 4:
         esya[4] = timestamp_now()
 
@@ -1056,12 +1078,32 @@ def complete_tutorial(save, a):
         save["privateState"]["dragonNestActive"] = 1
 
 
+def _odul_seviyesi(save):
+    """Ödülü verilmiş en yüksek seviye (privateState.odul_seviyesi); ilk okumada kayıttaki seviyeyle başlar."""
+    ps = save.setdefault("privateState", {})
+    if not isinstance(ps.get("odul_seviyesi"), int):
+        try:
+            ps["odul_seviyesi"] = max(1, min(int(save["maps"][0].get("level", 1)), en_yuksek_seviye()))
+        except (TypeError, ValueError, OverflowError):
+            ps["odul_seviyesi"] = 1
+    return ps["odul_seviyesi"]
+
+
 @komut("rt_level_up")
 def rt_level_up(save, a):
     """[seviye]"""
     seviye = max(1, min(a.tam(0), en_yuksek_seviye()))
     h = save["maps"][0]
+    odulu_verilen = _odul_seviyesi(save)
     h["level"] = seviye
+    # SNK-01: istemci yeni seviyenin ödülünü (arLevelList[iLevel - 1]) PopupLevel'de kendisi ekler, komut göndermez.
+    # Ödülü verilmiş en yüksek seviye ayrı tutulur (#45 incelemesi): seviyeyi önce başka bir yol yükseltse de
+    # ödül verilir; aynı ya da daha düşük seviyeden yeniden çıkılırsa ikinci kez verilmez.
+    seviyeler = get_game_config()["levels"]
+    for s in range(odulu_verilen + 1, seviye + 1):
+        odul = seviyeler[s - 1]
+        kaynak_ekle(save, h, odul.get("reward_type"), int(odul.get("reward_amount") or 0))
+    save["privateState"]["odul_seviyesi"] = max(odulu_verilen, seviye)
     # XP en az seviyenin alt eşiği (OYN-14: eskiden bir sonraki seviyenin eşiğiydi, yeniden açılışta +1 seviye)
     tavan = int(get_game_config()["levels"][-1]["exp_required"])
     h["xp"] = max(get_xp_from_level(seviye), min(int(h.get("xp", 0)), tavan))
@@ -1075,8 +1117,14 @@ def rt_publish_score(save, a):
         print(f" ! publish_score: mantiksiz XP ({xp}), yok sayildi")
         return
     h = save["maps"][0]
+    _odul_seviyesi(save)  # seviye burada yükselirse ödülü sonraki rt_level_up verir
     h["xp"] = xp
-    h["level"] = get_level_from_xp(xp)
+    try:
+        simdiki = int(h.get("level", 1))
+    except (TypeError, ValueError, OverflowError):
+        simdiki = 1
+    # KYT-05 ile aynı kural: XP seviyeyi yalnızca yükseltir (istemci PlayerStatus/checkForLevelUp)
+    h["level"] = min(max(simdiki, get_level_from_xp(xp)), en_yuksek_seviye())
 
 
 @komut("complete_mission")
