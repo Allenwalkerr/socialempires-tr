@@ -76,10 +76,16 @@ def gerekenler(dosyalar, config, esdegerler):
     buyuler = {m["img_name"] for m in config.get("magics", []) if m.get("img_name")}
     # Mağazadakiler ve haritada rastgele beliren kayıp eşyalar (yaralı inek, yalnız şövalye...; alt kategori 91)
     # Milli bayramlarda açılan Türk birimleri de (ONR-04; oyun.config.TURK_BIRIMLERI)
+    # Ada Ocağı'nın adası ve ödülleri, viral tekliflerin ödül birimleri de (KAR-27, KAR-29: temel pakette)
     from oyun.config import TURK_BIRIMLERI
+    etkinlik = set()
+    for ada in (config.get("collect_game") or {}).values():
+        etkinlik.add(str(ada.get("building_id")))
+        etkinlik.update(str(b) for odul in (ada.get("rewards") or {}).values() for b in odul)
+    etkinlik.update(str(t.get("unit_id")) for t in (config.get("viral_offers") or {}).values() if t.get("unit_id"))
     magazada = {i["img_name"] for i in config["items"] if i.get("img_name")
                 and (str(i.get("in_store")) == "1" or str(i.get("subcategory_id")) == "91"
-                     or str(i.get("id")) in TURK_BIRIMLERI)}
+                     or str(i.get("id")) in TURK_BIRIMLERI or str(i.get("id")) in etkinlik)}
     secilen = []
     for yol, bayt in dosyalar:
         klasor, ad = yol.split("/", 1)[0], os.path.splitext(os.path.basename(yol))[0]

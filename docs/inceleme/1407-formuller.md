@@ -149,7 +149,8 @@ küçükse vermez. Şans istemcide (`Math.random`); sunucu bekleme süresini den
 ### Açık olma
 
 `active`: `starts_at < şimdi < starts_at + duration` ve en az bir ödül. 1.4.07'nin config'inde `starts_at` ve
-`duration` 0: ada haritada çıkmaz, komutlar gelmez. Açılması ayrı karar.
+`duration` 0: ada haritada çıkmaz, komutlar gelmez. 12.11.2026'dan beri açık (KAR-27, KAR-29): istemciye giden config'te
+ada ve beş viral teklif kayan 30 günlük pencereyle (`config.etkinlik_penceresi`); sunucunun config'i değişmez.
 
 ## Koleksiyon ödülü (`finish_collection`)
 

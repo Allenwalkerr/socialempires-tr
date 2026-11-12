@@ -269,6 +269,7 @@
     }
     var ruffle = window.RufflePlayer.newest();
     var oyuncu = ruffle.createPlayer();
+    etkinOyuncu = oyuncu;
     kutu.appendChild(oyuncu);
     ikiParmaklaYakinlastir(oyuncu);
     ilerle(35, "Yükleyici indiriliyor...");
@@ -283,6 +284,29 @@
     });
     oyuncu.load({ url: AYAR.swf, parameters: AYAR.parametreler });
   }
+
+  // --- Bot yardımı (KAR-26, KAR-27, KAR-29). Oyunun "arkadaşından iste" düğmeleri ExternalInterface.call ile bu iki
+  // genel işlevi çağırır (Ruffle: window.<ad>); asıl oyunda Facebook açılırdı. Sunucu bir bot yazar (günde bir),
+  // ardından oyunun forceReloadInfo geri çağrısı (Base/init addCallback) yeni yardımcıyı okutur.
+  var etkinOyuncu = null;
+  function botYardimi(veri) {
+    fetch("/yardim/bot", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(veri) })
+      .then(function (r) { return r.json().then(function (v) { return { ok: r.ok, v: v }; }); })
+      .then(function (s) {
+        if (s.ok) {
+          if (etkinOyuncu && typeof etkinOyuncu.forceReloadInfo === "function") etkinOyuncu.forceReloadInfo();
+        } else {
+          alert(s.v.hata || "Yardım gelmedi.");
+        }
+      })
+      .catch(function () { alert("Yardım gelmedi."); });
+  }
+  // PopupRecruitment/onFindFriend: (tx, ty, kasaba, bina, yardımcılar, ad); yalnızca Asker Toplama (387)
+  window.showPopupSEHelpSocialItem = function (tx, ty, kasaba, bina) {
+    if (Number(bina) === 387) botYardimi({ tur: "sosyal", tx: Number(tx), ty: Number(ty), town: Number(kasaba), id: 387 });
+  };
+  // Viral teklifler ve Ada Ocağı'nın boru malzemesi: (teklif no)
+  window.showPopupSEHelpOffer = function (no) { botYardimi({ tur: "teklif", no: Number(no) }); };
 
   // --- Diyar Haberleri: 15 saniyede bir yoklama; en fazla 5 saniyede bir satır.
   var liste = document.getElementById("haberler");

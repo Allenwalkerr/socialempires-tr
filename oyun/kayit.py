@@ -346,6 +346,8 @@ def fb_friends_str(USERID: str) -> list:
         frie["uid"] = vill["playerInfo"]["pid"]
         frie["pic_square"] = vill["playerInfo"]["pic"]
         if not frie["pic_square"]: frie["pic_square"] = "/img/profile/1025.png"
+        # Yardımcı yuvaları adı buradan okur (PopupRecruitment/refreshFotos: friendsInfoMap[id].first_name); yoksa "- -"
+        frie["first_name"] = vill["playerInfo"].get("name", "")
         friends += [frie]
     # other players
     for key in __saves:
@@ -356,6 +358,8 @@ def fb_friends_str(USERID: str) -> list:
         frie["uid"] = vill["playerInfo"]["pid"]
         frie["pic_square"] = vill["playerInfo"]["pic"]
         if not frie["pic_square"]: frie["pic_square"] = "/img/profile/1025.png"
+        # Yardımcı yuvaları adı buradan okur (PopupRecruitment/refreshFotos: friendsInfoMap[id].first_name); yoksa "- -"
+        frie["first_name"] = vill["playerInfo"].get("name", "")
         friends += [frie]
     return friends
 

@@ -38,6 +38,8 @@ indirmek için gerekir.
   çerçevesi, hız seçici (Normal … 10 kat), "Sen yokken" özeti, Diyar Haberleri şeridi, Şeref Kürsüsü,
   haftalık turnuva tablosu (Elo; hafta bitince ilk 10'a ödül) ve tek tıkla
   kayıt yedeği indirme/yükleme. Günlük ödül oyunun kendi ödülüdür.
+- **Ada Ocağı ve teklifler**: oyunun Ada Ocağı mini oyunu ve ejderha teklifleri açık; "arkadaşından
+  iste" düğmelerinde bot köyleri yardım eder (her yer için günde bir).
 - **Büyücünün İksirleri**: iksir kaynatıp nadir yaratıklar kazanılan şans
   oyunu; her 30 günde yenilenir.
 - **İstemciyle birebir uyumlu komutlar**: sunucu, istemcinin gönderdiği
@@ -47,7 +49,7 @@ indirmek için gerekir.
   oyunun Türk Kılıççı, Baltacı, Okçu ve Atlı birimleri mağazada açılır.
 - **Yeni içerik**: Büyük Ev, Büyük Değirmen, Büyük Kule; Süper Şövalye,
   Süper Okçu, Süper Kılıçlı ve yeni mağaza paketleri.
-- **Çevrimdışı paket**: oyun dosyaları bir kerede iner (temel ~210 MB, tam ~1,1 GB), sonra internet gerekmez.
+- **Çevrimdışı paket**: oyun dosyaları bir kerede iner (temel ~225 MB, tam ~1,1 GB), sonra internet gerekmez.
 - **Wi-Fi ile taşı**: imparatorluk, bilgisayar ile tablet arasında 6 haneli kodla aktarılır.
 - **Android uygulaması**: sunucu tabletin içinde; iki parmakla yakınlaştırma ([ANDROID.md](ANDROID.md)).
 - **Güvenli kayıt**: atomik yazım, `.bak` yedeği, günlük yedekler ve

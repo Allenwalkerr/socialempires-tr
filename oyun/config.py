@@ -180,6 +180,21 @@ def kompu_teklifi(simdi=None):
     return teklif
 
 
+ETKINLIK_SURESI = 30 * 86400
+
+
+def etkinlik_penceresi(simdi=None):
+    """(starts_at, duration): Ada Ocağı ve viral teklifler için kayan 30 günlük pencere (OYN-29, KAR-27, KAR-29).
+
+    1.4.07'nin config'inde ikisinin de starts_at ve duration'ı 0 (hiç görünmezler). İstemci: CollectGameManager/get
+    active şimdi > starts_at ve şimdi < starts_at + duration; SpecialDayOfferManager/timeLeft int(starts_at + duration -
+    şimdi) > 0 (convert_i: 2^31'i aşmamalı). Pencere her gün (UTC) yeniden kurulur: bugün başlar, 30 gün sonra biter;
+    pencerede kalan süre hep 29-30 gün görünür. Sunucu komutları süreye bakmaz."""
+    simdi = int(time.time()) if simdi is None else simdi
+    gun_basi = simdi // 86400 * 86400
+    return gun_basi - 1, ETKINLIK_SURESI + 1
+
+
 def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     """İstemciye gönderilecek config'i döndürür.
 
@@ -196,8 +211,9 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     bayram = bayram_hedefleri.aktif_hedefler() if dil == "tr" else []
     from oyun import takvim
     milli = takvim.milli_bayram()
+    pencere = etkinlik_penceresi()
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
-               tuple(h["id"] for h in bayram), milli)
+               tuple(h["id"] for h in bayram), milli, pencere)
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
@@ -212,6 +228,10 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
         kopya = ascii_uygula(kopya)
     if teklif:
         kopya["kompu_offers"] = [teklif]
+    bas, sure = pencere
+    for etkinlik in list((kopya.get("collect_game") or {}).values()) + list((kopya.get("viral_offers") or {}).values()):
+        if isinstance(etkinlik, dict):
+            etkinlik["starts_at"], etkinlik["duration"] = bas, sure
     if takvim_setleri:
         for esya in kopya.get("items", []):
             if esya["id"] in takvim_setleri:

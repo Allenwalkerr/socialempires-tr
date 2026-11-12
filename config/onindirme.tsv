@@ -1087,6 +1087,12 @@ buildingsprites/1456_dragon_statue.swf	69409	1
 buildingsprites/1457_vulcano.swf	229843	1
 buildingsprites/1463_time_machine.swf	62310	1
 buildingsprites/1529_soulMixer.swf	85832	1
+buildingsprites/1530_forgeIsland.swf	763433	1
+buildingsprites/2267_easterDragon.swf	1598712	1
+buildingsprites/2269_forgeDragon.swf	1691835	1
+buildingsprites/2272_demonDragon.swf	1509974	1
+buildingsprites/2324_ivoryDinastyDragon.swf	2933126	1
+buildingsprites/2363_nightForgeDragon.swf	1433245	1
 buildingsprites/469_fortaleza.swf	94191	1
 buildingsprites/470_maravilla.swf	101941	1
 buildingsprites/472_castillo.swf	41629	1
@@ -3653,7 +3659,6 @@ buildingsprites/1521_chariot_barrack.swf	51905	2
 buildingsprites/1522_cesar_barrack.swf	54346	2
 buildingsprites/1526_punisherKnight_barrack.swf	82623	2
 buildingsprites/1527_dragonCity_cross.swf	1081239	2
-buildingsprites/1530_forgeIsland.swf	763433	2
 buildingsprites/2000_bahamut.swf	575404	2
 buildingsprites/2001_bahamuty.swf	1011717	2
 buildingsprites/2002_bahamut_jinete.swf	704268	2
@@ -3894,11 +3899,8 @@ buildingsprites/2258_diamondsSavageDragonRider.swf	1908712	2
 buildingsprites/2259_spaceSavageDragon.swf	1991938	2
 buildingsprites/2260_spaceSavageDraggy.swf	209506	2
 buildingsprites/2261_spaceSavageDragonRider.swf	1591583	2
-buildingsprites/2267_easterDragon.swf	1598712	2
 buildingsprites/2268_easterDragonRider.swf	2637854	2
-buildingsprites/2269_forgeDragon.swf	1691835	2
 buildingsprites/2271_forgeDragonRider.swf	1882151	2
-buildingsprites/2272_demonDragon.swf	1509974	2
 buildingsprites/2274_demonDragonRider.swf	1994468	2
 buildingsprites/2275_spawnSavageDragon.swf	992419	2
 buildingsprites/2276_spawnSavageDraggy.swf	831014	2
@@ -3947,7 +3949,6 @@ buildingsprites/2320_wraithExtremeDragonRider.swf	2472024	2
 buildingsprites/2321_waterbornBahamutDragon.swf	1359728	2
 buildingsprites/2322_waterbornBahamutDraggy.swf	220330	2
 buildingsprites/2323_waterbornBahamutDragonRider.swf	2283026	2
-buildingsprites/2324_ivoryDinastyDragon.swf	2933126	2
 buildingsprites/2325_ivoryDinastyDraggy.swf	143231	2
 buildingsprites/2326_ivoryDinastyDragonRider.swf	3081965	2
 buildingsprites/2327_ghostEpicDragon.swf	1630506	2
@@ -3986,7 +3987,6 @@ buildingsprites/2359_platinumArmorDragonRider.swf	2194618	2
 buildingsprites/2360_bullArmorDragon.swf	2577256	2
 buildingsprites/2361_bullArmorDraggy.swf	373755	2
 buildingsprites/2362_bullArmorDragonRider.swf	2622158	2
-buildingsprites/2363_nightForgeDragon.swf	1433245	2
 buildingsprites/2364_nightForgeDraggy.swf	392754	2
 buildingsprites/2365_nightForgeDragonRider.swf	2095560	2
 buildingsprites/2366_devilAncientDragon.swf	2442895	2
