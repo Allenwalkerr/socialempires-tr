@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #73 birleşti; DNT-45 ve TST-02'nin dördüncü grubu PR'da. Sırada TST-02 (30 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #74 birleşti. Sırada TST-02 (30 testsiz komut; kill'in ölen birim ve düşman binası xp'si açık), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2573,13 +2573,13 @@
       "baslik": "Mobil kutudan yerleştirme ve satış, kutuda olmayan eşyada da eşya ekliyor ya da iade veriyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "place_iphone ve sell_iphone_item _mobil_depodan_cikar'ın sonucuna bakmıyordu: kutuda olmayan eşya için tekrarlanan komut eşyayı haritaya yeniden ekliyor ya da %5 iadeyi yeniden veriyordu. İstemci (GiftButtonLarge/sellGiftReally, Base/sendPlaceItemCmd @270-345) eşyayı kutudan bir kez çıkarır. Aynı açık sell_gift'te ve birim deposunda daha önce kapatılmıştı (DNT-20).",
       "test": "tests/test_komutlar.py test_mobil_kutudan_yerlestirme_ve_satis_bir_kez",
-      "pr": null,
+      "pr": "#74",
       "onay": null,
-      "notlar": "_mobil_depodan_cikar artık bulup çıkarırsa True döner; yerleştirme ve iade yalnızca o zaman. 2 bozma düştü. TST-02 sırasında bulundu. Mobil kutu (iphoneBox) çevrimdışı oyunda büyük olasılıkla boş; etki küçük."
+      "notlar": "_mobil_depodan_cikar artık bulup çıkarırsa True döner; yerleştirme ve iade yalnızca o zaman. 2 bozma düştü. TST-02 sırasında bulundu. Mobil kutu (iphoneBox) çevrimdışı oyunda büyük olasılıkla boş; etki küçük. 12.11.2026: #74 birleşti (CI yeşil, sinama dahil)."
     }
   ]
 }
