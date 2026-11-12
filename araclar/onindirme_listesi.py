@@ -83,6 +83,9 @@ def gerekenler(dosyalar, config, esdegerler):
         etkinlik.add(str(ada.get("building_id")))
         etkinlik.update(str(b) for odul in (ada.get("rewards") or {}).values() for b in odul)
     etkinlik.update(str(t.get("unit_id")) for t in (config.get("viral_offers") or {}).values() if t.get("unit_id"))
+    # Arazi türleri (çimen ve bot köylerinin arazileri; oyun.bot_koy.BOT_ARAZILERI, öğe 1000 + skin)
+    from oyun.bot_koy import BOT_ARAZILERI
+    etkinlik.update(str(1000 + s) for s in (0,) + BOT_ARAZILERI)
     magazada = {i["img_name"] for i in config["items"] if i.get("img_name")
                 and (str(i.get("in_store")) == "1" or str(i.get("subcategory_id")) == "91"
                      or str(i.get("id")) in TURK_BIRIMLERI or str(i.get("id")) in etkinlik)}

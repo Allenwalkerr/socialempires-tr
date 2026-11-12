@@ -224,11 +224,13 @@ class DunyaOlayiTestleri(DunyaTesti):
 
 class EkonomiTestleri(DunyaTesti):
     def ekonomi(self, d, uid, rastgele, secim=None):
-        """random.random sırayla `rastgele`yi döndürür (4 kaynak zarı, sonra birim zarı)."""
+        """random.random sırayla `rastgele`yi döndürür (4 kaynak zarı, sonra birim zarı); `secim` botun seçtiği
+        birim (bot_koy.birim_sec)."""
+        from oyun import bot_koy
         with contextlib.ExitStack() as yigin:
             yigin.enter_context(mock.patch.object(dunya.random, "random", side_effect=rastgele))
             if secim:
-                yigin.enter_context(mock.patch.object(dunya.random, "choice", side_effect=lambda s: secim))
+                yigin.enter_context(mock.patch.object(bot_koy, "birim_sec", lambda *a: secim))
             return d._ekonomi(uid, self.kayitlar[uid])
 
     def test_her_kaynak_uretilir_ve_uretim_stoktan_bagimsiz(self):
@@ -308,23 +310,35 @@ class EkonomiTestleri(DunyaTesti):
             self.assertLess(uretim["notr"][k], uretim["hizli"][k], uretim)
 
     def test_alinan_birim_gercek_birim_ve_bedeli_odenir(self):
-        """Haber 'ordusuna bir X kattı': alınan eşya config'te birimdir (tür 'u', yoksa ordu sayılmaz) ve
-        altından tam bedeli düşer (config cost). Seçim yamalanmaz: botun gerçek birim listesi denenir."""
-        d = self.kur(a=koy("a", coins=10 ** 6))
+        """Haber 'ordusuna bir X kattı': alınan eşya config'te birimdir (tür 'u', yoksa ordu sayılmaz), açılış seviyesi
+        botun seviyesini aşmaz (config min_level, binası kademeyle: KOLLAR config'e karşı test_bot_koy'da) ve altından tam
+        bedeli düşer (config cost). Ordu bot_koy.ordu_buyuklugu'nda durur (plan §3.1: 8 + seviye, kişilik oranıyla;
+        bugün 700 öğeye dek büyüyordu); birim başka öğenin karosuna konmaz. Seçim yamalanmaz."""
+        from oyun import bot_koy
+        d = self.kur(a=koy("a", seviye=12, coins=10 ** 6))
+        self.kayitlar["a"]["playerInfo"]["bot_kisi"] = "agresif"
         d.ekonomi_carpan = 0
         harita = self.kayitlar["a"]["maps"][0]
+        sinir = bot_koy.ordu_buyuklugu(12, "agresif")
+        self.assertEqual(sinir, 20)  # min(8 + 12, 60) × 1.0
         random.seed(7)
-        for _ in range(60):
+        for _ in range(40):
             once_altin, once_esya = harita["coins"], len(harita["items"])
             self.ekonomi(d, "a", [0.5] * 4 + [0.0])
             yeni = harita["items"][once_esya:]
+            if not yeni:
+                self.assertEqual(once_altin, harita["coins"])  # alınmayan birimin bedeli düşmez
+                continue
             self.assertEqual(len(yeni), 1)
             item = dunya._item(yeni[0][0])
             self.assertEqual(item.get("type"), "u", yeni[0][0])
+            self.assertLessEqual(int(item.get("min_level") or 0), 12)
             self.assertEqual(once_altin - harita["coins"], int(item["cost"]))
-        self.assertEqual(birim(self.kayitlar["a"]), 60)
-        self.assertEqual(len(d._ekonomi_haberleri), 60)
+        self.assertEqual(birim(self.kayitlar["a"]), sinir)
+        self.assertEqual(len(d._ekonomi_haberleri), sinir)
         self.assertTrue(all("ordusuna bir" in h for h in d._ekonomi_haberleri))
+        karolar = [(int(e[1]), int(e[2])) for e in harita["items"]]
+        self.assertEqual(len(karolar), len(set(karolar)))  # hepsi 1×1: aynı karoda iki öğe yok
 
 
 class HafizaTestleri(DunyaTesti):

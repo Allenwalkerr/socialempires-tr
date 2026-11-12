@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. DNT-50 ve KAR-33/34 #80'de. Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (5) KAR-34: etkinlikler 15'ten kademeli ve takvimli; (6) sınırlı mağaza öğesi 'SON 0 GÜN' kalıyor: süresi bitince ertesi gün rastgele başkası gelsin; (7) çeviri taşmaları ('28 NAKİ', 'Kayıp Ejderha Yumurtala'); (8) çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor; (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor;"
   },
   "maddeler": [
     {
@@ -2706,10 +2706,10 @@
       "durum": "karar_verildi",
       "isaret": "✔",
       "kanit": "Sahibi (12.11.2026): 'bu etkinlikler çok erken açıldı 15 seviye veya 20 seviyede açılsa hatta etkinlikler kademeli olsa veya takvime bağlansa'. Soruldu: açılış 'Kademeli, 15'ten başlayıp' (önerilen) / 'Hepsi 15' / 'Hepsi 20' → 'Kademeli, 15'ten başlayıp'; takvim 'Hayır, seviye yeter' (önerilen) / 'Evet, takvime bağla' → 'Evet, takvime bağla' (sayfada yaklaşan etkinlikler listesi). Bugün Ada Ocağı ve beş viral teklif herkese kayan 30 günlük pencereyle açık (oyun/config.py etkinlik_penceresi, KAR-27, KAR-29); istemci config'i oyuncuya göre değişmiyor.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_bot_yardim.py Pencere, tests/test_bayram_hedefleri.py",
+      "pr": "#81",
       "onay": "Sahibi, 12 Kasım 2026",
-      "notlar": "Uygulama ayrı PR: istemci config'i oyuncunun seviyesine göre (starts_at/duration) kurulmalı; ilk etkinlik 15, sonrakiler 20, 25, 30...; her etkinliğin yılda belirli haftaları (config/takvim.json gibi). Oyunun içine takvim çizilmez (CLAUDE.md görsel kuralı); liste sayfada, oyunun kendi simgeleriyle. Sahibinin 'aşağıdaki boşluk' dediği yer Doldur görünümü hatası (görev listesi). 12.11.2026 (#80): bayram hedefleri 15. seviyeden önce gitmez (ilk adım); viral teklif ve Ada Ocağı'nın seviye ve takvim kademesi ayrı."
+      "notlar": "Uygulama ayrı PR: istemci config'i oyuncunun seviyesine göre (starts_at/duration) kurulmalı; ilk etkinlik 15, sonrakiler 20, 25, 30...; her etkinliğin yılda belirli haftaları (config/takvim.json gibi). Oyunun içine takvim çizilmez (CLAUDE.md görsel kuralı); liste sayfada, oyunun kendi simgeleriyle. Sahibinin 'aşağıdaki boşluk' dediği yer Doldur görünümü hatası (görev listesi). 12.11.2026 (#80): bayram hedefleri 15. seviyeden önce gitmez (ilk adım); viral teklif ve Ada Ocağı'nın seviye ve takvim kademesi ayrı. 12.11.2026 (#81): uygulandı. config/takvim.json 'teklifler': Cehennem Örsü Adası 15 (15 Şubat, 15 Haziran, 15 Kasım; 28-30 gün), Paskalya Ejderhası 20 (1 Nisan), Gece Örs Ejderhası 25 (10 Ekim, Cadılar Bayramı), Fildişi Hanedan 30 (20 Ocak) ve 35 (1 Ağustos, ikinci IvoryOffer). config.teklif_pencereleri: yalnızca bugün süren ve seviyesi yeten teklifin starts_at/duration'ı (Türkiye gece yarısından gece yarısına), ötekiler 1.4.07'deki gibi 0; ada açıksa ödül teklifi 2 de. Kayan 30 günlük pencere (KAR-29'un o maddesi) kalktı. Sayfadaki etkinlik kutusu süren ve sıradaki teklifi seviyesiyle ve oyunun küçük resmiyle gösterir (Chromium'da görüldü). 10 bozmanın 8'i test düşürüyor, kalan ikisi eşdeğer (bugüne bakan sorgu yalnızca süren etkinliği döndürür). Ruffle'da ada ve teklif penceresi bu takvimle denenmedi. #81 incelemesi: Pencere sınıfı yeniden yazılırken yanlışlıkla silinen test_ada_ve_odul_cizimleri_temel_pakette (KAR-29) geri kondu."
     },
     {
       "id": "DNT-51",
@@ -2762,6 +2762,123 @@
       "pr": "#80",
       "onay": null,
       "notlar": "ceviri/tr.json mission:56:aciklama: 'Asker ve köylülerinle nüfusunu 40'a çıkar (sağ üstteki sayıların soldaki). Ev kurmak yalnızca sınırı artırır; birim eğitmelisin!'. Kod değişmedi; istemcinin kuralı doğru."
+    },
+    {
+      "id": "DNT-53",
+      "baslik": "Çevrimdışı paket sayfasında indirme bitince 'paket iniyor...' yazısı kalıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026): iki çubuk dolu, ikisi de 'İndi', altta 'Tam paket iniyor...'. templates/cevrimdisi.html goster(): calisiyor true iken ileti yazılıyor, false olunca yalnızca hata ya da başarısız dosya varsa değiştiriliyordu; başarılı bitişte eski yazı kalıyordu.",
+      "test": "tests/js/cevrimdisi.test.js",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Bitince 'İndirme bitti.', durdurulunca boş. Düzeltme kaldırılınca iki test de düşüyor."
+    },
+    {
+      "id": "DNT-54",
+      "baslik": "Çeviri metin kutusuna sığmayınca son harf kesiliyordu ('28 NAKİ')",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026): '28 NAKİ'. swf_yama yalnızca DefineEditText metnini değiştiriyor, kutunun RECT'ine dokunmuyordu; İngilizce 'CASH' kutusuna 'NAKİT' sığmıyor. Gerçek istemci SWF'sinde ölçüm (yazı tipi ilerlemeleri, DefineFont3 em 1024×20): 916 çevrilen alandan 37'si sığmıyor, ör. NAKİT 1400 twip kutu, KARIŞTIRMAYA BAŞLA 2886, KAPALI 1200, HIZLANDIR 1580. Oyun içinde görüntü denetimi yapılmadı (◐). Oyunda sınandı (Playwright, yerel sunucu, yeni köy, 'aç beni' sandığı → PopupFirstBuyMC): önce '28 NAKİ', sonra '28NAKİT' tam; başlık 'Kayıp Yumurtalar!' sığıyor. Aynı pencerede '70% OFF' indirim anlamında 'KAPALI' çevrilmiş ve 'KAPAL' kesiliyordu: 'OFF' SWF'de yalnızca bu pencerede (PopupFirstBuyMC), 'İNDİRİM' yapıldı; 1,6 kat kutuya da sığmadığı için harf boyu 500'den 350'ye indi, '70%İNDİRİM' okunuyor.",
+      "test": "tests/test_swf_yama.py AlanGenisletmeTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "swf_yama.alani_genislet: sığmayan alan hizasına göre (sol, sağ, orta) genişler; en çok 1,6 kat kutuya da sığmayan yazıda önce harf boyu küçülür (en çok 0,7 katına), kutu kalan kadar genişler. AutoSize alana, bilinmeyen yazı tipine ve harfe dokunmaz. YAMA_SURUMU 10 (önbellekteki eski SWF yenilenir). Gerçek SWF'de 916 çevrilen alandan 37'si genişliyor, 1'inin harf boyu küçülüyor. Çalışırken yazılan 'Kayıp Ejderha Yumurtaları!' (POPUP_FIRST_OFFER_TITLE) SWF'de değil, 'Kayıp Yumurtalar!' diye kısaltıldı. Bozma ölçümü: 17 bozmadan 16'sı test düşürüyor; KENAR (80 twip) çıkarılınca kalan, çünkü %6 + 40 twip'lik güvenlik payı onu örtüyor. Ruh Kazanı'ndaki 'KARIŞTIRMAYA BAŞLA' ve 'HIZLANDIR' da genişliyor, oyun içinde görülmedi (seviye 8). #81 incelemesi: HTML alanda (b2 0x02) çizilen boy <font size>'dan gelir; ölçüm artık etiketteki boyla, harf küçültme HTML alanda yapılmaz (yalnızca genişler). Gerçek SWF'de küçülen tek alan (İNDİRİM) HTML değil, etkilenmedi. YAMA_SURUMU 12. Yeni test eski kodda düşüyor."
+    },
+    {
+      "id": "DNT-55",
+      "baslik": "Mağazadaki sınırlı öğe hep 'SINIRLI, SON 0 GÜN' gösteriyordu, hiç değişmiyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "◐",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026): 'SINIRLI, SON 0 GÜN'; isteği: 'yarın açtım mı o gitsin rastgele başka bi tanesi gelsin'. İstemci bayt kodu: ItemButtonLarge/setItem rozeti subcategory_id == Subcat.LIMITED_EDITION (121) öğeye koyar; Base/getLimitedDaysLeft = max(0, ceil((globals.LIMITED_EDITION_EXPIRATION - lastServerTimestamp) / 86400)); Utils$/getTimeStampFromString 'Y-A-G' → new Date(Y, A-1, G) (yerel gece yarısı). Config'te tarih 2012-09-14; mağazada tek sınırlı öğe 1299 Cash Wonder (in_store 1).",
+      "test": "tests/test_bayram_hedefleri.py GununSinirliOgesi",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "config.gunun_sinirli_esyasi: havuz tema setlerindeki sınırlı öğeler (Harikalar dışında, 237) ve 1299; sabit karıştırılmış sırada her gün sıradaki (havuz bitmeden tekrar yok), takvimde açık olan atlanır. Bitiş tarihi yarın: 'SON 1 GÜN'. Dünkü öğe istemci config'inde kapanır; 'hepsi açık' kipinde hiçbir şey kapanmaz. Takvimle açılan set öğeleri de tek ortak tarih yüzünden 'SON 1 GÜN' gösterir (istemcide öğe başına tarih yok). On bozmanın onu test düşürüyor. Oyun içinde görülmedi (◐). #81 incelemesi: (1) döngü yalnızca 'takvim' kipinde çalışır; 'false: hiçbiri' kipinde tema seti öğesi açılmazdı ama açılıyordu. (2) Takvimde açık öğeler havuzdan çıkarılıp sıra kalanlarda döner; açıkları atlamak aynı öğeyi etkinlik günlerinde günlerce seçerdi. İki yeni test eski kodda düşüyor."
+    },
+    {
+      "id": "DNT-56",
+      "baslik": "Komşu köydeyken başka bir köye geçmek için önce My Town'a dönmek gerekiyordu",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bir köyü ziyaret ettim mesela başka bir farklı köye bakmak için illa my towna dönmem lazım'. 1.4.07 FriendButton/mouseUsed@41-58: gameModeCurrent != GameMode.NORMAL ise return; komşuda mod NEIGHBOUR (2). Oyunda sınandı (Playwright, yerel sunucu): yeni köy → İblis Kıran'ı ziyaret → alttaki çubuktan Balrog → Ziyaret → doğrudan 'Balrog Kalesi' yüklendi (get_player_info sırası: Emperor, Emperor, İblis Kıran, Balrog).",
+      "test": "tests/test_swf_yama.py KomsudanKomsuyaTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "swf_yama.komsudan_komsuya: koşul aynı uzunlukta (uint)(mod - 1) <= 1 olur; yalnızca NORMAL ve NEIGHBOUR geçer, eğitim (0), saldırı, görev, hayatta kalma, turnuva, casus geçmez. Çapa tek değilse dokunulmaz. YAMA_SURUMU 11. Beş bozmanın beşi test düşürüyor."
+    },
+    {
+      "id": "DNT-57",
+      "baslik": "Doldur görünümünde oyunun menüleri 760×600'lük köşede kalıyor, arayüz bozuluyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüleri (12.11.2026): alt çubuk ve sağdaki simgeler haritanın ortasında. 1.4.07 bayt kodu: Base/getStageDimensions displayState FULL_SCREEN değilse Config.STAGE_WIDTH/HEIGHT (760×600) döndürür; menüler yalnızca StateNormal/onFullScreenChange → setFullScreen (getStageDimensions) / setNormalScreen ile yeniden dizilir. Doldur Ruffle'ı noScale ile açıyordu: sahne büyüyor, tam ekran olayı hiç gelmiyor. Chromium'da sınandı (1280×720, yerel sunucu): oyuncunun enterFullscreen'i ile oyun FULL_SCREEN'e geçti, üst çubuk, sağ simgeler ve alt çubuk ekranın kenarlarına dizildi; Esc'ten sonra sayfadaki kutuda yine düzgün.",
+      "test": "tests/js/doldur.test.js",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Sahibi raisetheempires-tr'deki çözümü örnek gösterdi (Tam ekran düğmesi oyun kutusunu requestFullscreen ile açar). Burada kutu yerine Ruffle oyuncusunun kendisi tam ekrana alınır: Social Empires bu olayda menülerini kenarlara dizer. Doldur seçiliyken oyuna ilk dokunuşta ya da sayfadaki Tam Ekran düğmesinde açılır (tarayıcı tam ekranı yalnızca kullanıcı dokunuşuyla izin verir); noScale kaldırıldı. Android'de WebView onShowCustomView ile tam ekranı karşılıyor (MainActivity); tablette denenmedi (GEC-09). Bozma: üç bozmanın üçü JS testini düşürüyor. #81 incelemesi: Doldur'da Tam Ekran düğmesi aynı tıklamada önce sayfanın, sonra oyuncunun tam ekranını istiyordu (ilk istek kullanıcı etkinleşmesini tüketir). Artık yalnızca oyuncunun tam ekranı istenir; Esc ile çıkınca oyun modu da kapanır. Chromium'da düğmeyle fullscreenElement RUFFLE-PLAYER oldu. Yeni JS testi eski kodda düşüyor."
+    },
+    {
+      "id": "DNT-58",
+      "baslik": "Sağdaki teklif simgeleri (asma kilit, ateş yumurtası, sandık) sürekli parlıyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "◐",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026, seviye 6): 'aç beni' sandığı, parıltılı asma kilit, ateş yumurtası. Asma kilit ve yumurta viral teklif simgeleridir (SpecialDayOfferManager/checkViralButton: timeLeft > 0 ise eklenir); kayan 30 günlük pencereyle (KAR-29) herkese açıktı. KAR-34 uygulamasından (#81) sonra seviye 15'ten önce ve takvim dışında starts_at/duration 0: Chromium'da yeni köyde yalnızca 'aç beni' kaldı. Sandık FirstOfferButton (viral_icons'ta tek active 1 giriş, oyunun kendi ilk alım teklifi: 28 nakde 20K altın + 40K yemek).",
+      "test": "tests/test_bot_yardim.py Pencere",
+      "pr": "#81",
+      "onay": "Sahibi, 12 Kasım 2026 ('1 ve 2'ye sen en iyi kararı ver')",
+      "notlar": "Sandığın gizlenip gizlenmeyeceği sahibine soruldu (viral_icons FirstOfferButton active 0 yapılırsa simge ve teklif kalkar). Karar: 'aç beni' sandığı kalır. Oyunun kendi ilk alım teklifi (viral_icons'ta açık tek giriş) ve oyuncuya değer veriyor; sahibini rahatsız eden parıltılı kilit ve yumurta simgeleri KAR-34 ile kalktı. İnceleme yorumları da aynı yetkiyle cevaplanıp kapatıldı (8 konuşma)."
+    },
+    {
+      "id": "DNT-59",
+      "baslik": "Bot köyleri hep aynı, binalar üst üste, ordu seviyeden bağımsızdı",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'bot köylerinin dizaynı hepsi aynı ve çok ama çok kötü'; 'askeri seviyelerini ayarla, özene bezene, bir plan çerçevesinde'. araclar/bot_koy_uret.py binaları yalnızca sol üst karo denetlenerek rastgele koyuyordu (2×2..4×4 üst üste), sur her köyde aynı kare ve alan dışında, ordu 3. seviyede de 60. seviyede de 512/516/517/518; dunya.py de aynı dört birimi 700 öğeye dek ekliyordu. İstemcinin doluluk kuralı Base/setOccupiedGrid (kayıttaki konum en büyük köşe). Ruffle'da sınandı (yerel sunucu): İblis Kıran (55) ve Balrog (57) surlu, kapılı, farklı yönlere dönük, Belediye IV, ev sıraları, ordugâh ve Kraliyet birlikleriyle.",
+      "test": "tests/test_bot_koy.py, tests/test_dunya.py EkonomiTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Plan: docs/inceleme/bot-koyleri-plani.md. oyun/bot_koy.py: dört düzen (kale, çarşı, ordugâh, çiftlik) kişiliğe göre, 8 simetriden biri, köy seviyeyle büyür (1-14 tek büyük karo, 15-29 2×2, 30+ 3×3). Ordu kişiliğin kol ağırlığıyla, açık en yüksek iki kademeden; büyüklük 8 + seviye (en çok 60) × kişilik oranı. Kule sayısı büyük karo başına 10'u aşmaz. Var olan botlar açılışta bir kez yeni tasarıma geçer (bot_tasarim 2; kimlik, ad, kaynak, seviye, geçmiş kalır). Dünya simülasyonu birimi aynı kuralla seçer, boş karoya koyar, ordu sınırında durur. Test, Belediye'nin açılış seviyesini (config 0, tabloda 1) yakaladı. 10 bozmanın 10'u test düşürüyor. 12.11.2026, ikinci tur: sahibi 'çok bot gibi/yapay' dedi, Arthur köylerini gösterdi. Arthur30/31/32 incelendi (plan §5). Hangi Arthur köyünün açılacağı istemcide üç aşama (FriendButton/mouseUsed: ≤10, ≤20, öteki; bayt kodu okundu); çubuktaki seviye oyuncu × 1,2 (FriendsWindow/<kurucu>). Sahibi '40, 50, 60, 70'te de değişiyor' dedi: bu sürümün istemcisinde ve dosyalarında yalnızca üç Arthur köyü var, öteki 1000000xx kimlikleri görev ve hayatta kalma haritaları; sahibine ekran görüntüsü soruldu. Yeni yerleşim (tasarım 4): Arthur kuralları; Ruffle'da İblis Kıran ve Balrog yeniden görüldü (sık mahalleler, çiçekli meydan, asker mangaları). 13 bozmanın 12'si test düşürüyor; kalan, mangaların büyüme sırası (rastgele karıştırma da kümeyi bozmuyor). #81 incelemesi: (1) rng.shuffle(sira[2:]) dilim kopyasını karıştırıyordu, şerit sırası hiç değişmiyordu; serit_sirasi ilk ikiyi sabit tutup kalanı karıştırır, tasarım 5. (2) birim_ekle'nin kayıttaki genişlemede kalması için test eklendi (düzeltme tasarım 4'te). (3) Hiç okunmayan 'duzen' alanını denetleyen test satırı, SERIT_SIRASI'nın dört kişilikte farklı başladığını sınayan denetimle değiştirildi. İki yeni test kendi bozmasında düşüyor."
+    },
+    {
+      "id": "DNT-60",
+      "baslik": "Gerçek oyuncu köylerinden bot köylerine öneriler; arazi türü (skin) oyunda var",
+      "sinif": "ozellik",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "İnternet taraması 15 dilde, YouTube'da 52 Social Empires videosu, köy gösteren 16'sının kapağı ve üç karesi incelendi (docs/inceleme/koy-tasarim-taramasi.md). Arazi türü bayt koduyla doğrulandı: Base/_parseLoadedInfo map.skin → skinMap (Config.BG_SKIN_COLORS), Base/addExpandedTileBuilding arazi öğesi 1000 + skinMap; config 1000-1006 (çimen, çöl, buz, deniz, maden, orman, bulut); sunucuda set_skin (oyun/komutlar.py).",
+      "test": "tests/test_bot_koy.py AskerGecidi, IcSur, Arazi",
+      "pr": "#81",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Öneriler (sahibine soruldu): simetrik avlular ve iç surlar, çift sur, avluda asker geçidi, bazı botlara arazi türü. terreno*.swf çizimlerinin yedisi de (çimen terreno.swf dahil) config/onindirme.tsv'de 2. öncelikte (PAKETLER temel 1); arazi türü uygulanırsa temel pakete alınmalı (≈1,8 MB) ve çimenin de denetlenmesi gerekir. Sahibi (12.11.2026): '1. Bir kısmını yap, diğerlerine sen karar ver'. Yapılan (tasarım 6): iç surlar (3+ büyük karolu köyde bitişik karolar arasında, ortası 3 karo kapı, iki yanında kule) ve asker geçidi (15. seviyeden, ordu ≥ 12 ise ordunun yarısı, en az 8 en çok 16, 4 sütun, bir karo ara; yer yoksa sıra azalır). Yapılmayan ve gerekçesi: çift sur (büyük karo başına 10 kule sınırı köşe ve kapılara gidiyor, ikinci kule sırasına yetmez); arazi türü (çizimleri temel pakette değil, internetsiz oyunda bot köyünün zemini görünmeyebilir). Ruffle'da İblis Kıran: artı biçimli iç surlarla dört avlu, meydan önünde Kraliyet Kılıççısı geçidi. Altı bozmanın altısı test düşürüyor. Sahibi (12.11.2026): 'arazi türünü çok değil ama az da olsa değiştirsen güzel olurdu'. Yapıldı (tasarım 7): botların yaklaşık altıda birine çöl, buz, maden ya da orman (bot_koy.arazi_sec; yerel 50 botta 6). Çimen dahil beş arazi çizimi temel pakete alındı (araclar/onindirme_listesi.py kuralı ve config/onindirme.tsv, +≈2 MB). Ruffle'da İblis Kıran maden arazisinde (kahverengi) görüldü. Beş bozmanın beşi test düşürüyor. #81 incelemesi: iç sur kapısının yanındaki kuleler hiç konmuyordu (önce sur yazılıyor, sonra kule dolu karoya konamıyordu). Artık iç kapı kuleleri dış kulelerden önce konuyor (büyük karo bütçesi dış köşelerde tükeniyordu); IcSur testi kapının yanında kule arıyor, eski kodda düşüyor. Tasarım 8."
+    },
+    {
+      "id": "CEV-09",
+      "baslik": "Bazı birlik adları tuhaf ya da tutarsızdı",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bazı birliklerin ismi çok saçma geldi onlara da bak'. 716 birlik adı İngilizcesiyle yan yana gözden geçirildi (config items type 'u', ceviri/tr.json item:). Bulunanlar: 'Unsur' (Elemental, 16 ad), anlamı kayanlar (Kelle/Skull, Leş/Corpse, Döl/Spawn, Serseri/Punky, Limit Wizard), eski kelimeler (Cenkçi, Hoyrat, Tayf), tutarsızlıklar (Imperial: Haşmetli / tema seti 'İmparatorluk Elfleri'; Kayadelen / Kum Delen; Wind: Yel / Rüzgâr; Boss: Reis).",
+      "test": null,
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi. #81 incelemesi: büyük harfli biçimler kalmıştı; Kaya Delen görevinin üç başlığı (KAYA DELEN), mağaza sekmeleri (DESTANSI KAFATASI EJDERHALARI, VAHŞİ KULUÇKA EJDERHALARI) ve hayatta kalma uyarısı (ELEBAŞI GELİYOR) düzeltildi. 'Aztek Reisi' heykeli (kabile reisi) bilerek bırakıldı."
     }
   ]
 }

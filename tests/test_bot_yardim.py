@@ -7,14 +7,14 @@ Beklenen değerlerin kaynağı: 1.4.07 bayt kodu (docs/inceleme/1407-asker-ada.m
   (config: teklif 2 = 5, teklif 1 = 3).
 - CollectGameManager/get active: şimdi > starts_at ve şimdi < starts_at + duration; SpecialDayOfferManager/timeLeft
   int(starts_at + duration - şimdi) > 0 (int32). ImageManager/getUserPhoto: serverUrl + "graph.facebook.com/<id>/picture".
-Sahibinin kararları: botlar yardım eder; her yer için günde bir bot; kayan 30 günlük pencere; ada ve ödül çizimleri
-temel pakette.
+Sahibinin kararları: botlar yardım eder; her yer için günde bir bot; ada ve ödül çizimleri temel pakette; teklifler
+takvimli ve 15'ten kademeli (KAR-34, kayan 30 günlük pencerenin yerine).
 """
 
 import os
 import re
 import unittest
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from unittest import mock
 
 from ortak import KOK
@@ -140,25 +140,84 @@ class Yardim(unittest.TestCase):
 
 
 class Pencere(unittest.TestCase):
-    def test_ada_ve_teklifler_istemcide_acik_sunucuda_degismez(self):
-        simdi = 1_794_500_000
-        bas, sure = config.etkinlik_penceresi(simdi)
-        self.assertTrue(bas < simdi < bas + sure)  # CollectGameManager/get active
-        self.assertTrue(29 * 86400 < bas + sure - simdi <= 30 * 86400)  # pencerede 29-30 gün
-        self.assertLess(bas + sure - simdi, 2 ** 31)  # timeLeft convert_i
-        self.assertGreater(config.etkinlik_penceresi(simdi + 86400)[0], bas)  # her gün kayar
-        c = config.get_client_game_config("tr")
-        bugun = config.etkinlik_penceresi()
-        self.assertEqual((c["collect_game"]["1"]["starts_at"], c["collect_game"]["1"]["duration"]), bugun)
-        for no, t in c["viral_offers"].items():
-            self.assertEqual((t["starts_at"], t["duration"]), bugun, no)
+    """KAR-34 (sahibi, 12.11.2026: "Kademeli, 15'ten başlayıp", "Evet, takvime bağla"): Ada Ocağı ve viral teklifler
+    kayan 30 günlük pencere (KAR-29) yerine config/takvim.json teklifler'deki günlerde ve oyuncunun seviyesi yetince
+    açılır. Bayt kodu: CollectGameManager/get active şimdi > starts_at ve şimdi < starts_at + duration;
+    SpecialDayOfferManager/timeLeft int(starts_at + duration - şimdi) > 0 (convert_i); ada ödülü viral teklif 2 ile
+    (CollectGameManager/giveReward reward_viral_offer [2, ...]); popup eşlemesi 1 SpecialDayOffer, 2 IslandForge,
+    3-4 IvoryOffer, 5 NightForgeOffer."""
+
+    def istemci(self, gun, seviye):
+        with mock.patch.object(takvim, "bugun", lambda: gun):
+            return config.get_client_game_config("tr", seviye=seviye)
+
+    def acik(self, c, simdi):
+        sonuc = set()
+        for tur, alan in (("ada", "collect_game"), ("viral", "viral_offers")):
+            for no, t in c[alan].items():
+                if t["starts_at"] < simdi < t["starts_at"] + t["duration"]:
+                    self.assertLess(t["starts_at"] + t["duration"] - simdi, 2 ** 31)
+                    sonuc.add((tur, int(no)))
+        return sonuc
+
+    def an(self, gun, saat=12):  # Türkiye saati (UTC+3), takvimden bağımsız
+        return int((datetime(gun.year, gun.month, gun.day, saat) - datetime(1970, 1, 1)).total_seconds()) - 3 * 3600
+
+    def test_takvim_kademeli_on_bes_ten(self):
+        teklifler = takvim._yukle()["teklifler"]
+        seviyeler = {}
+        for t in teklifler:
+            seviyeler.setdefault((t["tur"], t["no"]), set()).add(t["seviye"])
+        self.assertEqual(sorted(min(v) for v in seviyeler.values()), [15, 20, 25, 30, 35])  # 15'ten 5'er kademe
         g = config.get_game_config()
-        self.assertEqual(g["collect_game"]["1"]["starts_at"], 0)  # sunucunun config'i değişmez
-        self.assertEqual({t["active"] for t in c["viral_icons"]} if isinstance(c["viral_icons"], list)
-                         else None, {t["active"] for t in g["viral_icons"]} if isinstance(g["viral_icons"], list)
-                         else None)  # viral_icons (gerçek para, Facebook) değişmez
+        for tur, no in seviyeler:
+            self.assertIn(str(no), g["collect_game" if tur == "ada" else "viral_offers"])
+        self.assertEqual({no for tur, no in seviyeler if tur == "viral"}, {1, 3, 4, 5})  # 2 adanın ödülü
+        # Aynı pencere (3 ve 4 IvoryOffer) aynı gün iki kez açılmaz; yılın her günü en çok iki teklif
+        for i in range(366):
+            gun = date(2027, 1, 1) + timedelta(days=i)
+            bugun = [(t["tur"], t["no"]) for t in takvim.teklifler(gun, ileri=0) if t["aktif"]]
+            self.assertLessEqual(len(bugun), 2, gun)
+            self.assertFalse({("viral", 3), ("viral", 4)} <= set(bugun), gun)
+
+    def test_ada_on_bes_inci_seviyede_ve_takvim_gununde(self):
+        gun = date(2026, 11, 20)  # 15 Kasım - 14 Aralık Cehennem Örsü Adası
+        self.assertEqual(self.acik(self.istemci(gun, 14), self.an(gun)), set())
+        c = self.istemci(gun, 15)
+        self.assertEqual(self.acik(c, self.an(gun)), {("ada", 1), ("viral", 2)})
+        ada = c["collect_game"]["1"]
+        self.assertEqual(ada["starts_at"], self.an(date(2026, 11, 15), 0))  # 15 Kasım Türkiye gece yarısı
+        self.assertEqual(ada["duration"], 30 * 86400)
+        # Kapalı teklif 1.4.07 config'indeki gibi (0, 0): timeLeft 0, simge ve ada hiç çıkmaz
+        self.assertEqual({(t["starts_at"], t["duration"]) for no, t in c["viral_offers"].items() if no != "2"}, {(0, 0)})
+        for saat in (0, 23):
+            self.assertIn(("ada", 1), self.acik(self.istemci(date(2026, 12, 14), 40), self.an(date(2026, 12, 14), saat) + 1))
+        self.assertEqual(self.acik(self.istemci(date(2026, 11, 12), 40), self.an(date(2026, 11, 12))), set())
+        self.assertEqual(self.acik(self.istemci(date(2026, 12, 15), 40), self.an(date(2026, 12, 15))), set())
+
+    def test_ejderha_teklifleri_kendi_seviyesinde(self):
+        for gun, no, sv in ((date(2027, 10, 20), 5, 25), (date(2027, 4, 10), 1, 20), (date(2027, 1, 25), 3, 30),
+                            (date(2027, 8, 10), 4, 35)):
+            self.assertEqual(self.acik(self.istemci(gun, sv - 1), self.an(gun)), set(), (gun, no))
+            self.assertEqual(self.acik(self.istemci(gun, sv), self.an(gun)), {("viral", no)}, (gun, no))
+
+    def test_sunucu_configi_ve_viral_simgeler_degismez(self):
+        c = self.istemci(date(2026, 11, 20), 40)
+        g = config.get_game_config()
+        self.assertEqual(g["collect_game"]["1"]["starts_at"], 0)
+        self.assertEqual({t["starts_at"] for t in g["viral_offers"].values()}, {0})
+        self.assertEqual(c["viral_icons"], g["viral_icons"])  # viral_icons (gerçek para, Facebook) değişmez
+
+    def test_sayfadaki_takvim_listesi(self):
+        with mock.patch.object(takvim, "bugun", lambda: date(2026, 11, 20)):
+            v = server.app.test_client().get("/dunya/takvim").get_json()
+        ada = next(t for t in v["teklifler"] if t["aktif"])
+        self.assertEqual((ada["ad"], ada["seviye"], ada["son_gun"]), ("Cehennem Örsü Adası", 15, "2026-12-14"))
+        self.assertTrue(ada["resim"].endswith("/buildingthumbs/1530_forgeIsland.jpg"), ada["resim"])  # oyunun resmi
+        self.assertIn("Fildişi Hanedan Ejderhası", [t["ad"] for t in v["teklifler"] if not t["aktif"]])
 
     def test_ada_ve_odul_cizimleri_temel_pakette(self):
+        """KAR-29: ada ve ödül ejderhalarının çizimleri temel pakette (teklif takvim günü açılınca çevrimdışı da çizilsin)."""
         from oyun import onindirme
         oncelik = {y: o for y, _, o in onindirme.liste()}
         for ad in ("1530_forgeIsland", "2267_easterDragon", "2269_forgeDragon", "2272_demonDragon",

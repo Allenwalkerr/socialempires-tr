@@ -774,3 +774,187 @@ class DepoYaziTipleriTestleri(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# --- swf_yama: kesik çeviri için metin kutusunu genişletme -------------------------------------------------
+
+def _kutu_alani(metin, genislik=1000, font=9, hiza=None, kaydir=False, boyutlan=False, sol=0, sag=0, html=False):
+    """Belgeye göre DefineEditText: RECT (0, genislik, 0, 300), HasText, isteğe bağlı WordWrap (b1 0x40),
+    AutoSize (b2 0x40), HasLayout (b2 0x20: Align UI8, Left/RightMargin UI16, Indent UI16, Leading SI16)."""
+    b1 = 0x80 | 0x01 | (0x40 if kaydir else 0)
+    b2 = (0x40 if boyutlan else 0) | (0x20 if hiza is not None else 0) | (0x02 if html else 0)
+    ek = struct.pack("<HH", font, 240)  # FontID, FontHeight (twip)
+    if hiza is not None:
+        ek += bytes([hiza]) + struct.pack("<HHHh", sol, sag, 0, 0)
+    return struct.pack("<H", 4) + _rect(14, 0, genislik, 0, 300) + bytes([b1, b2]) + ek + b"_txt\0" + \
+        metin.encode("utf-8") + b"\0"
+
+
+def _kutu_rect(t):
+    """RECT'i belgeye göre (Nbits UB[5], dört SB[Nbits]) uygulamadan bağımsız çöz."""
+    nbit = t[2] >> 3
+    bitler = int.from_bytes(t[2:2 + (5 + 4 * nbit + 7) // 8], "big")
+    toplam = ((5 + 4 * nbit + 7) // 8) * 8
+    sonuc = []
+    for i in range(4):
+        d = (bitler >> (toplam - 5 - nbit * (i + 1))) & ((1 << nbit) - 1)
+        sonuc.append(d - (1 << nbit) if d >> (nbit - 1) else d)
+    return sonuc
+
+
+class AlanGenisletmeTestleri(unittest.TestCase):
+    """'28 NAKİ' (sahibinin bildirimi): çeviri kutudan uzunsa son harf kesilir. Belge: DefineFont3 ilerlemeleri em
+    karesi 1024 × 20 = 20480 birimdir, ekrandaki en = ilerleme × FontHeight / 20480 twip. Flash metin alanının iki
+    yanında 2'şer piksel (toplam 80 twip) boşluk vardır. Yazı tipi: 'A' yarım em (240 twip yazıda 120), 'B' bir em
+    (240), boşluk çeyrek em (60)."""
+
+    def setUp(self):
+        self.fontlar = {9: Font3(_font3(9, b"F\0", [32, 65, 66], [S0, S0, S0], [5120, 10240, 20480],
+                                        [_rect(0, 0, 0, 0, 0)] * 3))}
+
+    def _en(self, metin):  # belgenin formülü, elle: harf ilerlemeleri toplamı
+        return sum({" ": 5120, "A": 10240, "B": 20480}[h] for h in metin) * 240 / 20480
+
+    def test_sigan_metin_bayt_bayt_ayni(self):
+        t = _kutu_alani("AB")  # 360 + 80 twip, kutu 1000
+        self.assertEqual(swf_yama.alani_genislet(t, "AB", self.fontlar), t)
+
+    def test_sigmayan_metin_sigacak_kadar_genisler(self):
+        metin = "BBBB A"
+        self.assertEqual(self._en(metin), 1140)
+        t = _kutu_alani(metin)
+        yeni = swf_yama.alani_genislet(t, metin, self.fontlar)
+        xmin, xmax, ymin, ymax = _kutu_rect(yeni)
+        self.assertEqual((xmin, ymin, ymax), (0, 0, 300))  # sola dayalı: yalnızca sağa açılır, yükseklik aynı
+        self.assertGreaterEqual(xmax - xmin, 1140 + 80)
+        self.assertLessEqual(xmax - xmin, 1600)
+        rect_uz = lambda b: (5 + 4 * (b[2] >> 3) + 7) // 8  # noqa: E731 (belge: RECT uzunluğu Nbits'ten)
+        self.assertEqual(yeni[2 + rect_uz(yeni):], t[2 + rect_uz(t):])  # RECT dışında bayt bayt aynı
+
+    def test_hizaya_gore_acilir(self):
+        metin = "BBBB A"
+        xmin, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(_kutu_alani(metin, hiza=1), metin, self.fontlar))
+        self.assertEqual(xmax, 1000)  # sağa dayalı: sağ kenar yerinde, sola açılır
+        self.assertLessEqual(xmin, -220)
+        xmin, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(_kutu_alani(metin, hiza=2), metin, self.fontlar))
+        self.assertLessEqual(abs(-xmin - (xmax - 1000)), 1)  # ortalı: iki yana eşit
+        self.assertGreaterEqual(xmax - xmin, 1220)
+
+    def test_kenar_boslugu_da_sayilir(self):
+        """Align + LeftMargin/RightMargin: metin kenar boşluklarının içinde dizilir (belge, HasLayout)."""
+        metin = "BB A"  # 660 + 80 = 740: boşluksuz sığar, 300 + 300 kenar boşluğuyla (1340) sığmaz
+        t = _kutu_alani(metin, hiza=0)
+        self.assertEqual(swf_yama.alani_genislet(t, metin, self.fontlar), t)
+        xmin, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(_kutu_alani(metin, hiza=0, sol=300, sag=300), metin,
+                                                               self.fontlar))
+        self.assertGreaterEqual(xmax - xmin, 660 + 80 + 600)
+
+    def test_genisleme_en_cok_yuzde_altmis(self):
+        metin = "B" * 10  # 2400 twip
+        xmin, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(_kutu_alani(metin), metin, self.fontlar))
+        self.assertEqual((xmin, xmax), (0, 1600))
+
+    def test_en_genis_kutuya_sigmayan_yazi_kuculur(self):
+        """FontHeight UI16, FontID'nin hemen ardından (belge). 1,6 kat kutuya da sığmayan yazıda harf boyu düşer,
+        ama en çok 0,7 katına (240 → 168); sığan yazının boyu hiç değişmez."""
+        yukseklik = lambda b: struct.unpack_from("<H", b, 2 + (5 + 4 * (b[2] >> 3) + 7) // 8 + 4)[0]  # noqa: E731
+        self.assertEqual(yukseklik(_kutu_alani("x")), 240)  # kurucunun kendisi: konum doğru
+        metin = "B" * 7  # 1680 twip: 1600'lük kutuya sığmaz
+        yeni = swf_yama.alani_genislet(_kutu_alani(metin), metin, self.fontlar)
+        h = yukseklik(yeni)
+        self.assertLess(h, 240)
+        self.assertGreaterEqual(h, 168)
+        xmin, xmax, _, _ = _kutu_rect(yeni)
+        self.assertGreaterEqual(xmax - xmin, self._en(metin) * h / 240 + 80)  # küçülen yazı kutuya sığar
+        self.assertLess(xmax - xmin, 1600)  # kutu küçülen yazıya göre genişler, sınıra dek değil (yanındakine taşmasın)
+        self.assertEqual(yukseklik(swf_yama.alani_genislet(_kutu_alani("B" * 20), "B" * 20, self.fontlar)), 168)
+        self.assertEqual(yukseklik(swf_yama.alani_genislet(_kutu_alani("BBBB A"), "BBBB A", self.fontlar)), 240)
+
+    def test_html_alanda_boy_font_etiketinden_ve_kucultulmez(self):
+        """HTML alanda (b2 0x02) çizilen boy <font size> (piksel ×20 twip) etiketinden gelir, FontHeight geçersizdir
+        (Flash/Ruffle HTML metni). size="20" = 400 twip: 'BBB' 720 × 400 / 240 = 1200 twip."""
+        yukseklik = lambda b: struct.unpack_from("<H", b, 2 + (5 + 4 * (b[2] >> 3) + 7) // 8 + 4)[0]  # noqa: E731
+        kisa = '<p><font size="20">BBB</font></p>'
+        t = _kutu_alani(kisa, html=True)
+        _, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(t, kisa, self.fontlar))
+        self.assertGreaterEqual(xmax, 1200 + 80)  # FontHeight (240) ile ölçülse 720 + 80 sığardı
+        uzun = '<p><font size="20">BBBBBBB</font></p>'  # 2800 twip: 1600'e sığmaz
+        yeni = swf_yama.alani_genislet(_kutu_alani(uzun, html=True), uzun, self.fontlar)
+        self.assertEqual(yukseklik(yeni), 240)  # küçültme etkisiz olacağı için yapılmaz
+        self.assertEqual(_kutu_rect(yeni)[:2], [0, 1600])  # en geniş kutu
+
+    def test_sozcuk_kaydiran_alanda_yalniz_uzun_sozcuk_genisletir(self):
+        metin = "AAAA AAAA AAAA"  # tek satır 1560, her sözcük 480: kaydıran alanda sığar
+        t = _kutu_alani(metin, kaydir=True)
+        self.assertEqual(swf_yama.alani_genislet(t, metin, self.fontlar), t)
+        self.assertNotEqual(swf_yama.alani_genislet(_kutu_alani(metin), metin, self.fontlar), _kutu_alani(metin))
+        uzun = "A BBBBB"  # 1200 twip'lik tek sözcük kaydırmayla da bölünmez
+        _, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(_kutu_alani(uzun, kaydir=True), uzun, self.fontlar))
+        self.assertGreaterEqual(xmax, 1200 + 80)
+
+    def test_satirlar_ayri_olculur_ve_html_etiketi_sayilmaz(self):
+        t = _kutu_alani("x")
+        self.assertEqual(swf_yama.alani_genislet(t, "BBB\rBBB", self.fontlar), t)  # her satır 720
+        self.assertEqual(swf_yama.alani_genislet(t, '<font size="20">BBB</font>', self.fontlar), t)
+        # HTML alanda ölçülen yalnızca görünen yazı: etiket harfleri yazı tipinde yok, yine de ölçülür
+        _, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(t, '<p><font size="20">BBBBB</font></p>', self.fontlar))
+        self.assertGreaterEqual(xmax, 1200 + 80)
+
+    def test_dokunulmayan_alanlar(self):
+        metin = "B" * 6
+        for t in (_kutu_alani(metin, boyutlan=True),   # AutoSize: kutu kendisi büyür
+                  _kutu_alani(metin, font=8)):         # yazı tipi bilinmiyor
+            self.assertEqual(swf_yama.alani_genislet(t, metin, self.fontlar), t)
+        t = _kutu_alani("BBBBBBÇ")                     # yazı tipinde olmayan harf: en ölçülemez
+        self.assertEqual(swf_yama.alani_genislet(t, "BBBBBBÇ", self.fontlar), t)
+
+    def test_turkcelestir_cevrilen_alani_genisletir(self):
+        """Bütün yamada: sözlükten gelen uzun çeviri SWF'nin kendi yazı tipiyle ölçülür ve kutu genişler."""
+        font = _font3(9, b"F\0", [32, 65, 66], [S0, S0, S0], [5120, 10240, 20480], [_rect(0, 0, 0, 0, 0)] * 3)
+        girdi = _swf(_etiket(75, font), _etiket(37, _kutu_alani("AB")), _etiket(1, b""), surum=13)
+        with mock.patch.object(swf_yama, "_turkce_fontlar", return_value={}):
+            cikti, _ = swf_yama.turkcelestir(girdi, {"metin_alanlari": {"AB": "BBBB A"}})
+        alan = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 37][0]
+        xmin, xmax, _, _ = _kutu_rect(alan)
+        self.assertGreaterEqual(xmax - xmin, 1140 + 80)
+
+
+class KomsudanKomsuyaTestleri(unittest.TestCase):
+    """Sahibinin isteği (12.11.2026): komşu köydeyken alttaki arkadaş düğmesiyle doğrudan başka köye geçilsin.
+    1.4.07 FriendButton/mouseUsed@41-58: getlex Base, getproperty Main, getproperty gameModeCurrent, getlex GameMode,
+    getproperty NORMAL, ifeq +1, returnvoid. AVM2 işlem kodları (Adobe AVM2 Overview): nop 0x02, decrement 0x93,
+    convert_u 0x74, pushbyte 0x24, ifle 0x16, ifeq 0x13 (s24 göreli konum, komutun sonundan). GameMode: TUTORIAL 0,
+    NORMAL 1, NEIGHBOUR 2, ASSAULT 3, CAMPAIGN 4, SURVIVAL 5, TOURNAMENT 6, SPY 7, EDITOR 10."""
+
+    ESKI = bytes.fromhex("6001660c66c201" "609c01" "669b02" "13010000" "47")
+
+    def test_kosul_ayni_uzunlukta_normal_ve_komsuyu_gecirir(self):
+        govde = _do_abc(["x"]) + b"\x00" + self.ESKI + b"\xd0\x30"
+        yeni, sayi = swf_yama.komsudan_komsuya(govde)
+        self.assertEqual(sayi, 1)
+        self.assertEqual(len(yeni), len(govde))
+        bas = govde.index(self.ESKI)
+        kod = yeni[bas:bas + len(self.ESKI)]
+        self.assertEqual(kod[:7], self.ESKI[:7])           # Base.Main.gameModeCurrent yığında
+        self.assertEqual(kod[7:9], b"\x02\x02")           # nop nop
+        self.assertEqual(kod[9:13], b"\x93\x74\x24\x01")  # decrement, convert_u, pushbyte 1
+        self.assertEqual(kod[13], 0x16)                   # ifle
+        self.assertEqual(kod[14:17], self.ESKI[14:17])    # aynı göreli konum: hedef returnvoid'in ardı
+        self.assertEqual(kod[17:], b"\x47")
+        self.assertEqual(yeni[:bas] + yeni[bas + len(kod):], govde[:bas] + govde[bas + len(kod):])
+        # Koşulun AVM2 anlamı: decrement Number, convert_u ToUint32, ifle sayısal <=
+        gecen = {m for m in (0, 1, 2, 3, 4, 5, 6, 7, 10) if ((m - 1) % 2 ** 32) <= 1}
+        self.assertEqual(gecen, {1, 2})  # yalnızca NORMAL ve NEIGHBOUR; eğitim, saldırı, görev geçmez
+
+    def test_capa_yoksa_ya_da_iki_kezse_dokunmaz(self):
+        for govde in (_do_abc(["x"]), _do_abc(["x"]) + self.ESKI + self.ESKI):
+            self.assertEqual(swf_yama.komsudan_komsuya(govde), (govde, 0))
+
+    def test_turkcelestir_yamayi_uygular(self):
+        with mock.patch.object(swf_yama, "_turkce_fontlar", return_value={}):
+            girdi = _swf(_etiket(82, _do_abc(["x"]) + self.ESKI), _etiket(1, b""), surum=13)
+            cikti, sayi = swf_yama.turkcelestir(girdi, {"metin_alanlari": {}})
+        abc = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 82][0]
+        self.assertNotIn(self.ESKI, abc)
+        self.assertIn(bytes.fromhex("020293742401"), abc)
+        self.assertEqual(sayi, 1)

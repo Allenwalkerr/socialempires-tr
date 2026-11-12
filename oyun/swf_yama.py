@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"8"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"12"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -167,6 +167,133 @@ def _metin_konumu(t: bytes):
     return p, son, bool(html_mi)
 
 
+def _rect_oku(t: bytes, p: int = 2):
+    """SWF RECT (Xmin, Xmax, Ymin, Ymax) ve bayt uzunluğu."""
+    nbit = t[p] >> 3
+    bitler = int.from_bytes(t[p:p + (5 + nbit * 4 + 7) // 8], "big")
+    toplam = ((5 + nbit * 4 + 7) // 8) * 8
+    degerler = []
+    for i in range(4):
+        kaydir = toplam - 5 - nbit * (i + 1)
+        d = (bitler >> kaydir) & ((1 << nbit) - 1)
+        if nbit and d >> (nbit - 1):
+            d -= 1 << nbit
+        degerler.append(d)
+    return degerler, (5 + nbit * 4 + 7) // 8
+
+
+def _rect_yaz(degerler) -> bytes:
+    nbit = max(max(abs(d) for d in degerler).bit_length() + 1, 1)
+    bitler = nbit
+    for d in degerler:
+        bitler = (bitler << nbit) | (d & ((1 << nbit) - 1))
+    toplam = 5 + nbit * 4
+    dolgu = (-toplam) % 8
+    return (bitler << dolgu).to_bytes((toplam + dolgu) // 8, "big")
+
+
+EN_COK_GENISLEME = 1.6
+EN_KUCUK_YAZI = 0.7  # sığmayan yazıda harf boyu en çok bu kata iner
+
+
+def _gorunen(metin: str) -> str:
+    return re.sub(r"<[^>]+>", "", html.unescape(metin)) if "<" in metin else metin
+
+
+def _alan_bilgisi(t: bytes):
+    """DefineEditText'ten (b1, b2, font_id, yukseklik, hiza, sol_bosluk, sag_bosluk, rect_uz, yukseklik_konumu)."""
+    _, rect_uz = _rect_oku(t)
+    p = 2 + rect_uz
+    b1, b2 = t[p], t[p + 1]
+    q = p + 2
+    font_id = yukseklik = yk = None
+    if b1 & 0x01:
+        font_id = struct.unpack_from("<H", t, q)[0]
+        q += 2
+    if b2 & 0x80:
+        q = t.index(b"\0", q) + 1
+    if b1 & 0x01 or b2 & 0x80:
+        yk = q
+        yukseklik = struct.unpack_from("<H", t, q)[0]
+        q += 2
+    if b1 & 0x04:
+        q += 4
+    if b1 & 0x02:
+        q += 2
+    hiza = sol = sag = 0
+    if b2 & 0x20:
+        hiza = t[q]
+        sol, sag = struct.unpack_from("<HH", t, q + 1)
+    return b1, b2, font_id, yukseklik, hiza, sol, sag, rect_uz, yk
+
+
+KENAR = 80  # Flash metin alanının iki yanındaki 2'şer piksellik boşluk (twip)
+
+
+def alani_genislet(t: bytes, metin: str, fontlar) -> bytes:
+    """DefineEditText'te çeviri kutuya sığmıyorsa kutuyu hizasına göre gerektiği kadar genişletir (kesik yazı:
+    '28 NAKİ', sahibinin bildirimi 12.11.2026). Metnin eni yazı tipinin harf ilerlemelerinden hesaplanır (DefineFont3:
+    em 1024 × 20). Satırlar ayrı ayrı ölçülür; sözcük kaydıran alanda (WordWrap) satır kendiliğinden bölündüğü için
+    yalnızca en uzun sözcük. Kendiliğinden boyutlanan (AutoSize) alana, yazı tipi ya da harfi bilinmeyen alana
+    dokunmaz; genişlik en çok EN_COK_GENISLEME kat olur, yine sığmazsa harf boyu (FontHeight) en çok EN_KUCUK_YAZI katına
+    iner. Sığan alan değişmez (gereksiz geniş metin kutusu yanındaki
+    düğmenin tıklanmasını kapatabilirdi). %6 + 2 piksellik pay ölçülmüş değil, Ruffle dizgisine karşı güvenlik payıdır."""
+    bilgi = _alan_bilgisi(t)
+    b1, b2, font_id, yukseklik, hiza, sol, sag, rect_uz, yk = bilgi
+    if b2 & 0x40 or font_id is None or not yukseklik:  # AutoSize: kutu zaten metne göre büyür
+        return t
+    font = fontlar.get(font_id)
+    if font is None or not font.duzen:
+        return t
+    ilerleme = font.duzen[1]
+    sira = {k: i for i, k in enumerate(font.kodlar)}
+    gorunen = _gorunen(metin).replace("\n", "\r").strip()
+    if any(ord(h) not in sira for h in gorunen if not h.isspace()) or not gorunen:
+        return t
+    bosluk = ilerleme[sira[32]] if 32 in sira else 0
+
+    # HTML alanda (b2 0x02) çizilen boy <font size="..."> etiketinden gelir (piksel; ×20 twip), FontHeight geçersiz
+    # kalır: ölçüm etiketteki en büyük boyla yapılır ve harf küçültülmez, yalnızca kutu genişler (#81 incelemesi)
+    html_mi = bool(b2 & 0x02)
+    boylar = [int(b) * 20 for b in re.findall(r'size="(\d+)"', metin)] if html_mi else []
+    olcu_boyu = max(boylar) if boylar else yukseklik
+
+    def olc(parca):
+        return sum(ilerleme[sira[ord(h)]] if ord(h) in sira else bosluk for h in parca) * olcu_boyu / 20480
+
+    satirlar = [s.strip() for s in gorunen.split("\r")]
+    # Sözcük kaydıran alanda (WordWrap) satır bölünür; kesilen yalnızca kutudan uzun tek sözcüktür
+    parcalar = [w for s in satirlar for w in s.split()] if b1 & 0x40 else satirlar
+    en = max((olc(p) for p in parcalar), default=0)
+    (xmin, xmax, ymin, ymax), _ = _rect_oku(t)
+    genislik = xmax - xmin
+    # Ruffle'ın dizgisi yazı tipi ilerlemesinden biraz geniş olabilir: %6 ve 2 piksel pay
+    ek = int(en * 1.06 + 40 + sol + sag + KENAR - genislik + 0.5)
+    sinir = int(genislik * (EN_COK_GENISLEME - 1))
+    yeni_yukseklik = yukseklik
+    if ek > sinir and html_mi:
+        ek = sinir
+    elif ek > sinir:
+        # En geniş kutuya da sığmıyor: önce harf boyu küçülür (en çok EN_KUCUK_YAZI katına, kutuyu hiç
+        # genişletmeden sığacak kadar), kutu kalan kadar genişler (yandaki yazının üstüne az taşsın)
+        sigan = genislik - sol - sag - KENAR - 40
+        yeni_yukseklik = max(int(yukseklik * sigan / (en * 1.06)), int(yukseklik * EN_KUCUK_YAZI + 0.5))
+        en = en * yeni_yukseklik / yukseklik
+        ek = min(int(en * 1.06 + 40 + sol + sag + KENAR - genislik + 0.5), sinir)
+    if ek <= 0:
+        return t
+    if hiza == 1:      # sağa dayalı: sola açılır
+        xmin -= ek
+    elif hiza == 2:    # ortalı: iki yana
+        xmin -= ek // 2
+        xmax += ek - ek // 2
+    else:              # sola dayalı ya da iki yana yaslı: sağa açılır
+        xmax += ek
+    if yeni_yukseklik != yukseklik:
+        t = t[:yk] + struct.pack("<H", yeni_yukseklik) + t[yk + 2:]
+    return t[:2] + _rect_yaz((xmin, xmax, ymin, ymax)) + t[2 + rect_uz:]
+
+
 def _html_degistir(kaynak: str, ceviri: str) -> str:
     """HTML metnin ilk yazı düğümüne çeviriyi koyar, diğerlerini boşaltır."""
     parcalar = re.split(r"(<[^>]+>)", kaynak)
@@ -281,6 +408,26 @@ def buyutmeyi_kaldir(t: bytes):
     return bytes(b), len(yerler)
 
 
+# Köyden köye geçiş (sahibinin isteği, 12.11.2026: "başka bir farklı köye bakmak için illa my towna dönmem lazım").
+# FriendButton/mouseUsed@41-58 (1.4.07 bayt kodu, araclar/abc_okur.py): `if (Base.Main.gameModeCurrent != GameMode.NORMAL)
+# return;` Komşu köyde mod NEIGHBOUR olduğundan alttaki arkadaş düğmesi hiçbir şey yapmaz. GameMode: TUTORIAL 0,
+# NORMAL 1, NEIGHBOUR 2, ASSAULT 3, CAMPAIGN 4, SURVIVAL 5, TOURNAMENT 6, SPY 7, EDITOR 10. Koşul aynı uzunlukta
+# `(uint)(mod - 1) <= 1` olur: yalnızca NORMAL ve NEIGHBOUR geçer (eğitim -1 → 2^32-1, saldırı ve görevler > 1).
+# Bayt: getlex GameMode (60 9c01), getproperty NORMAL (66 9b02), ifeq +1 (13 010000) → nop nop (02 02), decrement
+# (93), convert_u (74), pushbyte 1 (24 01), ifle +1 (16 010000); atlamanın sonu ve hedefi (returnvoid'in ardı) aynı.
+# Çapa öncesi getlex Base (60 01), getproperty Main (66 0c), getproperty gameModeCurrent (66 c201), sonrası returnvoid.
+# Tek kez geçmezse dokunulmaz.
+KOMSU_KOSULU = bytes.fromhex("6001660c66c201" "609c01669b0213010000" "47")
+KOMSU_KOSULU_YENI = bytes.fromhex("6001660c66c201" "0202937424011601000" "0" "47")
+
+
+def komsudan_komsuya(t: bytes):
+    """(yeni_etiket, değişen): FriendButton'ın komşu köyde de çalışması; çapa tek değilse dokunmaz."""
+    if t.count(KOMSU_KOSULU) != 1:
+        return t, 0
+    return t.replace(KOMSU_KOSULU, KOMSU_KOSULU_YENI), 1
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -306,9 +453,10 @@ def turkcelestir(veri: bytes, sozluk=None):
         if kod == DO_ABC:
             t, sayi = abc_dizelerini_degistir(govde[bas:son], as3) if as3 else (govde[bas:son], 0)
             t, kaldirilan = buyutmeyi_kaldir(t)
-            if sayi or kaldirilan:
+            t, komsu = komsudan_komsuya(t)
+            if sayi or kaldirilan or komsu:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan
+                degisen += sayi + kaldirilan + komsu
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]
@@ -334,6 +482,7 @@ def turkcelestir(veri: bytes, sozluk=None):
                     yeni_metin = _html_degistir(metin, ceviri) if html_mi else ceviri
                     t = t[:m_bas] + yeni_metin.encode("utf-8") + t[m_son:]
                     t = _yazi_tipini_uydur(t, ceviri, yeni_fontlar)
+                    t = alani_genislet(t, yeni_metin, yeni_fontlar)
                     cikti.append(_baslik(kod, len(t)) + t)
                     degisen += 1
                     continue

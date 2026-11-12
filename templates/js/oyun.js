@@ -195,7 +195,8 @@
     try { k = localStorage.getItem(KALITE_ANAHTARI); } catch (e) {}
     return KALITELER.indexOf(k) >= 0 ? k : "high";
   }
-  // Görüntü: "doldur" oyunu ekranın tamamına yayar (Android'de varsayılan), "sigdir" 760:600 oranını korur
+  // Görüntü: "doldur" oyunu ilk dokunuşta oyunun kendi tam ekranına alır (Android'de varsayılan), "sigdir" 760:600
+  // oranını korur
   var GORUNUM_ANAHTARI = "oyun-gorunum";
   function gorunumSecimi() {
     var g = null;
@@ -261,14 +262,20 @@
     // Ruffle telefonda/tablette kendiliğinden "düşük" kaliteye geçer; görüntü yumuşatılmaz, dokunulan yerlerde
     // çizim kırıntıları kalabilir. Varsayılan masaüstündeki gibi yüksek; oyuncu başlıktan seçer (KALITE_ANAHTARI).
     window.RufflePlayer.config.quality = kaliteSecimi();
-    if (document.body.classList.contains("ekran-doldur")) {
-      // Oyun esnetilmez: sahne kutunun gerçek boyutunu alır, oyun haritayı genişletip menülerini yerleştirir
-      // (orijinal oyunun tam ekranı gibi). Kutu en az 760×600 (oyunun kendi boyutu) tutulur.
-      window.RufflePlayer.config.scale = "noScale";
-      window.RufflePlayer.config.forceScale = true;
-    }
     var ruffle = window.RufflePlayer.newest();
     var oyuncu = ruffle.createPlayer();
+    if (document.body.classList.contains("ekran-doldur")) {
+      // Doldur: oyunun kendi tam ekranı. Oyun menülerini yalnızca tam ekran olayında yerleştirir (1.4.07:
+      // StateNormal/onFullScreenChange → setFullScreen; Base/getStageDimensions tam ekran dışında 760×600 sabitini
+      // verir); sahneyi noScale ile büyütmek menüleri 760×600'lük köşede bırakıyordu (sahibinin bildirimi 12.11.2026).
+      // Tarayıcı tam ekranı yalnızca kullanıcı dokunuşuyla açar: oyuna ilk dokunuşta bir kez. Esc ile çıkılınca oyun
+      // setNormalScreen ile menüleri kendisi geri dizer.
+      var tamEkranaGec = function () {
+        oyuncu.removeEventListener("pointerup", tamEkranaGec, true);
+        if (document.fullscreenElement !== oyuncu && typeof oyuncu.enterFullscreen === "function") oyuncu.enterFullscreen();
+      };
+      oyuncu.addEventListener("pointerup", tamEkranaGec, true);
+    }
     etkinOyuncu = oyuncu;
     kutu.appendChild(oyuncu);
     ikiParmaklaYakinlastir(oyuncu);
@@ -512,7 +519,7 @@
       var aktif = v.etkinlikler.filter(function (e) { return e.aktif; });
       var yakin = v.etkinlikler.filter(function (e) { return !e.aktif; })[0];
       var olay = function (e, icerik) {
-        var resim = e.resim ? "<img class='simge' src='" + e.resim + "' alt=''>" : "";
+        var resim = e.resim ? "<img class='simge' src='" + e.resim + "' alt='' onerror='this.remove()'>" : "";
         return "<div class='olay'>" + resim + icerik + "</div>";
       };
       var parcalar = aktif.map(function (e) {
@@ -520,6 +527,15 @@
           " setleri mağazada.<small>" + tarih(e.son_gun) + " gün sonuna dek</small>");
       });
       if (yakin) parcalar.push(olay(yakin, "Sıradaki şenlik: " + yakin.ad + "<small>" + tarih(yakin.baslangic) + "</small>"));
+      // KAR-34: özel teklifler (Ada Ocağı, ejderha teklifleri) takvimli ve seviyeye bağlı
+      var teklifler = v.teklifler || [];
+      teklifler.filter(function (t) { return t.aktif; }).forEach(function (t) {
+        parcalar.push(olay(t, "<b class='yazi-oyun'>" + t.ad + "</b>" + t.seviye + ". seviyeden açık." +
+          "<small>" + tarih(t.son_gun) + " gün sonuna dek</small>"));
+      });
+      var siradaki = teklifler.filter(function (t) { return !t.aktif; })[0];
+      if (siradaki) parcalar.push(olay(siradaki, "Sıradaki teklif: " + siradaki.ad + " (" + siradaki.seviye +
+        ". seviyeden)<small>" + tarih(siradaki.baslangic) + "</small>"));
       if (parcalar.length) etkinlik.innerHTML = parcalar.join("");
       else etkinlik.remove();
     })
@@ -548,7 +564,7 @@
   var MOD_ANAHTARI = "oyun-modu";
   var tamCik = document.getElementById("tam-cik");
   var sayfaTamEkranda = false;
-  function oyunModu(acik, kaydet) {
+  function oyunModu(acik, kaydet, sayfaTamEkraniIsteme) {
     document.body.classList.toggle("oyun-modu", acik);
     tamCik.hidden = !acik;
     if (!acik) panelleriTazele();
@@ -557,11 +573,19 @@
     if (kaydet) {
       try { localStorage.setItem(MOD_ANAHTARI, acik ? "1" : "0"); } catch (e) {}
     }
-    if (UYGULAMA || !document.documentElement.requestFullscreen) return;
+    if (UYGULAMA || sayfaTamEkraniIsteme || !document.documentElement.requestFullscreen) return;
     if (acik && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {});
     else if (!acik && document.fullscreenElement === document.documentElement) document.exitFullscreen().catch(function () {});
   }
-  document.getElementById("tam-ekran").addEventListener("click", function () { oyunModu(true, true); });
+  document.getElementById("tam-ekran").addEventListener("click", function () {
+    // Doldur: düğmeye basış kullanıcı dokunuşudur; yalnızca oyunun kendi tam ekranı istenir (menüler kenarlara
+    // dizilir). Sayfanın tam ekranı da istenseydi ilk istek dokunuşu tüketir, ikincisi reddedilebilirdi (Fullscreen
+    // belirtimi: başarılı istek kullanıcı etkinleşmesini tüketir; #81 incelemesi).
+    var oyuncu = document.querySelector("ruffle-player");
+    var doldur = oyuncu && document.body.classList.contains("ekran-doldur") && typeof oyuncu.enterFullscreen === "function";
+    oyunModu(true, true, doldur);
+    if (doldur) oyuncu.enterFullscreen();
+  });
   tamCik.addEventListener("click", function () { oyunModu(false, true); });
   // Oyunun kendi tam ekranı (Ruffle, oyun kutusundaki öğe) sayfanın tam ekranından çıkış sayılmaz;
   // yalnızca tam ekran bütünüyle bitince (Esc) oyun modu kapanır.
@@ -569,8 +593,9 @@
     if (!document.fullscreenElement) {
       if (sayfaTamEkranda && document.body.classList.contains("oyun-modu")) oyunModu(false, true);
       sayfaTamEkranda = false;
-    } else if (document.fullscreenElement === document.documentElement) {
-      sayfaTamEkranda = true;
+    } else if (document.fullscreenElement === document.documentElement ||
+               (document.body.classList.contains("oyun-modu") && document.fullscreenElement === document.querySelector("ruffle-player"))) {
+      sayfaTamEkranda = true;  // Esc ile tam ekran bitince oyun modu da kapanır
     }
   });
   if (UYGULAMA) {

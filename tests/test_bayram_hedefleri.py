@@ -9,7 +9,7 @@ goalComparison `order` farkıyla sıralar; resim config `images`'ında olmalı (
 import json
 import os
 import unittest
-from datetime import date
+from datetime import date, timedelta
 from unittest import mock
 
 from ortak import KOK, KomutTesti
@@ -159,6 +159,88 @@ class TurkBirimleri(unittest.TestCase):
         oncelik = {y: o for y, _, o in onindirme.liste()}
         for ad in ("880_tk_sword", "881_tk_axe", "882_tk_archer", "885_tk_horseman"):
             self.assertLessEqual(oncelik["buildingsprites/%s.swf" % ad], onindirme.PAKETLER["temel"], ad)
+
+
+class GununSinirliOgesi(unittest.TestCase):
+    """Sahibinin isteği (12.11.2026): "SINIRLI, SON 0 GÜN" öğesi ertesi gün gitsin, rastgele başkası gelsin. İstemci
+    bayt kodu: ItemButtonLarge/setItem rozeti subcategory_id == Subcat.LIMITED_EDITION (121) olan öğeye koyar, gün
+    Base/getLimitedDaysLeft = max(0, ceil((LIMITED_EDITION_EXPIRATION - lastServerTimestamp) / 86400));
+    Utils$/getTimeStampFromString "Y-A-G"yi new Date(Y, A - 1, G), yani yerel gece yarısı okur. Config'te tarih
+    2012-09-14, 1299 Cash Wonder in_store 1 (sahibinin gördüğü öğe)."""
+
+    def istemci(self, gun, kip="takvim"):
+        with mock.patch.object(config, "yerel_bugun", lambda: gun), \
+                mock.patch.object(takvim, "bugun", lambda: gun), \
+                mock.patch.object(config, "tema_seti_kipi", lambda: kip):
+            c = config.get_client_game_config("tr")
+        return c, {e["id"] for e in c["items"] if e.get("subcategory_id") == "121" and e.get("in_store") == "1"}
+
+    def kalan_gun(self, bitis, gun, saat):
+        """getLimitedDaysLeft'in kendisi, elle: yerel gece yarısı ile o günün saatindeki an arasındaki gün."""
+        import math
+        from datetime import datetime
+        y, a, g = (int(x) for x in bitis.split("-"))
+        fark = (datetime(y, a, g) - datetime(gun.year, gun.month, gun.day, saat)).total_seconds()
+        return max(0, math.ceil(fark / 86400))
+
+    def test_config_tarihi_gecmiste(self):
+        self.assertEqual(config.get_game_config()["globals"]["LIMITED_EDITION_EXPIRATION"], "2012-09-14")
+
+    def test_her_gun_bir_oge_son_bir_gun(self):
+        gun = date(2026, 11, 11)  # takvimde etkinlik yok (milli bayram 29 Ekim'de bitti)
+        c, acik = self.istemci(gun)
+        self.assertEqual(len(acik), 1)
+        bitis = c["globals"]["LIMITED_EDITION_EXPIRATION"]
+        for saat in (0, 9, 23):
+            self.assertEqual(self.kalan_gun(bitis, gun, saat), 1)
+        sinirli = {e["id"] for e in config.get_game_config()["items"] if e.get("subcategory_id") == "121"}
+        self.assertLessEqual(acik, sinirli)
+
+    def test_ertesi_gun_baskasi_gelir_ve_tekrar_etmez(self):
+        gunler = [date(2026, 11, 5) + timedelta(days=i) for i in range(20)]
+        ogeler = [self.istemci(g)[1] for g in gunler]
+        ogeler = [next(iter(o)) for o in ogeler]
+        self.assertEqual(len(set(ogeler)), len(ogeler))  # 20 gün, 20 ayrı öğe
+        self.assertEqual(ogeler[3], next(iter(self.istemci(gunler[3])[1])))  # aynı gün hep aynı öğe
+
+    def test_nakit_harikasi_de_doner_sunucu_configi_degismez(self):
+        gunler = [date(2026, 11, 5) + timedelta(days=i) for i in range(60)]
+        gorulen = [next(iter(self.istemci(g)[1])) for g in gunler]
+        self.assertLess(gorulen.count("1299"), 2)  # dünkü öğe (1299) her gün kalmaz
+        self.assertEqual(next(e for e in config.get_game_config()["items"] if e["id"] == "1299")["in_store"], "1")
+
+    def test_etkinlik_gunlerinde_de_her_gun_baskasi(self):
+        """Ramazan Bayramı'nda (Firavunlar, Mısır açık) art arda günlerde günün öğesi iki gün üst üste aynı olmaz."""
+        setler = config.tema_setleri()
+        onceki = None
+        for i in range(-1, 4):
+            gun = RAMAZAN_2026 + timedelta(days=i)
+            ogeler = self.istemci(gun)[1]
+            takvimde = {str(k) for ad in takvim.acik_setler(gun) for k in setler.get(ad, [])}
+            gunun = ogeler - takvimde
+            self.assertEqual(len(gunun), 1, gun)
+            self.assertNotEqual(gunun, onceki, gun)
+            onceki = gunun
+
+    def test_hicbiri_kipinde_tema_seti_acilmaz(self):
+        """ayarlar.json _magaza_tema_setleri: "false: hiçbiri"; config'te açık olanlar (1299) olduğu gibi kalır."""
+        sunucuda = {e["id"] for e in config.get_game_config()["items"]
+                    if e.get("subcategory_id") == "121" and e.get("in_store") == "1"}
+        for i in range(5):
+            _, acik = self.istemci(date(2026, 11, 5) + timedelta(days=i), kip=False)
+            self.assertEqual(acik, sunucuda)
+
+    def test_takvimde_acik_set_kalir_hepsi_acik_kipte_dokunulmaz(self):
+        _, acik = self.istemci(RAMAZAN_2026)  # Firavunlar ve Mısır açık (config/takvim.json)
+        setler = config.tema_setleri()
+        misir = {str(i) for i in setler["Mısır"] + setler["Firavunlar"]}
+        self.assertLessEqual(misir & {e["id"] for e in config.get_game_config()["items"]
+                                      if e.get("subcategory_id") == "121"}, acik)
+        self.assertEqual(len(acik - misir), 1)  # ve günün öğesi
+        # "hepsi açık" kipinde setler sunucu açılırken açılır (tema_setlerini_ac); günlük döngü hiçbirini kapatmaz
+        gunler = [date(2026, 11, 5) + timedelta(days=i) for i in range(3)]
+        for g in gunler:
+            self.assertIn("1299", self.istemci(g, kip=True)[1])
 
 
 if __name__ == "__main__":
