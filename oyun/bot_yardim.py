@@ -52,18 +52,32 @@ def _gunluk_hak(ps, hedef):
     return defter.get(hedef) != _bugun(), defter
 
 
+def _calisan_sayisi(bina_id):
+    """Dost isteyen binanın kaç dost aldığı: Asker Toplama 4 (PopupRecruitment/onOpenBuilding); öteki sosyal binalar
+    (pazar, değirmen, kilise...) config social_items[bina].workers kadar (PopupSocialBuilding/onFindFriend @18-70:
+    si.length < arWorkerNames.length iken yardım istenir). Sosyal bina değilse None."""
+    if bina_id == ASKER_TOPLAMA:
+        return SI_SINIRI
+    for sosyal in get_game_config().get("social_items") or []:
+        if isinstance(sosyal, dict) and int(sosyal.get("id", -1)) == bina_id:
+            return len([a for a in str(sosyal.get("workers") or "").split(",") if a.strip()]) or None
+    return None
+
+
 def _sosyal_liste(kayit, veri):
     from oyun.komutlar import esya_bul, harita, ozellikler
-    if int(veri.get("id", 0)) != ASKER_TOPLAMA:
+    bina_id = int(veri.get("id", 0))
+    sinir = _calisan_sayisi(bina_id)
+    if sinir is None:
         return None, None, "Bu bina için bot yardımı yok."
     kasaba = int(veri.get("town", 0))
-    esya = esya_bul(harita(kayit, kasaba), int(veri.get("tx", -1)), int(veri.get("ty", -1)), ASKER_TOPLAMA)
+    esya = esya_bul(harita(kayit, kasaba), int(veri.get("tx", -1)), int(veri.get("ty", -1)), bina_id)
     if esya is None:
-        return None, None, "Asker Toplama binası bulunamadı."
+        return None, None, "Bina bulunamadı."
     ozellik = ozellikler(esya)
     if not isinstance(ozellik.get("si"), list):
         ozellik["si"] = []
-    return ozellik["si"], SI_SINIRI, f"si:{kasaba}:{esya[1]}:{esya[2]}"
+    return ozellik["si"], sinir, f"si:{kasaba}:{esya[1]}:{esya[2]}"
 
 
 def _teklif_liste(kayit, veri):

@@ -2736,6 +2736,19 @@
       "pr": "#80",
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "ceviri/tr.json: item:529, 552, 597 ve başarım metni; Bıçkıhane'nin 38 geçişi (ekler aynı ünlü uyumunda). Düğmenin genişliği oyunda denenmedi (◐)."
+    },
+    {
+      "id": "DNT-52",
+      "baslik": "Pazar ve öteki dost isteyen binalarda 'Dostlarını tut' çevrimdışı çalışmıyordu; 'Pazarı aç' hedefi bu yüzden bitmiyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'pazar için dostlarını tut diyom olmuyo'; 'Pazarı açtım ama pazar görevi halen yapılmamış sayıyor'. PopupSocialBuilding/onFindFriend @18-133: si.length < arWorkerNames.length iken ExternalInterface.call('showPopupSEHelpSocialItem', tx, ty, townID, iID, si, ad), Asker Toplama'yla (387) aynı çağrı. Sayfa (templates/js/oyun.js) yalnızca 387'yi sunucuya iletiyordu, sunucu da yalnızca 387'yi kabul ediyordu (KAR-26/27/29). config social_items 31 bina (pazar 23: Butcher, Fishmonger, Greengrocer). 'Pazarı aç' (hedef 53, complete_social_subcat 132) çalışanlar dolunca biter.",
+      "test": "tests/test_bot_yardim.py test_pazar_calisan_sayisi_kadar_dost_alir, test_yalnizca_asker_toplama_ve_bina_dogrulanir; tests/js/bot_yardimi.test.js",
+      "pr": "#80",
+      "onay": "KAR-26/27/29 (botlar yardım eder, her yere günde bir)",
+      "notlar": "Sunucu sosyal binada en çok workers sayısı kadar bot yazar (Asker Toplama 4). Her bina için günde bir bot (KAR-29): pazarın 3 çalışanı 3 günde dolar ya da istemcinin 'Doldur: 2 nakit'iyle. 3 bozma düştü. Oyun içinde denenmedi (◐)."
     }
   ]
 }
