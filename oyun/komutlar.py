@@ -2222,26 +2222,29 @@ def buy_pvp_territory(save, a):
 
 
 def _mobil_depodan_cikar(save, esya_id):
+    """Mobil kutudan bir eşya düşer; kutuda yoksa False (tekrarlanan komut eşyayı ya da iadeyi çoğaltmasın, DNT-45;
+    depo_cikar ve DNT-20 gibi)."""
     kutu = save["privateState"].get("iphoneBox")
     if isinstance(kutu, list):
         for i, oge in enumerate(kutu):
             if (oge[0] if isinstance(oge, list) else oge) == esya_id:
                 del kutu[i]
-                return
+                return True
+    return False
 
 
 @komut("place_iphone")
 def place_iphone(save, a):
     """[id, x, y, yon, kasaba] - mobil depodan haritaya."""
-    _mobil_depodan_cikar(save, a.tam(0))
-    esya_ekle(harita(save, a.tam(4)), a.tam(0), a.tam(1), a.tam(2), a.tam(3))
+    if _mobil_depodan_cikar(save, a.tam(0)):
+        esya_ekle(harita(save, a.tam(4)), a.tam(0), a.tam(1), a.tam(2), a.tam(3))
 
 
 @komut("sell_iphone_item")
 def sell_iphone_item(save, a):
     """[id, kasaba]"""
-    _mobil_depodan_cikar(save, a.tam(0))
-    satis_iadesi(save, harita(save, a.tam(1)), a.tam(0))
+    if _mobil_depodan_cikar(save, a.tam(0)):
+        satis_iadesi(save, harita(save, a.tam(1)), a.tam(0))
 
 
 # ---------------------------------------------------------------------------

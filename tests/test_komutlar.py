@@ -159,6 +159,37 @@ class EsyaKomutlari(KomutTesti):
         self.komut("sell_gift", 1, 0)
         self.assertEqual(self.harita["wood"], 1000)
 
+    def test_mobil_kutudan_yerlestirme_ve_satis_bir_kez(self):
+        """DNT-45, TST-02. 1.4.07 GiftButtonLarge/sellGiftReally: iphoneId olan eşya sell_iphone_item [id, townID] ile satılır,
+        Base/sendPlaceItemCmd @270-345 place_iphone [id, x, y, frame, townID] ile yerleştirilir; istemci eşyayı kutudan bir kez
+        çıkarır. Kutuda olmayan eşya için tekrarlanan komut eşyayı ya da iadeyi çoğaltmamalı (sell_gift ve DNT-20 gibi).
+        Ev I: 30 odun, iade %5 (satis_iadesi)."""
+        self.ps["iphoneBox"] = [1, 1]
+        self.komut("place_iphone", 1, 5, 6, 0, 0)
+        self.komut("sell_iphone_item", 1, 0)
+        self.assertEqual((self.ps["iphoneBox"], self.harita["wood"]), ([], 1000 + 1))
+        adet = sum(1 for e in self.harita["items"] if e[0] == 1)
+        self.komut("place_iphone", 1, 7, 8, 0, 0)  # kutu boş
+        self.komut("sell_iphone_item", 1, 0)
+        self.assertEqual((sum(1 for e in self.harita["items"] if e[0] == 1), self.harita["wood"]), (adet, 1000 + 1))
+
+    def test_komsu_yardimi_ve_ejderha_adimi(self):
+        """TST-02. 1.4.07: FauxBar2/update ekranda globals.ASSIST_REWARD_GOLD altın ve ASSIST_REWARD_XP xp verir, assist_neighbor
+        [komşu_pid, lastIdAssist, townID] yollar. PopupDragons/goNextStep _stepCash kadar nakit düşer, next_step [_stepCash ya da 0]
+        yollar, dragonStepNumber + 1 (PlayerStatus/Init privateState.stepNumber'dan okur) ve timeStampTakeCare = şimdi."""
+        from unittest import mock
+        from oyun.config import get_game_config
+        g = get_game_config()["globals"]
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.komut("assist_neighbor", "komsu1", 3, 0)
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp),
+                         (int(g["ASSIST_REWARD_GOLD"]), int(g["ASSIST_REWARD_XP"])))
+        self.assertIn("ukomsu1", self.ps["neighborAssists"])
+        self.ps["stepNumber"] = 2
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_000):
+            self.komut("next_step", 6)
+        self.assertEqual((self.cash, self.ps["stepNumber"], self.ps["timeStampTakeCare"]), (94, 3, 2_000_000_000))
+
     def test_depoya_gecersiz_adet_eklenmez(self):
         self.komut("end_survival", 1, 30, json.dumps({"523": -1, "-2": 1}))
         self.assertEqual(self.ps["gifts"], [])
