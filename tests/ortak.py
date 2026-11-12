@@ -46,6 +46,7 @@ class KomutTesti(unittest.TestCase):
         self.komutlar, self.pvp = komutlar, pvp
         self.kayit = bos_kayit()
         self.kayitlar = {"test": self.kayit}
+        komutlar._EVDE.clear()  # oyuncunun yeri bellekte (DNT-49): testler birbirini etkilemesin
         self._eski = (komutlar.session, komutlar.save_session, komutlar.neighbor_session,
                       komutlar.all_saves_userid, pvp.neighbor_session, pvp.save_session,
                       pvp.all_saves_userid)

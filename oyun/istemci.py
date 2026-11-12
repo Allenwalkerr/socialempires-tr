@@ -16,7 +16,7 @@ from oyun.ekonomi import timestamp_now
 from oyun.kayit import (gecerli_uid, neighbor_session, save_lock, save_session,
                         session as kayit_oturumu)
 from oyun.kayit_semasi import saldiri_sonuclari
-from oyun.komutlar import command, depo_ekle, listeye_ekle, paket_gecmisini_sil
+from oyun.komutlar import command, depo_ekle, listeye_ekle, paket_gecmisini_sil, yer_bildir
 from oyun.oyuncu import get_neighbor_info, get_player_info, get_quest_map
 from oyun.sunucu import OYUN_DILI, app
 
@@ -83,8 +83,12 @@ def get_player_info_response():
         if kayit is None:
             return ({"result": "error"}, 404)  # SNK-04: bilinmeyen kimlik 500 veriyordu
         with save_lock:  # get_player_info günlük ödülü kayda yazabilir (KAR-24): komutlarla aynı kilit
+            yer_bildir(uid, True)  # DNT-49: kendi adası yüklendi
             kompu_donemini_guncelle(kayit)
             return (get_player_info(uid, harita_no), 200)
+    if gecerli_uid(uid):
+        # DNT-49: Base/realLoadMap @129-169 user'ı yalnızca loadMapParams.userId doluysa ekler: komşu ya da görev haritası
+        yer_bildir(uid, kullanici == uid)
     if neighbor_session(kullanici) is None and kullanici.startswith("100000"):
         return get_quest_map(kullanici)  # görev (quest) haritası
     return (get_neighbor_info(kullanici, harita_no), 200)

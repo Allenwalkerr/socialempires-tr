@@ -303,6 +303,7 @@ def start_quest(save, a):
     map.lastQuestTimes'tan sayar (Quest$/getNumQuestsAvailable: en yeniden geriye, aralarında DELAY_ALLOWED'dan az fark
     olanlar), ama listeye kendisi hiç yazmaz (Base/processAttacks@2085 yalnızca okur); yazan sunucudur. Sayım hakkı en çok
     GOREV_HAKKI olduğundan son GOREV_HAKKI başlangıç yeter."""
+    _yer(save, False)
     h = harita(save, a.tam(1))
     zamanlar = [t for t in (h.get("lastQuestTimes") or []) if isinstance(t, (int, float))]
     h["lastQuestTimes"] = (zamanlar + [timestamp_now()])[-GOREV_HAKKI:]
@@ -362,11 +363,55 @@ def sell(save, a):
         mezarliga_ekle(save, esya_id, listeye=False)
 
 
+# Oyuncu şu an kendi adasında mı (DNT-49). Bellekte tutulur, kayda yazılmaz: True ev, False başka harita ya da savaş,
+# yok = bilinmiyor. get_player_info kendi adası için True, komşu/görev haritası için False yazar (oyun/istemci.py);
+# savaş komutları başta False, sonda True yazar.
+_EVDE = {}
+OLDURME_ALTINI = 5  # IsoFightingElement/kill @398-405, @442-449: Token(TOKEN_GOLD, 5)
+HAYVANLAR = {"74", "75", "88", "90"}  # SUBCATFUNC_UNIT_COW, _SHEEP, _HORSE, _BOAR (MapInitializer$/spawnRemainingResources)
+
+
+def yer_bildir(uid, evde):
+    _EVDE[str(uid)] = bool(evde)
+
+
+def _yer(save, evde):
+    yer_bildir(save["playerInfo"].get("pid", ""), evde)
+
+
+def _dusman_odulu(save, h, esya_id, tur):
+    """IsoFightingElement/kill @168-511: PLAYER_ENEMY öğe NORMAL kipte (saldırı, görev, survival, turnuva dışında)
+    ölünce istemci jeton bırakır; Token/onComplete2 jetonu NORMAL kipte komut yollamadan ekler. Birim: 5 altın ve
+    collect_xp. Bina: uiAttack > 0 ise 5 altın ve ceil(floor(cost / 4) × 0,02) xp (taş bedelliyse, yoksa 0). Tarafsız
+    hayvanlara (PLAYER_NEUTRAL) jeton yok."""
+    esya = get_item_from_id(esya_id) or {}
+    if tur == "u":
+        if str(esya.get("subcat_functional")) in HAYVANLAR:
+            return
+        xp = int(esya.get("collect_xp", 0) or 0)
+    elif int(esya.get("attack", 0) or 0) > 0:
+        tas = math.floor(int(esya.get("cost", 0) or 0) / 4) if esya.get("cost_type") == "s" else 0
+        xp = math.ceil(tas * 0.02)
+    else:
+        return
+    kaynak_ekle(save, h, "g", OLDURME_ALTINI)
+    h["xp"] = int(h.get("xp", 0)) + xp
+
+
 @komut("kill")
 def kill(save, a):
-    """[x, y, id, kasaba, tur]"""
+    """[x, y, id, kasaba, tur]. IsoFightingElement/kill bunu kendi öğesi olmayan (PlayerID != PLAYER_SELF) birim ve
+    bina için yollar (@903-967, @1082-1133)."""
     h = harita(save, a.tam(3))
+    evde = _EVDE.get(str(save["playerInfo"].get("pid", "")))
+    if evde is False:
+        # DNT-49: saldırıda, görevde ya da komşuda öldürülen öğenin koordinatı o haritanındır; kendi adası değişmez
+        return
     esya = esya_bul(h, a.tam(0), a.tam(1), a.tam(2))
+    if not esya:
+        if evde:  # istemcinin kendi adasında doğurduğu düşman (kuşatma, tehdit): kayıtta yok, ödülü jetondan
+            _dusman_odulu(save, h, a.tam(2), a.metin(4))
+        return
     if esya:
         # Tükenen çiftlik (TST-02): IsoElement/collect @3576-3675 odun yetmeyince çiftliği SELL_REASON_FARM_DEPLETED ile
         # kaldırır ve yalnızca kill yollar; local12 false olduğu için collect_xp'yi veren @3805-3831 atlanır. Çiftlik
@@ -1461,6 +1506,7 @@ def buy_first_purchase(save, a):
 @komut("end_quest")
 def end_quest(save, a):
     """[json] - görev sonucu."""
+    _yer(save, True)
     veri = a.json(0, {}) or {}
     h = harita(save, int(veri.get("map", 0)))
     kaynaklar = veri.get("resources", {})
@@ -1494,6 +1540,7 @@ def set_quest_var(save, a):
 def start_survival(save, a):
     """Bir can harcanır. PopupSurvival/refreshLifes: 3 can; harcanan can SURVIVAL_HOURS_LIVE_REGENERATE saatte
     yenilenir, sonra survivalVidasExtra."""
+    _yer(save, False)
     ps = save["privateState"]
     simdi = timestamp_now()
     sure = int(globals_().get("SURVIVAL_HOURS_LIVE_REGENERATE", 3)) * 3600
@@ -1508,6 +1555,7 @@ def start_survival(save, a):
 @komut("end_survival")
 def end_survival(save, a):
     """[harita_id, sure, json{esya_id: adet}]"""
+    _yer(save, True)
     for esya_id, adet in (a.json(2, {}) or {}).items():
         depo_ekle(save, int(esya_id), int(adet))
     haritalar = save["privateState"].setdefault("survivalMaps", {})
@@ -2271,17 +2319,20 @@ def modify_position_univers(save, a):
     """[eski_yuva, yeni_yuva] - oyuncunun dünya haritasındaki yuvası. İstemci (ExplorationsManager/
     evalUserPositionNotConquered @286-376) oyuncunun yuvasını (yerel6) ilk, geçtiği yuvayı (yerel5) ikinci gönderir.
     DNT-48: sunucu ilk argümanı yeni yuva sanıyordu."""
-    save["privateState"]["kita_konum"] = a.tam(1) % 8
+    from oyun import ada
+    ada.yuva_degistir(save, a.tam(0), a.tam(1))
 
 
 @komut("attack_player")
 def attack_player(save, a):
+    _yer(save, False)
     pvp.saldiri_baslat(save, a.liste)
 
 
 @komut("end_attack")
 def end_attack(save, a):
     pvp.saldiri_bitir(save, a.liste)
+    _yer(save, True)
 
 
 
@@ -2289,6 +2340,7 @@ def end_attack(save, a):
 def end_attack_new(save, a):
     """[g, f, w, s, saldırılan, ad, seviye, zaman, kazanan, gönüllü, intikam, kalkan, yüzde*100, xp] - PVPManager/sendEnd."""
     pvp.yeni_sonuc(save, a.liste)
+    _yer(save, True)
 
 
 # --- 1.4.07'nin yeni PvP'si (GEC-05; kaynakları oyun/pvp_yeni.py'de) ---
@@ -2302,6 +2354,7 @@ def get_enemy_new(save, a):
 @komut("begin_attack_new")
 def begin_attack_new(save, a):
     """[zaman] - PVPManager/loadMap; saldıranın kalkanı kalkar."""
+    _yer(save, False)
     pvp_yeni.saldiri_basladi(save, a)
 
 
