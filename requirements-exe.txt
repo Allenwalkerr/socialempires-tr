@@ -1,0 +1,10 @@
+# Tek dosyalık Windows programı (.exe) için derleme araçları (araclar/exe_paketi.py). Sürümler sabittir (DGV-08).
+-r requirements.txt
+pyinstaller==6.11.1
+pyinstaller-hooks-contrib==2026.10
+altgraph==0.17.5
+packaging==26.3
+setuptools==84.2.1
+# Yalnızca Windows'ta gerekenler
+pefile==2023.2.7; sys_platform == "win32"
+pywin32-ctypes==0.2.3; sys_platform == "win32"
