@@ -2991,7 +2991,7 @@
       "onem": "Yüksek",
       "durum": "acik",
       "isaret": "◐",
-      "kanit": "Sahibi (12.11.2026): 'Seferde adayı bitirdim zorluk seçemiyorum böylece yıldız kazanmı olmuyor'. İstemci zorluk penceresini Base.Player.questsRank[questId]'den açar (PlayerStatus/Init@122-129 privateState.questsRank; PopupLoadingQuest/<kurucu>@1674-1755). end_quest JSON'u 'difficulty' taşır (QuestIslaCivilizacion/sendResults@153). Sunucunun end_quest'i bu alanı okumuyor; initial.json'da \"questsRank\": {} ve hiçbir kod yazmıyor (grep).",
+      "kanit": "Sahibi (12.11.2026): 'Seferde adayı bitirdim zorluk seçemiyorum böylece yıldız kazanmı olmuyor'. İstemci zorluk penceresini Base.Player.questsRank[questId]'den açar (PlayerStatus/Init@122-129 privateState.questsRank; PopupLoadingQuest/<kurucu>@1674-1755). end_quest JSON'u 'difficulty' taşır (Quest$/end@208; QuestIslaEgg1/2, God, Hard, TrollsGeneric, Heroes sendResults@153-155, QuestBoss*, QuestCollectable*). Bağımsız denetçi aynı yerleri buldu. Sunucunun end_quest'i bu alanı okumuyor; initial.json'da \"questsRank\": {} ve hiçbir kod yazmıyor (grep).",
       "test": null,
       "pr": null,
       "onay": null,
@@ -3035,6 +3035,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Birleştirilerek kurulan yollar sayılmaz. Yerine çizilemez (CLAUDE.md). İkinci kasaba penceresi oyunda denenecek (YOL_HARITASI_2 A5)."
+    },
+    {
+      "id": "YOL-04",
+      "baslik": "Boş işleyicili spy_player ve gold_statue_conversion istemcide bir değişiklik bekliyor olabilir",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim (12.11.2026): spy_player kayda hiçbir şey yazmıyor (oyun/komutlar.py kayitsiz), oysa buy_spyings_pack spyingsPack'i 50 yapıyor ve istemci spyingsPack'i Base/processAttacks'ta okuyor; casusluk hakkı sunucuda azalmıyor olabilir. gold_statue_conversion da boş. İstemcide doğrulanmadı.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "YOL_HARITASI_2 A7, Faz 2."
     }
   ]
 }

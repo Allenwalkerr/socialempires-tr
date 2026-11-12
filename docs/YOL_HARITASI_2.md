@@ -21,7 +21,7 @@ sözlüğü karşılaştırıldı. Aynı ad iki kez kaydedilirse sözlükte **so
 |---|---|
 | İstemcinin gönderdiği komut | 158 (çözülemeyen çağrı 0) |
 | Gerçek işleyicisi olan | 141 |
-| Boş işleyici (bilerek kayıt değiştirmeyen) | 17 |
+| Boş işleyici (kayda hiçbir şey yazmıyor) | 17 |
 | İşleyicisi hiç olmayan | 0 |
 | Sunucuda olup istemcinin göndermediği | 1 (`exchange_cash_new`) |
 | Aynı adın iki kez kaydı | 0 |
@@ -30,6 +30,7 @@ Boş 17 komut: `game_status`, `ping`, `system_set_count_hack`, `perform_city_que
 `reset_position_univers`, `rt_publish_achievement_unit`, `gold_statue_conversion`, `start_quest_new`, geliştirici
 paneli komutları (`fast_forward`, `load_map`, `save_map`, `reset`, `clear_tiles_area`, `set_variables`,
 `reset_dragon`) ve `end_tournament_match` (sonucu ayrı uç `tournaments/finish_tournament_match.php` işler).
+Bunların zararsız olduğu tek tek kanıtlanmadı. `spy_player` boş, ama `buy_spyings_pack` `spyingsPack`'i 50 yapıyor ve istemci bunu `Base/processAttacks`'ta okuyor; casusluk hakkı sunucuda hiç azalmıyor olabilir (?). `gold_statue_conversion` da adından bir değişiklik bekletiyor (?). İkisi A7'de.
 Bilinmeyen bir komut gelirse `do_command` yalnızca günlüğe yazar; istemciye hata dönmez.
 
 **Ama** "işleyici var" demek "doğru işliyor" demek değil. Bu oturumda iki örnek bulundu:
@@ -48,7 +49,7 @@ Bilinmeyen bir komut gelirse `do_command` yalnızca günlüğe yazar; istemciye 
 | Yalnızca onay (`data: {}`, `OK`, `true/false`) | 19 | `pvp/attack/*`, `pvp/pool/*`, `tournaments/*`, `kompu_*` |
 | Boş ya da hata | 4 | `track_game_status`, `sync_error_track` (bilerek boş), `command.php` (gövdesiz istekte 400; komutlar 1.1'de), `get_continent.php` (404) |
 
-`get_continent.php` istemcide yalnızca tanımlı (`Config.SERVICE_LOAD_CONTINENT`); onu kullanan kod yok (◐), yani 404
+`get_continent.php` istemcide yalnızca tanımlı (`Config.SERVICE_LOAD_CONTINENT`); onu kullanan kod yok (✔: ad ve dize yalnızca `Config` sınıf kurucusunda, @119-127), yani 404
 gerçek bir eksik değil.
 
 ### 1.3 Kapalı sistemler ✔
@@ -101,7 +102,7 @@ Sonuç: **kapalı ya da yarım duran büyük bir sistem yok**; istemcinin istedi
 
 ### 1.4 Varlık tamlığı ✔
 
-İstemci dizelerindeki 66 dosya yolunun 60'ı indirilebilir arşivde (`config/onindirme.tsv`, 4751 dosya; istemci yolları
+İstemci dizelerindeki 66 dosya yolunun 60'ı indirilebilir arşivde (`config/onindirme.tsv`, 4751 satır; istemci yolları
 önek olmadan yazıldığı için bir önekin ardı da eşleşme sayıldı). Eksik 6:
 
 | Yol | Etki |
@@ -124,7 +125,7 @@ penceresi eksik olup "açılamaz" sayılacak bir sistem bulunmadı; ikinci kasab
   - en çok saatte bir (`oyuncu_saldiri_araligi` 3600, KAR-30);
   - kalkana saygılı (`pvp_yeni.kalkan_bitisi`).
 
-  Ölçülmüş: kalkansız 300 denemede 18 akın, kalkanlıyken 0 (TST-07, ✔). Kalkan gerçek bir tehdide karşı duruyor.
+  Ölçülmüş: kalkansız 300 denemede 18 akın, kalkanlıyken 0 (TST-07, ◐: deneme betikleri depoda değil, bu ölçüm betiği üretmiyor). Kalkan gerçek bir tehdide karşı duruyor.
 - **Savunma kaybı:** Sahibinin kararıyla oyunun kuralı uygulanıyor (OYN-32): ölenlerin %95'i kurtarılır,
   `protect` birimleri kaybolmaz.
 - **Kaynak çıkışı:** inşaat, eğitim, büyü, genişleme ve sefer araması altın ve odun yakıyor; kaynak yetmezse sunucu
@@ -153,7 +154,7 @@ Sınırlar:
 
 ### 1.7 Kendi sistemlerimizin sağlığı ✔
 
-Test sayısı, modülün adının geçtiği test dosyalarındaki test sayısıdır (üst sınır; tam kapsam değil).
+Test sayısı, modülün adının geçtiği test dosyalarındaki test sayısıdır (üst sınır; tam kapsam değil). `ada` sıradan bir sözcük ("ada") olduğu için onun sayısı kesin şişkin.
 
 | Sistem | Satır | Test | Not |
 |---|---|---|---|
@@ -176,6 +177,9 @@ Test sayısı, modülün adının geçtiği test dosyalarındaki test sayısıd�
 | bildirim | 111 | 13 | Android'de |
 | bot_yardim | 128 | 13 | |
 | gunluk_odul | 57 | 6 | |
+| diyar | 136 | 95 | |
+| profil | 87 | 65 | |
+| denge | 16 | 90 | |
 | fx_yama | 115 | 3 | SWF'yi değiştiriyor, en az test |
 
 Kitaptaki durum sayıları:
@@ -186,9 +190,9 @@ Kitaptaki durum sayıları:
 | karar verildi | 45 |
 | çürütüldü | 11 |
 | onay bekliyor | 8 |
-| doğrulandı | 6 |
+| doğrulandı | 9 |
 | ertelendi | 3 |
-| açık | 2 |
+| açık | 3 |
 | CI bekliyor | 1 |
 
 Onay bekleyenlerin çoğu Android ve tablet maddeleri (DAG-04, DAG-05, DAG-12, OYN-07, OYN-08, DNT-02); sahibi 12.11.2026'da
@@ -204,11 +208,12 @@ Puan = Etki (1-5) × Güven (0,3-1,0) × 10 / Emek (oturum: 1, 2, 3, 5, 8). Güv
 | # | İş | Etki | Güven | Emek | Puan | Kanıt |
 |---|---|---|---|---|---|---|
 | A1 | Hikâye görevi kampı (DNT-65): bu daldaki düzeltmeyi birleştirip sürüme koymak | 4 | 0,9 | 1 | 36 | 0926 spawnInit@82-92; Ruffle'da 3 açılışta tek kamp |
-| A2 | Seferde zorluk ve yıldız (DNT-66): `end_quest`'in `difficulty`'sini `questsRank`'a yazmak | 4 | 0,9 | 1 | 36 | QuestIsla*/sendResults `difficulty`; PlayerStatus/Init `questsRank`; PopupLoadingQuest |
+| A2 | Seferde zorluk ve yıldız (DNT-66): `end_quest`'in `difficulty`'sini `questsRank`'a yazmak | 4 | 0,9 | 1 | 36 | `Quest$/end`@208 ve QuestIslaEgg, God, Hard, TrollsGeneric, Heroes, QuestBoss*, QuestCollectable* sendResults `difficulty`; PlayerStatus/Init `questsRank`; PopupLoadingQuest |
 | A3 | Eksik globals: `PVP_MAX_NUM_DRAGONS`, `PVP_NUM_RANDOM_UNITS`, `TOWER_LIMIT_EXPANSION` | 2 | 0,6 | 1 | 12 | 1.3; değerlerin kaynağı aranacak (eski config'ler, upstream) |
 | A4 | Oyunun sistemlerini oyunda tek tek denemek: hayatta kalma, dart, zaman makinesi, simyacı, ada etkinliği, ikinci kasaba | 3 | 0,6 | 2 | 9 | komutları var (1.3), oyunda denenmedi |
 | A5 | Eksik 6 varlığın etkisini oyunda görmek (özellikle ikinci kasaba penceresi) | 2 | 0,7 | 1 | 14 | 1.4 |
 | A6 | `HONOR_POINT_QUEST_LOSE` 0: görev kaybında onur | 1 | 0,5 | 1 | 5 | 1.3 |
+| A7 | Boş `spy_player` ve `gold_statue_conversion`: istemcide ne bekledikleri | 2 | 0,5 | 1 | 10 | 1.1; `buy_spyings_pack` |
 
 ### 2.2 Kendi eklememizi iyileştirmek ya da yenisini eklemek
 
@@ -221,17 +226,19 @@ Puan = Etki (1-5) × Güven (0,3-1,0) × 10 / Emek (oturum: 1, 2, 3, 5, 8). Güv
 | B5 | Mutasyon ölçümünün açık uçları (TST-06) | 2 | 0,8 | 2 | 8 | |
 | B6 | Açık artırma (KAR-38; sahibi "şimdilik kalsın") | 3 | 0,5 | 5 | 3 | yeni özellik, oyunda yok |
 
+Tablolar iş numarasına göre dizili; sıra puana göre: A1 = A2 (36), A5 (14), A3 (12), A7 (10), A4 (9), A6 (5); B1 (18), B2 (12), B5 (8), B3 (7,5), B4 (7), B6 (3).
+
 Bağımlılık: A1 ve A2 aynı oyun sürümünde çıkmalı (ikisi de görev deneyimi). A4, A1-A2'den sonra; böylece görevler
-denenirken yeni bir hata çıkarsa aynı fazda düzeltilir. B2 bot köyü üreticisine dokunur; B3'ten bağımsız.
+denenirken yeni bir hata çıkarsa aynı fazda düzeltilir. B2 bot köyü üreticisine dokunur; B3'ten bağımsız. B2 ve B3, puanı B5'ten düşük olsa da sahibinin kendi istekleri olduğu için Faz 3'te; B4 sahibinin oyun günlüğünü beklediği için sonda.
 
 ## 3. Fazlar
 
 | Faz | İşler | Kabul kapısı (ölçülebilir) |
 |---|---|---|
 | 1. Görevler | A1, A2 | Testler: kamp her açılışta tek (kayıtta 41 duvar) ve `end_quest` `difficulty` 2 ile gelince `questsRank[ada]` 2. Ruffle'da 9. seviye köyde kamp görünür; bir ada kazanılınca sonraki açılışta zorluk seçilebilir. Sürüm v0.1.0-deneme4; sahibi oynar. |
-| 2. Sistem turu | A3, A4, A5 | Her sistem için bir Ruffle betiği: pencere açılıyor, komut gidiyor, F5'te sonuç kalıyor (TST-07 gibi). Eksik globals'ın değeri kaynakla yazıldı ya da "kaynak yok" diye ertelendi. |
+| 2. Sistem turu ve testler | A5, A3, A7, A4, B1 | Her sistem için bir Ruffle betiği: pencere açılıyor, komut gidiyor, F5'te sonuç kalıyor (TST-07 gibi). Eksik globals'ın değeri kaynakla yazıldı ya da "kaynak yok" diye ertelendi. Az testli beş modülün her biri en az 10 test (B1 ucuz ve bağımsız olduğu için öne alındı). |
 | 3. Bot köyleri ve görünüm | B2, B3 | 50 köyün her birinde profil resmindeki birlik var (test). Dekor yalnızca oyunun kendi süsleri (CLAUDE.md). Tam ekran: sahibinin videosuyla yan yana ekran görüntüsü. |
-| 4. Sağlamlık | B1, B4, B5 | Az testli beş modülün her biri en az 10 test; mutasyon oranı ölçülür (`docs/TEST_OLCUMU.md`). Ekonomi: sahibinin bir saatlik günlüğünden gelir tablosu. |
+| 4. Sağlamlık | B5, B4 | Mutasyon oranı ölçülür (`docs/TEST_OLCUMU.md`). Ekonomi: sahibinin bir saatlik günlüğünden gelir tablosu. |
 | 5. Sürüm | GEC-09 | v0.1.0 etiketi sahibinin onayıyla. |
 
 ## 4. Ertelenenler ve yapılmayacaklar
