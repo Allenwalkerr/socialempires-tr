@@ -2866,6 +2866,19 @@
       "pr": "#81",
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "Öneriler (sahibine soruldu): simetrik avlular ve iç surlar, çift sur, avluda asker geçidi, bazı botlara arazi türü. terreno*.swf çizimlerinin yedisi de (çimen terreno.swf dahil) config/onindirme.tsv'de 2. öncelikte (PAKETLER temel 1); arazi türü uygulanırsa temel pakete alınmalı (≈1,8 MB) ve çimenin de denetlenmesi gerekir. Sahibi (12.11.2026): '1. Bir kısmını yap, diğerlerine sen karar ver'. Yapılan (tasarım 6): iç surlar (3+ büyük karolu köyde bitişik karolar arasında, ortası 3 karo kapı, iki yanında kule) ve asker geçidi (15. seviyeden, ordu ≥ 12 ise ordunun yarısı, en az 8 en çok 16, 4 sütun, bir karo ara; yer yoksa sıra azalır). Yapılmayan ve gerekçesi: çift sur (büyük karo başına 10 kule sınırı köşe ve kapılara gidiyor, ikinci kule sırasına yetmez); arazi türü (çizimleri temel pakette değil, internetsiz oyunda bot köyünün zemini görünmeyebilir). Ruffle'da İblis Kıran: artı biçimli iç surlarla dört avlu, meydan önünde Kraliyet Kılıççısı geçidi. Altı bozmanın altısı test düşürüyor. Sahibi (12.11.2026): 'arazi türünü çok değil ama az da olsa değiştirsen güzel olurdu'. Yapıldı (tasarım 7): botların yaklaşık altıda birine çöl, buz, maden ya da orman (bot_koy.arazi_sec; yerel 50 botta 6). Çimen dahil beş arazi çizimi temel pakete alındı (araclar/onindirme_listesi.py kuralı ve config/onindirme.tsv, +≈2 MB). Ruffle'da İblis Kıran maden arazisinde (kahverengi) görüldü. Beş bozmanın beşi test düşürüyor. #81 incelemesi: iç sur kapısının yanındaki kuleler hiç konmuyordu (önce sur yazılıyor, sonra kule dolu karoya konamıyordu). Artık iç kapı kuleleri dış kulelerden önce konuyor (büyük karo bütçesi dış köşelerde tükeniyordu); IcSur testi kapının yanında kule arıyor, eski kodda düşüyor. Tasarım 8."
+    },
+    {
+      "id": "CEV-09",
+      "baslik": "Bazı birlik adları tuhaf ya da tutarsızdı",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bazı birliklerin ismi çok saçma geldi onlara da bak'. 716 birlik adı İngilizcesiyle yan yana gözden geçirildi (config items type 'u', ceviri/tr.json item:). Bulunanlar: 'Unsur' (Elemental, 16 ad), anlamı kayanlar (Kelle/Skull, Leş/Corpse, Döl/Spawn, Serseri/Punky, Limit Wizard), eski kelimeler (Cenkçi, Hoyrat, Tayf), tutarsızlıklar (Imperial: Haşmetli / tema seti 'İmparatorluk Elfleri'; Kayadelen / Kum Delen; Wind: Yel / Rüzgâr; Boss: Reis).",
+      "test": null,
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi."
     }
   ]
 }
