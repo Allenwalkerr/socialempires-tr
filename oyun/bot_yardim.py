@@ -104,6 +104,8 @@ def bot_yardimi_ucu():
     if not uid or uid not in all_saves_userid():
         return ({"hata": "Oturum yok."}, 404)
     veri = request.get_json(silent=True) or {}
+    if not isinstance(veri, dict):  # liste ya da dizge gövde: 500 değil 400 (#67 incelemesi)
+        return ({"hata": "Geçersiz istek."}, 400)
     with save_lock:
         kayit = kayit_oturumu(uid)
         cevap, kod = yardim_et(kayit, veri)
