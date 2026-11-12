@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-40",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37 çürütüldü (koruma testi). Sırada DNT-40 (kayıt göçü denetimi), TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "madde": "TST-02",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37, DNT-40/41 PR'da. Sırada TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2261,13 +2261,13 @@
       "baslik": "Kayıt göçü denetim alanı yarım kaldı",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "✔",
       "kanit": "docs/denetim/kayit-goc.md başlığı 'Yarım rapor': dört bulgudan sonrası yazılmadı (surum.py göç adımları, tasima.py, kayit_yedek.py tam denetlenmedi). KAR-13 notu 'altı alanın raporu tamam' diyordu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": null,
+      "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
       "pr": null,
       "onay": null,
-      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır."
+      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı."
     },
     {
       "id": "TST-06",
@@ -2515,6 +2515,19 @@
       "pr": "#70",
       "onay": null,
       "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez. #70 incelemesi: istemci kasabada binaların içindeki birimleri de sayar (IsoEngine/countPlayerElementsById: vUnitsContained, ✔ bayt kodu); sunucu da sayar. Kasabadaki süs olmayan bina ödülünü (yalnızca 1410) istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements, ?): sunucu orada yalnızca depoya bakar, istemciden katı olup ödülü kaybettirmesin. 3 bozma daha düştü. 12.11.2026: #70 birleşti (CI yeşil, sinama dahil)."
+    },
+    {
+      "id": "DNT-41",
+      "baslik": "Yedek yükleme ve Wi-Fi taşıma bot dünyasının yazılmamış değişikliklerini siliyordu (KYG-05)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "kayit_yedek.geri_yukle load_saved_villages()'dan önce dunya.etkin.bekleyenleri_yaz()'ı çağırmıyordu (sunucu.login çağırıyor). Test: bellekteki bot değişikliği yedek yüklemeden sonra kayboluyordu.",
+      "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
+      "pr": null,
+      "onay": null,
+      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü."
     }
   ]
 }
