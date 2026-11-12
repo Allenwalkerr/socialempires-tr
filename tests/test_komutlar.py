@@ -62,6 +62,33 @@ class EsyaKomutlari(KomutTesti):
         self.assertEqual(self.ps["gifts"], [])
         self.assertEqual(self.harita["items"][-1][:4], [1, 5, 6, 1])
 
+    def test_hediye_yerlestirme_xp_verir_depodan_yerlestirme_vermez(self):
+        """TST-02, DNT-43. 1.4.07 Base/sendPlaceItemCmd: giftId yolunda (@40-262, place_gift) istemci xp verir: seviye
+        heykelinde (Constants.ID_BUILDING_LEVELUP_STATUE 1478) uiExpMax − iExperience (@59-84; uiExpMax =
+        levels[seviye].exp_required, PlayerStatus/checkForLevelUp), öteki eşyada selectedBuilding.xp (@131-145);
+        place_stored_item yolu (@352-405) xp vermez. Config: Ev I xp 3; levels[10].exp_required 1993."""
+        from oyun.config import get_item_from_id, seviye_araligi
+        self.assertEqual((get_item_from_id(1)["xp"], seviye_araligi(10)[1], get_item_from_id(1478)["name"]),
+                         ("3", 1993, "Level Up Statue"))
+        self.ps["gifts"] = [0, 2]
+        self.harita["xp"] = 1600
+        self.komut("place_gift", 1, 5, 6, 0, 0)
+        self.assertEqual(self.harita["xp"], 1603)
+        self.komut("place_stored_item", 1, 7, 8, 0, 0)
+        self.assertEqual(self.harita["xp"], 1603)
+        self.ps["gifts"] = [0] * 1478 + [1]
+        self.komut("place_gift", 1478, 9, 9, 0, 0)
+        self.assertEqual(self.harita["xp"], 1993)  # bir sonraki seviyenin eşiği
+        self.komut("place_gift", 1478, 9, 9, 0, 0)  # depoda yok: xp de yok
+        self.assertEqual(self.harita["xp"], 1993)
+
+    def test_nufus_artisi_haritaya(self):
+        """TST-02. PopupRecruitmentPopulation/onRecruitComplete: Player.increasedPopulation + 1 ve increase_population
+        [townID]; PlayerStatus/Init @61-81 değeri _mapInfo.increasedPopulation'dan okur (yoksa 0)."""
+        self.komut("increase_population", 0)
+        self.komut("increase_population", 0)
+        self.assertEqual(self.harita["increasedPopulation"], 2)
+
     def test_depoda_olmayan_esya_yerlestirilip_satilamaz(self):
         # tekrarlanan komut: depo boşken eşya çoğalmamalı, iade verilmemeli
         self.ps["gifts"] = [0, 1]
@@ -286,6 +313,23 @@ class UretimKomutlari(KomutTesti):
         self.komut("kill", 30, 30, 8, 0, "b")
         self.assertEqual(self.harita["xp"], xp)
         self.assertNotIn([8, 30, 30], [e[:3] for e in self.harita["items"]])
+
+    def test_birim_deposu_kapasitesi_ve_pvp_arazisi_nakitle(self):
+        """TST-02. 1.4.07 bayt kodu:
+        - PopupUnitWarehouse/onBuyMoreSlots: upgradePrice (kurucu: globals.WAREHOUSE_CAPACITY_INCREASE_PRICE_SINGLE)
+          kadar nakit; buy_warehouse_capacity_single [kasaba]. Base/loadPlayerInfoSuccess @1838-1854 kapasiteyi
+          map.warehouseAditionalCapacitySingle'dan okur.
+        - PopupBuyTerritoryPvp/onBuy: costCash (kurucu: globals.PVP_BUY_TERRITORY_CASH) kadar nakit;
+          buy_pvp_territory [position]; mapInfo.universAttackWin'e eklenir.
+        Config globals: WAREHOUSE_CAPACITY_INCREASE_PRICE_SINGLE 2, PVP_BUY_TERRITORY_CASH 5."""
+        from oyun.config import get_game_config
+        g = get_game_config()["globals"]
+        self.assertEqual((g["WAREHOUSE_CAPACITY_INCREASE_PRICE_SINGLE"], g["PVP_BUY_TERRITORY_CASH"]), (2, 5))
+        self.komut("buy_warehouse_capacity_single", 0)
+        self.komut("buy_warehouse_capacity_single", 0)
+        self.assertEqual((self.cash, self.harita["warehouseAditionalCapacitySingle"]), (96, 2))
+        self.komut("buy_pvp_territory", 3)
+        self.assertEqual((self.cash, self.harita["universAttackWin"]), (91, [3]))
 
     def test_birim_deposu(self):
         self.harita["items"].append([512, 3, 3, 0, 0, 0])

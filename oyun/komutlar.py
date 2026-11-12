@@ -392,9 +392,32 @@ def store_item(save, a):
     depo_ekle(save, esya_id)
 
 
-@komut("place_gift", "place_stored_item")
+SEVIYE_HEYKELI = 1478  # Constants.ID_BUILDING_LEVELUP_STATUE
+
+
+@komut("place_gift")
 def place_gift(save, a):
-    """[id, x, y, yon, kasaba]"""
+    """[id, x, y, yon, kasaba] - hediye kutusundan yerleştirme.
+
+    Base/sendPlaceItemCmd @40-190 (1.4.07): giftId yolunda istemci xp verir. Seviye heykelinde (1478)
+    uiExpMax − iExperience (bir sonraki seviyenin eşiğine kadar), öteki eşyada eşyanın config xp'si. Komut xp
+    taşımaz; sunucu vermezse xp (heykelde seviye) yenilemede kaybolurdu (TST-02, DNT-43)."""
+    esya_id = a.tam(0)
+    if not depo_cikar(save, esya_id):
+        return
+    h = harita(save, a.tam(4))
+    esya_ekle(h, esya_id, a.tam(1), a.tam(2), a.tam(3))
+    if esya_id == SEVIYE_HEYKELI:
+        from oyun.config import seviye_araligi
+        xp = seviye_araligi(int(h.get("level", 1) or 1))[1] - int(h.get("xp", 0) or 0)
+    else:
+        xp = int(float((get_item_from_id(esya_id) or {}).get("xp") or 0))
+    h["xp"] = int(h.get("xp", 0) or 0) + max(0, xp)
+
+
+@komut("place_stored_item")
+def place_stored_item(save, a):
+    """[id, x, y, yon, kasaba] - Base/sendPlaceItemCmd @352-405: xp vermez (place_gift'ten farkı)."""
     esya_id = a.tam(0)
     if depo_cikar(save, esya_id):
         esya_ekle(harita(save, a.tam(4)), esya_id, a.tam(1), a.tam(2), a.tam(3))
