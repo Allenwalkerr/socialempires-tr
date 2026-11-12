@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "DNT-37",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #69 birleşti; DNT-35 ve KMT-10 (#70) PR'da. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026, sahibi kullanım sınırı yüzünden durdurdu. İlk iş: PR #70 (DNT-35, KMT-10) CI'ı yeşilse sahibine birleştirmeyi sor (KAR-19). Sonra DNT-37, 40, TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
