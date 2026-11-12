@@ -136,6 +136,7 @@ class ArgumanSirasi(ortak.KomutTesti):
         kayit["playerInfo"]["map_sizes"].append(0)
         kayit["privateState"]["gifts"] = [0] * IDLER[1] + [1]  # depodan yerleştirme ve satma için
         kayit["privateState"]["gifts"][IDLER[0]] = 1
+        kayit["privateState"]["iphoneBox"] = list(IDLER) * 2  # mobil kutudan yerleştirme ve satma kutudakini işler (DNT-45)
         self.kayitlar["test"] = kayit
         return kayit
 

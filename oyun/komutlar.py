@@ -2236,15 +2236,17 @@ def _mobil_depodan_cikar(save, esya_id):
 @komut("place_iphone")
 def place_iphone(save, a):
     """[id, x, y, yon, kasaba] - mobil depodan haritaya."""
+    h = harita(save, a.tam(4))
     if _mobil_depodan_cikar(save, a.tam(0)):
-        esya_ekle(harita(save, a.tam(4)), a.tam(0), a.tam(1), a.tam(2), a.tam(3))
+        esya_ekle(h, a.tam(0), a.tam(1), a.tam(2), a.tam(3))
 
 
 @komut("sell_iphone_item")
 def sell_iphone_item(save, a):
     """[id, kasaba]"""
+    h = harita(save, a.tam(1))  # önce: kasaba argümanı her durumda okunur (test_arguman_sirasi)
     if _mobil_depodan_cikar(save, a.tam(0)):
-        satis_iadesi(save, harita(save, a.tam(1)), a.tam(0))
+        satis_iadesi(save, h, a.tam(0))
 
 
 # ---------------------------------------------------------------------------
