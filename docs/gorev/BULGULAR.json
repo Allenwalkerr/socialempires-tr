@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08). #81 birleşti (DNT-53…60, KAR-34 uygulaması, CEV-09). #82 açık (DNT-61…63, KAR-36: asker paketleri; birleştirmeden önce sahibine sorulur). Sahibinin ilk oyunda bildirdiklerinden hedefler (DNT-51), asker paketi (DNT-62 çürütüldü, KAR-36 uygulandı, #82) ve pazarda 'Dostlarını tut' kapandı. Ağaç, taş ve altın günde bir yenileniyor (DNT-64, #82). Sırada: (2) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (3) savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (4) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (2) açık artırma fikri (yeni özellik, sahibiyle sonra konuşulacak); (3) Prenses hikâye serisinin 30 görevi oyunda baştan sona oynanmadı (DNT-50'de F5 denemesi var). Sonra GEC-09: tablet denemesi sahibinde, v0.1.0 etiketi sahibinin onayıyla. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2501,7 +2501,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da."
+      "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da. Savaştan sonra askerlerin F5'te eski yere dönmesi (12.11.2026): kendi adasına dönüş bir harita yüklemesidir (Base/realLoadMap → get_player_info), istemci sağ kalanları kayıttaki yerleriyle kurar; sunucu end_attack'ta yalnızca net kaybı siler (oyun/pvp.py _birimleri_sil), sağ kalanın koordinatına dokunmaz. Dönüşte görülen ile F5 aynı kayıttan gelir. Not: hangi birimin öldüğünü istemci koordinatsız bildirdiği için silinen, aynı türün kayıttaki ilk örnekleridir. Test: tests/test_komutlar.py test_saldiridan_sonra_sag_kalanlar_yerinde (bozma düştü). Ekrandan tıklanarak oynanan savaş yine GEC-09'da."
     },
     {
       "id": "KMT-10",
