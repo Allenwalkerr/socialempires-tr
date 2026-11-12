@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"7"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"8"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -250,6 +250,37 @@ def _yazi_tipini_uydur(t, metin, fontlar):
     return t
 
 
+# DNT-35 (denetim TRA-02): AS3'ün String.toUpperCase'i Türkçe kuralı bilmez ("Değirmen" → "DEĞIRMEN"; Ruffle da
+# Unicode'un dile bağsız eşlemesini kullanır). Ekrana çıkan tek yer, koleksiyonu tamamlanan binanın tebrik penceresi:
+# PopUpCollectionComplete/<kurucu> bina adını dört kez büyütür: buildingStringName @50, POPUP_EDIFICIO_ENHORABUENA
+# metnine giden ad @140, vurgulanacak yeri bulan iki indexOf @198 ve @216 (1.4.07 bayt kodu, araclar/abc_okur.py).
+# Dördü birlikte kaldırılır: ad olduğu gibi ("Değirmen") yazılır ve indexOf yine bulur, vurgu bozulmaz. Öteki
+# toUpperCase'ler ekrana çıkmaz (düğme durumu adları, karşılaştırmalar, turnuva sonuç kodu) ya da yalnızca ASCII
+# çevirisi olan dizeleri büyütür.
+#
+# Çapa: getlocal_0, getlocal_1, getproperty name (158), callproperty toUpperCase (2767) 0, initproperty
+# buildingStringName (10828). Bu dizi 1.4.07 istemcisinde bir kez geçer; çağrılar çapanın toUpperCase'inden +0, +90,
+# +148, +166 bayttadır. Bir şey uymazsa hiç dokunulmaz.
+BUYUTME = bytes.fromhex("46cf1500")      # callproperty toUpperCase, 0 argüman
+BUYUTME_CAPASI = bytes.fromhex("d0d1669e01") + BUYUTME + bytes.fromhex("68cc54")
+BUYUTME_ARALARI = (0, 90, 148, 166)
+NOP = 0x02  # yığına dokunmaz: alıcı dize yığında kalır, toUpperCase hiç çağrılmamış gibi olur
+
+
+def buyutmeyi_kaldir(t: bytes):
+    """(yeni_etiket, kaldırılan_çağrı_sayısı). Yalnızca çapa tek kez geçiyor ve dört yerin dördü de beklenen çağrıysa."""
+    if t.count(BUYUTME_CAPASI) != 1:
+        return t, 0
+    bas = t.index(BUYUTME_CAPASI) + 5
+    yerler = [bas + ara for ara in BUYUTME_ARALARI]
+    if any(t[y:y + len(BUYUTME)] != BUYUTME for y in yerler):
+        return t, 0
+    b = bytearray(t)
+    for y in yerler:
+        b[y:y + len(BUYUTME)] = bytes([NOP]) * len(BUYUTME)
+    return bytes(b), len(yerler)
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -272,11 +303,12 @@ def turkcelestir(veri: bytes, sozluk=None):
             t = degisim[("bolge", bas)]
             cikti.append(_baslik(kod, len(t)) + t)
             continue
-        if kod == DO_ABC and as3:
-            t, sayi = abc_dizelerini_degistir(govde[bas:son], as3)
-            if sayi:
+        if kod == DO_ABC:
+            t, sayi = abc_dizelerini_degistir(govde[bas:son], as3) if as3 else (govde[bas:son], 0)
+            t, kaldirilan = buyutmeyi_kaldir(t)
+            if sayi or kaldirilan:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi
+                degisen += sayi + kaldirilan
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]
