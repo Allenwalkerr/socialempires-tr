@@ -96,21 +96,32 @@ def _araliklar(etkinlik, yil):
         yield baslangic, baslangic + timedelta(days=int(etkinlik.get("sure", 1)))
 
 
-def etkinlikler(gun=None, ileri=60):
-    """`gun`de süren ve `ileri` gün içinde başlayacak etkinlikler."""
-    gun = gun or bugun()
+def _listele(liste, gun, ileri, alanlar):
     sonuc = []
-    for etkinlik in _yukle()["etkinlikler"]:
+    for etkinlik in liste:
         for yil in (gun.year - 1, gun.year, gun.year + 1):
             for baslangic, bitis in _araliklar(etkinlik, yil):  # bitis dahil değil
                 if bitis <= gun or (baslangic - gun).days > ileri:
                     continue
-                sonuc.append({"ad": etkinlik["ad"], "no": etkinlik.get("no"), "setler": list(etkinlik.get("setler", [])),
-                              "baslangic": baslangic.isoformat(), "bitis": bitis.isoformat(),
-                              "son_gun": (bitis - timedelta(days=1)).isoformat(),
-                              "aktif": baslangic <= gun < bitis, "bayrak": bool(etkinlik.get("bayrak"))})
+                kayit = {"ad": etkinlik["ad"], "baslangic": baslangic.isoformat(), "bitis": bitis.isoformat(),
+                         "son_gun": (bitis - timedelta(days=1)).isoformat(), "aktif": baslangic <= gun < bitis}
+                kayit.update(alanlar(etkinlik))
+                sonuc.append(kayit)
     sonuc.sort(key=lambda e: e["baslangic"])
     return sonuc
+
+
+def etkinlikler(gun=None, ileri=60):
+    """`gun`de süren ve `ileri` gün içinde başlayacak etkinlikler."""
+    return _listele(_yukle()["etkinlikler"], gun or bugun(), ileri,
+                    lambda e: {"no": e.get("no"), "setler": list(e.get("setler", [])), "bayrak": bool(e.get("bayrak"))})
+
+
+def teklifler(gun=None, ileri=60):
+    """`gun`de süren ve `ileri` gün içinde başlayacak özel teklif etkinlikleri (KAR-34; takvim.json teklifler)."""
+    return _listele(_yukle().get("teklifler", []), gun or bugun(), ileri,
+                    lambda e: {"tur": e["tur"], "no": int(e["no"]), "seviye": int(e["seviye"]),
+                               "birim": e.get("birim")})
 
 
 def milli_bayram(gun=None):

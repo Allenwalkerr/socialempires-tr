@@ -128,4 +128,9 @@ def takvim_ucu():
     for e in etkinlikler:
         # Milli bayramda oyunun Türk bayrağı süsü (Turkey Flag, öğe 174), ötekilerde setin resmi
         e["resim"] = TURK_BAYRAGI if e["bayrak"] else next((r for r in map(set_resmi, e["setler"]) if r), "")
-    return {"etkinlikler": etkinlikler, "acik_setler": takvim.acik_setler()}
+    from oyun.config import get_item_from_id
+    teklifler = takvim.teklifler(ileri=120)
+    for t in teklifler:  # KAR-34: özel teklifler, oyunun kendi küçük resmiyle (ödül ejderhası ya da ada)
+        ad = (get_item_from_id(t["birim"]) or {}).get("img_name") if t.get("birim") else None
+        t["resim"] = f"{RESIMLER}{ad}.jpg" if ad else ""
+    return {"etkinlikler": etkinlikler, "acik_setler": takvim.acik_setler(), "teklifler": teklifler}

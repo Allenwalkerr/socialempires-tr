@@ -512,7 +512,7 @@
       var aktif = v.etkinlikler.filter(function (e) { return e.aktif; });
       var yakin = v.etkinlikler.filter(function (e) { return !e.aktif; })[0];
       var olay = function (e, icerik) {
-        var resim = e.resim ? "<img class='simge' src='" + e.resim + "' alt=''>" : "";
+        var resim = e.resim ? "<img class='simge' src='" + e.resim + "' alt='' onerror='this.remove()'>" : "";
         return "<div class='olay'>" + resim + icerik + "</div>";
       };
       var parcalar = aktif.map(function (e) {
@@ -520,6 +520,15 @@
           " setleri mağazada.<small>" + tarih(e.son_gun) + " gün sonuna dek</small>");
       });
       if (yakin) parcalar.push(olay(yakin, "Sıradaki şenlik: " + yakin.ad + "<small>" + tarih(yakin.baslangic) + "</small>"));
+      // KAR-34: özel teklifler (Ada Ocağı, ejderha teklifleri) takvimli ve seviyeye bağlı
+      var teklifler = v.teklifler || [];
+      teklifler.filter(function (t) { return t.aktif; }).forEach(function (t) {
+        parcalar.push(olay(t, "<b class='yazi-oyun'>" + t.ad + "</b>" + t.seviye + ". seviyeden açık." +
+          "<small>" + tarih(t.son_gun) + " gün sonuna dek</small>"));
+      });
+      var siradaki = teklifler.filter(function (t) { return !t.aktif; })[0];
+      if (siradaki) parcalar.push(olay(siradaki, "Sıradaki teklif: " + siradaki.ad + " (" + siradaki.seviye +
+        ". seviyeden)<small>" + tarih(siradaki.baslangic) + "</small>"));
       if (parcalar.length) etkinlik.innerHTML = parcalar.join("");
       else etkinlik.remove();
     })

@@ -12,5 +12,15 @@
     {"no": 8, "ad": "Zafer Bayramı", "gun": "08-30", "once": 0, "sure": 3, "setler": ["Gladyatörler"], "bayrak": true},
     {"no": 9, "ad": "Cumhuriyet Bayramı", "gun": "10-29", "once": 0, "sure": 2, "setler": ["Kara Orklar"], "bayrak": true},
     {"no": 10, "ad": "Cadılar Bayramı", "gun": "10-31", "once": 4, "sure": 7, "setler": ["Cadılar Bayramı", "Ölüler Diyarı", "Cehennem"]}
+  ],
+  "_teklifler": "Özel teklif etkinlikleri (KAR-34): oyunun Ada Ocağı (tur ada: collect_game 1, ödülü viral teklif 2 ile verilir) ve viral teklifleri (tur viral, no: viral_offers kimliği). Yalnızca takvimdeki günlerde ve oyuncu seviye'ye gelmişse açılır; açılış 15'ten başlayıp 5'er kademeli. Her teklif oyuncu başına bir kez tamamlanır (istemci: rewarded). gun, once ve sure etkinlikler gibi.",
+  "teklifler": [
+    {"ad": "Cehennem Örsü Adası", "tur": "ada", "no": 1, "seviye": 15, "gun": "02-15", "sure": 28, "birim": 1530},
+    {"ad": "Paskalya Ejderhası", "tur": "viral", "no": 1, "seviye": 20, "gun": "04-01", "sure": 30, "birim": 2267},
+    {"ad": "Cehennem Örsü Adası", "tur": "ada", "no": 1, "seviye": 15, "gun": "06-15", "sure": 30, "birim": 1530},
+    {"ad": "Fildişi Hanedan Ejderhası", "tur": "viral", "no": 4, "seviye": 35, "gun": "08-01", "sure": 31, "birim": 2324},
+    {"ad": "Gece Örs Ejderhası", "tur": "viral", "no": 5, "seviye": 25, "gun": "10-10", "sure": 30, "birim": 2363},
+    {"ad": "Cehennem Örsü Adası", "tur": "ada", "no": 1, "seviye": 15, "gun": "11-15", "sure": 30, "birim": 1530},
+    {"ad": "Fildişi Hanedan Ejderhası", "tur": "viral", "no": 3, "seviye": 30, "gun": "01-20", "sure": 30, "birim": 2324}
   ]
 }

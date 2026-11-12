@@ -224,19 +224,26 @@ def gunun_sinirli_esyasi(bugun=None, acik=frozenset()):
     return secilen, (bugun + datetime.timedelta(days=1)).isoformat()
 
 
-ETKINLIK_SURESI = 30 * 86400
+ADA_ODUL_TEKLIFI = 2  # Ada Ocağı'nın boru malzemesi ve ödülü viral teklif 2'den (CollectGameManager/giveReward)
 
 
-def etkinlik_penceresi(simdi=None):
-    """(starts_at, duration): Ada Ocağı ve viral teklifler için kayan 30 günlük pencere (OYN-29, KAR-27, KAR-29).
-
-    1.4.07'nin config'inde ikisinin de starts_at ve duration'ı 0 (hiç görünmezler). İstemci: CollectGameManager/get
-    active şimdi > starts_at ve şimdi < starts_at + duration; SpecialDayOfferManager/timeLeft int(starts_at + duration -
-    şimdi) > 0 (convert_i: 2^31'i aşmamalı). Pencere her gün (UTC) yeniden kurulur: bugün başlar, 30 gün sonra biter;
-    pencerede kalan süre hep 29-30 gün görünür. Sunucu komutları süreye bakmaz."""
-    simdi = int(time.time()) if simdi is None else simdi
-    gun_basi = simdi // 86400 * 86400
-    return gun_basi - 1, ETKINLIK_SURESI + 1
+def teklif_pencereleri(seviye=None, gun=None):
+    """{("ada", 1) | ("viral", no): (starts_at, duration)}: bugün açık özel teklifler (KAR-34, sahibi 12.11.2026:
+    "Kademeli, 15'ten başlayıp" ve "Evet, takvime bağla"). Yalnızca config/takvim.json teklifler'de bugün süren ve
+    oyuncunun seviyesinin yettiği teklif açılır (seviye bilinmiyorsa yalnızca takvim). Pencere takvim gününün Türkiye
+    saatiyle başı ve sonu. İstemci: CollectGameManager/get active şimdi > starts_at ve şimdi < starts_at + duration;
+    SpecialDayOfferManager/timeLeft int(starts_at + duration - şimdi) > 0. Ada açıksa ödül teklifi 2 de açılır."""
+    from oyun import takvim
+    pencereler = {}
+    for t in takvim.teklifler(gun, ileri=0):
+        if not t["aktif"] or (seviye is not None and seviye < t["seviye"]):
+            continue
+        bas, bit = (int(datetime.datetime.combine(datetime.date.fromisoformat(t[k]), datetime.time(),
+                                                  takvim.TURKIYE).timestamp()) for k in ("baslangic", "bitis"))
+        pencereler[(t["tur"], t["no"])] = (bas, bit - bas)
+        if t["tur"] == "ada":
+            pencereler[("viral", ADA_ODUL_TEKLIFI)] = (bas, bit - bas)
+    return pencereler
 
 
 def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: int = None) -> dict:
@@ -256,7 +263,7 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
     bayram = bayram_hedefleri.aktif_hedefler() if dil == "tr" else []
     from oyun import takvim
     milli = takvim.milli_bayram()
-    pencere = etkinlik_penceresi()
+    pencere = tuple(sorted(teklif_pencereleri(seviye).items()))
     sinirli = gunun_sinirli_esyasi(acik=takvim_setleri or frozenset())
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
                tuple(h["id"] for h in bayram), milli, pencere, seviye, sinirli)
@@ -277,10 +284,11 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
         kopya = ascii_uygula(kopya)
     if teklif:
         kopya["kompu_offers"] = [teklif]
-    bas, sure = pencere
-    for etkinlik in list((kopya.get("collect_game") or {}).values()) + list((kopya.get("viral_offers") or {}).values()):
-        if isinstance(etkinlik, dict):
-            etkinlik["starts_at"], etkinlik["duration"] = bas, sure
+    acik_teklifler = dict(pencere)
+    for tur, alan in (("ada", "collect_game"), ("viral", "viral_offers")):
+        for no, etkinlik in (kopya.get(alan) or {}).items():
+            if isinstance(etkinlik, dict):
+                etkinlik["starts_at"], etkinlik["duration"] = acik_teklifler.get((tur, int(no)), (0, 0))
     if takvim_setleri:
         for esya in kopya.get("items", []):
             if esya["id"] in takvim_setleri:
