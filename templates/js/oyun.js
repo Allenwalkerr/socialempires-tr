@@ -195,7 +195,8 @@
     try { k = localStorage.getItem(KALITE_ANAHTARI); } catch (e) {}
     return KALITELER.indexOf(k) >= 0 ? k : "high";
   }
-  // Görüntü: "doldur" oyunu ekranın tamamına yayar (Android'de varsayılan), "sigdir" 760:600 oranını korur
+  // Görüntü: "doldur" oyunu ilk dokunuşta oyunun kendi tam ekranına alır (Android'de varsayılan), "sigdir" 760:600
+  // oranını korur
   var GORUNUM_ANAHTARI = "oyun-gorunum";
   function gorunumSecimi() {
     var g = null;
@@ -261,14 +262,20 @@
     // Ruffle telefonda/tablette kendiliğinden "düşük" kaliteye geçer; görüntü yumuşatılmaz, dokunulan yerlerde
     // çizim kırıntıları kalabilir. Varsayılan masaüstündeki gibi yüksek; oyuncu başlıktan seçer (KALITE_ANAHTARI).
     window.RufflePlayer.config.quality = kaliteSecimi();
-    if (document.body.classList.contains("ekran-doldur")) {
-      // Oyun esnetilmez: sahne kutunun gerçek boyutunu alır, oyun haritayı genişletip menülerini yerleştirir
-      // (orijinal oyunun tam ekranı gibi). Kutu en az 760×600 (oyunun kendi boyutu) tutulur.
-      window.RufflePlayer.config.scale = "noScale";
-      window.RufflePlayer.config.forceScale = true;
-    }
     var ruffle = window.RufflePlayer.newest();
     var oyuncu = ruffle.createPlayer();
+    if (document.body.classList.contains("ekran-doldur")) {
+      // Doldur: oyunun kendi tam ekranı. Oyun menülerini yalnızca tam ekran olayında yerleştirir (1.4.07:
+      // StateNormal/onFullScreenChange → setFullScreen; Base/getStageDimensions tam ekran dışında 760×600 sabitini
+      // verir); sahneyi noScale ile büyütmek menüleri 760×600'lük köşede bırakıyordu (sahibinin bildirimi 12.11.2026).
+      // Tarayıcı tam ekranı yalnızca kullanıcı dokunuşuyla açar: oyuna ilk dokunuşta bir kez. Esc ile çıkılınca oyun
+      // setNormalScreen ile menüleri kendisi geri dizer.
+      var tamEkranaGec = function () {
+        oyuncu.removeEventListener("pointerup", tamEkranaGec, true);
+        if (document.fullscreenElement !== oyuncu && typeof oyuncu.enterFullscreen === "function") oyuncu.enterFullscreen();
+      };
+      oyuncu.addEventListener("pointerup", tamEkranaGec, true);
+    }
     etkinOyuncu = oyuncu;
     kutu.appendChild(oyuncu);
     ikiParmaklaYakinlastir(oyuncu);
@@ -570,7 +577,14 @@
     if (acik && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {});
     else if (!acik && document.fullscreenElement === document.documentElement) document.exitFullscreen().catch(function () {});
   }
-  document.getElementById("tam-ekran").addEventListener("click", function () { oyunModu(true, true); });
+  document.getElementById("tam-ekran").addEventListener("click", function () {
+    oyunModu(true, true);
+    // Doldur: düğmeye basış kullanıcı dokunuşudur; oyunun kendi tam ekranı hemen açılır (menüler kenarlara dizilir)
+    var oyuncu = document.querySelector("ruffle-player");
+    if (oyuncu && document.body.classList.contains("ekran-doldur") && typeof oyuncu.enterFullscreen === "function") {
+      oyuncu.enterFullscreen();
+    }
+  });
   tamCik.addEventListener("click", function () { oyunModu(false, true); });
   // Oyunun kendi tam ekranı (Ruffle, oyun kutusundaki öğe) sayfanın tam ekranından çıkış sayılmaz;
   // yalnızca tam ekran bütünüyle bitince (Esc) oyun modu kapanır.

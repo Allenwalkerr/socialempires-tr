@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor; Doldur'da arayüz bozuluyor; bot köyleri özenle ve bir plana göre, askeri seviyeleriyle birlikte tasarlansın."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor; bot köyleri özenle ve bir plana göre, askeri seviyeleriyle birlikte tasarlansın."
   },
   "maddeler": [
     {
@@ -2814,6 +2814,19 @@
       "pr": "#81",
       "onay": null,
       "notlar": "swf_yama.komsudan_komsuya: koşul aynı uzunlukta (uint)(mod - 1) <= 1 olur; yalnızca NORMAL ve NEIGHBOUR geçer, eğitim (0), saldırı, görev, hayatta kalma, turnuva, casus geçmez. Çapa tek değilse dokunulmaz. YAMA_SURUMU 11. Beş bozmanın beşi test düşürüyor."
+    },
+    {
+      "id": "DNT-57",
+      "baslik": "Doldur görünümünde oyunun menüleri 760×600'lük köşede kalıyor, arayüz bozuluyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüleri (12.11.2026): alt çubuk ve sağdaki simgeler haritanın ortasında. 1.4.07 bayt kodu: Base/getStageDimensions displayState FULL_SCREEN değilse Config.STAGE_WIDTH/HEIGHT (760×600) döndürür; menüler yalnızca StateNormal/onFullScreenChange → setFullScreen (getStageDimensions) / setNormalScreen ile yeniden dizilir. Doldur Ruffle'ı noScale ile açıyordu: sahne büyüyor, tam ekran olayı hiç gelmiyor. Chromium'da sınandı (1280×720, yerel sunucu): oyuncunun enterFullscreen'i ile oyun FULL_SCREEN'e geçti, üst çubuk, sağ simgeler ve alt çubuk ekranın kenarlarına dizildi; Esc'ten sonra sayfadaki kutuda yine düzgün.",
+      "test": "tests/js/doldur.test.js",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Sahibi raisetheempires-tr'deki çözümü örnek gösterdi (Tam ekran düğmesi oyun kutusunu requestFullscreen ile açar). Burada kutu yerine Ruffle oyuncusunun kendisi tam ekrana alınır: Social Empires bu olayda menülerini kenarlara dizer. Doldur seçiliyken oyuna ilk dokunuşta ya da sayfadaki Tam Ekran düğmesinde açılır (tarayıcı tam ekranı yalnızca kullanıcı dokunuşuyla izin verir); noScale kaldırıldı. Android'de WebView onShowCustomView ile tam ekranı karşılıyor (MainActivity); tablette denenmedi (GEC-09). Bozma: üç bozmanın üçü JS testini düşürüyor."
     }
   ]
 }

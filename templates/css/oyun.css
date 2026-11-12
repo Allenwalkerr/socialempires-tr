@@ -666,13 +666,8 @@ body.oyun-modu .oyun-kutusu {
 }
 .tam-cik:hover, .tam-cik:focus-visible { opacity: 1; }
 
-/* Görüntü: Doldur. Oyun esnetilmeden ekranın tamamını alır (Ruffle noScale); oyun haritayı genişletir, menülerini
-   yerleştirir. Sahne oyunun kendi boyutundan (760×600) küçük olmasın: menüler kesilirdi. Çık sağ üstte, haritanın
-   üstünde (sol üstte oyunun kaynak sayaçları var). */
-body.oyun-modu.ekran-doldur .oyun-kutusu {
-  width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; min-width: 760px; min-height: 600px;
-}
-body.ekran-doldur:not(.oyun-modu) .oyun-kutusu { min-width: 760px; min-height: 600px; }
+/* Görüntü: Doldur. Oyun ilk dokunuşta oyunun kendi tam ekranına geçer (oyun.js oyunuBaslat); kutu Sığdır'daki
+   gibidir. Çık sağ üstte (sol üstte oyunun kaynak sayaçları var). */
 body.ekran-doldur .tam-cik { left: auto; right: 8px; }
 
 /* ================= Sen yokken (ONR-02) ================= */
