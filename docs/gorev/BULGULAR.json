@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor; Doldur'da arayüz bozuluyor; bot köyleri özenle ve bir plana göre, askeri seviyeleriyle birlikte tasarlansın."
   },
   "maddeler": [
     {
@@ -2801,6 +2801,19 @@
       "pr": "#81",
       "onay": null,
       "notlar": "config.gunun_sinirli_esyasi: havuz tema setlerindeki sınırlı öğeler (Harikalar dışında, 237) ve 1299; sabit karıştırılmış sırada her gün sıradaki (havuz bitmeden tekrar yok), takvimde açık olan atlanır. Bitiş tarihi yarın: 'SON 1 GÜN'. Dünkü öğe istemci config'inde kapanır; 'hepsi açık' kipinde hiçbir şey kapanmaz. Takvimle açılan set öğeleri de tek ortak tarih yüzünden 'SON 1 GÜN' gösterir (istemcide öğe başına tarih yok). On bozmanın onu test düşürüyor. Oyun içinde görülmedi (◐)."
+    },
+    {
+      "id": "DNT-56",
+      "baslik": "Komşu köydeyken başka bir köye geçmek için önce My Town'a dönmek gerekiyordu",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bir köyü ziyaret ettim mesela başka bir farklı köye bakmak için illa my towna dönmem lazım'. 1.4.07 FriendButton/mouseUsed@41-58: gameModeCurrent != GameMode.NORMAL ise return; komşuda mod NEIGHBOUR (2). Oyunda sınandı (Playwright, yerel sunucu): yeni köy → İblis Kıran'ı ziyaret → alttaki çubuktan Balrog → Ziyaret → doğrudan 'Balrog Kalesi' yüklendi (get_player_info sırası: Emperor, Emperor, İblis Kıran, Balrog).",
+      "test": "tests/test_swf_yama.py KomsudanKomsuyaTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "swf_yama.komsudan_komsuya: koşul aynı uzunlukta (uint)(mod - 1) <= 1 olur; yalnızca NORMAL ve NEIGHBOUR geçer, eğitim (0), saldırı, görev, hayatta kalma, turnuva, casus geçmez. Çapa tek değilse dokunulmaz. YAMA_SURUMU 11. Beş bozmanın beşi test düşürüyor."
     }
   ]
 }

@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"10"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"11"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -400,6 +400,26 @@ def buyutmeyi_kaldir(t: bytes):
     return bytes(b), len(yerler)
 
 
+# Köyden köye geçiş (sahibinin isteği, 12.11.2026: "başka bir farklı köye bakmak için illa my towna dönmem lazım").
+# FriendButton/mouseUsed@41-58 (1.4.07 bayt kodu, araclar/abc_okur.py): `if (Base.Main.gameModeCurrent != GameMode.NORMAL)
+# return;` Komşu köyde mod NEIGHBOUR olduğundan alttaki arkadaş düğmesi hiçbir şey yapmaz. GameMode: TUTORIAL 0,
+# NORMAL 1, NEIGHBOUR 2, ASSAULT 3, CAMPAIGN 4, SURVIVAL 5, TOURNAMENT 6, SPY 7, EDITOR 10. Koşul aynı uzunlukta
+# `(uint)(mod - 1) <= 1` olur: yalnızca NORMAL ve NEIGHBOUR geçer (eğitim -1 → 2^32-1, saldırı ve görevler > 1).
+# Bayt: getlex GameMode (60 9c01), getproperty NORMAL (66 9b02), ifeq +1 (13 010000) → nop nop (02 02), decrement
+# (93), convert_u (74), pushbyte 1 (24 01), ifle +1 (16 010000); atlamanın sonu ve hedefi (returnvoid'in ardı) aynı.
+# Çapa öncesi getlex Base (60 01), getproperty Main (66 0c), getproperty gameModeCurrent (66 c201), sonrası returnvoid.
+# Tek kez geçmezse dokunulmaz.
+KOMSU_KOSULU = bytes.fromhex("6001660c66c201" "609c01669b0213010000" "47")
+KOMSU_KOSULU_YENI = bytes.fromhex("6001660c66c201" "0202937424011601000" "0" "47")
+
+
+def komsudan_komsuya(t: bytes):
+    """(yeni_etiket, değişen): FriendButton'ın komşu köyde de çalışması; çapa tek değilse dokunmaz."""
+    if t.count(KOMSU_KOSULU) != 1:
+        return t, 0
+    return t.replace(KOMSU_KOSULU, KOMSU_KOSULU_YENI), 1
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -425,9 +445,10 @@ def turkcelestir(veri: bytes, sozluk=None):
         if kod == DO_ABC:
             t, sayi = abc_dizelerini_degistir(govde[bas:son], as3) if as3 else (govde[bas:son], 0)
             t, kaldirilan = buyutmeyi_kaldir(t)
-            if sayi or kaldirilan:
+            t, komsu = komsudan_komsuya(t)
+            if sayi or kaldirilan or komsu:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan
+                degisen += sayi + kaldirilan + komsu
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]

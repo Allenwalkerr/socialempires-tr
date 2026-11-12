@@ -904,3 +904,44 @@ class AlanGenisletmeTestleri(unittest.TestCase):
         alan = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 37][0]
         xmin, xmax, _, _ = _kutu_rect(alan)
         self.assertGreaterEqual(xmax - xmin, 1140 + 80)
+
+
+class KomsudanKomsuyaTestleri(unittest.TestCase):
+    """Sahibinin isteği (12.11.2026): komşu köydeyken alttaki arkadaş düğmesiyle doğrudan başka köye geçilsin.
+    1.4.07 FriendButton/mouseUsed@41-58: getlex Base, getproperty Main, getproperty gameModeCurrent, getlex GameMode,
+    getproperty NORMAL, ifeq +1, returnvoid. AVM2 işlem kodları (Adobe AVM2 Overview): nop 0x02, decrement 0x93,
+    convert_u 0x74, pushbyte 0x24, ifle 0x16, ifeq 0x13 (s24 göreli konum, komutun sonundan). GameMode: TUTORIAL 0,
+    NORMAL 1, NEIGHBOUR 2, ASSAULT 3, CAMPAIGN 4, SURVIVAL 5, TOURNAMENT 6, SPY 7, EDITOR 10."""
+
+    ESKI = bytes.fromhex("6001660c66c201" "609c01" "669b02" "13010000" "47")
+
+    def test_kosul_ayni_uzunlukta_normal_ve_komsuyu_gecirir(self):
+        govde = _do_abc(["x"]) + b"\x00" + self.ESKI + b"\xd0\x30"
+        yeni, sayi = swf_yama.komsudan_komsuya(govde)
+        self.assertEqual(sayi, 1)
+        self.assertEqual(len(yeni), len(govde))
+        bas = govde.index(self.ESKI)
+        kod = yeni[bas:bas + len(self.ESKI)]
+        self.assertEqual(kod[:7], self.ESKI[:7])           # Base.Main.gameModeCurrent yığında
+        self.assertEqual(kod[7:9], b"\x02\x02")           # nop nop
+        self.assertEqual(kod[9:13], b"\x93\x74\x24\x01")  # decrement, convert_u, pushbyte 1
+        self.assertEqual(kod[13], 0x16)                   # ifle
+        self.assertEqual(kod[14:17], self.ESKI[14:17])    # aynı göreli konum: hedef returnvoid'in ardı
+        self.assertEqual(kod[17:], b"\x47")
+        self.assertEqual(yeni[:bas] + yeni[bas + len(kod):], govde[:bas] + govde[bas + len(kod):])
+        # Koşulun AVM2 anlamı: decrement Number, convert_u ToUint32, ifle sayısal <=
+        gecen = {m for m in (0, 1, 2, 3, 4, 5, 6, 7, 10) if ((m - 1) % 2 ** 32) <= 1}
+        self.assertEqual(gecen, {1, 2})  # yalnızca NORMAL ve NEIGHBOUR; eğitim, saldırı, görev geçmez
+
+    def test_capa_yoksa_ya_da_iki_kezse_dokunmaz(self):
+        for govde in (_do_abc(["x"]), _do_abc(["x"]) + self.ESKI + self.ESKI):
+            self.assertEqual(swf_yama.komsudan_komsuya(govde), (govde, 0))
+
+    def test_turkcelestir_yamayi_uygular(self):
+        with mock.patch.object(swf_yama, "_turkce_fontlar", return_value={}):
+            girdi = _swf(_etiket(82, _do_abc(["x"]) + self.ESKI), _etiket(1, b""), surum=13)
+            cikti, sayi = swf_yama.turkcelestir(girdi, {"metin_alanlari": {}})
+        abc = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 82][0]
+        self.assertNotIn(self.ESKI, abc)
+        self.assertIn(bytes.fromhex("020293742401"), abc)
+        self.assertEqual(sayi, 1)
