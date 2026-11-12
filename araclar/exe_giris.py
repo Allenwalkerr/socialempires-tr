@@ -59,7 +59,16 @@ def tarayiciyi_ac(adres=ADRES, sure=240):
     return False
 
 
+def konsolu_hazirla():
+    """Windows'ta çıktı dosyaya ya da boruya yönlendirilince kodlama cp1252 olur ve Türkçe harf (ı, ş...) yazan her
+    print programı düşürür (S-77, #78 CI). Zip'teki .bat bunu PYTHONIOENCODING=utf-8 ile önler; .exe kendisi yapar."""
+    for akim in (sys.stdout, sys.stderr):
+        if akim is not None and hasattr(akim, "reconfigure"):
+            akim.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main():
+    konsolu_hazirla()
     if os.name == "nt":
         os.system("title Social Empires Sunucusu")
     print("Social Empires Turkce: oyun tarayicida kendiliginden acilacak:", ADRES)

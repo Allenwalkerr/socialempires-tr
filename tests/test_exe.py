@@ -74,15 +74,32 @@ class YazilamayanKlasor(unittest.TestCase):
     def test_hata_yazilir_ve_pencere_bekler(self):
         """#78 incelemesi: .exe yazılamayan klasörden açılırsa (PermissionError) konsol iletisi okunmadan kapanmasın."""
         giris = yukle("exe_giris")
-        with mock.patch.object(giris, "hazirla", side_effect=PermissionError("erisim engellendi")), \
+        with mock.patch.object(giris, "konsolu_hazirla") as konsol, \
+                mock.patch.object(giris, "hazirla", side_effect=PermissionError("erisim engellendi")), \
                 mock.patch.object(giris.sys, "stdin") as stdin, mock.patch("builtins.input") as bekle, \
                 mock.patch("builtins.print") as yaz:
             stdin.isatty.return_value = True
             with self.assertRaises(SystemExit) as son:
                 giris.main()
         self.assertEqual(son.exception.code, 1)
+        konsol.assert_called_once()  # S-77: ilk iş konsolun kodlaması
         bekle.assert_called_once()
         self.assertIn("yazilamadi", " ".join(str(a) for c in yaz.call_args_list for a in c.args))
+
+
+class Konsol(unittest.TestCase):
+    def test_yonlendirilmis_ciktida_turkce_harf_programi_dusurmez(self):
+        """S-77: #78 CI'ında windows-latest'te çıktı dosyaya yönlendirilince kodlama cp1252 oldu ve kayıt adındaki 'ı'
+        UnicodeEncodeError ile programı düşürdü (oyun/kayit.py _load_saved_villages)."""
+        import io
+        giris = yukle("exe_giris")
+        ham = io.BytesIO()
+        akim = io.TextIOWrapper(ham, encoding="cp1252")
+        with mock.patch.object(giris.sys, "stdout", akim), mock.patch.object(giris.sys, "stderr", None):
+            giris.konsolu_hazirla()
+            print("Mızrakçı Kalesi", file=giris.sys.stdout)
+            akim.flush()
+        self.assertEqual(ham.getvalue().decode("utf-8").strip(), "Mızrakçı Kalesi")
 
 
 class Paketleme(unittest.TestCase):
