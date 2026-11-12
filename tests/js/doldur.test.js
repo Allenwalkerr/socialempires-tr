@@ -47,3 +47,46 @@ test("Sığdır: tam ekran kendiliğinden açılmaz", () => {
 test("Doldur sahneyi noScale ile esnetmez (menüler 760×600 köşede kalıyordu)", () => {
   assert.ok(!/config\.scale\s*=\s*"noScale"/.test(js));
 });
+
+// Tam Ekran düğmesi (#81 incelemesi). Fullscreen belirtimi: başarılı requestFullscreen kullanıcı etkinleşmesini
+// tüketir; aynı tıklamada ikinci istek reddedilebilir. Doldur'da tıklama başına tek istek: oyuncunun tam ekranı.
+const bas2 = js.indexOf("var UYGULAMA = /SocialEmpiresTR-Android/");
+const son2 = js.indexOf("  if (UYGULAMA) {", bas2);
+assert.ok(bas2 > 0 && son2 > bas2, "oyun modu bölümü oyun.js'te bulunamadı");
+const modBolumu = js.slice(bas2, son2);
+
+function sayfa(doldur) {
+  const dinle = {}, siniflar = new Set(doldur ? ["ekran-doldur"] : []);
+  const k = { sayfaIstek: 0, oyuncuIstek: 0 };
+  const oyuncu = { focus() {}, enterFullscreen() { k.oyuncuIstek += 1; } };
+  const document = {
+    fullscreenElement: null,
+    body: { classList: { toggle: (s, a) => (a ? siniflar.add(s) : siniflar.delete(s)), contains: (s) => siniflar.has(s) } },
+    documentElement: { requestFullscreen() { k.sayfaIstek += 1; return Promise.resolve(); } },
+    exitFullscreen() { return Promise.resolve(); },
+    querySelector: (s) => (s === "ruffle-player" ? oyuncu : null),
+    getElementById: (id) => (dinle[id] = dinle[id] || { hidden: true, addEventListener(ad, f) { this[ad] = f; } }),
+    addEventListener(ad, f) { dinle["belge-" + ad] = f; },
+  };
+  vm.runInNewContext(modBolumu, { document, navigator: { userAgent: "Chrome" }, localStorage: { setItem() {} },
+                                  panelleriTazele() {} });
+  return { k, dinle, document, oyuncu, siniflar };
+}
+
+test("Doldur: Tam Ekran düğmesi tek istek yapar (oyuncunun tam ekranı), Esc oyun modunu kapatır", () => {
+  const s = sayfa(true);
+  s.dinle["tam-ekran"].click();
+  assert.deepStrictEqual(s.k, { sayfaIstek: 0, oyuncuIstek: 1 });
+  assert.ok(s.siniflar.has("oyun-modu"));
+  s.document.fullscreenElement = s.oyuncu;
+  s.dinle["belge-fullscreenchange"]();
+  s.document.fullscreenElement = null;  // Esc
+  s.dinle["belge-fullscreenchange"]();
+  assert.ok(!s.siniflar.has("oyun-modu"));
+});
+
+test("Sığdır: Tam Ekran düğmesi sayfanın tam ekranını ister, oyuncununkini istemez", () => {
+  const s = sayfa(false);
+  s.dinle["tam-ekran"].click();
+  assert.deepStrictEqual(s.k, { sayfaIstek: 1, oyuncuIstek: 0 });
+});

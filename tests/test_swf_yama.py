@@ -778,11 +778,11 @@ if __name__ == "__main__":
 
 # --- swf_yama: kesik çeviri için metin kutusunu genişletme -------------------------------------------------
 
-def _kutu_alani(metin, genislik=1000, font=9, hiza=None, kaydir=False, boyutlan=False, sol=0, sag=0):
+def _kutu_alani(metin, genislik=1000, font=9, hiza=None, kaydir=False, boyutlan=False, sol=0, sag=0, html=False):
     """Belgeye göre DefineEditText: RECT (0, genislik, 0, 300), HasText, isteğe bağlı WordWrap (b1 0x40),
     AutoSize (b2 0x40), HasLayout (b2 0x20: Align UI8, Left/RightMargin UI16, Indent UI16, Leading SI16)."""
     b1 = 0x80 | 0x01 | (0x40 if kaydir else 0)
-    b2 = (0x40 if boyutlan else 0) | (0x20 if hiza is not None else 0)
+    b2 = (0x40 if boyutlan else 0) | (0x20 if hiza is not None else 0) | (0x02 if html else 0)
     ek = struct.pack("<HH", font, 240)  # FontID, FontHeight (twip)
     if hiza is not None:
         ek += bytes([hiza]) + struct.pack("<HHHh", sol, sag, 0, 0)
@@ -869,6 +869,19 @@ class AlanGenisletmeTestleri(unittest.TestCase):
         self.assertLess(xmax - xmin, 1600)  # kutu küçülen yazıya göre genişler, sınıra dek değil (yanındakine taşmasın)
         self.assertEqual(yukseklik(swf_yama.alani_genislet(_kutu_alani("B" * 20), "B" * 20, self.fontlar)), 168)
         self.assertEqual(yukseklik(swf_yama.alani_genislet(_kutu_alani("BBBB A"), "BBBB A", self.fontlar)), 240)
+
+    def test_html_alanda_boy_font_etiketinden_ve_kucultulmez(self):
+        """HTML alanda (b2 0x02) çizilen boy <font size> (piksel ×20 twip) etiketinden gelir, FontHeight geçersizdir
+        (Flash/Ruffle HTML metni). size="20" = 400 twip: 'BBB' 720 × 400 / 240 = 1200 twip."""
+        yukseklik = lambda b: struct.unpack_from("<H", b, 2 + (5 + 4 * (b[2] >> 3) + 7) // 8 + 4)[0]  # noqa: E731
+        kisa = '<p><font size="20">BBB</font></p>'
+        t = _kutu_alani(kisa, html=True)
+        _, xmax, _, _ = _kutu_rect(swf_yama.alani_genislet(t, kisa, self.fontlar))
+        self.assertGreaterEqual(xmax, 1200 + 80)  # FontHeight (240) ile ölçülse 720 + 80 sığardı
+        uzun = '<p><font size="20">BBBBBBB</font></p>'  # 2800 twip: 1600'e sığmaz
+        yeni = swf_yama.alani_genislet(_kutu_alani(uzun, html=True), uzun, self.fontlar)
+        self.assertEqual(yukseklik(yeni), 240)  # küçültme etkisiz olacağı için yapılmaz
+        self.assertEqual(_kutu_rect(yeni)[:2], [0, 1600])  # en geniş kutu
 
     def test_sozcuk_kaydiran_alanda_yalniz_uzun_sozcuk_genisletir(self):
         metin = "AAAA AAAA AAAA"  # tek satır 1560, her sözcük 480: kaydıran alanda sığar

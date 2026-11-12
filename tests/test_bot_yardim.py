@@ -216,6 +216,14 @@ class Pencere(unittest.TestCase):
         self.assertTrue(ada["resim"].endswith("/buildingthumbs/1530_forgeIsland.jpg"), ada["resim"])  # oyunun resmi
         self.assertIn("Fildişi Hanedan Ejderhası", [t["ad"] for t in v["teklifler"] if not t["aktif"]])
 
+    def test_ada_ve_odul_cizimleri_temel_pakette(self):
+        """KAR-29: ada ve ödül ejderhalarının çizimleri temel pakette (teklif takvim günü açılınca çevrimdışı da çizilsin)."""
+        from oyun import onindirme
+        oncelik = {y: o for y, _, o in onindirme.liste()}
+        for ad in ("1530_forgeIsland", "2267_easterDragon", "2269_forgeDragon", "2272_demonDragon",
+                   "2324_ivoryDinastyDragon", "2363_nightForgeDragon"):
+            self.assertLessEqual(oncelik["buildingsprites/%s.swf" % ad], onindirme.PAKETLER["temel"], ad)
+
 
 class Sayfa(unittest.TestCase):
     def test_oyunun_cagirdigi_islevler_sayfada(self):

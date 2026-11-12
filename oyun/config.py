@@ -218,9 +218,10 @@ def gunun_sinirli_esyasi(bugun=None, acik=frozenset()):
     havuz = sinirli_havuz()
     if not havuz:
         return None, (bugun + datetime.timedelta(days=1)).isoformat()
-    bas = bugun.toordinal() % len(havuz)
-    sira = havuz[bas:] + havuz[:bas]
-    secilen = next((k for k in sira if k not in acik), sira[0])
+    # Takvimde zaten açık olanlar havuzdan çıkarılıp sıra kalanlarda döner: etkinlik günlerinde de her gün başka öğe
+    # (açıkları atlayıp aynı sırada ilerlemek aynı öğeyi günlerce seçerdi; #81 incelemesi)
+    kalan = [k for k in havuz if k not in acik] or havuz
+    secilen = kalan[bugun.toordinal() % len(kalan)]
     return secilen, (bugun + datetime.timedelta(days=1)).isoformat()
 
 
@@ -295,7 +296,9 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
                 esya["in_store"] = "1"
     sinirli_id, bitis = sinirli
     kopya.setdefault("globals", {})["LIMITED_EDITION_EXPIRATION"] = bitis
-    if tema_seti_kipi() is not True:  # "hepsi açık" kipinde sınırlı öğeler zaten mağazada
+    # Yalnızca "takvim" kipinde döner: "hepsi açık" (True) kipinde sınırlı öğeler zaten mağazada, "hiçbiri" (False)
+    # kipinde tema seti öğesi mağazaya hiç açılmaz (ayarlar.json _magaza_tema_setleri; #81 incelemesi)
+    if tema_seti_kipi() == "takvim":
         for esya in kopya.get("items", []):
             if esya.get("subcategory_id") != SINIRLI_ALTKATEGORI:
                 continue

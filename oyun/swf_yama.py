@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"11"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"12"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -252,8 +252,14 @@ def alani_genislet(t: bytes, metin: str, fontlar) -> bytes:
         return t
     bosluk = ilerleme[sira[32]] if 32 in sira else 0
 
+    # HTML alanda (b2 0x02) çizilen boy <font size="..."> etiketinden gelir (piksel; ×20 twip), FontHeight geçersiz
+    # kalır: ölçüm etiketteki en büyük boyla yapılır ve harf küçültülmez, yalnızca kutu genişler (#81 incelemesi)
+    html_mi = bool(b2 & 0x02)
+    boylar = [int(b) * 20 for b in re.findall(r'size="(\d+)"', metin)] if html_mi else []
+    olcu_boyu = max(boylar) if boylar else yukseklik
+
     def olc(parca):
-        return sum(ilerleme[sira[ord(h)]] if ord(h) in sira else bosluk for h in parca) * yukseklik / 20480
+        return sum(ilerleme[sira[ord(h)]] if ord(h) in sira else bosluk for h in parca) * olcu_boyu / 20480
 
     satirlar = [s.strip() for s in gorunen.split("\r")]
     # Sözcük kaydıran alanda (WordWrap) satır bölünür; kesilen yalnızca kutudan uzun tek sözcüktür
@@ -265,7 +271,9 @@ def alani_genislet(t: bytes, metin: str, fontlar) -> bytes:
     ek = int(en * 1.06 + 40 + sol + sag + KENAR - genislik + 0.5)
     sinir = int(genislik * (EN_COK_GENISLEME - 1))
     yeni_yukseklik = yukseklik
-    if ek > sinir:
+    if ek > sinir and html_mi:
+        ek = sinir
+    elif ek > sinir:
         # En geniş kutuya da sığmıyor: önce harf boyu küçülür (en çok EN_KUCUK_YAZI katına, kutuyu hiç
         # genişletmeden sığacak kadar), kutu kalan kadar genişler (yandaki yazının üstüne az taşsın)
         sigan = genislik - sol - sag - KENAR - 40

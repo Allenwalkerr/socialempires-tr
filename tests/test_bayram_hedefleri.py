@@ -209,6 +209,27 @@ class GununSinirliOgesi(unittest.TestCase):
         self.assertLess(gorulen.count("1299"), 2)  # dünkü öğe (1299) her gün kalmaz
         self.assertEqual(next(e for e in config.get_game_config()["items"] if e["id"] == "1299")["in_store"], "1")
 
+    def test_etkinlik_gunlerinde_de_her_gun_baskasi(self):
+        """Ramazan Bayramı'nda (Firavunlar, Mısır açık) art arda günlerde günün öğesi iki gün üst üste aynı olmaz."""
+        setler = config.tema_setleri()
+        onceki = None
+        for i in range(-1, 4):
+            gun = RAMAZAN_2026 + timedelta(days=i)
+            ogeler = self.istemci(gun)[1]
+            takvimde = {str(k) for ad in takvim.acik_setler(gun) for k in setler.get(ad, [])}
+            gunun = ogeler - takvimde
+            self.assertEqual(len(gunun), 1, gun)
+            self.assertNotEqual(gunun, onceki, gun)
+            onceki = gunun
+
+    def test_hicbiri_kipinde_tema_seti_acilmaz(self):
+        """ayarlar.json _magaza_tema_setleri: "false: hiçbiri"; config'te açık olanlar (1299) olduğu gibi kalır."""
+        sunucuda = {e["id"] for e in config.get_game_config()["items"]
+                    if e.get("subcategory_id") == "121" and e.get("in_store") == "1"}
+        for i in range(5):
+            _, acik = self.istemci(date(2026, 11, 5) + timedelta(days=i), kip=False)
+            self.assertEqual(acik, sunucuda)
+
     def test_takvimde_acik_set_kalir_hepsi_acik_kipte_dokunulmaz(self):
         _, acik = self.istemci(RAMAZAN_2026)  # Firavunlar ve Mısır açık (config/takvim.json)
         setler = config.tema_setleri()
