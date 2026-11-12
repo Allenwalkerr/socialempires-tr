@@ -144,7 +144,9 @@ def savunan_kalici_kayip(olen, rng=random):
     """Sahibinin kararı (12.11.2026, "Oyunun kuralı"): savunanın ölen birlikleri oyunun kendi kuralıyla kurtarılır.
     1.4.07 Assault$/recoverEnemyUnits: önce ölenlerin hepsi kurtarılmış sayılır (RECOVERED = KILLED); toplam ölen n için
     n - ceil(n * PERCENT_UNITS_RECOVERED_DEFENDER / 100) kadarı kurtarılanlardan rastgele düşülür; protect == 1 olan
-    birim hiç düşülmez (@283-288), döngü en çok 500 deneme (@317-330). {id: ölen} -> {id: kalıcı kayıp}."""
+    birim hiç düşülmez (@283-288), döngü en çok 500 deneme (@317-330). Seçim birim başına ağırlıklı: kurtarılanlar
+    Utils$/countedArrayToArray@114-157 ile her birim ayrı öğe olur, rastgele öğe seçilir (@221-247).
+    {id: ölen} -> {id: kalıcı kayıp}."""
     import math
     yuzde = int(get_game_config().get("globals", {}).get("PERCENT_UNITS_RECOVERED_DEFENDER", 95) or 0)
     n = sum(max(0, int(x)) for x in olen.values())

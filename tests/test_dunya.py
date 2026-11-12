@@ -366,6 +366,15 @@ class SavunmaKurtarmaTestleri(unittest.TestCase):
         self.assertEqual(karisik, {512: 2})  # n = 40: 40 - 38 = 2, hepsi korumasızdan
 
 
+    def test_secim_birim_basina_agirlikli(self):
+        """Utils$/countedArrayToArray@114-157: her satırın kimliği kurtarılan sayısı kadar diziye girer; recoverEnemyUnits
+        bu diziden rastgele seçer (@221-247). 100 Hafif Şövalye ve 1 Akrep: Akrebin bir seçimde düşme olasılığı ~1/101
+        (satır başına seçimde 1/2 olurdu). Çağrı başına 101 - ceil(101 × 0,95) = 5 kayıp."""
+        rng = random.Random(7)
+        akrep = sum(dunya.savunan_kalici_kayip({512: 100, 520: 1}, rng).get(520, 0) for _ in range(200))
+        self.assertLess(akrep, 30)  # birim başına beklenen ~10; satır başına ~200 olurdu
+
+
 class HafizaTestleri(DunyaTesti):
     def test_ofke_sayar(self):
         d = self.kur(a=koy("a"))
