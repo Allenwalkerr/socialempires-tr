@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #72 birleşti; DNT-44 ve TST-02'nin üçüncü grubu PR'da. Sırada TST-02 (34 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #73 birleşti; DNT-45 ve TST-02'nin dördüncü grubu PR'da. Sırada TST-02 (30 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1370,7 +1370,7 @@
       "test": "tests/test_istemci_kaynakli.py, tests/test_degismezler.py",
       "pr": null,
       "onay": null,
-      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler. 12.11.2026 (2): buy_warehouse_capacity_single ve buy_pvp_territory (PopupUnitWarehouse/onBuyMoreSlots, PopupBuyTerritoryPvp/onBuy: globals fiyatları; 4 bozma düştü), increase_population (PlayerStatus/Init _mapInfo), place_stored_item ve place_gift (DNT-43) testli. Testsiz kalan 40 komut. 12.11.2026 (3): buy_step_cash, buy_monster_step_cash, rider_buy_step_cash, buy_temple_step_cash (clickGetnow'lar; yuvada sunucu -1, istemci 0 yazar, NestsManager/check ve getDragonTimeLeft'e göre ikisi de 'hazır': fark yok) ve darts_shoot_balloon (PopupDarts/onClickPlay, hitBalloon: DART_COST_CASH yalnızca ücretli atışta) testli; 4 bozma düştü. Testsiz kalan 35 komut. 12.11.2026 (4): end_quest testli (DNT-44 bulundu). Testsiz kalan 34 komut."
+      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler. 12.11.2026 (2): buy_warehouse_capacity_single ve buy_pvp_territory (PopupUnitWarehouse/onBuyMoreSlots, PopupBuyTerritoryPvp/onBuy: globals fiyatları; 4 bozma düştü), increase_population (PlayerStatus/Init _mapInfo), place_stored_item ve place_gift (DNT-43) testli. Testsiz kalan 40 komut. 12.11.2026 (3): buy_step_cash, buy_monster_step_cash, rider_buy_step_cash, buy_temple_step_cash (clickGetnow'lar; yuvada sunucu -1, istemci 0 yazar, NestsManager/check ve getDragonTimeLeft'e göre ikisi de 'hazır': fark yok) ve darts_shoot_balloon (PopupDarts/onClickPlay, hitBalloon: DART_COST_CASH yalnızca ücretli atışta) testli; 4 bozma düştü. Testsiz kalan 35 komut. 12.11.2026 (4): end_quest testli (DNT-44 bulundu). Testsiz kalan 34 komut. 12.11.2026 (5): place_iphone, sell_iphone_item (DNT-45), assist_neighbor (FauxBar2/update: ASSIST_REWARD_GOLD/XP), next_step (PopupDragons/goNextStep) testli. Testsiz kalan 30 komut."
     },
     {
       "id": "TST-03",
@@ -2560,13 +2560,26 @@
       "baslik": "Görev zaferi bütün adaları sırasız açıyordu: unlockedQuestIndex'e görev numarası yazılıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "1.4.07 bayt kodu: unlockedQuestIndex globals.ISLE_ORDER'da (28 ada) açık son adanın sırasıdır; PopupQuestsManager/<kurucu> @1207-1232 ada kilitli = isLevelLocked || sıra > unlockedQuestIndex; QuestZeppelin/QuestShip elementCollected de indexOf ile karşılaştırır; istemci değeri kendisi artırmaz (PlayerStatus/Init kayıttan okur). Quest*/sendResults end_quest'e set_unlocked_index 1 (koleksiyon görevleri QuestCollectable1-5: 0) koyar; QuestBossDragon2 anahtarı 'set_unlocked_index:' diye iki noktalı yazar. Sunucu ise kazanılan her görevde unlockedQuestIndex = quest_id + 1 (ör. QUEST_BOSS_GOLEM 100000003 → 100000004) yazıyordu: ilk zaferden sonra seviyesi yeten bütün adalar sırasız açılıyordu, koleksiyon görevi de açıyordu.",
       "test": "tests/test_komutlar.py test_gorev_sonu_ada_sirasi_ve_odul",
+      "pr": "#73",
+      "onay": null,
+      "notlar": "Düzeltme: win ve bayrak (iki yazım da) 1 ise unlockedQuestIndex = max(ISLE_ORDER'daki sıra + 1, eski); listede olmayan görev değiştirmez. Var olan kayıtlarda büyük değer olduğu gibi kalır (açılmış adalar geri kilitlenmez, oyuncu bir şey kaybetmez). 5 bozma düştü (ilk turda bayrak denetimi sağ kaldı, test listedeki bir adayla güçlendirildi). TST-02 sırasında bulundu. ◐: oyunda ada haritası görülmedi. 12.11.2026: #73 birleşti (CI yeşil, sinama dahil)."
+    },
+    {
+      "id": "DNT-45",
+      "baslik": "Mobil kutudan yerleştirme ve satış, kutuda olmayan eşyada da eşya ekliyor ya da iade veriyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "place_iphone ve sell_iphone_item _mobil_depodan_cikar'ın sonucuna bakmıyordu: kutuda olmayan eşya için tekrarlanan komut eşyayı haritaya yeniden ekliyor ya da %5 iadeyi yeniden veriyordu. İstemci (GiftButtonLarge/sellGiftReally, Base/sendPlaceItemCmd @270-345) eşyayı kutudan bir kez çıkarır. Aynı açık sell_gift'te ve birim deposunda daha önce kapatılmıştı (DNT-20).",
+      "test": "tests/test_komutlar.py test_mobil_kutudan_yerlestirme_ve_satis_bir_kez",
       "pr": null,
       "onay": null,
-      "notlar": "Düzeltme: win ve bayrak (iki yazım da) 1 ise unlockedQuestIndex = max(ISLE_ORDER'daki sıra + 1, eski); listede olmayan görev değiştirmez. Var olan kayıtlarda büyük değer olduğu gibi kalır (açılmış adalar geri kilitlenmez, oyuncu bir şey kaybetmez). 5 bozma düştü (ilk turda bayrak denetimi sağ kaldı, test listedeki bir adayla güçlendirildi). TST-02 sırasında bulundu. ◐: oyunda ada haritası görülmedi."
+      "notlar": "_mobil_depodan_cikar artık bulup çıkarırsa True döner; yerleştirme ve iade yalnızca o zaman. 2 bozma düştü. TST-02 sırasında bulundu. Mobil kutu (iphoneBox) çevrimdışı oyunda büyük olasılıkla boş; etki küçük."
     }
   ]
 }
