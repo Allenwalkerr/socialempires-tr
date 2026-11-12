@@ -2118,13 +2118,13 @@
       "baslik": "Denetim SNK-06: orient/upgrade/push_unit/pop_unit binayı yalnızca (x, y) ile buluyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-06, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_komutlar.py test_kimliksiz_bina_komutlari_karedeki_birimi_degil_binayi_bulur",
       "pr": null,
       "onay": null,
-      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir."
+      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü)."
     },
     {
       "id": "DNT-30",
