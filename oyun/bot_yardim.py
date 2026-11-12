@@ -80,7 +80,7 @@ def yardim_et(kayit, veri):
     tur = veri.get("tur")
     try:
         liste, sinir, hedef = (_sosyal_liste if tur == "sosyal" else _teklif_liste)(kayit, veri)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):  # OverflowError: int(1e400 -> inf)
         return {"hata": "Geçersiz istek."}, 400
     if liste is None:
         return {"hata": hedef}, 400

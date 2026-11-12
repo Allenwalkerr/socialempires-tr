@@ -86,6 +86,9 @@ class Yardim(unittest.TestCase):
         self.assertEqual(self.iste(tur="sosyal", tx=40, ty=41, town=0, id=234).status_code, 400)
         self.assertEqual(self.iste(tur="sosyal", tx=1, ty=1, town=0, id=387).status_code, 400)
         self.assertEqual(self.iste(tur="sosyal", tx="x", ty=41, town=0, id=387).status_code, 400)
+        r = self.istemci.post("/yardim/bot", data='{"tur": "sosyal", "tx": 1e400, "ty": 41, "town": 0, "id": 387}',
+                              content_type="application/json")  # JSON 1e400 -> inf; int(inf) OverflowError
+        self.assertEqual(r.status_code, 400)
         for govde in ([1], "x"):  # JSON nesnesi olmayan gövde
             self.assertEqual(self.istemci.post("/yardim/bot", json=govde).status_code, 400, govde)
         cikis = server.app.test_client()
