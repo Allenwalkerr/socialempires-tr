@@ -231,6 +231,14 @@ jobs:
           Get-Content hata.txt -Tail 30
           if (-not $hazir) { throw "Kurulu oyun 90 saniye içinde hazır olmadı" }
           Start-Sleep -Seconds 2
+          # Yükseltme: eski sürümden kalmış bir yama yeni kurulumda silinmeli, kayıtlar kalmalı
+          $eski = "$uyg\_internal\config\patch\eski_surumden.json"
+          Set-Content -Path $eski -Value "[]"
+          $kayitSayisi = (Get-ChildItem "$uyg\saves" -Filter *.save.json).Count
+          $yeniden = Start-Process "kurulum/$env:AD-kurulum.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/TASKS=masaustu" -Wait -PassThru
+          if ($yeniden.ExitCode -ne 0) { throw "Yeniden kurulum çıkış kodu $($yeniden.ExitCode)" }
+          if (Test-Path $eski) { throw "Yükseltmede eski sürümün dosyası kaldı" }
+          if ((Get-ChildItem "$uyg\saves" -Filter *.save.json).Count -ne $kayitSayisi) { throw "Yükseltmede kayıtlar değişti" }
           $kaldir = Start-Process "$uyg\unins000.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait -PassThru
           if ($kaldir.ExitCode -ne 0) { throw "Kaldırma çıkış kodu $($kaldir.ExitCode)" }
           Start-Sleep -Seconds 3   # kaldırıcı kendini sonradan siler

@@ -2670,7 +2670,7 @@
       "test": "tests/test_exe.py (KurulumTarifi, simge, klasör kipi); .github/workflows/windows.yml kurulum",
       "pr": "#79",
       "onay": null,
-      "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü."
+      "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü. #79 incelemesi: yükseltmede eski sürümün _internal verisi (config/patch, villages dizin taranarak okunur) kalıp yeniden uygulanırdı; [InstallDelete] {app}\\_internal'ı kopyadan önce siler. CI eski dosya bırakıp üzerine kurar, dosyanın gittiğini ve kayıt sayısının değişmediğini denetler. Test ve bozma."
     }
   ]
 }

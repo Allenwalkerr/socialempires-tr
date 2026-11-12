@@ -58,6 +58,12 @@ Name: "tr"; MessagesFile: "compiler:Languages\Turkish.isl"
 [Tasks]
 Name: "masaustu"; Description: "Masaüstüne kısayol koy"; GroupDescription: "Kısayollar:"
 
+[InstallDelete]
+; Yükseltmede eski sürümün oyun verisi kalmasın: config/patch ve villages klasörleri dizin taranarak okunur
+; (oyun/config.py, oyun/kayit.py), silinmiş ya da adı değişmiş bir yama yine uygulanırdı (#79 incelemesi).
+; Kayıtlar, ayarlar, modlar ve indirilenler _internal dışında (oyun/yollar.py BASE_DIR), silinmez.
+Type: filesandordirs; Name: "{app}\_internal"
+
 [Files]
 Source: "{#Kaynak}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 

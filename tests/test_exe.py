@@ -186,6 +186,14 @@ class KurulumTarifi(unittest.TestCase):
         self.assertIn(r'Name: "{app}\saves"; Flags: uninsneveruninstall', self.metin)
         self.assertNotIn("[UninstallDelete]", self.metin)
 
+    def test_yukseltmede_eski_oyun_verisi_temizlenir(self):
+        """#79 incelemesi: PyInstaller --onedir verisi {app}\\_internal altında; eski sürümden kalan yama yine uygulanırdı.
+        Kayıtlar BASE_DIR'de (_internal dışında) olduğundan bu silmeden etkilenmez."""
+        self.assertIn("[InstallDelete]\n", self.metin)
+        bolum = self.metin[self.metin.index("[InstallDelete]"):self.metin.index("[Files]")]
+        self.assertIn(r'Type: filesandordirs; Name: "{app}\_internal"', bolum)
+        self.assertNotIn("saves", bolum.split("\n", 4)[-1])
+
     def test_kimlik_sabit_turkce_ve_utf8(self):
         self.assertTrue(self.ham.startswith(b"\xef\xbb\xbf"))
         self.assertIn("AppId={{6E0C5A2B-2F4E-4C1B-9B57-5E3D2B8A41C7}", self.metin)
