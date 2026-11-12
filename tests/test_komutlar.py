@@ -913,6 +913,19 @@ class PvpKomutlari(KomutTesti):
         self.assertEqual(self.ps["resurrectableUnits"], [668, 668])
         self.assertEqual(self.ps["deadHeroes"], {"668": 2, "535": 1})
 
+    def test_saldiridan_sonra_sag_kalanlar_yerinde(self):
+        """Sahibinin F5 sorusu (savaştan sonra askerler eski yere dönüyor mu): kendi adasına dönüş bir harita
+        yüklemesidir (Base/realLoadMap → get_player_info); istemci sağ kalanları kayıttaki yerleriyle kurar. Sunucu
+        yalnızca net kaybı siler; sağ kalanın koordinatı, başka türden birlik ve bina değişmez."""
+        self.harita["items"] += [[668, 10, 11, 0], [668, 12, 13, 0], [668, 14, 15, 0], [512, 20, 21, 0]]
+        once = [list(e) for e in self.harita["items"]]
+        self.saldir(attacker_units=[[668, 3, 1, 0], [512, 1, 0, 0]])
+        sonra = self.harita["items"]
+        self.assertEqual(len(sonra), len(once) - 1)
+        self.assertTrue(all(e in once for e in sonra))  # hiçbir öğenin yeri ya da yönü değişmedi
+        self.assertEqual(sum(e[0] == 668 for e in sonra), 2)
+        self.assertIn([512, 20, 21, 0], sonra)
+
     def test_yeni_sonuc_saldirinin_kasabasina(self):
         """#50 incelemesi: end_attack attacker.map'in kasabasına yazar; end_attack_new'in ganimeti de oraya."""
         import copy

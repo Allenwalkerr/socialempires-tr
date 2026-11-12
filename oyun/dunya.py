@@ -16,7 +16,7 @@ import threading
 import time
 
 from oyun import ayarlar, denge, pvp_yeni
-from oyun.config import get_game_config, get_level_from_xp
+from oyun.config import get_game_config, get_item_from_id, get_level_from_xp
 from oyun.kayit import all_saves_userid, save_lock, save_session, session
 from oyun.turkce import cevirileri_yukle
 from oyun.zaman import zaman_olcegi
@@ -138,6 +138,33 @@ def kule_gucu(save):
             if saldiri > 0:
                 guc += saldiri * 3
     return guc
+
+
+def savunan_kalici_kayip(olen, rng=random):
+    """Sahibinin kararı (12.11.2026, "Oyunun kuralı"): savunanın ölen birlikleri oyunun kendi kuralıyla kurtarılır.
+    1.4.07 Assault$/recoverEnemyUnits: önce ölenlerin hepsi kurtarılmış sayılır (RECOVERED = KILLED); toplam ölen n için
+    n - ceil(n * PERCENT_UNITS_RECOVERED_DEFENDER / 100) kadarı kurtarılanlardan rastgele düşülür; protect == 1 olan
+    birim hiç düşülmez (@283-288), döngü en çok 500 deneme (@317-330). Seçim birim başına ağırlıklı: kurtarılanlar
+    Utils$/countedArrayToArray@114-157 ile her birim ayrı öğe olur, rastgele öğe seçilir (@221-247).
+    {id: ölen} -> {id: kalıcı kayıp}."""
+    import math
+    yuzde = int(get_game_config().get("globals", {}).get("PERCENT_UNITS_RECOVERED_DEFENDER", 95) or 0)
+    n = sum(max(0, int(x)) for x in olen.values())
+    hedef = n - math.ceil(n * yuzde / 100)
+    kurtarilan = {i: max(0, int(x)) for i, x in olen.items()}
+    kayip, dusulen, deneme = {}, 0, 0
+    while dusulen < hedef and deneme < 500:
+        deneme += 1
+        havuz = [i for i, x in kurtarilan.items() for _ in range(x)]
+        if not havuz:
+            break
+        secilen = havuz[int(rng.random() * len(havuz))]
+        if str((get_item_from_id(str(secilen)) or {}).get("protect")) == "1":
+            continue
+        kurtarilan[secilen] -= 1
+        kayip[secilen] = kayip.get(secilen, 0) + 1
+        dusulen += 1
+    return kayip
 
 
 def birim_sil(save, silinecek):
@@ -706,7 +733,8 @@ class Dunya:
         kayip_orani_saldiran = 0.2 if kazandi else 0.45
         kayip_orani_savunan = 0.45 if kazandi else 0.2
         saldiran_kayip = {i: max(0, int(n * kayip_orani_saldiran)) for i, n in giden.items()}
-        savunan_kayip = {i: max(0, int(n * kayip_orani_savunan)) for i, n in savunan_birimler.items()}
+        savunan_olen = {i: max(0, int(n * kayip_orani_savunan)) for i, n in savunan_birimler.items()}
+        savunan_kayip = savunan_kalici_kayip(savunan_olen)
         birim_sil(saldiran, saldiran_kayip)
         birim_sil(hedef, savunan_kayip)
 
@@ -736,7 +764,9 @@ class Dunya:
             "resources": {"x": max(1, hedef_seviye * 2) if kazandi else 0,
                           "g": ganimet.get("coins", 0)},
             "attacker_units": [[i, n, 0, 0] for i, n in giden.items()],
-            "victim_units": [[i, n, 0, 0] for i, n in savunan_birimler.items()],
+            # [id, başlangıç, ölen, kurtarılan] (Assault.FIELD_INIT/KILLED/RECOVERED)
+            "victim_units": [[i, n, savunan_olen.get(i, 0), savunan_olen.get(i, 0) - savunan_kayip.get(i, 0)]
+                             for i, n in savunan_birimler.items()],
             # İstemci bunu savunanın kazancı olarak gösterir; çalınan ganimet değil.
             "resources_victim": {"g": 0},
             "voluntary_end": 0,

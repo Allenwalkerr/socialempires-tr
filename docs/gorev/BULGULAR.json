@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08). #81 birleşti (DNT-53…60, KAR-34 uygulaması, CEV-09). #82 açık (DNT-61…63, KAR-36: asker paketleri; birleştirmeden önce sahibine sorulur). Sahibinin ilk oyunda bildirdiklerinden hedefler (DNT-51), asker paketi (DNT-62 çürütüldü, KAR-36 uygulandı, #82) ve pazarda 'Dostlarını tut' kapandı. Ağaç, taş ve altın günde bir yenileniyor (DNT-64, #82). Sırada: (2) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (3) savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (4) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -928,7 +928,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): oynanış betiği (Playwright + Ruffle, her komut grubu) yazılmadı. Oyunda gözle bakılmamışlar: Ruh Kazanı, PvP, mezarlık/diriltme, eğitim kuyruğu, birlik paketi, ilk alım teklifi, koleksiyon ödülü, Ada Ocağı, yüksek seviyeli hesap (SV59), köylü yürütme ve evi yere bırakma (FAZ0 §1). ONR-03'ün tanımındaki 'inşaat bitti' KAR-22'deki gibi sahibine sorulacak."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): oynanış betiği (Playwright + Ruffle, her komut grubu) yazılmadı. Oyunda gözle bakılmamışlar: Ruh Kazanı, PvP, mezarlık/diriltme, eğitim kuyruğu, birlik paketi, ilk alım teklifi, koleksiyon ödülü, Ada Ocağı, yüksek seviyeli hesap (SV59), köylü yürütme ve evi yere bırakma (FAZ0 §1). ONR-03'ün tanımındaki 'inşaat bitti' KAR-22'deki gibi sahibine sorulacak. Sahibi (12.11.2026): 'tablette şimdilik sorun görmedim'. v0.1.0 etiketi için ayrıca onay gerekir."
     },
     {
       "id": "OYN-11",
@@ -1091,13 +1091,13 @@
       "baslik": "Bugünkü 0926 istemcisi üç komut gönderiyor, sunucuda işleyicisi yok: time_ff, buy_time_packet, reset_dragon",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "dogrulandi",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "araclar/komut_imzalari.py 0926b üzerinde: G = 131, H = 128, G ∖ H = {time_ff, buy_time_packet, reset_dragon}. time_ff ve buy_time_packet PopupSelectTime/onUse ve onBuy'dan (Zaman Makinesi), reset_dragon AdminPanel/resetPopupDragon'dan (geliştirici paneli). tests/test_komutlar.py'deki elle çıkarılmış 128'lik liste araçla bulunan 131'in alt kümesi; fark tam bu üçü. Önceki not (upstream-tarama1 §5.3) time_ff'yi 'gerçekten gönderilmiyor' sayıyordu; bayt kodu bunu çürütüyor.",
       "test": "tests/test_komut_imzalari.py",
-      "pr": "#20",
+      "pr": "#38",
       "onay": null,
-      "notlar": "Bilinmeyen komut hata vermeden günlüğe düşer; oyunda Zaman Makinesi penceresine ulaşılıp ulaşılmadığı denenmedi (?). 1.4.07'de de eksik; GEC-03'te formülüyle birlikte yazılır. GEC-02: 0926 kaldırıldı; üç komut 1.4.07 istemcisinde de var, EKSIK_1407'de duruyor (GEC-03)."
+      "notlar": "Bilinmeyen komut hata vermeden günlüğe düşer; oyunda Zaman Makinesi penceresine ulaşılıp ulaşılmadığı denenmedi (?). 1.4.07'de de eksik; GEC-03'te formülüyle birlikte yazılır. GEC-02: 0926 kaldırıldı; üç komut 1.4.07 istemcisinde de var, EKSIK_1407'de duruyor (GEC-03). 12.11.2026 kitap denetimi: buy_time_packet ve time_ff #38'de (ec2dfe5) işleyiciyle eklendi (PopupSelectTime/onBuy, onUse); reset_dragon bilerek yok sayılan komutlar arasında (oyun/komutlar.py). Zaman Makinesi penceresi oyunda açılıp denenmedi (◐)."
     },
     {
       "id": "KYN-06",
@@ -2313,39 +2313,39 @@
       "baslik": "Upstream'in veri ve davranış düzeltmeleri tek tek değerlendirilmedi",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "curutuldu",
+      "isaret": "✔",
       "kanit": "docs/inceleme/2026-10-30-upstream-tarama1.md §6 ve tarama2 §6(a): efb753b, 1a51219, ba02772, a437e92, 6f9d792 (Konak ev sınırı), e989ba1 (ejderha yuvası istismarı), 2d39fb4/d76d1ae (baskın köylüleri). Hiçbiri kitapta yok (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Veri düzeltmeleri 54df29e yamalarıyla büyük olasılıkla içeride (?); davranış düzeltmeleri bizim komutlar.py için okunmadı."
+      "notlar": "Veri düzeltmeleri 54df29e yamalarıyla büyük olasılıkla içeride (?); davranış düzeltmeleri bizim komutlar.py için okunmadı. 12.11.2026 (sahibinin isteği: 'onun deposunda çalışan fakat bizde eksik veya çalışmayan şeyler için de bak'): AcidCaos/socialemperors nerroth-rewrite dalı indirilip sekiz commit tek tek okundu, bizim son config'imiz (get_game_config) ve komutlar.py ile karşılaştırıldı. Veri: efb753b tarla zinciri 10→8→9→200→201→0, 1a51219 üretim binaları (77-79, 300-301, 312-313, 315-316, 318-319) upgrades_to 0, ba02772 Müttefik Binası 234/361 subcat_functional 139, e989ba1 Ejderha Yuvası 1233 bedel 0 xp 0, a437e92 Firavun Altın Ocağı 1372 collect_type g: beşi de bizde aynı. 6f9d792 TOWNHALL_HOUSE_LIMIT: 26/289 14, 139/321 17, 140/322 20, 141 25 aynı; tek fark Altın Belediye 412: bizde 100 (GEC-02, #22), upstream 25; istemcinin varsayılanı yok (Base/checkBuildingConstructionLimit ve AbstractEpIsoElement/setTip config'ten okur), iki değerin de birincil kaynağı bulunmadı; değiştirilmedi (iOS kimlikleri 500xx Flash'ta yok). Davranış: d76d1ae (kayıtta olmayan baskın düşmanını öldürmek jeton verir) bizde DNT-49 _dusman_odulu; 2d39fb4 (baskın köylüsü 501 ile push/pop/depo komutları desync) bizde yok: komutlar eksik öğede hata döndürmez (desync yanıtı yok). add_unit_warehouse ve place_warehoused_item eksik öğede hiçbir şey yazmaz (DNT-20). push_unit ve pop_unit ise istemcinin gördüğünü kayda yazar (#83 incelemesi düzeltti): push_unit birim haritada yokken de bina[6]'ya ekler, pop_unit birim binada yokken de haritaya koyar; baskın köylüsü böylece istemcideki gibi binada/haritada kalır (upstream onu yok sayıyordu, F5'te kaybolurdu). Aynı paket yeniden gelirse uygulanmaz (first_number denetimi), tek eylemden çoğalma olmaz. Orada çalışıp bizde eksik bir şey bulunmadı."
     },
     {
       "id": "OYN-31",
       "baslik": "end_attack_new'in 11. ve 12. argümanları (kurbana kalkan, yıkım yüzdesi) kullanılmıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "ertelendi",
       "isaret": "◐",
       "kanit": "docs/inceleme/1407-pvp.md §3, §10; oyun/pvp.py yeni_sonuc args[11]/args[12] okumuyor (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Kurbanlar bot olduğu için etkisi küçük olabilir; bayt kodundan anlamı okunup karar verilir."
+      "notlar": "Kurbanlar bot olduğu için etkisi küçük olabilir; bayt kodundan anlamı okunup karar verilir. 12.11.2026: anlam 1407-pvp.md §3'te okunmuştu: 11. argüman (indeks 11) Math.round(yüzde*100) > SHIELD_PERCENTAGE_LIMIT (40) ise 1, 12. argüman yıkım yüzdesi (çalınan / toplam kaynak × 100). Kurbana verilecek kalkanın süresini istemci bilmez (eski sunucu belirliyordu); config'te ve bayt kodunda kaynak yok. Kurbanlar bot; aynı bota 4 saat içindeki ikinci saldırı zaten ganimetsiz (pvp.AYNI_HEDEF_SURESI = Config.ATTACKS_SAME_PLAYER_HOURS) ve rakip_sec bu hedefi önermez. Süre uydurulmadan ertelendi; gerçek oyuncuya saldırı (çok oyunculu) kapsam dışı (CLAUDE.md)."
     },
     {
       "id": "OYN-32",
       "baslik": "Savunmada kurtarılabilen birimler iki incelemede ters yazılmış (protect)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "docs/inceleme/1407-mezarlik.md:60-61 'yalnızca protect==1 kurtarılabilir', 1407-pvp.md:148 'protect==1 düşülmez'; kodda protect geçmiyor, savunmacı kaybı sabit oran (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": null,
-      "pr": null,
-      "onay": null,
-      "notlar": "Doğru yön bayt kodundan okunacak."
+      "test": "tests/test_dunya.py SavunmaKurtarmaTestleri, SavasTestleri.test_kayiplar_silinir_kazanan_daha_az_kaybeder_ofke",
+      "pr": "#83",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Doğru yön bayt kodundan okunacak. 12.11.2026: yön bayt kodundan okundu (Assault$/recoverEnemyUnits@283-288): protect == 1 ise RemoveFromCountedArray atlanır, yani protect == 1 hep kurtarılır, kalıcı kayıp yalnızca protect != 1 birimlerde. 1407-mezarlik.md doğru, 1407-pvp.md §8 ters yazmıştı: düzeltildi. Gerçek PvP'de sorun yok: savunmacının kurtarmasını saldıranın istemcisi yapar, victim_units [id, başlangıç, ölen, kurtarılan] net gelir, sunucu neti siler (oyun/pvp.py _olenler). Fark dünya simülasyonunda (oyun/dunya.py botun oyuncuya saldırısı): savunan, bot kazanınca birliklerinin %45'ini (kaybederse %20'sini) kalıcı kaybeder; oyunun kuralı: ölenlerin PERCENT_UNITS_RECOVERED_DEFENDER %95'i kurtarılır, protect == 1 birimler (config'te 510 öğe) hiç kaybedilmez. Denge kararı sahibine soruldu. Sahibinin kararı (12.11.2026, soruya cevap 'Oyunun kuralı'): oyun/dunya.py savunan_kalici_kayip: simülasyonun ölen sayısı korunur (bot kazanırsa %45, kaybederse %20), kalıcı kayıp n - ceil(n × PERCENT_UNITS_RECOVERED_DEFENDER / 100), protect == 1 birim hiç düşülmez, en çok 500 deneme. Rapordaki victim_units artık [id, başlangıç, ölen, kurtarılan] dolu. Eski testin 'kazanan saldıran savunandan oransal az kaybeder' beklentisi eski dengenin varsayımıydı; kararla yerine formül denetimi kondu. İki bozma düştü (protect denetimi, eski %45 kayıp). #83 incelemesi: kural her savunana uygulanır, bot bota saldırdığında da (oyunun kuralı oyuncuya da bota da aynı; bot orduları ordu_dolu_mu ile 8 + seviye sınırında kalır, kaybın azalması orduyu sınırsız büyütmez). Test hem bot hem oyuncu savunanla."
     },
     {
       "id": "BLG-01",
@@ -2501,7 +2501,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da."
+      "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da. Savaştan sonra askerlerin F5'te eski yere dönmesi (12.11.2026): kendi adasına dönüş bir harita yüklemesidir (Base/realLoadMap → get_player_info), istemci sağ kalanları kayıttaki yerleriyle kurar; sunucu end_attack'ta yalnızca net kaybı siler (oyun/pvp.py _birimleri_sil), sağ kalanın koordinatına dokunmaz. Dönüşte görülen ile F5 aynı kayıttan gelir. Not: hangi birimin öldüğünü istemci koordinatsız bildirdiği için silinen, aynı türün kayıttaki ilk örnekleridir. Test: tests/test_komutlar.py test_saldiridan_sonra_sag_kalanlar_yerinde (bozma düştü). Ekrandan tıklanarak oynanan savaş yine GEC-09'da."
     },
     {
       "id": "KMT-10",
@@ -2683,7 +2683,7 @@
       "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
       "pr": "#80",
       "onay": null,
-      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma. 12.11.2026, oyunda F5 denemesi (Ruffle, yerel sunucu, 10. seviye köy): görev 0 açıkken istemcinin göndereceği collect_treasure [250, 10, 1, 0, 0, 0] verildi, sayfa yenilendi. Kayıtta idCurrentTreasure 0 → 1, altın 450 → 700, xp +10, timestampLastTreasure yazıldı; haritada eski görev işareti kalktı, yeni görevin nesneleri çıktı (hikâye ilk göreve dönmedi). Görevin savaşla bitirilmesi ve 30 görevin hepsi oyunda oynanmadı."
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma. 12.11.2026, oyunda F5 denemesi (Ruffle, yerel sunucu, 10. seviye köy): görev 0 açıkken istemcinin göndereceği collect_treasure [250, 10, 1, 0, 0, 0] verildi, sayfa yenilendi. Kayıtta idCurrentTreasure 0 → 1, altın 450 → 700, xp +10, timestampLastTreasure yazıldı; haritada eski görev işareti kalktı, yeni görevin nesneleri çıktı (hikâye ilk göreve dönmedi). Görevin savaşla bitirilmesi ve 30 görevin hepsi oyunda oynanmadı. 12.11.2026 otuz görev denemesi (scratchpad betiği prenses.js): her görev için numara oyunun ödülsüz collect_treasure [0,0,n,0,0,0] komutuyla ayarlandı, sayfa yeniden açıldı (Chromium + Ruffle). 30/30: açılıştaki idCurrentTreasure = n, Ruffle paniği 0, sync_error_track 0, sayfa/konsol hatası 0. Görevlerin oynanması (düşmanla savaş, görev ekranı) denenmedi: ekran görüntüleri yakın görünümde, görev öğeleri kadraj dışında (◐)."
     },
     {
       "id": "KAR-33",
@@ -2885,13 +2885,13 @@
       "baslik": "Ruh Kazanı'nda sonuç gölgeleri üst üste biniyor (golem önde, süvari arkada)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "?",
       "kanit": "Sahibinin ekran görüntüsü (12.11.2026). Ruffle'da sınandı (yerel sunucu, 10. seviye köy, Ruh Kazanı 1529): boş pencere, tek asker seçimi ve iki asker seçimi düzgün; ortada tek sonuç gölgesi. Bayt kodu: PopupSoulMixer/onUnitSelected → generateResultUnit (sonuç birimi rastgele: Utils.getRandom) → update; update eski AnimatedUnit'i remove() ile kaldırıp unitAnchor'ı temizliyor, yenisini AnimatedUnit(unitAnchor, img_name...) ile eşzamansız yüklüyor. AnimatedUnit/remove yükleme sürerken loader.close() çağırıyor; Ruffle bunu iptal etmezse eski gölge sonradan eklenebilir (iki farklı rastgele sonuç üst üste = sahibinin gördüğü). Çizimler 4-8 sn geciktirilip seçim art arda değiştirilince bir karede iki biçimin birleşimine benzeyen gölge görüldü, kesin değil.",
       "test": null,
       "pr": null,
-      "onay": null,
-      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak."
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak. Sahibi oyunda gördükten sonra (12.11.2026): 'tamam olmuş bu devam et'. Yavaş inişte üst üste binme olasılığı not olarak kalır."
     },
     {
       "id": "DNT-62",
@@ -2930,7 +2930,7 @@
       "test": "Ruffle'da deneme köyü (elle); bayt kodu MissionPopup/refreshGoals (1.4.07 ve 0926)",
       "pr": null,
       "onay": null,
-      "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı."
+      "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı. Sahibi (12.11.2026): '2 kalsın' — üçüncü simge sorusu şimdilik bekletiliyor."
     },
     {
       "id": "DNT-64",
@@ -2944,6 +2944,32 @@
       "pr": "#82",
       "onay": null,
       "notlar": "oyun/swf_yama.py kaynaklari_gunde_bir (YAMA_SURUMU 13): üç gövdenin önüne `if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL)` dön (spawnInitResources, spawnRemainingResources) ya da halka temizliğini atla (spawnInit). Komşu, saldırı, görev, eğitimde değişmez. Sunucu (oyun/istemci.py kaynak_yenilenir_mi) günün ilk config'inde 1 yollar ve günü privateState.kaynakYenilemeGunu'na yazar, sonra 0; kayıt yoksa 1. Ruffle'da aynı gün ikinci açılış: 0 buy, 0 sell, görüntü aynı. İki bozma testlerde düştü (dal konumu, gün denetimi). Hayvanların yenilenmesi de günde bire iner (aynı işlev). İnceleme (#82, github-actions): kasaba değişince istemci config'i yeniden istemez (TownManager$/loadTown@22-113), gün oyuncu başına tutulunca ikinci kasaba aynı gün hiç yenilenmeyebilirdi; gün de config istenince yazıldığından yarıda kalan açılış günü harcıyordu. Düzeltme (YAMA_SURUMU 14): bayrak kasaba başına dizi, koşul globals.NUM_TREE_CLUSTERS[Base.Main.townID] (townID 197, MultinameL 1631) okur; gün privateState.kaynakYenilemeGunu {kasaba: gün}, kendi kasabasının get_player_info'sunda yazılır. Bilinen sınır: aynı sayfa oturumunda kasabalar arasında gidip gelinirse config yenilenmediği için o oturumda bayrağı 1 olan kasaba her dönüşte yine yenilenir (eski davranış gibi). Ruffle'da yeniden: ilk açılış 142 kaynak eklemesi, aynı gün ikinci açılış 0. İki bozma düştü (haritada gün yazılmaması, kasabaya bakmayan bayrak). İkinci inceleme: istemcinin map değeri denetlenmeden anahtar yapılıyordu (aralık dışı numarada 0. kasaba yüklenir, gün '7' ya da '-1'e yazılırdı). Gün artık get_player_info'nun yüklediği kasabaya (playerInfo.acik_kasaba) yazılır ve gün değişince kayıt hemen diske yazılır; test aralık dışı numarayla (bozma düştü). Üçüncü inceleme (özet notu): komşudan ya da akından dönüşte config yeniden gelmediği için günün ilk oturumunda kendi köyü her dönüşte yine yenileniyordu; Ruffle'da doğrulandı (dönüşte 91 ekleme, 106 temizlik). İstemcide bayrağı sıfırlamak işe yaramadı: GameDataManager/get globals → OData/get v her okumada yeni nesne kurar. Düzeltme (YAMA_SURUMU 16): oturum işareti Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS'ta (Const yuvalı Array, oturum boyunca aynı) kasaba başına bit; izin = bayrak[townID] && !(işaret >> townID & 1); spawnRemainingResources izinle çalışınca biti koyar. Bu, kasabalar arasında gidip gelme sınırını da kapattı. Ruffle'da: ilk açılış 158 ekleme ve 81 temizlik; komşudan dönüş ve aynı gün F5'te kaynak eklemesi ve temizlik 0 (yalnızca spawnRemainingIdleTrolls'un 3 trolü, yamanın dışında). Bozmalar düştü (işaret konmaması, bit sınaması). Dördüncü inceleme: izin gitmeyen yüklemede de gün yazılıyordu (gece yarısını geçen oturumda komşudan dönüş yeni günü harcardı). Sunucu son config'te giden bayrakları bellekte tutar (oyun/istemci.py _GIDEN_BAYRAKLAR); gün yalnızca izin giden ve o oturumda kullanılmamış kasabaya yazılır, izin yazılınca kullanılmış sayılır (istemcinin oturum işaretiyle aynı kural); config gitmeden gelen yükleme günü yazmaz. Ruffle'da: ilk açılış 142, dönüş 0, F5 0. Bozmalar düştü."
+    },
+    {
+      "id": "KAR-37",
+      "baslik": "Altın Belediye'nin ev sınırı 100 kalır",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "KYN-07 karşılaştırması: TOWNHALL_HOUSE_LIMIT'te Altın Belediye (412) bizde 100 (GEC-02, #22), AcidCaos/socialemperors nerroth-rewrite'ta (6f9d792) 25; istemcinin varsayılanı yok, iki değerin de birincil kaynağı bulunmadı. Sahibine soruldu.",
+      "test": null,
+      "pr": "#83",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Sahibi: '3 100 olsun'. config/patch/1-mega_patch.json değişmedi."
+    },
+    {
+      "id": "KAR-38",
+      "baslik": "Açık artırma (yeni özellik): biçimi belirlendi, şimdilik bekletiliyor",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "ertelendi",
+      "isaret": "✔",
+      "kanit": "Sahibinin fikri (12.11.2026). İstemcide açık artırma yok (1.4.07 dizelerinde auction/subasta/puja/bid yok; en yakın Dart oyunu PopupDarts). Sahibinin cevapları: 'Sen alırsın' (her gün birkaç nadir birlik ya da eşya, botlarla yarış, kazanılan Depo'ya), para 'Altın', süre 'Birkaç saat', 'Açık arttırma lvl 15 te açılsın'. Sonra: 'ya da bu fikir şimdilik kalsın'.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Yapılırsa: oyunun yanındaki sayfada (Diyar sayfası gibi), yalnızca oyunun kendi resimleriyle (CLAUDE.md); tek kişilik, rakipler botlar. Sahibi yeniden isteyince bu biçimle başlanır."
     }
   ]
 }

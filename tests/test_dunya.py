@@ -341,6 +341,40 @@ class EkonomiTestleri(DunyaTesti):
         self.assertEqual(len(karolar), len(set(karolar)))  # hepsi 1×1: aynı karoda iki öğe yok
 
 
+class SavunmaKurtarmaTestleri(unittest.TestCase):
+    """Sahibinin kararı (12.11.2026, "Oyunun kuralı"): bot saldırısında savunanın ölenleri oyunun kuralıyla kurtarılır.
+    1.4.07 Assault$/recoverEnemyUnits: toplam ölen n için n - ceil(n * yüzde / 100) kalıcı kayıp, protect == 1 olan
+    birim hiç düşülmez (@283-288). Yüzde config'ten: PERCENT_UNITS_RECOVERED_DEFENDER (1.4.07 config'i 95)."""
+
+    def setUp(self):
+        self.yuzde = get_game_config()["globals"]["PERCENT_UNITS_RECOVERED_DEFENDER"]
+
+    def test_yuzde_config_degeri(self):
+        self.assertEqual(self.yuzde, 95)
+
+    def test_korumasiz_birimden_yuzde_bes(self):
+        # 512 Hafif Şövalye: config'te protect yok
+        self.assertNotEqual(str(dunya.get_item_from_id("512").get("protect")), "1")
+        self.assertEqual(dunya.savunan_kalici_kayip({512: 100}, random.Random(1)), {512: 5})
+        self.assertEqual(dunya.savunan_kalici_kayip({512: 1}, random.Random(1)), {})  # 1 - ceil(0,95) = 0
+
+    def test_korumali_birim_hic_kaybolmaz(self):
+        # 649 Öfkeli Ejderha: config'te protect 1
+        self.assertEqual(str(dunya.get_item_from_id("649").get("protect")), "1")
+        self.assertEqual(dunya.savunan_kalici_kayip({649: 100}, random.Random(1)), {})
+        karisik = dunya.savunan_kalici_kayip({649: 20, 512: 20}, random.Random(2))
+        self.assertEqual(karisik, {512: 2})  # n = 40: 40 - 38 = 2, hepsi korumasızdan
+
+
+    def test_secim_birim_basina_agirlikli(self):
+        """Utils$/countedArrayToArray@114-157: her satırın kimliği kurtarılan sayısı kadar diziye girer; recoverEnemyUnits
+        bu diziden rastgele seçer (@221-247). 100 Hafif Şövalye ve 1 Akrep: Akrebin bir seçimde düşme olasılığı ~1/101
+        (satır başına seçimde 1/2 olurdu). Çağrı başına 101 - ceil(101 × 0,95) = 5 kayıp."""
+        rng = random.Random(7)
+        akrep = sum(dunya.savunan_kalici_kayip({512: 100, 520: 1}, rng).get(520, 0) for _ in range(200))
+        self.assertLess(akrep, 30)  # birim başına beklenen ~10; satır başına ~200 olurdu
+
+
 class HafizaTestleri(DunyaTesti):
     def test_ofke_sayar(self):
         d = self.kur(a=koy("a"))
@@ -402,10 +436,15 @@ class SavasTestleri(DunyaTesti):
         self.assertEqual(self.kayitlar["v"]["maps"][0]["coins"], 0)
 
     def test_kayiplar_silinir_kazanan_daha_az_kaybeder_ofke(self):
-        """Kayıplar haritadan silinir; kazanan, kaybedenden oransal olarak az kaybeder. Yorum (dunya.py
-        _savas): 'saldırılan, saldırana öfkelenir; kaybeden saldıran da öfkelenir'."""
-        for a_birim, v_birim, kazanir in ((20, 6, True), (5, 40, False)):
-            d = self.kur(a=koy("a", birim=a_birim, ittifak=0), v=koy("v", birim=v_birim, ittifak=1))
+        """Kayıplar haritadan silinir. Savunanın kalıcı kaybı oyunun kurtarma kuralıyla (sahibinin kararı, 12.11.2026):
+        rapordaki ölen n için n - ceil(n * PERCENT_UNITS_RECOVERED_DEFENDER / 100) (Assault$/recoverEnemyUnits);
+        kaybeden saldıran savunandan oransal olarak çok kaybeder. Yorum (dunya.py _savas): 'saldırılan, saldırana
+        öfkelenir; kaybeden saldıran da öfkelenir'."""
+        import math
+        yuzde = get_game_config()["globals"]["PERCENT_UNITS_RECOVERED_DEFENDER"]
+        for a_birim, v_birim, kazanir, v_bot in ((20, 6, True, True), (5, 40, False, True), (20, 6, True, False)):
+            # kural her savunana: bot hedef (bot bota) ve oyuncu hedef
+            d = self.kur(a=koy("a", birim=a_birim, ittifak=0), v=koy("v", birim=v_birim, ittifak=1, bot=v_bot))
             a, v = self.kayitlar["a"], self.kayitlar["v"]
             d._savas("a", a, "v", v, SIMDI)
             r = v["privateState"]["attacksReceived"][-1]["description"]
@@ -414,8 +453,11 @@ class SavasTestleri(DunyaTesti):
             self.assertLessEqual(giden, a_birim)
             self.assertEqual(sum(n for _, n, *_ in r["victim_units"]), v_birim)
             oran_a, oran_v = (a_birim - birim(a)) / giden, (v_birim - birim(v)) / v_birim
+            olen = sum(s[2] for s in r["victim_units"])
+            self.assertEqual(v_birim - birim(v), olen - math.ceil(olen * yuzde / 100))
+            self.assertEqual(sum(s[2] - s[3] for s in r["victim_units"]), v_birim - birim(v))
             if kazanir:
-                self.assertLess(oran_a, oran_v)
+                self.assertGreater(olen, 0)
             else:
                 self.assertLess(oran_v, oran_a)
             self.assertGreater(a_birim - birim(a) + v_birim - birim(v), 0)

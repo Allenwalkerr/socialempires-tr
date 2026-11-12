@@ -58,7 +58,7 @@ Yardımcı ajanın bayt kodu araştırması. **Doğrulama notu:** kodlanan iddia
   n - ceil(n*yüzde/100) kadarı düşülür, en çok 500 tur). `Base.resurrectableUnits`'e hiç dokunmaz: kurtarılan birim
   yerel mezarlıktan ÇIKMAZ (yerelde hem kurtarılmış hem diriltilebilir görünür; oturum sonunda kayıp).
 - recoverEnemyUnits@283-288: protect==1 olan birim düşülmez (hep kurtarılır); protect!=1 düşülebilir (mevcut
-  docs/inceleme/1407-pvp.md "yalnızca protect==1 kurtarılabilir" diyor: yön tersi gibi görünüyor ◐, bu sorunun dışı).
+  docs/inceleme/1407-pvp.md'deki ters cümle OYN-32'de düzeltildi ✔).
 - sendAssaultResults gönderdiği `attacker_units` = arPlayerUnits (kurtarma SONRASI) satırları
   [id, başlangıç, ölen, kurtarılan] ✔ (@205-208).
 
