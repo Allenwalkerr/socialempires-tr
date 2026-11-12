@@ -17,12 +17,17 @@ def _harita(kayit, map_number):
 
 
 # Oyuncunun en son açtığı kasaba (kasaba değiştirince istemci get_player_info'yu o kasabayla ister). Kasaba numarası
-# taşımayan komutlar (buy_first_purchase) kaynağı buraya yazar. Kayda yazılmaz: açılışta istemci yeniden ister.
+# taşımayan komutlar (buy_first_purchase, push_queue_unit...) kaynağı buraya yazar. Bellekte ve kayıtta
+# (playerInfo.acik_kasaba) tutulur: sunucu oyun sürerken yeniden başlarsa istemci get_player_info'yu yeniden istemez,
+# komutlar yanlışlıkla ana kasabaya gitmesin (DNT-30, SNK-07).
 _acik_kasabalar = {}
 
 
-def acik_kasaba(USERID) -> int:
-    return _acik_kasabalar.get(str(USERID), 0)
+def acik_kasaba(USERID, kayit=None) -> int:
+    if str(USERID) in _acik_kasabalar:
+        return _acik_kasabalar[str(USERID)]
+    deger = ((kayit or {}).get("playerInfo") or {}).get("acik_kasaba", 0)
+    return deger if isinstance(deger, int) and deger >= 0 else 0
 
 
 def giris_gunu_say(kayit, ts_now):
@@ -53,9 +58,12 @@ def get_player_info(USERID, map_number=0):
     if goster:  # KAR-24: bugünün ödülü verildi; pencere yalnızca bu yanıtla açılır (showDailyBonus kayda yazılmaz)
         ozel = dict(ozel, showDailyBonus=1)
     kayit["playerInfo"]["last_logged_in"] = ts_now
-    if odul:
-        save_session(USERID)  # ödül ve lastDayRewarded hemen kalıcı olsun
-    _acik_kasabalar[str(USERID)] = map_number if 0 <= map_number < len(kayit["maps"]) else 0
+    yeni = map_number if 0 <= map_number < len(kayit["maps"]) else 0
+    _acik_kasabalar[str(USERID)] = yeni
+    kasaba_degisti = kayit["playerInfo"].get("acik_kasaba") != yeni
+    kayit["playerInfo"]["acik_kasaba"] = yeni
+    if odul or kasaba_degisti:
+        save_session(USERID)  # ödül / açık kasaba hemen kalıcı olsun (sunucu bir komuttan önce yeniden başlayabilir)
     return {
         "result": "ok",
         "processed_errors": 0,

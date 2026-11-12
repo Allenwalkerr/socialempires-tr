@@ -781,6 +781,30 @@ class IlkAlimTeklifi(KomutTesti):
         self.komut("buy_first_purchase")
         self.assertEqual(ikinci["coins"], self.g["POPUP_FIRST_PURCHASE_OFFER_REWARD"]["g"])
 
+    def test_acik_kasaba_sunucu_yeniden_baslayinca_kayittan(self):
+        """DNT-30 (SNK-07): istemci açık kasabayı yalnızca açılışta ve kasaba değişiminde bildirir (get_player_info
+        map); sunucu oyun sürerken yeniden başlarsa bellek boşalır. Kasaba kayıtta da durur, ödül yine o kasabaya."""
+        from oyun import oyuncu
+        ikinci = dict(self.harita, id=1, coins=0, food=0)
+        self.kayit["maps"].append(ikinci)
+        yazilan = []
+        self.ps.update(numDayLogged=9, lastDayRewarded=9)  # günlük ödül yok: kayıt yalnızca kasaba için yazılmalı
+        self.kayit["playerInfo"]["last_logged_in"] = self.komutlar.timestamp_now()  # aynı gün
+        with mock.patch.object(oyuncu, "session", lambda u: self.kayit), \
+                mock.patch.object(oyuncu, "neighbors", lambda u: []), \
+                mock.patch.object(oyuncu, "save_session", yazilan.append):
+            oyuncu.get_player_info("test", 1)
+            self.assertEqual(yazilan, ["test"])  # #66 incelemesi: hemen diske (komuttan önce yeniden başlayabilir)
+            oyuncu.get_player_info("test", 1)
+            self.assertEqual(yazilan, ["test"])  # değişmediyse yeniden yazılmaz
+        self.assertEqual(self.kayit["playerInfo"]["acik_kasaba"], 1)
+        oyuncu._acik_kasabalar.pop("test", None)  # sunucu yeniden başladı
+        self.komut("set_first_purchase_timestamp")
+        self.komut("buy_first_purchase")
+        self.assertEqual(ikinci["coins"], self.g["POPUP_FIRST_PURCHASE_OFFER_REWARD"]["g"])
+        self.kayit["playerInfo"]["acik_kasaba"] = "bozuk"
+        self.assertEqual(oyuncu.acik_kasaba("test", self.kayit), 0)
+
     def test_giris_gunu_yeni_gunde_artar(self):
         from oyun.oyuncu import giris_gunu_say
         pi = self.kayit["playerInfo"]
