@@ -2749,6 +2749,19 @@
       "pr": "#80",
       "onay": "KAR-26/27/29 (botlar yardım eder, her yere günde bir)",
       "notlar": "Sunucu sosyal binada en çok workers sayısı kadar bot yazar (Asker Toplama 4). Her bina için günde bir bot (KAR-29): pazarın 3 çalışanı 3 günde dolar ya da istemcinin 'Doldur: 2 nakit'iyle. 3 bozma düştü. Oyun içinde denenmedi (◐)."
+    },
+    {
+      "id": "CEV-08",
+      "baslik": "'40 nüfusa ulaş' hedefi nüfus sınırını değil birlik nüfusunu sayar; metin yanıltıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'nüfusu 40'a çıkar dedi çıkarttım görev beni başarılı saymadı'. GoalPopulation/onPopulationUpdate @0-72 PlayerStatus.SIG_POPULATION_UPDATED'ın değerini (_currentStep) ammount 40'la karşılaştırır; PlayerStatus/updatePopulation @51-444 bu değeri binalardaki ve haritadaki birimlerin iPopulationCount toplamı olarak yollar (iPopulationMax değil). Hedef yalnızca NORMAL kipte ve nüfus değiştiğinde denetlenir.",
+      "test": null,
+      "pr": "#80",
+      "onay": null,
+      "notlar": "ceviri/tr.json mission:56:aciklama: 'Asker ve köylülerinle nüfusunu 40'a çıkar (sağ üstteki sayıların soldaki). Ev kurmak yalnızca sınırı artırır; birim eğitmelisin!'. Kod değişmedi; istemcinin kuralı doğru."
     }
   ]
 }
