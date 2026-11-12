@@ -218,6 +218,23 @@ class EsyaKomutlari(KomutTesti):
             self.komut("activate_monster", "c")
         self.assertEqual(once - self.cash, 16)
 
+    def test_tapinak_adimi(self):
+        """TST-02. 1.4.07 PopupBahamutSupremeInvocationTemple/doAction: next_temple_step [JSON veri, adım]. RESOURCES_SUBSTRACT
+        adımında veri _configTemple[adım].data'dır ({tür: miktar}, mana dahil) ve istemci ekranda düşer (@598-744);
+        SACRIFICE_UNIT'te {"u": birim} gider, birimi MapInitializer$/removeFromMapNoResources ayrı bir sell
+        [.., PARAM_DONT_MODIFY_RESOURCES] ile kaldırır; COMPLETE_COLLECTION'da {"collection": c} gider, parça harcanmaz.
+        privateState.templeStep'e adım eklenir."""
+        from unittest import mock
+        self.ps["mana"] = 10
+        altin = self.harita["coins"]
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_000):
+            self.komut("next_temple_step", json.dumps({"g": 5000, "m": 3}), 2)
+        self.assertEqual((altin - self.harita["coins"], self.ps["mana"], self.ps["templeStep"], self.ps["timeStampTemple"]),
+                         (5000, 7, [2], 2_000_000_000))
+        self.komut("next_temple_step", json.dumps({"u": 512}), 3)  # kurban: kaynak değişmez (birim sell ile gider)
+        self.komut("next_temple_step", json.dumps({"collection": 4}), 4)
+        self.assertEqual((altin - self.harita["coins"], self.ps["mana"], self.ps["templeStep"]), (5000, 7, [2, 3, 4]))
+
     def test_depoya_gecersiz_adet_eklenmez(self):
         self.komut("end_survival", 1, 30, json.dumps({"523": -1, "-2": 1}))
         self.assertEqual(self.ps["gifts"], [])
