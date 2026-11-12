@@ -490,7 +490,8 @@ class KomsuKomutlari(KomutTesti):
         # CollectableManager$/getReward'ı çağırır: her parça (1-5) sıfırdan büyükse bir azalır,
         # arCollected[c][0] = true (Base/processAttacks yüklemede bunu collections[c][0] == 1'den kurar);
         # ikisinde de collectionsCompleted'a c eklenir
-        self.ps["collections"] = [[0] * 6, [0, 2, 1, 0, 1, 1], [0] * 6, [0] * 6, [0, 1, 0, 3, 1, 1]]
+        # Takas yalnızca beş parçanın her biri varken (checkCollectionComplete); nakitle alım eksik parçayla da olur.
+        self.ps["collections"] = [[0] * 6, [0, 2, 1, 1, 1, 1], [0] * 6, [0] * 6, [0, 1, 0, 3, 1, 1]]
         self.komut("finish_collection", 1)
         self.assertEqual(self.ps["collections"][1], [1, 1, 0, 0, 0, 0])
         self.komut("finish_collection", 4, 1, 12)
@@ -517,6 +518,7 @@ class KomsuKomutlari(KomutTesti):
         for c, (ad, odul) in enumerate(self.KOLEKSIYON_ODULLERI, 1):
             with self.subTest(koleksiyon=c, odul=ad):
                 self.ps["gifts"] = []
+                self.ps["collections"] = [[0, 1, 1, 1, 1, 1] for _ in range(24)]  # takas için beş parça
                 self.komut("finish_collection", c, *((1, 5) if c % 2 else ()))
                 self.assertEqual(self.ps["gifts"][odul], 1)
                 self.assertEqual(sum(self.ps["gifts"]), 1)
@@ -524,10 +526,39 @@ class KomsuKomutlari(KomutTesti):
     def test_koleksiyon_tekrar_bitirilince_odul_yine_verilir(self):
         # arUniqueCollections = [21, 22] dışındakiler yeniden toplanabilir; getReward her seferinde ödül verir
         self.ps["gifts"] = []
+        self.ps["collections"] = [[0] * 6, [0] * 6, [0, 2, 2, 2, 2, 2]]  # iki takaslık parça
         self.komut("finish_collection", 2)
         self.komut("finish_collection", 2)
         self.assertEqual(self.ps["gifts"][177], 2)
         self.assertEqual(self.ps["collectionsCompleted"], [2])
+
+    def test_takas_istemcinin_kosulu_yoksa_uygulanmaz(self):
+        """1.4.07 bayt kodu. popupCollections/onExchange finish_collection [c]'yi yalnızca iki denetim geçerse yollar:
+        CollectableManager$/checkCollectionComplete (p1..p5'in her biri > 0; arUniqueCollections = [21, 22]
+        ödülü depodaysa olmaz) ve checkCanComplete (ödül süs, SUBCATFUNC_BUILDING_DECO 411, ise olur; birim ya da
+        binaysa açık kasabada ya da depoda bir tanesi bile varsa olmaz, AVISO_UNIDAD_UNICA; tekil koleksiyonda yalnızca
+        depoya bakılır, @59-106). onBuy (nakit) yalnızca
+        canAfford'a bakar. Önce sunucu bunları denetlemiyordu: eksik parçayla ikinci takas ödülü yeniden veriyordu."""
+        def dene(c, parcalar=(0, 1, 1, 1, 1, 1), gifts=(), harita=(), nakit=False):
+            self.ps["gifts"] = []
+            for i in gifts:
+                komutlar_mod.depo_ekle(self.kayit, i)
+            self.ps["collections"] = [list(parcalar) for _ in range(24)]
+            self.harita["items"] = [[1, 10, 10, 0, 0, 0]] + [[i, 30, 30, 0, 0, 0] for i in harita]
+            self.komut("finish_collection", c, *((1, 5) if nakit else ()))
+            return self.ps["gifts"][KOLEKSIYON[c]] if len(self.ps["gifts"]) > KOLEKSIYON[c] else 0
+        KOLEKSIYON = {1: 176, 8: 544, 21: 875, 23: 1410}
+        komutlar_mod = self.komutlar
+        self.assertEqual(dene(1, parcalar=(0, 1, 1, 0, 1, 1)), 0)        # 3. parça yok
+        self.assertEqual(self.ps["collections"][1], [0, 1, 1, 0, 1, 1])  # parçalar da düşmez
+        self.assertEqual(dene(1, parcalar=(0, 1, 1, 0, 1, 1), nakit=True), 1)  # nakitle olur
+        self.assertEqual(dene(1, gifts=(176,)), 2)                        # süs: depoda olsa da olur
+        self.assertEqual(dene(8, gifts=(544,)), 1)                        # birim depoda: olmaz (zaten 1)
+        self.assertEqual(dene(8, harita=(544,)), 0)                       # birim kasabada: olmaz
+        self.assertEqual(dene(8), 1)                                      # birim yok: olur
+        self.assertEqual(dene(23, harita=(1410,)), 0)                     # süs olmayan bina kasabada: olmaz
+        self.assertEqual(dene(21, gifts=(875,)), 1)                       # tekil koleksiyon, ödül depoda: olmaz
+        self.assertEqual(dene(21, harita=(875,)), 1)                      # tekil: kasabadaki ejderha engel değil
 
     def test_koleksiyon_disi_numara_odul_vermez(self):
         # arCollections[0] adlar listesidir, NUM_COLLECTIONS = 23: 0 ve 24 koleksiyon değildir

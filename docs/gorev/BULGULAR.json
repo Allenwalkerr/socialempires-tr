@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "DNT-37",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #69 birleşti; DNT-35 PR'da. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #69 birleşti; DNT-35 ve KMT-10 (#70) PR'da. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2502,6 +2502,19 @@
       "pr": null,
       "onay": null,
       "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da."
+    },
+    {
+      "id": "KMT-10",
+      "baslik": "Koleksiyon takası istemcinin koşulunu denetlemiyordu: eksik parçayla ödül yeniden veriliyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Sahibinin 'koleksiyon işi nasıl' sorusu üzerine uçtan uca denendi (12.11.2026, gerçek sunucu ve tarayıcıda F5): parçalar tamamlanmadan gelen ikinci finish_collection [1] Piramit'i (176) yeniden verdi (gifts[176] 1 → 2). 1.4.07 bayt kodu: popupCollections/onExchange komutu yalnızca CollectableManager$/checkCollectionComplete (p1..p5'in her biri > 0; arUniqueCollections [21, 22] ödülü depodaysa olmaz) ve checkCanComplete (tekil koleksiyonda yalnızca depo; ödül süs, SUBCATFUNC_BUILDING_DECO 411, ise olur; birim ya da binaysa açık kasabada ya da depoda bir tanesi varsa olmaz, AVISO_UNIDAD_UNICA) geçerse yollar. popupCollections/onBuy yalnızca canAfford'a bakar.",
+      "test": "tests/test_komutlar.py test_takas_istemcinin_kosulu_yoksa_uygulanmaz",
+      "pr": null,
+      "onay": null,
+      "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez."
     }
   ]
 }
