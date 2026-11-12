@@ -2326,13 +2326,13 @@
       "baslik": "end_attack_new'in 11. ve 12. argümanları (kurbana kalkan, yıkım yüzdesi) kullanılmıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "ertelendi",
       "isaret": "◐",
       "kanit": "docs/inceleme/1407-pvp.md §3, §10; oyun/pvp.py yeni_sonuc args[11]/args[12] okumuyor (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Kurbanlar bot olduğu için etkisi küçük olabilir; bayt kodundan anlamı okunup karar verilir."
+      "notlar": "Kurbanlar bot olduğu için etkisi küçük olabilir; bayt kodundan anlamı okunup karar verilir. 12.11.2026: anlam 1407-pvp.md §3'te okunmuştu: 11. argüman (indeks 11) Math.round(yüzde*100) > SHIELD_PERCENTAGE_LIMIT (40) ise 1, 12. argüman yıkım yüzdesi (çalınan / toplam kaynak × 100). Kurbana verilecek kalkanın süresini istemci bilmez (eski sunucu belirliyordu); config'te ve bayt kodunda kaynak yok. Kurbanlar bot; aynı bota 4 saat içindeki ikinci saldırı zaten ganimetsiz (pvp.AYNI_HEDEF_SURESI = Config.ATTACKS_SAME_PLAYER_HOURS) ve rakip_sec bu hedefi önermez. Süre uydurulmadan ertelendi; gerçek oyuncuya saldırı (çok oyunculu) kapsam dışı (CLAUDE.md)."
     },
     {
       "id": "OYN-32",
