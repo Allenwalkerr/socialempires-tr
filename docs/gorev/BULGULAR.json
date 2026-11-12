@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-35",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti; DNT-32 (KAR-30) ve DNT-27 PR'da. Sırada DNT-35, 37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-37",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #69 birleşti; DNT-35 PR'da. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2092,13 +2092,13 @@
       "baslik": "Denetim EKF-08: Yükseltmede (sell + buy) XP ve fark bedeli kayda istemciden farklı yansıyor olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-08, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_komutlar.py test_yukseltmede_satis_iadesi_yok",
-      "pr": null,
+      "pr": "#69",
       "onay": null,
-      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak. 12.11.2026 bayt kodu (✔): XP kısmı çürütüldü. İstemci de sunucu da yalnızca yeni binanın xp'sini ekler, eski binanınkini geri almaz (denetçinin gördüğü negatif değer bedel, xp değil). Bedel kısmı doğrulandı: yükseltmede istemci iade vermez (Base/removeElement kaynağa dokunmaz; IsoEngine/getDifferenceCost yeni binanın tam bedelini döndürür), sunucu ise sell [.., 0, 'UPGR'] için %5 iade veriyordu. Düzeltme: neden 'UPGR' ise iade yok. Bozma düştü. docs/inceleme/1407-formuller.md'ye yazıldı."
+      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak. 12.11.2026 bayt kodu (✔): XP kısmı çürütüldü. İstemci de sunucu da yalnızca yeni binanın xp'sini ekler, eski binanınkini geri almaz (denetçinin gördüğü negatif değer bedel, xp değil). Bedel kısmı doğrulandı: yükseltmede istemci iade vermez (Base/removeElement kaynağa dokunmaz; IsoEngine/getDifferenceCost yeni binanın tam bedelini döndürür), sunucu ise sell [.., 0, 'UPGR'] için %5 iade veriyordu. Düzeltme: neden 'UPGR' ise iade yok. Bozma düştü. docs/inceleme/1407-formuller.md'ye yazıldı. 12.11.2026: #69 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-28",
@@ -2157,13 +2157,13 @@
       "baslik": "Denetim DPT-07: Oyuncuya bot akınının sıklığı ve toplam kaybı sınırlı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-07, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_dunya.py SaatteBirAkinTestleri (3 test)",
-      "pr": null,
+      "pr": "#69",
       "onay": null,
-      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde. 12.11.2026 KAR-30 (sahibi: saatte en çok bir): oyuncu_saldiri_araligi 600 → 3600 (ayarlar.json ve dunya.VARSAYILAN_AYAR). İntikam seferi önce aralığın yarısını bekliyordu, artık tamamını bekliyor. Son akın bellekte 0 ise (sunucu yeni açıldı) oyuncunun PVPattacksReceived attackTime'ından okunur (_oyuncuya_son_akin); yeniden başlatma sınırı aşamaz. 5 bozma denemesinin 5'i düştü (ilk turda sefer yolunun günlük okuması sağ kaldı, çünkü önceki çağrı belleği dolduruyordu; test ayrı dünya kurar)."
+      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde. 12.11.2026 KAR-30 (sahibi: saatte en çok bir): oyuncu_saldiri_araligi 600 → 3600 (ayarlar.json ve dunya.VARSAYILAN_AYAR). İntikam seferi önce aralığın yarısını bekliyordu, artık tamamını bekliyor. Son akın bellekte 0 ise (sunucu yeni açıldı) oyuncunun PVPattacksReceived attackTime'ından okunur (_oyuncuya_son_akin); yeniden başlatma sınırı aşamaz. 5 bozma denemesinin 5'i düştü (ilk turda sefer yolunun günlük okuması sağ kaldı, çünkü önceki çağrı belleği dolduruyordu; test ayrı dünya kurar). 12.11.2026: #69 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-33",
@@ -2196,13 +2196,13 @@
       "baslik": "Denetim TRA-02: İstemci toUpperCase/toLowerCase ile Türkçe metni bozuyor (Değirmen → DEĞIRMEN)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-02, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_swf_yama.py BuyutmeTestleri (3 test)",
       "pr": null,
       "onay": null,
-      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok."
+      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok. 12.11.2026 (✔ bayt kodu): istemcide 11 toUpperCase var; ekrana Türkçe çıkan tek yer PopUpCollectionComplete/<kurucu>: bina adını buildingStringName'e (@50), POPUP_EDIFICIO_ENHORABUENA tebrik metnine (@140) ve vurgunun yerini bulan iki indexOf'a (@198, @216) büyüterek verir. Ötekiler: BaseButton/LabelButton 'selected' durum adı, StringUtil karşılaştırması, SelectionTeamWindow/formatFirstUppercase, JSONTokenizer, TournamentManager sonuç kodu; infoFriendAssistPopup AUX_ACEPTAR'ı büyütür (çeviri sözlüğünde bu anahtar yok, İngilizce). BuildingWindow/passFilter arama süzgecinde toLowerCase iki tarafa da uygulanır; ekrana çıkmaz, büyük İ ile aramada eşleşme kaçabilir (küçük etki, dokunulmadı). Düzeltme: swf_yama.buyutmeyi_kaldir o dört callproperty toUpperCase'i (4 bayt) nop yapar; ad 'Değirmen' yazılır, indexOf yine bulur. Çapa (getlocal_0 getlocal_1 getproperty name callproperty toUpperCase initproperty buildingStringName) gerçek SWF'de bir kez; uymazsa dokunulmaz. YAMA_SURUMU 8. Yamalı SWF Ruffle'da açıldı (oyun eğitim adımına kadar yüklendi, ✔). ◐: tebrik penceresi ekranda görülmedi (koleksiyon tamamlamak gerekiyor). 5 bozma denemesinin 5'i düştü."
     },
     {
       "id": "DNT-36",
@@ -2473,7 +2473,7 @@
       "isaret": "✔",
       "kanit": "DNT-32 için soruldu (12.11.2026). Seçenekler: 'Saatte en çok bir' (önerilen), 'Oyun kapalıyken akın yok', 'Günde en çok 6 akın', 'Olduğu gibi kalsın'. Soruda verilen bilgi: 6. seviyeden sonra en sık 10 dakikada bir akın, oyun kapalıyken de; kaybedilen akında kaynak başına %10 (en çok 50.000) ve savunan askerlerin yaklaşık yarısı. Cevap: 'Saatte en çok bir'.",
       "test": "tests/test_dunya.py SaatteBirAkinTestleri",
-      "pr": null,
+      "pr": "#69",
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "İntikam seferi de aynı aralığa uyar (önce yarısıydı: 5 dk). Oyun kapalıyken kural aynı."
     },
