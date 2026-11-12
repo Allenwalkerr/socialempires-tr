@@ -89,6 +89,35 @@ class EsyaKomutlari(KomutTesti):
         self.komut("increase_population", 0)
         self.assertEqual(self.harita["increasedPopulation"], 2)
 
+    def test_yuva_ve_tapinak_adimi_nakitle(self):
+        """TST-02. 1.4.07: PopupDragons/clickGetnow, PopupMonstersNest/clickGetnow, PopupDragonRiderTraining/clickGetNow ve
+        PopupBahamutSupremeInvocationTemple$/clickGetnow nakdi ekranda düşer ve bedeli tek argümanla yollar; zaman damgası
+        sıfırlanır (tapınakta privateState.timeStampTemple = 0). Yuvada istemci 0 yazar; NestsManager/check ve
+        getDragonTimeLeft'e göre damga ≤ 0 iken adım hazırdır (kalan süre = adım − (şimdi − damga) < 0)."""
+        for komut, alan, bedel in (("buy_step_cash", "timeStampTakeCare", 7), ("buy_monster_step_cash", "timeStampTakeCareMonster", 5),
+                                   ("rider_buy_step_cash", "riderTimeStamp", 3)):
+            self.ps[alan] = 2_000_000_000
+            once = self.cash
+            self.komut(komut, bedel)
+            self.assertEqual(self.cash, once - bedel, komut)
+            self.assertLessEqual(self.ps[alan], 0, komut)
+        self.ps["timeStampTemple"] = 2_000_000_000
+        once = self.cash
+        self.komut("buy_temple_step_cash", 4)
+        self.assertEqual((self.cash, self.ps["timeStampTemple"]), (once - 4, 0))
+
+    def test_dart_atisi(self):
+        """TST-02. PopupDarts/onClickPlay: dartsHasFree değilse globals.DART_COST_CASH kadar nakit düşer; hitBalloon
+        darts_shoot_balloon [balon, dartsHasFree ? 0 : 1, gotExtraInThisThrow ? 1 : 0] yollar ve balonu dartsBalloonsShot'a
+        ekler; ödül storeItem(..., true) ile ayrı komutla gelir. Config: DART_COST_CASH."""
+        from oyun.config import get_game_config
+        bedel = int(get_game_config()["globals"]["DART_COST_CASH"])
+        once = self.cash
+        self.komut("darts_shoot_balloon", 3, 0, 0)  # bedava atış
+        self.assertEqual((self.cash, self.ps["dartsBalloonsShot"], self.ps["dartsHasFree"]), (once, [3], False))
+        self.komut("darts_shoot_balloon", 5, 1, 1)  # ücretli, ekstra
+        self.assertEqual((self.cash, self.ps["dartsBalloonsShot"], self.ps["dartsGotExtra"]), (once - bedel, [3, 5], True))
+
     def test_depoda_olmayan_esya_yerlestirilip_satilamaz(self):
         # tekrarlanan komut: depo boşken eşya çoğalmamalı, iade verilmemeli
         self.ps["gifts"] = [0, 1]
