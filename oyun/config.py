@@ -1,5 +1,7 @@
 import copy
+import datetime
 import json
+import random
 import os
 import time
 import jsonpatch
@@ -183,6 +185,45 @@ def kompu_teklifi(simdi=None):
     return teklif
 
 
+# Sahibinin isteği (12.11.2026): mağazadaki "SINIRLI, SON 0 GÜN" öğesi süresi bitince gitsin, ertesi gün rastgele başkası
+# gelsin. İstemci: ItemButtonLarge/setItem, subcategory_id == Subcat.LIMITED_EDITION (121) ise rozet çıkar ve yazı
+# Base/getLimitedDaysLeft = max(0, ceil((globals.LIMITED_EDITION_EXPIRATION - lastServerTimestamp) / 86400)) olur;
+# Utils$/getTimeStampFromString "YYYY-AA-GG"yi new Date(y, a - 1, g) ile oyuncunun yerel gece yarısı okur. Config'te
+# tarih 2012-09-14 (hep 0 gün). Her gün havuzdan bir öğe açılır, tarih yarın olur: "SON 1 GÜN".
+SINIRLI_ALTKATEGORI = "121"
+SINIRLI_HAVUZ_DISI = ("Harikalar",)  # tema seti her zaman açık, sınırlı değil
+
+
+def sinirli_havuz():
+    """Günlük sınırlı öğe havuzu: tema setlerindeki sınırlı öğeler (Harikalar dışında) ve config'te zaten mağazada
+    olan sınırlı öğe (1299 Nakit Harikası). Sıra sabit karıştırılır, her gün sıradaki gelir: iki gün üst üste aynı
+    öğe gelmez, havuz bitmeden öğe tekrarlanmaz."""
+    esyalar = {e["id"]: e for e in __game_config["items"]}
+    kimlikler = {str(i) for ad, ids in tema_setleri().items() if ad not in SINIRLI_HAVUZ_DISI for i in ids}
+    kimlikler |= {e["id"] for e in __game_config["items"]
+                  if e.get("subcategory_id") == SINIRLI_ALTKATEGORI and e.get("in_store") == "1"}
+    havuz = sorted((k for k in kimlikler if esyalar.get(k, {}).get("subcategory_id") == SINIRLI_ALTKATEGORI), key=int)
+    random.Random(SINIRLI_ALTKATEGORI).shuffle(havuz)
+    return havuz
+
+
+def yerel_bugun():
+    """Oyuncunun bilgisayarındaki tarih: istemci bitiş tarihini yerel gece yarısı okur (sunucu aynı cihazda)."""
+    return datetime.date.today()
+
+
+def gunun_sinirli_esyasi(bugun=None, acik=frozenset()):
+    """(eşya kimliği, bitiş tarihi "YYYY-AA-GG"): bugünün sınırlı öğesi; takvimde zaten açık olanlar atlanır."""
+    bugun = bugun or yerel_bugun()
+    havuz = sinirli_havuz()
+    if not havuz:
+        return None, (bugun + datetime.timedelta(days=1)).isoformat()
+    bas = bugun.toordinal() % len(havuz)
+    sira = havuz[bas:] + havuz[:bas]
+    secilen = next((k for k in sira if k not in acik), sira[0])
+    return secilen, (bugun + datetime.timedelta(days=1)).isoformat()
+
+
 ETKINLIK_SURESI = 30 * 86400
 
 
@@ -216,8 +257,9 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
     from oyun import takvim
     milli = takvim.milli_bayram()
     pencere = etkinlik_penceresi()
+    sinirli = gunun_sinirli_esyasi(acik=takvim_setleri or frozenset())
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
-               tuple(h["id"] for h in bayram), milli, pencere, seviye)
+               tuple(h["id"] for h in bayram), milli, pencere, seviye, sinirli)
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
@@ -243,6 +285,16 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
         for esya in kopya.get("items", []):
             if esya["id"] in takvim_setleri:
                 esya["in_store"] = "1"
+    sinirli_id, bitis = sinirli
+    kopya.setdefault("globals", {})["LIMITED_EDITION_EXPIRATION"] = bitis
+    if tema_seti_kipi() is not True:  # "hepsi açık" kipinde sınırlı öğeler zaten mağazada
+        for esya in kopya.get("items", []):
+            if esya.get("subcategory_id") != SINIRLI_ALTKATEGORI:
+                continue
+            if esya["id"] == sinirli_id:
+                esya["in_store"] = "1"
+            elif esya.get("in_store") == "1" and esya["id"] not in (takvim_setleri or ()):
+                esya["in_store"] = "0"  # dünkü sınırlı öğe gider
     if milli:
         for esya in kopya.get("items", []):
             if esya["id"] in TURK_BIRIMLERI:
