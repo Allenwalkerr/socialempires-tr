@@ -1466,9 +1466,19 @@ def end_quest(save, a):
     kaynak_ekle(save, h, "g", int(kaynaklar.get("g", 0)))
     h["xp"] = int(h.get("xp", 0)) + int(kaynaklar.get("x", 0))
     ps = save["privateState"]
-    gorev_id = int(veri.get("quest_id", 0))
-    if int(veri.get("win", 0)) == 1:
-        ps["unlockedQuestIndex"] = max(gorev_id + 1, int(ps.get("unlockedQuestIndex", 0)))
+    # DNT-44: unlockedQuestIndex görev numarası değil, globals.ISLE_ORDER'da açık son adanın sırasıdır
+    # (PopupQuestsManager/<kurucu> @1207-1232: ada kilitli = isLevelLocked || sıra > unlockedQuestIndex; istemci değeri
+    # kendisi artırmaz, PlayerStatus/Init kayıttan okur). Quest*/sendResults kazanılan adadan sonra sıradakini açtırmak
+    # için set_unlocked_index 1 yollar; koleksiyon görevleri (QuestCollectable1-5) 0 yollar. Önce quest_id + 1
+    # (ör. 100000004) yazılıyordu: ilk zaferden sonra seviyesi yeten bütün adalar sırasız açılıyordu.
+    # QuestBossDragon2/sendResults anahtarı 'set_unlocked_index:' (iki noktalı) yazar; ikisi de okunur, yoksa o adadan
+    # sonraki ada hiç açılmazdı.
+    bayrak = veri.get("set_unlocked_index", veri.get("set_unlocked_index:", 0))
+    if int(veri.get("win", 0) or 0) == 1 and int(bayrak or 0) == 1:
+        sira = [str(g) for g in (globals_().get("ISLE_ORDER") or [])]
+        gorev = str(veri.get("quest_id", ""))
+        if gorev in sira:
+            ps["unlockedQuestIndex"] = max(sira.index(gorev) + 1, int(ps.get("unlockedQuestIndex", 0) or 0))
     for esya_id, adet in (veri.get("item_rewards") or {}).items() if isinstance(veri.get("item_rewards"), dict) else []:
         depo_ekle(save, int(esya_id), int(adet))
 

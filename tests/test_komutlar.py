@@ -118,6 +118,38 @@ class EsyaKomutlari(KomutTesti):
         self.komut("darts_shoot_balloon", 5, 1, 1)  # ücretli, ekstra
         self.assertEqual((self.cash, self.ps["dartsBalloonsShot"], self.ps["dartsGotExtra"]), (once - bedel, [3, 5], True))
 
+    def test_gorev_sonu_ada_sirasi_ve_odul(self):
+        """DNT-44, TST-02. 1.4.07: Quest*/sendResults end_quest [JSON {map, resources {g, x}, win, quest_id, item_rewards,
+        set_unlocked_index, ...}] yollar; QuestBossGolem: quest_id QUEST_BOSS_GOLEM (100000003), item_rewards {"537": 1}
+        (ödülü storeItem(.., false, false) ile komutsuz depoya koyar), set_unlocked_index 1; QuestCollectable1-5: 0.
+        unlockedQuestIndex globals.ISLE_ORDER'da açık son adanın sırasıdır: PopupQuestsManager/<kurucu> @1207-1232 ada
+        kilitli = isLevelLocked || sıra > unlockedQuestIndex. Config ISLE_ORDER: 100000003 8. sırada (indeks 7)."""
+        from oyun.config import get_game_config
+        sira = [str(g) for g in get_game_config()["globals"]["ISLE_ORDER"]]
+        self.assertEqual(sira.index("100000003"), 7)
+        self.ps["unlockedQuestIndex"] = 2
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.ps["gifts"] = []
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 150, "x": 30}, "win": True, "quest_id": 100000003,
+                                            "item_rewards": {"537": 1}, "set_unlocked_index": 1}))
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp, self.ps["gifts"][537]), (150, 30, 1))
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000006,
+                                            "item_rewards": {}, "set_unlocked_index": 1}))  # sıra 0: geri düşmez
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000055,
+                                            "item_rewards": {}, "set_unlocked_index": 0}))  # koleksiyon görevi
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000092,
+                                            "item_rewards": {}, "set_unlocked_index": 0}))  # listedeki ada, bayrak 0
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": False, "quest_id": 100000092,
+                                            "item_rewards": {}, "set_unlocked_index": 1}))  # yenilgi
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        # QuestBossDragon2/sendResults anahtarı iki noktalı yazar ('set_unlocked_index:', 1); QUEST_BOSS_DRAGON_2 100000033,
+        # ISLE_ORDER'da indeks 17
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000033,
+                                            "item_rewards": {}, "set_unlocked_index:": 1}))
+        self.assertEqual(self.ps["unlockedQuestIndex"], 18)
+
     def test_depoda_olmayan_esya_yerlestirilip_satilamaz(self):
         # tekrarlanan komut: depo boşken eşya çoğalmamalı, iade verilmemeli
         self.ps["gifts"] = [0, 1]
