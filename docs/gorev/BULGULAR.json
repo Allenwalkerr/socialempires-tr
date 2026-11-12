@@ -2170,13 +2170,13 @@
       "baslik": "Denetim DPT-08: Profil resmi kaydın içinde (~400 KB); her komutta bütün kayıt yeniden yazılıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "curutuldu",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) DPT-08, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "oyun/profil.py kayit['profil_resmi'] base64; command() her pakette save_session (fsync). Ölçülmedi. Öneri: ayrı dosya."
+      "notlar": "oyun/profil.py kayit['profil_resmi'] base64; command() her pakette save_session (fsync). Ölçülmedi. Öneri: ayrı dosya. 12.11.2026 ölçüm (✔ bu makinede, ◐ Android'de ölçülmedi): yeni köy kaydı 2 KB; 256×256 tipik resimle (40 KB JPEG) kayıt 56 KB, save_session ortalama 1,00 → 1,39 ms; izin verilen en büyük resimle (300 KB, profil.EN_BUYUK) 402 KB, 1,00 → 3,69 ms (30 yazmanın ortalaması). Komutlar birkaç saniyede bir toplu geldiği için yük önemsiz. Resim bilerek kayıtta: yedek, Wi-Fi taşıma ve göç onu da götürür (oyun/profil.py belge dizesi). Ayrı dosyaya taşımak bu üç yolu değiştirir; yarar ölçülen yükü karşılamıyor. Android'de belirgin yavaşlık görülürse yeniden açılır."
     },
     {
       "id": "DNT-34",
@@ -2209,13 +2209,13 @@
       "baslik": "Denetim TRA-04: docs/RESIM_KAYNAKLARI.md silinmiş görselleri anlatıyor; templates/img'deki dosyaların kaynağı yazılı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-04, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması."
+      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli."
     },
     {
       "id": "DNT-37",
