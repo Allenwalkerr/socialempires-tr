@@ -536,8 +536,8 @@ class KomsuKomutlari(KomutTesti):
         """1.4.07 bayt kodu. popupCollections/onExchange finish_collection [c]'yi yalnızca iki denetim geçerse yollar:
         CollectableManager$/checkCollectionComplete (p1..p5'in her biri > 0; arUniqueCollections = [21, 22]
         ödülü depodaysa olmaz) ve checkCanComplete (ödül süs, SUBCATFUNC_BUILDING_DECO 411, ise olur; birim ya da
-        binaysa açık kasabada ya da depoda bir tanesi bile varsa olmaz, AVISO_UNIDAD_UNICA; tekil koleksiyonda yalnızca
-        depoya bakılır, @59-106). onBuy (nakit) yalnızca
+        binaysa depoda, birimse kasabada ya da bir binanın içinde (IsoEngine/countPlayerElementsById, vUnitsContained) bir
+        tanesi bile varsa olmaz, AVISO_UNIDAD_UNICA; tekil koleksiyonda yalnızca depoya bakılır, @59-106). onBuy (nakit) yalnızca
         canAfford'a bakar. Önce sunucu bunları denetlemiyordu: eksik parçayla ikinci takas ödülü yeniden veriyordu."""
         def dene(c, parcalar=(0, 1, 1, 1, 1, 1), gifts=(), harita=(), nakit=False):
             self.ps["gifts"] = []
@@ -556,7 +556,16 @@ class KomsuKomutlari(KomutTesti):
         self.assertEqual(dene(8, gifts=(544,)), 1)                        # birim depoda: olmaz (zaten 1)
         self.assertEqual(dene(8, harita=(544,)), 0)                       # birim kasabada: olmaz
         self.assertEqual(dene(8), 1)                                      # birim yok: olur
-        self.assertEqual(dene(23, harita=(1410,)), 0)                     # süs olmayan bina kasabada: olmaz
+        self.assertEqual(dene(23, gifts=(1410,)), 1)                     # süs olmayan bina depoda: olmaz (zaten 1)
+        # Kasabadaki bina: istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements); sunucu katı olmaz,
+        # yoksa ekranda verilen ödül kayda yazılmazdı.
+        self.assertEqual(dene(23, harita=(1410,)), 1)
+        self.harita["items"] = [[1, 10, 10, 0, 0, 0]]
+        self.ps["collections"] = [[0, 1, 1, 1, 1, 1] for _ in range(24)]
+        self.ps["gifts"] = []
+        self.harita["items"].append([7, 20, 20, 0, 0, 0, [544], {}])  # Yeti bir binanın içinde (vUnitsContained)
+        self.komut("finish_collection", 8)
+        self.assertEqual(len(self.ps["gifts"]) > 544 and self.ps["gifts"][544], 0)
         self.assertEqual(dene(21, gifts=(875,)), 1)                       # tekil koleksiyon, ödül depoda: olmaz
         self.assertEqual(dene(21, harita=(875,)), 1)                      # tekil: kasabadaki ejderha engel değil
 

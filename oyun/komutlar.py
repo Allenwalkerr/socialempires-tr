@@ -1979,7 +1979,7 @@ def _takas_olur(save, c, odul):
     uygular, tekrarlanan ya da bozuk komut ödülü ikinci kez vermesin (DNT-20'nin koleksiyon karşılığı):
     - CollectableManager$/checkCollectionComplete: beş parçanın her biri > 0; tekil koleksiyonun ödülü depodaysa olmaz.
     - CollectableManager$/checkCanComplete: tekil koleksiyonda yalnızca depoya bakar; öteki ödül süsse olur, birim ya da
-      binaysa açık kasabada ya da depoda tek bir tanesi bile varsa olmaz (AVISO_UNIDAD_UNICA)."""
+      binaysa depoda, birimse kasabada ya da bir binanın içinde tek bir tanesi bile varsa olmaz (AVISO_UNIDAD_UNICA)."""
     parcalar = _koleksiyon(save, c)
     if any(int(p or 0) <= 0 for p in parcalar[1:6]):
         return False
@@ -1992,8 +1992,16 @@ def _takas_olur(save, c, odul):
         return True
     if esya.get("type") not in ("u", "b"):
         return False
+    if depoda >= 1:
+        return False
+    if esya.get("type") != "u":
+        # Süs olmayan bina (yalnızca 1410 Bahamut Kalbi): istemci kasabada arPlayerIsoFightingElements'e bakar; binanın
+        # orada olup olmadığı doğrulanmadı. Sunucu istemciden katı olursa ekranda verilen ödül kayda yazılmaz; yalnızca
+        # depo denetlenir.
+        return True
+    # IsoEngine/countPlayerElementsById: kasabadaki birimler ve kapasiteli binaların içindekiler (vUnitsContained).
     h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
-    return not (depoda >= 1 or any(e[0] == odul for e in h["items"]))
+    return not any(e[0] == odul or (len(e) > 6 and isinstance(e[6], list) and odul in e[6]) for e in h["items"])
 
 
 @komut("finish_collection")
