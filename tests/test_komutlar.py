@@ -211,12 +211,19 @@ class EsyaKomutlari(KomutTesti):
         self.assertEqual((self.ps["dragonNestActive"], self.ps["stepNumber"], self.ps["dragonNumber"]), (0, 0, 0))
         # bedel her yuvanın kendi anahtarından okunur (config değişirse istemciyle birlikte değişir)
         from unittest import mock
-        sahte = dict(g, ACTIVATE_DRAGON_NEST_CASH=7, ACTIVATE_MONSTER_NEST_CASH=9)
+        sahte = dict(g, ACTIVATE_DRAGON_NEST_CASH=7, ACTIVATE_MONSTER_NEST_CASH=9,
+                     ACTIVATE_DRAGON_NEST_GOLD=11, ACTIVATE_MONSTER_NEST_GOLD=13)
         with mock.patch.object(self.komutlar, "globals_", lambda: sahte):
             once = self.cash
             self.komut("activate_dragon", "c")
+            self.assertEqual(once - self.cash, 7)
             self.komut("activate_monster", "c")
-        self.assertEqual(once - self.cash, 16)
+            self.assertEqual(once - self.cash, 16)
+            altin = self.harita["coins"]
+            self.komut("activate_dragon", "g")
+            self.assertEqual(altin - self.harita["coins"], 11)
+            self.komut("activate_monster", "g")
+            self.assertEqual(altin - self.harita["coins"], 24)
 
     def test_tapinak_adimi(self):
         """TST-02. 1.4.07 PopupBahamutSupremeInvocationTemple/doAction: next_temple_step [JSON veri, adım]. RESOURCES_SUBSTRACT
