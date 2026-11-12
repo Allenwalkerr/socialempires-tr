@@ -46,3 +46,9 @@ skinMap) arka plan rengini (Config.BG_SKIN_COLORS) ve genişleme arazisini seçe
 2. Çift sur: dışta sur, içte kule sırası (büyük karo başına 10 kule sınırı içinde).
 3. Asker geçidi: bir avluda düzgün aralıklı sıralar (bugün düzensiz mangalar).
 4. Bazı botlara arazi türü (çöl, buz, maden, orman); çizimleri temel pakete alınırsa çevrimdışı da görünür.
+
+## Karar (12.11.2026)
+
+Sahibi: "Bir kısmını yap, diğerlerine sen karar ver." Yapıldı: 1 (iç surlarla bölünmüş avlular) ve 3 (asker geçidi).
+Yapılmadı: 2 (çift sur; büyük karo başına 10 kule sınırı köşelere ve kapılara gidiyor) ve 4 (arazi türü; çizimleri
+temel pakette değil, internetsiz oyunda zemin görünmeyebilir).

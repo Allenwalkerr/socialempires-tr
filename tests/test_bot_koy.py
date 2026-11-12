@@ -210,9 +210,11 @@ class ArthurDuzeni(unittest.TestCase):
             for k in bot_koy.KISILIK:
                 items, _ = bot_koy.koy_kur(sv, k, "a%d%s" % (sv, k), 0)
                 birimler = {(int(e[1]), int(e[2])) for e in items if ESYA[int(e[0])]["type"] == "u"}
+                # Ya mangada (8 komşudan biri asker) ya geçitte (sırada iki karo ötesi asker)
                 yalniz = [t for t in birimler
-                          if not any((t[0] + dx, t[1] + dy) in birimler for dx in (-1, 0, 1) for dy in (-1, 0, 1)
-                                     if dx or dy)]
+                          if not any((t[0] + dx, t[1] + dy) in birimler for dx in (-2, -1, 0, 1, 2)
+                                     for dy in (-2, -1, 0, 1, 2) if (dx or dy) and (abs(dx) < 2 or dy == 0)
+                                     and (abs(dy) < 2 or dx == 0))]
                 self.assertLessEqual(len(yalniz), len(birimler) * 0.2, (sv, k, len(yalniz), len(birimler)))
 
 
@@ -230,6 +232,57 @@ class BirimEkle(unittest.TestCase):
         self.assertEqual(len(items), 25)
         for e in items:
             self.assertIn((e[1], e[2]), acik_karolar([13]), e)
+
+
+class AskerGecidi(unittest.TestCase):
+    """DNT-60 (internet taraması: 55. seviye oyuncu köyünde avluda sıralı ordu; sahibi 'bir kısmını yap'): 15. seviyeden
+    ordusu en az 12 olan köyde askerlerin bir bölümü 4 sütunlu, bir karo aralı düzgün sıralar hâlinde."""
+
+    def test_gecit_dort_sutun_bir_karo_ara(self):
+        for sv in (15, 25, 35, 55):
+            for k in bot_koy.KISILIK:
+                items, _ = bot_koy.koy_kur(sv, k, "g%d%s" % (sv, k), 0)
+                birimler = {(int(e[1]), int(e[2])) for e in items if ESYA[int(e[0])]["type"] == "u"}
+                if len(birimler) < 12:
+                    continue
+                en_iyi = max(sum(1 for i in range(4) for j in range(4) if (x + 2 * i, y + 2 * j) in birimler)
+                             for x, y in birimler)
+                self.assertGreaterEqual(en_iyi, 8, (sv, k))  # en az iki tam sıra
+
+    def test_on_bes_ten_once_gecit_yok(self):
+        for k in bot_koy.KISILIK:
+            items, _ = bot_koy.koy_kur(14, k, "y%s" % k, 0)
+            birimler = {(int(e[1]), int(e[2])) for e in items if ESYA[int(e[0])]["type"] == "u"}
+            self.assertFalse(any(all((x + 2 * i, y) in birimler for i in range(4)) and
+                                 all((x + 2 * i, y + 2) in birimler for i in range(4)) and
+                                 not any((x + 1 + 2 * i, y) in birimler for i in range(3)) for x, y in birimler), k)
+
+
+class IcSur(unittest.TestCase):
+    """DNT-60 (internet taraması: oyuncu köylerinde iç surlarla bölünmüş avlular): 3 ve daha çok büyük karolu köyde
+    bitişik büyük karoların arasında sur var, ortasında geçilecek kapı boşluğu bırakılır."""
+
+    def test_bitisik_karolar_arasinda_kapili_sur(self):
+        for sv in (25, 35, 55):
+            for k in bot_koy.KISILIK:
+                items, acik = bot_koy.koy_kur(sv, k, "i%d%s" % (sv, k), 0)
+                bks = buyuk_karolar(acik)
+                surlar = set()
+                for e in items:
+                    if ESYA[int(e[0])].get("subcategory_id") in ("21", "22"):
+                        surlar |= karolar(e)
+                for c, r in bks:
+                    if (c + 1, r) in bks:
+                        cizgi = [((c + 1) * 20, r * 20 + j) for j in range(1, 19)]
+                    elif (c, r + 1) in bks:
+                        cizgi = [(c * 20 + j, (r + 1) * 20) for j in range(1, 19)]
+                    else:
+                        continue
+                    dolu = sum(t in surlar for t in cizgi)
+                    self.assertGreaterEqual(dolu, 10, (sv, k, c, r))
+                    self.assertLess(dolu, len(cizgi), (sv, k, c, r))  # kapı boşluğu
+        _, acik = bot_koy.koy_kur(12, "dengeli", "iki", 0)
+        self.assertEqual(len(acik), 2)  # iki karoluk köyde iç sur yok (Arthur30 gibi tek avlu)
 
 
 class YenidenKur(unittest.TestCase):

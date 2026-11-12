@@ -15,7 +15,7 @@ import random
 
 from oyun.config import get_item_from_id
 
-TASARIM_SURUMU = 5  # 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
+TASARIM_SURUMU = 6  # 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -397,6 +397,24 @@ def koy_kur(seviye, kisi, tohum, simdi):
                      "D": (x0 + BUYUK_KARO - 1 - d, y0 + k)}[yon]
                 a.koy(agac, *t, ayrik_serbest=True)
 
+    # 3b. İç surlar (3 ve daha çok büyük karolu köyde): bitişik büyük karoların arasında, ortası 3 karo kapı; köy
+    #     avlulara bölünür (internet taraması: oyuncu köylerinde iç surlarla bölünmüş avlular; DNT-60)
+    if sur and len(bks) >= 3:
+        for c, r in sorted(bks):
+            for dc, dr in ((1, 0), (0, 1)):
+                if (c + dc, r + dr) not in bks:
+                    continue
+                for k in range(1, BUYUK_KARO - 1):
+                    x, y = ((c + 1) * BUYUK_KARO, r * BUYUK_KARO + k) if dc else (c * BUYUK_KARO + k, (r + 1) * BUYUK_KARO)
+                    if 8 <= k <= 12:  # kapı ve iki yanında birer karo boşluk
+                        a.ayir([(x, y), (x - dc, y - dr), (x + dc, y + dr)])
+                        continue
+                    a.koy(sur, x, y, ayrik_serbest=True)
+                if kule:
+                    for k in (7, 13):
+                        a.kule_koy(kule, *(((c + 1) * BUYUK_KARO, r * BUYUK_KARO + k) if dc
+                                          else (c * BUYUK_KARO + k, (r + 1) * BUYUK_KARO)))
+
     # 4. Mahalleler: her dış kenar boyunca surun içinde boşluksuz şerit (kişiliğin sırasıyla)
     sira = serit_sirasi(kisi, rng)
     ic_kenarlar = [k for k in kenarlar]
@@ -438,6 +456,24 @@ def koy_kur(seviye, kisi, tohum, simdi):
     # 6. Ordu: kışlaların önünde ve meydanda 2-4 düzensiz manga
     ordu = [birim_sec(seviye, kisi, rng) for _ in range(ordu_buyuklugu(seviye, kisi))]
     ordu.sort()
+    # 15. seviyeden bir avluda asker geçidi: ordunun yarısı (en az 8, en çok 16), türüne göre sıra sıra, bir karo arayla
+    #     (internet taraması: 55. seviye oyuncu köyünde avluda sıralı ordu; DNT-60)
+    if seviye >= 15 and len(ordu) >= 12:
+        sutun = 4
+        adet = min(16, max(8, len(ordu) // 2)) // sutun * sutun  # en az iki sıra
+        hedefler = sorted(karolar, key=lambda t: (abs(t[0] - mx - 1) + abs(t[1] - my - 10), t))
+        bitti = False
+        for satir in range(adet // sutun, 1, -1):  # yer yoksa sıra sayısı azalır, en az iki sıra
+            gecit = sorted(ordu, key=lambda k: (-ordu.count(k), k))[:satir * sutun]
+            for x0, y0 in hedefler:
+                if a.bos_mu(x0, y0, 2 * sutun - 1, 2 * satir - 1):
+                    for n, k in enumerate(gecit):
+                        a.koy(k, x0 + 2 * (n % sutun), y0 + 2 * (n // sutun))
+                        ordu.remove(k)
+                    bitti = True
+                    break
+            if bitti:
+                break
     manga_sayisi = min(4, 2 + seviye // 20)
     adaylar = [(mx + rng.randint(-1, 4), my + 6 + rng.randint(0, 2))]
     for c, r in sorted(bks):
