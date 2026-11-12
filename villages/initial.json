@@ -4,7 +4,7 @@
         "pid": 1000,
         "name": "Emperor",
         "pic": "",
-        "cash": 0,
+        "cash": 20,
         "completed_tutorial": 0,
         "default_map": 0,
         "map_names": ["İmparatorluğum"],

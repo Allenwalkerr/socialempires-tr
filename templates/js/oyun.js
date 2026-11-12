@@ -301,9 +301,11 @@
       })
       .catch(function () { alert("Yardım gelmedi."); });
   }
-  // PopupRecruitment/onFindFriend: (tx, ty, kasaba, bina, yardımcılar, ad); yalnızca Asker Toplama (387)
+  // Çağrı: (tx, ty, kasaba, bina, yardımcılar, ad).
+  // Asker Toplama (PopupRecruitment) ve dost isteyen öteki binalar (pazar, değirmen...: PopupSocialBuilding/onFindFriend)
+  // aynı çağrıyı yapar; hangi binanın kaç dost aldığına sunucu bakar (oyun/bot_yardim.py)
   window.showPopupSEHelpSocialItem = function (tx, ty, kasaba, bina) {
-    if (Number(bina) === 387) botYardimi({ tur: "sosyal", tx: Number(tx), ty: Number(ty), town: Number(kasaba), id: 387 });
+    botYardimi({ tur: "sosyal", tx: Number(tx), ty: Number(ty), town: Number(kasaba), id: Number(bina) });
   };
   // Viral teklifler ve Ada Ocağı'nın boru malzemesi: (teklif no)
   window.showPopupSEHelpOffer = function (no) { botYardimi({ tur: "teklif", no: Number(no) }); };

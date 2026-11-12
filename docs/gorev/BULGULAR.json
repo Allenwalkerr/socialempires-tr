@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #78 birleşti; v0.1.0-deneme1 sahibince açıldı (.exe ve zip yüklendi). Windows kurulum programı (DAG-16) #79'da. Sonra GEC-09: tablet ve v0.1.0. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. DNT-50 ve KAR-33/34 #80'de. Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (5) KAR-34: etkinlikler 15'ten kademeli ve takvimli; (6) sınırlı mağaza öğesi 'SON 0 GÜN' kalıyor: süresi bitince ertesi gün rastgele başkası gelsin; (7) çeviri taşmaları ('28 NAKİ', 'Kayıp Ejderha Yumurtala'); (8) çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor; (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2664,13 +2664,104 @@
       "baslik": "Windows kurulum programı: masaüstü kısayolu, Başlat menüsü, kaldırıcı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
-      "kanit": "Sahibinin isteği (12.11.2026): 'exeye tıklıcam ... exe kurulumu yapar masaüstüne bir tane kısayol koyar tıkladın mı oynarsın'. v0.1.0-deneme1'de yalnızca tek dosyalık .exe (24,6 MB) ve zip vardı (✔ sürüm sayfası). araclar/kurulum.iss (Inno Setup 6) exe_paketi.py --klasor çıktısını %LOCALAPPDATA%\\Programs\\SocialEmpiresTR'ye kurar, PrivilegesRequired=lowest, masaüstü ve Başlat kısayolu, Türkçe sihirbaz; saves/ uninsneveruninstall. Klasör sürümü yerelde Linux'ta üretilip açıldı (✔): 4 sn'de hazır, Ruffle 200, kayıt/mod/ayar yanında. Windows'ta derleme, sessiz kurulum, açılış ve kaldırma CI'da (windows.yml kurulum işi) sınanacak: ◐ o kısım.",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin isteği (12.11.2026): 'exeye tıklıcam ... exe kurulumu yapar masaüstüne bir tane kısayol koyar tıkladın mı oynarsın'. v0.1.0-deneme1'de yalnızca tek dosyalık .exe (24,6 MB) ve zip vardı (✔ sürüm sayfası). araclar/kurulum.iss (Inno Setup 6) exe_paketi.py --klasor çıktısını %LOCALAPPDATA%\\Programs\\SocialEmpiresTR'ye kurar, PrivilegesRequired=lowest, masaüstü ve Başlat kısayolu, Türkçe sihirbaz; saves/ uninsneveruninstall. Klasör sürümü yerelde Linux'ta üretilip açıldı (✔): 4 sn'de hazır, Ruffle 200, kayıt/mod/ayar yanında. #79 CI'ında windows-latest'te derlendi, sessizce kuruldu, kısayol ve kaldırıcı yerinde, kurulu oyun açıldı, üzerine yeniden kurulunca eski dosya silindi ve kayıtlar kaldı, kaldırınca kayıtlar kaldı (✔).",
       "test": "tests/test_exe.py (KurulumTarifi, simge, klasör kipi); .github/workflows/windows.yml kurulum",
       "pr": "#79",
       "onay": null,
-      "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü. #79 incelemesi: yükseltmede eski sürümün _internal verisi (config/patch, villages dizin taranarak okunur) kalıp yeniden uygulanırdı; [InstallDelete] {app}\\_internal'ı kopyadan önce siler. CI eski dosya bırakıp üzerine kurar, dosyanın gittiğini ve kayıt sayısının değişmediğini denetler. Test ve bozma."
+      "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü. #79 incelemesi: yükseltmede eski sürümün _internal verisi (config/patch, villages dizin taranarak okunur) kalıp yeniden uygulanırdı; [InstallDelete] {app}\\_internal'ı kopyadan önce siler. CI eski dosya bırakıp üzerine kurar, dosyanın gittiğini ve kayıt sayısının değişmediğini denetler. Test ve bozma. 12.11.2026: #79 birleşti."
+    },
+    {
+      "id": "DNT-50",
+      "baslik": "Kendi adasındaki hikâye görevleri (prenses, tutsaklar, hazine...) F5'te ilk göreve dönüyordu; görevin yiyecek ve taş ödülü kayboluyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Oyunda normalde hikaye serisi vardı prensesi kurtar falan o yok'. QuestsInMap$/finalizeQuest @356-465: istemci altın, xp, yiyecek (yerel1) ve taşı ekler, currentQuestId = (id + 1) % NUM_QUESTS (30) yapar, timestampLastTreasure = sunucu zamanı (@91-120) ve collect_treasure [altın, xp, sıradaki görev, yiyecek, taş, townID] yollar. MapInitializer$/setCorrectQuest @274 düzeltilen görevi de [0, 0, görev, 0, 0, townID] ile yollar. Açılışta görev map.idCurrentTreasure'dan, zaman map.timestampLastTreasure'dan okunur (Base/loadPlayerInfoSuccess @614-641, TownManager$/onEndLoadTown @65-105). Sunucu yalnızca altın ve xp'yi işliyordu; argümanları [altın, xp, görev, x, y, kasaba] sanıyordu.",
+      "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
+      "pr": "#80",
+      "onay": null,
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma."
+    },
+    {
+      "id": "KAR-33",
+      "baslik": "Yeni oyuncu 20 nakitle başlar",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Birde oyuncu oyuna 20 nakitle başlasın bundan sonra böyle çok zor'. villages/initial.json playerInfo.cash 0 → 20.",
+      "test": "tests/test_http.py test_yeni_oyuncu_20_nakitle_baslar",
+      "pr": "#80",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Yalnızca yeni köyler; var olan kayıtlara dokunulmaz. Bozma (0'a dönüş) testi düşürdü."
+    },
+    {
+      "id": "KAR-34",
+      "baslik": "Özel teklif etkinlikleri 15. seviyeden başlayarak kademeli açılır ve takvime bağlanır",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'bu etkinlikler çok erken açıldı 15 seviye veya 20 seviyede açılsa hatta etkinlikler kademeli olsa veya takvime bağlansa'. Soruldu: açılış 'Kademeli, 15'ten başlayıp' (önerilen) / 'Hepsi 15' / 'Hepsi 20' → 'Kademeli, 15'ten başlayıp'; takvim 'Hayır, seviye yeter' (önerilen) / 'Evet, takvime bağla' → 'Evet, takvime bağla' (sayfada yaklaşan etkinlikler listesi). Bugün Ada Ocağı ve beş viral teklif herkese kayan 30 günlük pencereyle açık (oyun/config.py etkinlik_penceresi, KAR-27, KAR-29); istemci config'i oyuncuya göre değişmiyor.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Uygulama ayrı PR: istemci config'i oyuncunun seviyesine göre (starts_at/duration) kurulmalı; ilk etkinlik 15, sonrakiler 20, 25, 30...; her etkinliğin yılda belirli haftaları (config/takvim.json gibi). Oyunun içine takvim çizilmez (CLAUDE.md görsel kuralı); liste sayfada, oyunun kendi simgeleriyle. Sahibinin 'aşağıdaki boşluk' dediği yer Doldur görünümü hatası (görev listesi). 12.11.2026 (#80): bayram hedefleri 15. seviyeden önce gitmez (ilk adım); viral teklif ve Ada Ocağı'nın seviye ve takvim kademesi ayrı."
+    },
+    {
+      "id": "DNT-51",
+      "baslik": "Hedeflerin açılış seviyeleri bozuk: 206 hedefin 195'i 1. seviyede; saldırı hedefleri PvP'den önce çıkıyor",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'lvl 6 yım diyo ki git bir oyuncuya akın et ama pvp 8 seviyede açılıyor. Görevlerin acilen titizlikle işlenip düzenlenmesi lazım'; 'eskiden görev sıralaması lvla göre olurdu'. config/goals.json (GEC-02'de upstream'den alındı): min_level dağılımı 1: 195, 8: 10, 12: 1. attack_player hedefleri: 59 (1 oyuncu) 8, 242 (2 oyuncu) ve 243 (3 oyuncu) 1, 244-248 8. GoalsManager/isGoalAvailable her zaman true döner; istemci hedefi min_level ve sırayla gösterir (sortGoals/goalComparison, getActiveGoals incelenecek). İstemci min_level'e hiç bakmaz (yalnızca AbstractEpIsoElement/initBasicButtons binalarda okur); MAX_ACTIVE_GOALS 15 (GoalsManager/<sınıf> @26-31); order = parseInt(orders) (AbstractGoal/<kurucu> @49-60). Hedef 59 (1 oyuncuya saldır) dosyada 42. sıradaydı: ilk hedefler bitince 6. seviyede görünüyordu. Bayram hedefleri orders -1, min_level 1 ile en başa geçiyordu (sahibinin 'ilk seviyelerde etkinlik görevi var' dediği).",
+      "test": "tests/test_hedef_seviye.py, tests/test_bayram_hedefleri.py",
+      "pr": "#80",
+      "onay": null,
+      "notlar": "oyun/hedef_seviye.py: min_level istemcinin açılış seviyelerine göre yükseltilir (asla düşürülmez): attack_player MIN_LEVEL_PVP 8; complete_quest, popup_opened_quests, assaults_won MIN_LEVEL_QUESTS 6 (ve QUESTS_MIN_LEVELS); soulmixer SOUL_MIXER_MIN_LEVEL; recruit_market_friend pazarın (alt kategori 132) seviyesi; bina/birim hedefleri istedikleri eşyalardan en erken açılanın min_level'i. Dağılım 1: 59, sonra 2..35 arası. orders dosya sırasında 1, 2, 3... (0 korunur). get_game_config.php oturumdaki oyuncunun seviyesine gelmiş hedefleri yollar (config önbellek anahtarına seviye girdi). Bayram hedefleri min_level 15 (KAR-34). Yeni seviyenin hedefleri istemci config'i açılışta bir kez okuduğu için F5'ten sonra görünür. 10 bozma düştü."
+    },
+    {
+      "id": "KAR-35",
+      "baslik": "Ad değişiklikleri: Savaş Trolü → Yaman Trol, Bıçkıhane → Marangozhane, saldırıdaki 'Çek' → 'Geri Çekil'",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Savaş Trolü ismini beğenmedim'; 'Odun kesilen yerin adı bıçkıhane orayı marangoz diyebiliriz'; 'Çek var Geri çekil veya teslim ol olsa daha anlaşılır olur'. Soruldu: trol adı (Cenk Trolü önerilen / Yaman Trol / Dev Trol / Akancı Trol) → 'Yaman Trol'; odun binası (Marangozhane önerilen / Marangoz / Keresteci / kalsın) → 'Marangozhane'. loc:AUX_WITHDRAW yalnızca StateAssault/enter ve StateTournament/enter'de kullanılır (geri çekilme düğmesi).",
+      "test": null,
+      "pr": "#80",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "ceviri/tr.json: item:529, 552, 597 ve başarım metni; Bıçkıhane'nin 38 geçişi (ekler aynı ünlü uyumunda). Düğmenin genişliği oyunda denenmedi (◐). Ayrıca saldırı haritası seçiminde 'Start Loading' → 'Saldır!' (önce 'Yüklemeyi Başlat' kesik görünüyordu; sahibi: 'Yüklemeyi yazıyor çok saçma')."
+    },
+    {
+      "id": "DNT-52",
+      "baslik": "Pazar ve öteki dost isteyen binalarda 'Dostlarını tut' çevrimdışı çalışmıyordu; 'Pazarı aç' hedefi bu yüzden bitmiyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'pazar için dostlarını tut diyom olmuyo'; 'Pazarı açtım ama pazar görevi halen yapılmamış sayıyor'. PopupSocialBuilding/onFindFriend @18-133: si.length < arWorkerNames.length iken ExternalInterface.call('showPopupSEHelpSocialItem', tx, ty, townID, iID, si, ad), Asker Toplama'yla (387) aynı çağrı. Sayfa (templates/js/oyun.js) yalnızca 387'yi sunucuya iletiyordu, sunucu da yalnızca 387'yi kabul ediyordu (KAR-26/27/29). config social_items 31 bina (pazar 23: Butcher, Fishmonger, Greengrocer). 'Pazarı aç' (hedef 53, complete_social_subcat 132) çalışanlar dolunca biter.",
+      "test": "tests/test_bot_yardim.py test_pazar_calisan_sayisi_kadar_dost_alir, test_yalnizca_asker_toplama_ve_bina_dogrulanir; tests/js/bot_yardimi.test.js",
+      "pr": "#80",
+      "onay": "KAR-26/27/29 (botlar yardım eder, her yere günde bir)",
+      "notlar": "Sunucu sosyal binada en çok workers sayısı kadar bot yazar (Asker Toplama 4). Her bina için günde bir bot (KAR-29): pazarın 3 çalışanı 3 günde dolar ya da istemcinin 'Doldur: 2 nakit'iyle. 3 bozma düştü. Oyun içinde denenmedi (◐). #80 incelemesi: Artık Zirve (234), Yuvarlak Masa (389) ve Büyük Kilise (470) de bot alır (KAR-26 çizgisi). finish_si 234 dışında si'yi siler; istemci yardımı yalnızca pencere açık ve yuva boşken ister (doğrulanmadı ◐)."
+    },
+    {
+      "id": "CEV-08",
+      "baslik": "'40 nüfusa ulaş' hedefi nüfus sınırını değil birlik nüfusunu sayar; metin yanıltıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'nüfusu 40'a çıkar dedi çıkarttım görev beni başarılı saymadı'. GoalPopulation/onPopulationUpdate @0-72 PlayerStatus.SIG_POPULATION_UPDATED'ın değerini (_currentStep) ammount 40'la karşılaştırır; PlayerStatus/updatePopulation @51-444 bu değeri binalardaki ve haritadaki birimlerin iPopulationCount toplamı olarak yollar (iPopulationMax değil). Hedef yalnızca NORMAL kipte ve nüfus değiştiğinde denetlenir.",
+      "test": null,
+      "pr": "#80",
+      "onay": null,
+      "notlar": "ceviri/tr.json mission:56:aciklama: 'Asker ve köylülerinle nüfusunu 40'a çıkar (sağ üstteki sayıların soldaki). Ev kurmak yalnızca sınırı artırır; birim eğitmelisin!'. Kod değişmedi; istemcinin kuralı doğru."
     }
   ]
 }

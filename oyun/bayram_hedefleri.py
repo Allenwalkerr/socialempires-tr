@@ -38,6 +38,10 @@ AYLAR = ("Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağu
          "Aralık")
 
 
+# KAR-34 (sahibi, 12.11.2026): etkinlikler 15. seviyeden önce açılmaz; sunucu istemciye seviyesine gelmemiş hedefi
+# yollamaz (oyun/hedef_seviye.py seviyeye_gore)
+ETKINLIK_SEVIYESI = 15
+
 def _tarih(iso):
     yil, ay, gun = (int(x) for x in iso.split("-"))
     return "%d %s" % (gun, AYLAR[ay - 1])
@@ -63,7 +67,7 @@ def _hedef(etkinlik):
         return None
     set_adi = " ya da ".join(etkinlik["setler"])
     return {
-        "id": hedef_kimligi(etkinlik["no"], date.fromisoformat(etkinlik["baslangic"])), "types": "built_id", "orders": -1, "min_level": 1, "reward": ODUL,
+        "id": hedef_kimligi(etkinlik["no"], date.fromisoformat(etkinlik["baslangic"])), "types": "built_id", "orders": -1, "min_level": ETKINLIK_SEVIYESI, "reward": ODUL,
         "title": "%s kutlu olsun!" % etkinlik["ad"],
         "description": "%s şerefine mağazadaki %s setinden bir yapı kur. (Son gün: %s.)"
                        % (etkinlik["ad"], set_adi, _tarih(etkinlik["son_gun"])),

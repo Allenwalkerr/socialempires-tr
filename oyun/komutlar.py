@@ -1403,12 +1403,27 @@ def comeback_reward(save, a):
     listeye_ekle(save["privateState"], "comebackBonusCollected", a.tam(2))
 
 
+HARITA_GOREVI_SAYISI = 30  # Config.NUM_QUESTS
+
+
 @komut("collect_treasure")
 def collect_treasure(save, a):
-    """[altin, xp, gorev_id, x, y, kasaba]"""
+    """[altın, xp, sıradaki görev, yiyecek, taş, kasaba] - kendi adasındaki hikâye görevi bitti. QuestsInMap$/finalizeQuest
+    @356-465: istemci altın ve xp'yi, yiyeceği (yerel1) ve taşı (yerel2) ekler, currentQuestId'yi (id + 1) % NUM_QUESTS
+    yapar, timestampLastTreasure = sunucu zamanı (@91-120). Açılışta ikisini map.idCurrentTreasure ve
+    map.timestampLastTreasure'dan okur (Base/loadPlayerInfoSuccess @614-641, TownManager$/onEndLoadTown @65-105).
+    DNT-50: sunucu görev numarasını, zamanı, yiyeceği ve taşı yazmıyordu; F5'te hikâye ilk göreve dönüyordu."""
     h = harita(save, a.tam(5))
     kaynak_ekle(save, h, "g", a.tam(0))
     h["xp"] = int(h.get("xp", 0)) + max(0, a.tam(1))
+    kaynak_ekle(save, h, "f", max(0, a.tam(3)))
+    kaynak_ekle(save, h, "s", max(0, a.tam(4)))
+    if 0 <= a.tam(2, -1) < HARITA_GOREVI_SAYISI:
+        h["idCurrentTreasure"] = a.tam(2)
+    # Ödülsüz çağrı MapInitializer$/setCorrectQuest @227-274'ten gelir: yalnızca görev numarasını düzeltir, istemci
+    # zamana dokunmaz (#80 incelemesi). finalizeQuest'te altın seviyeye göre en az 250'dir (@123-283).
+    if a.tam(0) > 0 or a.tam(1) > 0 or a.tam(3) > 0 or a.tam(4) > 0:
+        h["timestampLastTreasure"] = timestamp_now()
 
 
 @komut("apply_rewards_ranking")

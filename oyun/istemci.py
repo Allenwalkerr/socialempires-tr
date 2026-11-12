@@ -61,15 +61,27 @@ def track_game_status_response():
     return ("", 200)
 
 
+def _oyuncu_seviyesi():
+    """Oturumdaki oyuncunun seviyesi (DNT-51: istemciye yalnızca bu seviyeye gelmiş hedefler gider); yoksa None."""
+    from flask import session as oturum
+    uid = oturum.get("USERID") or request.values.get("USERID", "")
+    kayit = kayit_oturumu(uid) if gecerli_uid(uid) else None
+    try:
+        return int(kayit["maps"][0].get("level", 1)) if kayit else None
+    except (KeyError, IndexError, TypeError, ValueError):
+        return None
+
+
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
 def get_game_config_response():
     # İstemcinin dil ayarından bağımsız olarak metinler OYUN_DILI'nde gönderilir.
+    seviye = _oyuncu_seviyesi()
     try:
-        return get_client_game_config(OYUN_DILI)
+        return get_client_game_config(OYUN_DILI, seviye=seviye)
     except Exception:
         traceback.print_exc()
         print(" ! Ceviri config'i uretilemedi; Ingilizceye donuluyor")
-        return get_client_game_config("en")
+        return get_client_game_config("en", seviye=seviye)
 
 
 @app.route(DINAMIK + "/get_player_info.php", methods=["POST"])

@@ -1,6 +1,6 @@
 // Bot yardımı kancaları (KAR-26, KAR-27; #67 incelemesi): oyunun ExternalInterface ile çağırdığı sayfa işlevleri.
 // Beklenen davranışın kaynağı (1.4.07 bayt kodu, docs/inceleme/1407-asker-ada.md):
-// - PopupRecruitment/onFindFriend: showPopupSEHelpSocialItem(tx, ty, kasaba, bina, si, ad); bot yalnızca Asker Toplama (387).
+// - PopupRecruitment/onFindFriend: showPopupSEHelpSocialItem(tx, ty, kasaba, bina, si, ad); PopupSocialBuilding/onFindFriend (pazar, değirmen...) aynı çağrıyı yapar.
 // - showPopupSEHelpOffer(no): viral teklif ve Ada'nın boru malzemesi.
 // - Liste sunucuda dolar; oyun yeni durumu ancak forceReloadInfo geri çağrısıyla (Base/init addCallback) okur,
 //   bu yüzden yalnızca başarıda çağrılır.
@@ -42,12 +42,12 @@ test("Asker Toplama: istek gider, başarıda oyun bilgisini yeniden okur", async
   assert.deepStrictEqual(k.uyarilar, []);
 });
 
-test("387 dışındaki binada istek yok", async () => {
+test("pazar gibi öteki dost isteyen binalar da sunucuya gider (PopupSocialBuilding/onFindFriend @89-133)", async () => {
   const k = kur({ ok: true, v: {} });
-  k.window.showPopupSEHelpSocialItem(1, 2, 0, 234, [], "x");
+  k.window.showPopupSEHelpSocialItem("12", "14", "0", "23", "", "Pazar");
   await bekle();
-  assert.strictEqual(k.istekler.length, 0);
-  assert.strictEqual(k.yenileme, 0);
+  assert.deepStrictEqual(k.istekler[0].govde, { tur: "sosyal", tx: 12, ty: 14, town: 0, id: 23 });
+  assert.strictEqual(k.yenileme, 1);
 });
 
 test("hata yanıtında oyun yenilenmez, sunucunun iletisi gösterilir", async () => {

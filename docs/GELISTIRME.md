@@ -82,7 +82,7 @@ argümanda varsayılan değer döndürür.
 1. **Config metinleri**: `ceviri/tr.json` (`oyun/turkce.py` uygular).
    Eksik metinleri bulmak için `araclar/sozluk_cikar.py`. Üslup:
    oyuncuya "sen" diye hitap edilir, noktalı virgül ve tire kullanılmaz,
-   terimler tutarlıdır (Konak, Okçu Ocağı, Bıçkıhane, Nakit, Sefer, Hedef).
+   terimler tutarlıdır (Konak, Okçu Ocağı, Marangozhane, Nakit, Sefer, Hedef).
 2. **SWF içindeki sabit yazılar**: `ceviri/arayuz_tr.json`.
    - `metin_alanlari`: DefineEditText başlangıç metinleri (HTML etiketleri
      çıkarılmış hâli anahtardır).

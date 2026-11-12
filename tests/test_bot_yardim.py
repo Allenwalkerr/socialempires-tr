@@ -82,8 +82,23 @@ class Yardim(unittest.TestCase):
                 mock.patch("oyun.kayit.neighbor_session", kayitlar.get):
             self.assertEqual(sorted(bot_yardim._botlar({"cd"})), ["5ab"])
 
-    def test_yalnizca_asker_toplama_ve_bina_dogrulanir(self):
+    def test_pazar_calisan_sayisi_kadar_dost_alir(self):
+        """PopupSocialBuilding/onFindFriend @18-70: si.length < arWorkerNames.length iken yardım istenir; işçiler
+        config social_items[23].workers 'Butcher,Fishmonger,Greengrocer' (3). Günde bir bot (KAR-29)."""
+        from oyun import bot_yardim
+        self.kayit["maps"][0]["items"].append([23, 12, 14, 0, 0, 0, [], {}])
+        self.assertEqual(bot_yardim._calisan_sayisi(23), 3)
+        self.assertEqual(bot_yardim._calisan_sayisi(387), 4)
+        self.assertIsNone(bot_yardim._calisan_sayisi(1))  # sosyal olmayan bina (Ev I)
+        self.assertEqual(self.iste(tur="sosyal", tx=12, ty=14, town=0, id=23).status_code, 200)
+        pazar = next(e for e in self.kayit["maps"][0]["items"] if e[0] == 23)
+        self.assertEqual(len(pazar[7]["si"]), 1)
+        self.assertEqual(self.iste(tur="sosyal", tx=12, ty=14, town=0, id=23).status_code, 409)  # aynı gün ikinci (KAR-29)
+
+    def test_sosyal_olmayan_ya_da_olmayan_bina_reddedilir(self):
         self.assertEqual(self.iste(tur="sosyal", tx=40, ty=41, town=0, id=234).status_code, 400)
+        self.kayit["maps"][0]["items"].append([1, 44, 45, 0, 0, 0, [], {}])  # Ev I: haritada var ama sosyal bina değil
+        self.assertEqual(self.iste(tur="sosyal", tx=44, ty=45, town=0, id=1).status_code, 400)
         self.assertEqual(self.iste(tur="sosyal", tx=1, ty=1, town=0, id=387).status_code, 400)
         self.assertEqual(self.iste(tur="sosyal", tx="x", ty=41, town=0, id=387).status_code, 400)
         r = self.istemci.post("/yardim/bot", data='{"tur": "sosyal", "tx": 1e400, "ty": 41, "town": 0, "id": 387}',
@@ -158,7 +173,7 @@ class Sayfa(unittest.TestCase):
         self.assertIn("window.showPopupSEHelpSocialItem = function", js)
         self.assertIn("window.showPopupSEHelpOffer = function", js)
         self.assertIn("forceReloadInfo()", js)
-        self.assertRegex(js, r"Number\(bina\) === 387")
+        self.assertIn("id: Number(bina)", js)
         self.assertIn('fetch("/yardim/bot"', js)
 
 

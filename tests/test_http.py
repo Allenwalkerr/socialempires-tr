@@ -28,6 +28,11 @@ class HttpDumanTestleri(unittest.TestCase):
         cevap = istemci.get("/")
         self.assertEqual(cevap.status_code, 200)
 
+    def test_yeni_oyuncu_20_nakitle_baslar(self):
+        """KAR-33: sahibinin kararı (12.11.2026) "oyuncu oyuna 20 nakitle başlasın"."""
+        from oyun.kayit import new_village, session
+        self.assertEqual(session(new_village())["playerInfo"]["cash"], 20)
+
     def test_saglik(self):
         cevap = self.istemci.get("/saglik")
         self.assertEqual(cevap.status_code, 200)
