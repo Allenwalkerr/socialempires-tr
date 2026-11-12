@@ -1091,13 +1091,13 @@
       "baslik": "Bugünkü 0926 istemcisi üç komut gönderiyor, sunucuda işleyicisi yok: time_ff, buy_time_packet, reset_dragon",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "dogrulandi",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "araclar/komut_imzalari.py 0926b üzerinde: G = 131, H = 128, G ∖ H = {time_ff, buy_time_packet, reset_dragon}. time_ff ve buy_time_packet PopupSelectTime/onUse ve onBuy'dan (Zaman Makinesi), reset_dragon AdminPanel/resetPopupDragon'dan (geliştirici paneli). tests/test_komutlar.py'deki elle çıkarılmış 128'lik liste araçla bulunan 131'in alt kümesi; fark tam bu üçü. Önceki not (upstream-tarama1 §5.3) time_ff'yi 'gerçekten gönderilmiyor' sayıyordu; bayt kodu bunu çürütüyor.",
       "test": "tests/test_komut_imzalari.py",
-      "pr": "#20",
+      "pr": "#38",
       "onay": null,
-      "notlar": "Bilinmeyen komut hata vermeden günlüğe düşer; oyunda Zaman Makinesi penceresine ulaşılıp ulaşılmadığı denenmedi (?). 1.4.07'de de eksik; GEC-03'te formülüyle birlikte yazılır. GEC-02: 0926 kaldırıldı; üç komut 1.4.07 istemcisinde de var, EKSIK_1407'de duruyor (GEC-03)."
+      "notlar": "Bilinmeyen komut hata vermeden günlüğe düşer; oyunda Zaman Makinesi penceresine ulaşılıp ulaşılmadığı denenmedi (?). 1.4.07'de de eksik; GEC-03'te formülüyle birlikte yazılır. GEC-02: 0926 kaldırıldı; üç komut 1.4.07 istemcisinde de var, EKSIK_1407'de duruyor (GEC-03). 12.11.2026 kitap denetimi: buy_time_packet ve time_ff #38'de (ec2dfe5) işleyiciyle eklendi (PopupSelectTime/onBuy, onUse); reset_dragon bilerek yok sayılan komutlar arasında (oyun/komutlar.py). Zaman Makinesi penceresi oyunda açılıp denenmedi (◐)."
     },
     {
       "id": "KYN-06",
