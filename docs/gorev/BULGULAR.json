@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (2) açık artırma fikri (yeni özellik, sahibiyle sonra konuşulacak); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: tablet denemesi sahibinde, v0.1.0 etiketi sahibinin onayıyla. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma fikri (yeni özellik, sahibiyle sonra konuşulacak); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -928,7 +928,7 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): oynanış betiği (Playwright + Ruffle, her komut grubu) yazılmadı. Oyunda gözle bakılmamışlar: Ruh Kazanı, PvP, mezarlık/diriltme, eğitim kuyruğu, birlik paketi, ilk alım teklifi, koleksiyon ödülü, Ada Ocağı, yüksek seviyeli hesap (SV59), köylü yürütme ve evi yere bırakma (FAZ0 §1). ONR-03'ün tanımındaki 'inşaat bitti' KAR-22'deki gibi sahibine sorulacak."
+      "notlar": "KAR-08 kararıyla açıldı (30.10.2026). 11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi): oynanış betiği (Playwright + Ruffle, her komut grubu) yazılmadı. Oyunda gözle bakılmamışlar: Ruh Kazanı, PvP, mezarlık/diriltme, eğitim kuyruğu, birlik paketi, ilk alım teklifi, koleksiyon ödülü, Ada Ocağı, yüksek seviyeli hesap (SV59), köylü yürütme ve evi yere bırakma (FAZ0 §1). ONR-03'ün tanımındaki 'inşaat bitti' KAR-22'deki gibi sahibine sorulacak. Sahibi (12.11.2026): 'tablette şimdilik sorun görmedim'. v0.1.0 etiketi için ayrıca onay gerekir."
     },
     {
       "id": "OYN-11",
@@ -2930,7 +2930,7 @@
       "test": "Ruffle'da deneme köyü (elle); bayt kodu MissionPopup/refreshGoals (1.4.07 ve 0926)",
       "pr": null,
       "onay": null,
-      "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı."
+      "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı. Sahibi (12.11.2026): '2 kalsın' — üçüncü simge sorusu şimdilik bekletiliyor."
     },
     {
       "id": "DNT-64",
@@ -2944,6 +2944,19 @@
       "pr": "#82",
       "onay": null,
       "notlar": "oyun/swf_yama.py kaynaklari_gunde_bir (YAMA_SURUMU 13): üç gövdenin önüne `if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL)` dön (spawnInitResources, spawnRemainingResources) ya da halka temizliğini atla (spawnInit). Komşu, saldırı, görev, eğitimde değişmez. Sunucu (oyun/istemci.py kaynak_yenilenir_mi) günün ilk config'inde 1 yollar ve günü privateState.kaynakYenilemeGunu'na yazar, sonra 0; kayıt yoksa 1. Ruffle'da aynı gün ikinci açılış: 0 buy, 0 sell, görüntü aynı. İki bozma testlerde düştü (dal konumu, gün denetimi). Hayvanların yenilenmesi de günde bire iner (aynı işlev). İnceleme (#82, github-actions): kasaba değişince istemci config'i yeniden istemez (TownManager$/loadTown@22-113), gün oyuncu başına tutulunca ikinci kasaba aynı gün hiç yenilenmeyebilirdi; gün de config istenince yazıldığından yarıda kalan açılış günü harcıyordu. Düzeltme (YAMA_SURUMU 14): bayrak kasaba başına dizi, koşul globals.NUM_TREE_CLUSTERS[Base.Main.townID] (townID 197, MultinameL 1631) okur; gün privateState.kaynakYenilemeGunu {kasaba: gün}, kendi kasabasının get_player_info'sunda yazılır. Bilinen sınır: aynı sayfa oturumunda kasabalar arasında gidip gelinirse config yenilenmediği için o oturumda bayrağı 1 olan kasaba her dönüşte yine yenilenir (eski davranış gibi). Ruffle'da yeniden: ilk açılış 142 kaynak eklemesi, aynı gün ikinci açılış 0. İki bozma düştü (haritada gün yazılmaması, kasabaya bakmayan bayrak). İkinci inceleme: istemcinin map değeri denetlenmeden anahtar yapılıyordu (aralık dışı numarada 0. kasaba yüklenir, gün '7' ya da '-1'e yazılırdı). Gün artık get_player_info'nun yüklediği kasabaya (playerInfo.acik_kasaba) yazılır ve gün değişince kayıt hemen diske yazılır; test aralık dışı numarayla (bozma düştü). Üçüncü inceleme (özet notu): komşudan ya da akından dönüşte config yeniden gelmediği için günün ilk oturumunda kendi köyü her dönüşte yine yenileniyordu; Ruffle'da doğrulandı (dönüşte 91 ekleme, 106 temizlik). İstemcide bayrağı sıfırlamak işe yaramadı: GameDataManager/get globals → OData/get v her okumada yeni nesne kurar. Düzeltme (YAMA_SURUMU 16): oturum işareti Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS'ta (Const yuvalı Array, oturum boyunca aynı) kasaba başına bit; izin = bayrak[townID] && !(işaret >> townID & 1); spawnRemainingResources izinle çalışınca biti koyar. Bu, kasabalar arasında gidip gelme sınırını da kapattı. Ruffle'da: ilk açılış 158 ekleme ve 81 temizlik; komşudan dönüş ve aynı gün F5'te kaynak eklemesi ve temizlik 0 (yalnızca spawnRemainingIdleTrolls'un 3 trolü, yamanın dışında). Bozmalar düştü (işaret konmaması, bit sınaması). Dördüncü inceleme: izin gitmeyen yüklemede de gün yazılıyordu (gece yarısını geçen oturumda komşudan dönüş yeni günü harcardı). Sunucu son config'te giden bayrakları bellekte tutar (oyun/istemci.py _GIDEN_BAYRAKLAR); gün yalnızca izin giden ve o oturumda kullanılmamış kasabaya yazılır, izin yazılınca kullanılmış sayılır (istemcinin oturum işaretiyle aynı kural); config gitmeden gelen yükleme günü yazmaz. Ruffle'da: ilk açılış 142, dönüş 0, F5 0. Bozmalar düştü."
+    },
+    {
+      "id": "KAR-37",
+      "baslik": "Altın Belediye'nin ev sınırı 100 kalır",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "KYN-07 karşılaştırması: TOWNHALL_HOUSE_LIMIT'te Altın Belediye (412) bizde 100 (GEC-02, #22), AcidCaos/socialemperors nerroth-rewrite'ta (6f9d792) 25; istemcinin varsayılanı yok, iki değerin de birincil kaynağı bulunmadı. Sahibine soruldu.",
+      "test": null,
+      "pr": "#83",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Sahibi: '3 100 olsun'. config/patch/1-mega_patch.json değişmedi."
     }
   ]
 }
