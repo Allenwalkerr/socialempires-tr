@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 (kurulum programı) yayında. DNT-50 (hikâye görevleri) ve KAR-33 (20 nakit) #80'de. Sahibinin oyun içi bildirdikleri sırada: pazarda 'Dostlarını tut' çalışmıyor; ilk seviyelerde etkinlik hedefi çıkıyor; 'pazar al' hedefi 'o bina sende yok' diyor; çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 (kurulum programı) yayında. DNT-50 (hikâye görevleri) ve KAR-33 (20 nakit) #80'de. Sahibinin oyun içi bildirdikleri sırada: pazarda 'Dostlarını tut' çalışmıyor; ilk seviyelerde etkinlik hedefi çıkıyor; 'pazar al' hedefi 'o bina sende yok' diyor; çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). KAR-34 (etkinlikler 15'ten kademeli ve takvimli) uygulanacak."
   },
   "maddeler": [
     {
@@ -2697,6 +2697,19 @@
       "pr": "#80",
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "Yalnızca yeni köyler; var olan kayıtlara dokunulmaz. Bozma (0'a dönüş) testi düşürdü."
+    },
+    {
+      "id": "KAR-34",
+      "baslik": "Özel teklif etkinlikleri 15. seviyeden başlayarak kademeli açılır ve takvime bağlanır",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'bu etkinlikler çok erken açıldı 15 seviye veya 20 seviyede açılsa hatta etkinlikler kademeli olsa veya takvime bağlansa'. Soruldu: açılış 'Kademeli, 15'ten başlayıp' (önerilen) / 'Hepsi 15' / 'Hepsi 20' → 'Kademeli, 15'ten başlayıp'; takvim 'Hayır, seviye yeter' (önerilen) / 'Evet, takvime bağla' → 'Evet, takvime bağla' (sayfada yaklaşan etkinlikler listesi). Bugün Ada Ocağı ve beş viral teklif herkese kayan 30 günlük pencereyle açık (oyun/config.py etkinlik_penceresi, KAR-27, KAR-29); istemci config'i oyuncuya göre değişmiyor.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Uygulama ayrı PR: istemci config'i oyuncunun seviyesine göre (starts_at/duration) kurulmalı; ilk etkinlik 15, sonrakiler 20, 25, 30...; her etkinliğin yılda belirli haftaları (config/takvim.json gibi). Oyunun içine takvim çizilmez (CLAUDE.md görsel kuralı); liste sayfada, oyunun kendi simgeleriyle. Sahibinin 'aşağıdaki boşluk' dediği yer Doldur görünümü hatası (görev listesi)."
     }
   ]
 }
