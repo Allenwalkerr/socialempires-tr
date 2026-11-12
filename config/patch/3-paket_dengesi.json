@@ -1,0 +1,686 @@
+[
+ {
+  "op": "replace",
+  "path": "/unit_packs/0/name",
+  "value": "Muhafız"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/0/banner",
+  "value": "İlk Muhafız"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/0/tooltip",
+  "value": "İlk paket\nHer oyuncuya\nbir Muhafız"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/0/description",
+  "value": "İmparatorluğun için ilk Muhafızını çağır!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/0/data",
+  "value": "Seçkin piyade, kahramanlar, büyücüler ve dahası!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/name",
+  "value": "Zorlu Paket"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/banner",
+  "value": "5 kat Usta Birlik Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/tooltip",
+  "value": "Altınla alınan güçlü paket\nEn çok 4 kez"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/description",
+  "value": "Seçkin birlik çıkma şansın 5 kat!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/data",
+  "value": "Seçkin piyade, kahramanlar, büyücüler ve dahası!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/name",
+  "value": "Gladyatör Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/banner",
+  "value": "Gladyatör Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/tooltip",
+  "value": "Arenanın savaşçıları\nimparatorluğuna geliyor"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/description",
+  "value": "Arenanın en güçlü savaşçılarını kazan!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/data",
+  "value": "Kılıçlı, Mızraklı, Sezar ve öteki gladyatörler!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/name",
+  "value": "Öfkeli Ejderhalar Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/banner",
+  "value": "10 kat Ejderha Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/tooltip",
+  "value": "Ejderha çıkma\nşansın 10 kat"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/description",
+  "value": "Gökyüzünün hâkimi ejderhaları ordusuna kat!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/data",
+  "value": "Öfkeli, Fırtına, Kristal ve nice ejderha!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/name",
+  "value": "Destansı Ejderhalar Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/banner",
+  "value": "24 kat Destansı Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/tooltip",
+  "value": "Destansı ejderha\nçıkma şansın 24 kat"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/description",
+  "value": "Destansı ejderhaların gücüne sahip ol!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/data",
+  "value": "Altın, Kara, Şimşek ve öteki destansı ejderhalar!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/name",
+  "value": "Vahşi ve Kadim Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/banner",
+  "value": "24 kat Destansı Şansı\n8 kat Kadim Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/tooltip",
+  "value": "Vahşi ve kadim\nejderhalar"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/description",
+  "value": "Vahşi ve kadim ejderhaların izini sür!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/data",
+  "value": "Vahşi Kavurucu, Kadim Rün ve dahası!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/name",
+  "value": "Kadim Ejderhalar Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/banner",
+  "value": "Kadim Ejderha Şansı"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/tooltip",
+  "value": "En güçlü paket:\nkadim ejderhalar"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/description",
+  "value": "Oyunun en güçlü ejderhaları bu pakette!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/data",
+  "value": "Kadim, Şaman, Rün ve Ceset ejderhaları!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/1/price",
+  "value": {
+   "g": 8000
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/price",
+  "value": {
+   "c": 8
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/price",
+  "value": {
+   "c": 20
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/5/price",
+  "value": {
+   "c": 38
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/6/price",
+  "value": {
+   "c": 45
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/7/price",
+  "value": {
+   "c": 60
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/custom",
+  "value": [
+   {
+    "id": 2105,
+    "chances": 1
+   },
+   {
+    "id": 2106,
+    "chances": 1
+   },
+   {
+    "id": 2107,
+    "chances": 1
+   },
+   {
+    "id": 2108,
+    "chances": 1
+   },
+   {
+    "id": 2109,
+    "chances": 1
+   },
+   {
+    "id": 2116,
+    "chances": 1
+   },
+   {
+    "id": 2117,
+    "chances": 1
+   },
+   {
+    "id": 2125,
+    "chances": 1
+   },
+   {
+    "id": 2126,
+    "chances": 1
+   },
+   {
+    "id": 2135,
+    "chances": 1
+   },
+   {
+    "id": 2136,
+    "chances": 1
+   },
+   {
+    "id": 2143,
+    "chances": 1
+   },
+   {
+    "id": 2144,
+    "chances": 1
+   },
+   {
+    "id": 2150,
+    "chances": 1
+   },
+   {
+    "id": 2151,
+    "chances": 1
+   },
+   {
+    "id": 2157,
+    "chances": 1
+   }
+  ]
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/2/carrusel",
+  "value": [
+   {
+    "id": 2105,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2106,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2107,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2108,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2109,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2116,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2117,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2125,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2126,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2135,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2136,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2143,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2144,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2150,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2151,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 2157,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   }
+  ]
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/custom",
+  "value": [
+   {
+    "id": 649,
+    "chances": 1
+   },
+   {
+    "id": 684,
+    "chances": 1
+   },
+   {
+    "id": 695,
+    "chances": 1
+   },
+   {
+    "id": 708,
+    "chances": 1
+   },
+   {
+    "id": 714,
+    "chances": 1
+   },
+   {
+    "id": 723,
+    "chances": 1
+   },
+   {
+    "id": 736,
+    "chances": 1
+   },
+   {
+    "id": 758,
+    "chances": 1
+   },
+   {
+    "id": 766,
+    "chances": 1
+   },
+   {
+    "id": 777,
+    "chances": 1
+   },
+   {
+    "id": 785,
+    "chances": 1
+   },
+   {
+    "id": 793,
+    "chances": 1
+   },
+   {
+    "id": 798,
+    "chances": 1
+   },
+   {
+    "id": 826,
+    "chances": 1
+   }
+  ]
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/carrusel",
+  "value": [
+   {
+    "id": 649,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 684,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 695,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 708,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 714,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 723,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 736,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 758,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 766,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 777,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 785,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 793,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 798,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 826,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   }
+  ]
+ },
+ {
+  "op": "test",
+  "path": "/unit_packs/4/id",
+  "value": 5
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/name",
+  "value": "Kraliyet Paketi"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/banner",
+  "value": "Kraliyet Birlikleri"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/tooltip",
+  "value": "Altınla alınan\nkraliyet birlikleri"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/description",
+  "value": "Kraliyet ordusundan bir birlik kazan!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/data",
+  "value": "Kraliyet Kılıççısı, Okçusu, Şövalyesi ve dahası!"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/img",
+  "value": "first.png"
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/price",
+  "value": {
+   "g": 5000
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/pack_category",
+  "value": {
+   "0": 0,
+   "custom": 10.0,
+   "2": 0
+  }
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/custom",
+  "value": [
+   {
+    "id": 608,
+    "chances": 1
+   },
+   {
+    "id": 609,
+    "chances": 1
+   },
+   {
+    "id": 610,
+    "chances": 1
+   },
+   {
+    "id": 611,
+    "chances": 1
+   },
+   {
+    "id": 539,
+    "chances": 1
+   },
+   {
+    "id": 540,
+    "chances": 1
+   },
+   {
+    "id": 541,
+    "chances": 1
+   },
+   {
+    "id": 574,
+    "chances": 1
+   }
+  ]
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/4/carrusel",
+  "value": [
+   {
+    "id": 608,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 609,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 610,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 611,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 539,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 540,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 541,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   },
+   {
+    "id": 574,
+    "scale": 1.0,
+    "orientation": "4",
+    "offset": -40
+   }
+  ]
+ }
+]
