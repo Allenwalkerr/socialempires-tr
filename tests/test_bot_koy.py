@@ -123,7 +123,8 @@ class Yerlesim(unittest.TestCase):
             desenler.add(frozenset((int(e[0]), int(e[1]), int(e[2])) for e in items
                                    if ESYA[int(e[0])]["type"] == "b"))
         self.assertEqual(len(desenler), 50)
-        self.assertEqual({v["duzen"] for v in bot_koy.KISILIK.values()}, {"kale", "carsi", "ordugah", "ciftlik"})
+        # Kişilik köyün ilk iki şeridini belirler: dört kişiliğin başı birbirinden farklı (plan §3.1)
+        self.assertEqual(len({tuple(v[:2]) for v in bot_koy.SERIT_SIRASI.values()}), 4)
 
     def test_koyler_farkli_yonlere_bakar(self):
         """Kapı (Sur Kapısı) belediyeye göre dört yönden birinde; köyler aynı yöne dizilmez."""
@@ -143,6 +144,13 @@ class Yerlesim(unittest.TestCase):
             self.assertLess(say[0], say[1], k)
             self.assertLess(say[1], say[2], k)
             self.assertGreaterEqual(say[2], 3 * say[0], k)
+
+    def test_serit_sirasi_kisiligin_basi_sabit_kalani_karisir(self):
+        import random
+        for k, asil in bot_koy.SERIT_SIRASI.items():
+            siralar = [bot_koy.serit_sirasi(k, random.Random("t%d" % i)) for i in range(20)]
+            self.assertTrue(all(s[:2] == asil[:2] and sorted(s) == sorted(asil) for s in siralar), k)
+            self.assertGreater(len({tuple(s[2:]) for s in siralar}), 1, k)
 
     def test_ayni_tohum_ayni_koy(self):
         self.assertEqual(bot_koy.koy_kur(20, "tuccar", "abc", 5), bot_koy.koy_kur(20, "tuccar", "abc", 5))
@@ -206,6 +214,22 @@ class ArthurDuzeni(unittest.TestCase):
                           if not any((t[0] + dx, t[1] + dy) in birimler for dx in (-1, 0, 1) for dy in (-1, 0, 1)
                                      if dx or dy)]
                 self.assertLessEqual(len(yalniz), len(birimler) * 0.2, (sv, k, len(yalniz), len(birimler)))
+
+
+class BirimEkle(unittest.TestCase):
+    def test_kayittaki_genisleme_icinde_kalir(self):
+        """Seviye atlayan bot (20) ama kayıtta yalnızca [13] açık: yeni birim 40..59'da kalır (genişleme kuralı,
+        acik_karolar; #81 incelemesi)."""
+        import random
+        kayit = {"playerInfo": {"bot": True, "bot_kisi": "agresif"},
+                 "maps": [{"level": 20, "expansions": [13], "items": []}]}
+        rng = random.Random(3)
+        for _ in range(25):
+            bot_koy.birim_ekle(kayit, 509, 0, rng)
+        items = kayit["maps"][0]["items"]
+        self.assertEqual(len(items), 25)
+        for e in items:
+            self.assertIn((e[1], e[2]), acik_karolar([13]), e)
 
 
 class YenidenKur(unittest.TestCase):

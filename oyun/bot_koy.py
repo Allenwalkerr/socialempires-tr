@@ -15,7 +15,7 @@ import random
 
 from oyun.config import get_item_from_id
 
-TASARIM_SURUMU = 4  # 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
+TASARIM_SURUMU = 5  # 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -296,6 +296,15 @@ SERIT_SIRASI = {
 }
 
 
+def serit_sirasi(kisi, rng):
+    """Kişiliğin şerit türleri: ilk ikisi kişiliği belirler (sabit), kalanı köyden köye karışır (#81 incelemesi:
+    dilim kopyası karıştırılıyordu, sıra hiç değişmiyordu)."""
+    sira = list(SERIT_SIRASI[kisi])
+    bas, son = sira[:2], sira[2:]
+    rng.shuffle(son)
+    return bas + son
+
+
 def koy_kur(seviye, kisi, tohum, simdi):
     """(items, expansions): botun köyü. Aynı tohum aynı köyü verir. Arthur köylerindeki düzen: sur köyün kenarında,
     köşelerde kule öbekleri, kapı bir boşluk ve iki yanında kule, içeri ağaçlı bir yol; mahalleler sura yaslı
@@ -389,8 +398,7 @@ def koy_kur(seviye, kisi, tohum, simdi):
                 a.koy(agac, *t, ayrik_serbest=True)
 
     # 4. Mahalleler: her dış kenar boyunca surun içinde boşluksuz şerit (kişiliğin sırasıyla)
-    sira = list(SERIT_SIRASI[kisi])
-    rng.shuffle(sira[2:])
+    sira = serit_sirasi(kisi, rng)
     ic_kenarlar = [k for k in kenarlar]
     kullanilan = set()
     for n, (c, r, yon) in enumerate(ic_kenarlar):
