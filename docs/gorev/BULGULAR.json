@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (5) KAR-34: etkinlikler 15'ten kademeli ve takvimli; (6) sınırlı mağaza öğesi 'SON 0 GÜN' kalıyor: süresi bitince ertesi gün rastgele başkası gelsin; (7) çeviri taşmaları ('28 NAKİ', 'Kayıp Ejderha Yumurtala'); (8) çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor; (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (4) 'Doldur' görünümünde menüler kayıyor (oyun menüleri yalnızca FULL_SCREEN olayında yerleştiriyor: StateNormal/setFullScreen, Base/getStageDimensions); (5) KAR-34: etkinlikler 15'ten kademeli ve takvimli; (6) sınırlı mağaza öğesi 'SON 0 GÜN' kalıyor: süresi bitince ertesi gün rastgele başkası gelsin; (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2775,6 +2775,19 @@
       "pr": "#81",
       "onay": null,
       "notlar": "Bitince 'İndirme bitti.', durdurulunca boş. Düzeltme kaldırılınca iki test de düşüyor."
+    },
+    {
+      "id": "DNT-54",
+      "baslik": "Çeviri metin kutusuna sığmayınca son harf kesiliyordu ('28 NAKİ')",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026): '28 NAKİ'. swf_yama yalnızca DefineEditText metnini değiştiriyor, kutunun RECT'ine dokunmuyordu; İngilizce 'CASH' kutusuna 'NAKİT' sığmıyor. Gerçek istemci SWF'sinde ölçüm (yazı tipi ilerlemeleri, DefineFont3 em 1024×20): 916 çevrilen alandan 37'si sığmıyor, ör. NAKİT 1400 twip kutu, KARIŞTIRMAYA BAŞLA 2886, KAPALI 1200, HIZLANDIR 1580. Oyun içinde görüntü denetimi yapılmadı (◐). Oyunda sınandı (Playwright, yerel sunucu, yeni köy, 'aç beni' sandığı → PopupFirstBuyMC): önce '28 NAKİ', sonra '28NAKİT' tam; başlık 'Kayıp Yumurtalar!' sığıyor. Aynı pencerede '70% OFF' indirim anlamında 'KAPALI' çevrilmiş ve 'KAPAL' kesiliyordu: 'OFF' SWF'de yalnızca bu pencerede (PopupFirstBuyMC), 'İNDİRİM' yapıldı; 1,6 kat kutuya da sığmadığı için harf boyu 500'den 350'ye indi, '70%İNDİRİM' okunuyor.",
+      "test": "tests/test_swf_yama.py AlanGenisletmeTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "swf_yama.alani_genislet: sığmayan alan hizasına göre (sol, sağ, orta) genişler; en çok 1,6 kat kutuya da sığmayan yazıda önce harf boyu küçülür (en çok 0,7 katına), kutu kalan kadar genişler. AutoSize alana, bilinmeyen yazı tipine ve harfe dokunmaz. YAMA_SURUMU 10 (önbellekteki eski SWF yenilenir). Gerçek SWF'de 916 çevrilen alandan 37'si genişliyor, 1'inin harf boyu küçülüyor. Çalışırken yazılan 'Kayıp Ejderha Yumurtaları!' (POPUP_FIRST_OFFER_TITLE) SWF'de değil, 'Kayıp Yumurtalar!' diye kısaltıldı. Bozma ölçümü: 17 bozmadan 16'sı test düşürüyor; KENAR (80 twip) çıkarılınca kalan, çünkü %6 + 40 twip'lik güvenlik payı onu örtüyor. Ruh Kazanı'ndaki 'KARIŞTIRMAYA BAŞLA' ve 'HIZLANDIR' da genişliyor, oyun içinde görülmedi (seviye 8)."
     }
   ]
 }
