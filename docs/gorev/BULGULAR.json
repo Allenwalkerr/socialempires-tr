@@ -2723,6 +2723,19 @@
       "pr": "#80",
       "onay": null,
       "notlar": "oyun/hedef_seviye.py: min_level istemcinin açılış seviyelerine göre yükseltilir (asla düşürülmez): attack_player MIN_LEVEL_PVP 8; complete_quest, popup_opened_quests, assaults_won MIN_LEVEL_QUESTS 6 (ve QUESTS_MIN_LEVELS); soulmixer SOUL_MIXER_MIN_LEVEL; recruit_market_friend pazarın (alt kategori 132) seviyesi; bina/birim hedefleri istedikleri eşyalardan en erken açılanın min_level'i. Dağılım 1: 59, sonra 2..35 arası. orders dosya sırasında 1, 2, 3... (0 korunur). get_game_config.php oturumdaki oyuncunun seviyesine gelmiş hedefleri yollar (config önbellek anahtarına seviye girdi). Bayram hedefleri min_level 15 (KAR-34). Yeni seviyenin hedefleri istemci config'i açılışta bir kez okuduğu için F5'ten sonra görünür. 10 bozma düştü."
+    },
+    {
+      "id": "KAR-35",
+      "baslik": "Ad değişiklikleri: Savaş Trolü → Yaman Trol, Bıçkıhane → Marangozhane, saldırıdaki 'Çek' → 'Geri Çekil'",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Savaş Trolü ismini beğenmedim'; 'Odun kesilen yerin adı bıçkıhane orayı marangoz diyebiliriz'; 'Çek var Geri çekil veya teslim ol olsa daha anlaşılır olur'. Soruldu: trol adı (Cenk Trolü önerilen / Yaman Trol / Dev Trol / Akancı Trol) → 'Yaman Trol'; odun binası (Marangozhane önerilen / Marangoz / Keresteci / kalsın) → 'Marangozhane'. loc:AUX_WITHDRAW yalnızca StateAssault/enter ve StateTournament/enter'de kullanılır (geri çekilme düğmesi).",
+      "test": null,
+      "pr": "#80",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "ceviri/tr.json: item:529, 552, 597 ve başarım metni; Bıçkıhane'nin 38 geçişi (ekler aynı ünlü uyumunda). Düğmenin genişliği oyunda denenmedi (◐)."
     }
   ]
 }
