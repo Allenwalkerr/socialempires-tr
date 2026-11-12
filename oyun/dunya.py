@@ -557,18 +557,15 @@ class Dunya:
             harita[alan] = int(harita.get(alan, 0)) + artis
             degisti = True
 
-        # Ara sıra yeni birim üret
+        # Ara sıra yeni birim üret: seviyesine ve kişiliğine uygun, köyün boş bir karosuna, ordu sınırına dek
+        # (oyun/bot_koy.py; plan: docs/inceleme/bot-koyleri-plani.md)
         if random.random() < 0.35:
-            birimler = [512, 516, 517, 518]
-            secim = random.choice(birimler)
-            item = _item(secim)
-            maliyet = int(item.get("cost") or 0)
-            if maliyet <= int(harita.get("coins", 0)) and len(kayit["maps"][0]["items"]) < 700:
+            from oyun import bot_koy
+            from oyun.ekonomi import timestamp_now
+            secim = bot_koy.birim_sec(seviye, kayit.get("playerInfo", {}).get("bot_kisi", "dengeli"), random.Random())
+            maliyet = int(_item(secim).get("cost") or 0)
+            if maliyet <= int(harita.get("coins", 0)) and bot_koy.birim_ekle(kayit, secim, timestamp_now()):
                 harita["coins"] = int(harita.get("coins", 0)) - maliyet
-                from oyun.ekonomi import timestamp_now
-                kayit["maps"][0]["items"].append(
-                    [secim, random.randint(38, 62), random.randint(38, 62), 0, timestamp_now(), 0, [], {}]
-                )
                 degisti = True
                 self._ekonomi_haberleri.append(
                     f"{kayit['playerInfo'].get('name', uid)} ordusuna bir {turkce_ad(secim)} kattı")

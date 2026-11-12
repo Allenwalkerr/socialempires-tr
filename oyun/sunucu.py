@@ -130,6 +130,7 @@ def _botlari_hazirla():
     """Hiç bot köyü yoksa (ilk çalıştırma) PvP/ada/turnuva için üretir."""
     if any(bot_mu(uid) for uid in all_saves_userid()):
         _bot_adlarini_yenile()
+        _bot_koylerini_yenile()
         return
     print(" [+] Bot koyleri bulunamadi; ilk calistirma icin uretiliyor...")
     try:
@@ -141,6 +142,21 @@ def _botlari_hazirla():
         print(" ! Bot koyleri uretilemedi; elle: python araclar/bot_koy_uret.py")
         return
     load_saved_villages()
+
+
+def _bot_koylerini_yenile():
+    """Eski tasarımlı bot köylerini yeni yerleşim ve orduya geçirir (oyun/bot_koy.py; kimlik, ad, kaynak, seviye ve
+    saldırı geçmişi kalır)."""
+    from oyun import bot_koy
+    degisen = []
+    with save_lock:
+        for uid in all_saves_userid():
+            kayit = kayit_oturumu(uid)
+            if isinstance(kayit, dict) and bot_koy.yeniden_kur(kayit, timestamp_now()):
+                save_session(uid)
+                degisen.append(uid)
+    if degisen:
+        print(f" [+] Bot koyleri yeni tasarima gecirildi: {len(degisen)} kayit")
 
 
 def _bot_adlarini_yenile():

@@ -24,106 +24,9 @@ from oyun.yollar import SAVES_DIR, VILLAGES_DIR  # noqa: E402
 from oyun.surum import version_code  # noqa: E402
 from oyun.kayit_semasi import eksikleri_tamamla  # noqa: E402
 from oyun.bot_kimlik import ISIMLER, portre  # noqa: E402
+from oyun import bot_koy  # noqa: E402  (yerleşim ve ordu: docs/inceleme/bot-koyleri-plani.md)
 
 KISILIKLER = ["agresif", "savunmaci", "tuccar", "dengeli"]
-
-# Birim havuzları (kişiliğe göre)
-BIRIMLER = {
-    "agresif": [512, 512, 512, 517, 518],
-    "savunmaci": [516, 516, 517, 518, 512],
-    "tuccar": [516, 517, 512, 516, 517],
-    "dengeli": [512, 516, 517, 518],
-}
-
-
-def _sec(tablo, seviye):
-    anahtar = 1 if seviye < 12 else 2 if seviye < 30 else 3
-    return tablo[anahtar]
-
-
-def _yerlesim(seviye, simdi, kisi, rastgele):
-    """Bot köyünün eşya listesini üretir; kişiliğe göre savunma dağılımı."""
-    esyalar = []
-    dolu = set()
-
-    def koy(esya_id, x, y):
-        if (x, y) in dolu:
-            return False
-        dolu.add((x, y))
-        esyalar.append([esya_id, x, y, 0, simdi, 0, [], {}])
-        return True
-
-    def bos_yer(alt=38, ust=62):
-        for _ in range(60):
-            x, y = rastgele.randint(alt, ust), rastgele.randint(alt, ust)
-            if (x, y) not in dolu:
-                return x, y
-        return None
-
-    # Belediye binası
-    belediye = 26 if seviye < 18 else 139 if seviye < 32 else 140 if seviye < 46 else 141
-    koy(belediye, 50, 50)
-
-    # Evler (seviyeye göre 3-7)
-    ev_ids = [1, 2, 3, 4, 194]
-    ev = ev_ids[min(len(ev_ids) - 1, seviye // 14)]
-    for _ in range(rastgele.randint(3, 7)):
-        yer = bos_yer()
-        if yer:
-            koy(ev, *yer)
-
-    # Kaynak binaları
-    mill = _sec({1: 5, 2: 6, 3: 7}, seviye)
-    for _ in range(rastgele.randint(2, 4)):
-        yer = bos_yer()
-        if yer:
-            koy(mill, *yer)
-    for _ in range(rastgele.randint(2, 4)):
-        yer = bos_yer()
-        if yer:
-            koy(10, *yer)  # Farm Land
-
-    # Kışla
-    kisla = _sec({1: 38, 2: 39, 3: 40}, seviye)
-    for _ in range(2 if kisi == "agresif" else 1):
-        yer = bos_yer()
-        if yer:
-            koy(kisla, *yer)
-
-    # Kuleler (savunmacı daha çok)
-    kule = _sec({1: 29, 2: 30, 3: 31}, seviye)
-    kule_sayisi = rastgele.randint(2, 4) + (2 if kisi == "savunmaci" else 0)
-    for _ in range(kule_sayisi):
-        yer = bos_yer(36, 64)
-        if yer:
-            koy(kule, *yer)
-
-    # Surlar (seviye 8+)
-    if seviye >= 8:
-        sur = 34 if seviye < 20 else 35 if seviye < 36 else 36
-        for x in range(34, 67):
-            koy(sur, x, 33)
-            koy(sur, x, 67)
-        for y in range(35, 66):
-            koy(sur, 33, y)
-            koy(sur, 67, y)
-        koy(37, 50, 67)  # kapı
-
-    # Dekor (birkaç heykel)
-    for _ in range(rastgele.randint(0, 2)):
-        yer = bos_yer()
-        if yer:
-            koy(122, *yer)
-
-    # Savunma birlikleri
-    havuz = BIRIMLER.get(kisi, BIRIMLER["dengeli"])
-    adet = min(6 + seviye + rastgele.randint(0, 8), 70)
-    for _ in range(adet):
-        yer = bos_yer(38, 62)
-        if yer:
-            koy(rastgele.choice(havuz), *yer)
-
-    return esyalar
 
 
 def mevcut_botlari_sil():
@@ -188,6 +91,7 @@ def bot_uret(adet=50):
             "sp_ref_uid": pid,
             "bot": True,
             "bot_kisi": kisi,
+            "bot_tasarim": bot_koy.TASARIM_SURUMU,
         })
         pi["map_names"] = [f"{isim} Kalesi"]
         pi["map_sizes"] = [0]
@@ -201,9 +105,8 @@ def bot_uret(adet=50):
         harita["stone"] = 350 * seviye
         harita["food"] = 400 * seviye
         harita["timestamp"] = simdi
-        harita["expansions"] = [13]
         harita["resourcesTraded"] = {}
-        harita["items"] = _yerlesim(seviye, simdi, kisi, rastgele)
+        harita["items"], harita["expansions"] = bot_koy.koy_kur(seviye, kisi, pid, simdi)
 
         ps = kayit["privateState"]
         ps["attacksSent"] = []

@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor; bot köyleri özenle ve bir plana göre, askeri seviyeleriyle birlikte tasarlansın."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor;"
   },
   "maddeler": [
     {
@@ -2827,6 +2827,32 @@
       "pr": "#81",
       "onay": null,
       "notlar": "Sahibi raisetheempires-tr'deki çözümü örnek gösterdi (Tam ekran düğmesi oyun kutusunu requestFullscreen ile açar). Burada kutu yerine Ruffle oyuncusunun kendisi tam ekrana alınır: Social Empires bu olayda menülerini kenarlara dizer. Doldur seçiliyken oyuna ilk dokunuşta ya da sayfadaki Tam Ekran düğmesinde açılır (tarayıcı tam ekranı yalnızca kullanıcı dokunuşuyla izin verir); noScale kaldırıldı. Android'de WebView onShowCustomView ile tam ekranı karşılıyor (MainActivity); tablette denenmedi (GEC-09). Bozma: üç bozmanın üçü JS testini düşürüyor."
+    },
+    {
+      "id": "DNT-58",
+      "baslik": "Sağdaki teklif simgeleri (asma kilit, ateş yumurtası, sandık) sürekli parlıyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "onay_bekliyor",
+      "isaret": "◐",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026, seviye 6): 'aç beni' sandığı, parıltılı asma kilit, ateş yumurtası. Asma kilit ve yumurta viral teklif simgeleridir (SpecialDayOfferManager/checkViralButton: timeLeft > 0 ise eklenir); kayan 30 günlük pencereyle (KAR-29) herkese açıktı. KAR-34 uygulamasından (#81) sonra seviye 15'ten önce ve takvim dışında starts_at/duration 0: Chromium'da yeni köyde yalnızca 'aç beni' kaldı. Sandık FirstOfferButton (viral_icons'ta tek active 1 giriş, oyunun kendi ilk alım teklifi: 28 nakde 20K altın + 40K yemek).",
+      "test": "tests/test_bot_yardim.py Pencere",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Sandığın gizlenip gizlenmeyeceği sahibine soruldu (viral_icons FirstOfferButton active 0 yapılırsa simge ve teklif kalkar)."
+    },
+    {
+      "id": "DNT-59",
+      "baslik": "Bot köyleri hep aynı, binalar üst üste, ordu seviyeden bağımsızdı",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'bot köylerinin dizaynı hepsi aynı ve çok ama çok kötü'; 'askeri seviyelerini ayarla, özene bezene, bir plan çerçevesinde'. araclar/bot_koy_uret.py binaları yalnızca sol üst karo denetlenerek rastgele koyuyordu (2×2..4×4 üst üste), sur her köyde aynı kare ve alan dışında, ordu 3. seviyede de 60. seviyede de 512/516/517/518; dunya.py de aynı dört birimi 700 öğeye dek ekliyordu. İstemcinin doluluk kuralı Base/setOccupiedGrid (kayıttaki konum en büyük köşe). Ruffle'da sınandı (yerel sunucu): İblis Kıran (55) ve Balrog (57) surlu, kapılı, farklı yönlere dönük, Belediye IV, ev sıraları, ordugâh ve Kraliyet birlikleriyle.",
+      "test": "tests/test_bot_koy.py, tests/test_dunya.py EkonomiTestleri",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Plan: docs/inceleme/bot-koyleri-plani.md. oyun/bot_koy.py: dört düzen (kale, çarşı, ordugâh, çiftlik) kişiliğe göre, 8 simetriden biri, köy seviyeyle büyür (1-14 tek büyük karo, 15-29 2×2, 30+ 3×3). Ordu kişiliğin kol ağırlığıyla, açık en yüksek iki kademeden; büyüklük 8 + seviye (en çok 60) × kişilik oranı. Kule sayısı büyük karo başına 10'u aşmaz. Var olan botlar açılışta bir kez yeni tasarıma geçer (bot_tasarim 2; kimlik, ad, kaynak, seviye, geçmiş kalır). Dünya simülasyonu birimi aynı kuralla seçer, boş karoya koyar, ordu sınırında durur. Test, Belediye'nin açılış seviyesini (config 0, tabloda 1) yakaladı. 10 bozmanın 10'u test düşürüyor."
     }
   ]
 }
