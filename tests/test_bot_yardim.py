@@ -95,7 +95,7 @@ class Yardim(unittest.TestCase):
         self.assertEqual(len(pazar[7]["si"]), 1)
         self.assertEqual(self.iste(tur="sosyal", tx=12, ty=14, town=0, id=23).status_code, 409)  # aynı gün ikinci (KAR-29)
 
-    def test_yalnizca_asker_toplama_ve_bina_dogrulanir(self):
+    def test_sosyal_olmayan_ya_da_olmayan_bina_reddedilir(self):
         self.assertEqual(self.iste(tur="sosyal", tx=40, ty=41, town=0, id=234).status_code, 400)
         self.kayit["maps"][0]["items"].append([1, 44, 45, 0, 0, 0, [], {}])  # Ev I: haritada var ama sosyal bina değil
         self.assertEqual(self.iste(tur="sosyal", tx=44, ty=45, town=0, id=1).status_code, 400)

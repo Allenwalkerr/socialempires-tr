@@ -301,7 +301,7 @@
       })
       .catch(function () { alert("Yardım gelmedi."); });
   }
-  // PopupRecruitment/onFindFriend: (tx, ty, kasaba, bina, yardımcılar, ad); yalnızca Asker Toplama (387)
+  // Çağrı: (tx, ty, kasaba, bina, yardımcılar, ad).
   // Asker Toplama (PopupRecruitment) ve dost isteyen öteki binalar (pazar, değirmen...: PopupSocialBuilding/onFindFriend)
   // aynı çağrıyı yapar; hangi binanın kaç dost aldığına sunucu bakar (oyun/bot_yardim.py)
   window.showPopupSEHelpSocialItem = function (tx, ty, kasaba, bina) {

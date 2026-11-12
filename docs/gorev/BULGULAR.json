@@ -2735,7 +2735,7 @@
       "test": null,
       "pr": "#80",
       "onay": "Sahibi, 12 Kasım 2026",
-      "notlar": "ceviri/tr.json: item:529, 552, 597 ve başarım metni; Bıçkıhane'nin 38 geçişi (ekler aynı ünlü uyumunda). Düğmenin genişliği oyunda denenmedi (◐)."
+      "notlar": "ceviri/tr.json: item:529, 552, 597 ve başarım metni; Bıçkıhane'nin 38 geçişi (ekler aynı ünlü uyumunda). Düğmenin genişliği oyunda denenmedi (◐). Ayrıca saldırı haritası seçiminde 'Start Loading' → 'Saldır!' (önce 'Yüklemeyi Başlat' kesik görünüyordu; sahibi: 'Yüklemeyi yazıyor çok saçma')."
     },
     {
       "id": "DNT-52",
@@ -2748,7 +2748,7 @@
       "test": "tests/test_bot_yardim.py test_pazar_calisan_sayisi_kadar_dost_alir, test_yalnizca_asker_toplama_ve_bina_dogrulanir; tests/js/bot_yardimi.test.js",
       "pr": "#80",
       "onay": "KAR-26/27/29 (botlar yardım eder, her yere günde bir)",
-      "notlar": "Sunucu sosyal binada en çok workers sayısı kadar bot yazar (Asker Toplama 4). Her bina için günde bir bot (KAR-29): pazarın 3 çalışanı 3 günde dolar ya da istemcinin 'Doldur: 2 nakit'iyle. 3 bozma düştü. Oyun içinde denenmedi (◐)."
+      "notlar": "Sunucu sosyal binada en çok workers sayısı kadar bot yazar (Asker Toplama 4). Her bina için günde bir bot (KAR-29): pazarın 3 çalışanı 3 günde dolar ya da istemcinin 'Doldur: 2 nakit'iyle. 3 bozma düştü. Oyun içinde denenmedi (◐). #80 incelemesi: Artık Zirve (234), Yuvarlak Masa (389) ve Büyük Kilise (470) de bot alır (KAR-26 çizgisi). finish_si 234 dışında si'yi siler; istemci yardımı yalnızca pencere açık ve yuva boşken ister (doğrulanmadı ◐)."
     },
     {
       "id": "CEV-08",
