@@ -1378,5 +1378,194 @@ class AdaOcagi(KomutTesti):
         self.assertEqual(self.harita["items"], bos_kayit()["maps"][0]["items"])  # birim store_add_items'la gelir
 
 
+class KalanKomutlar(KomutTesti):
+    """TST-02 son grup. Beklenen değerler 1.4.07 istemcisinin bayt kodundan (yöntem/@konum)."""
+
+    SIMDI = 2_000_000_000
+
+    def zamanla(self, ad, *args):
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=self.SIMDI):
+            self.komut(ad, *args)
+
+    def test_egitim_adimi_kaydedilir_ve_sonda_biter(self):
+        """DNT-46. TutorialMain/nextStep @457 her adımda completarTutorial(currentStep), endTutorial @97 sonda 15 yollar;
+        Base/completarTutorial @105 adımı playerInfo.completed_tutorial'a yazar. Base/tutorialCheck @36: açılışta
+        parseInt(completed_tutorial) 0 ise eğitim baştan başlar. 1.4.07 eğitiminde 15 adım var (TutorialMain/init)."""
+        self.kayit["playerInfo"]["completed_tutorial"] = 0
+        self.komut("complete_tutorial", 3)
+        self.assertEqual(self.kayit["playerInfo"]["completed_tutorial"], 3)
+        self.komut("complete_tutorial", 15)
+        self.assertEqual(self.kayit["playerInfo"]["completed_tutorial"], 15)
+
+    def test_binici_secimi_adimi_sifirlar(self):
+        """DNT-47. PopupDragonRiders/onRiderFieldClick @38-85: tür = seçilen, adım = 0, zaman = 0, sonra select_rider [tür].
+        PopupDragonRiderTraining/onTrainClick @89-139: select_rider ['0'] ve üçü de 0. PlayerStatus/Init bunları
+        riderNumber, riderStepNumber, riderTimeStamp'ten okur."""
+        self.ps.update(riderNumber=1, riderStepNumber=5, riderTimeStamp=123)
+        self.komut("rider_select", 2)
+        self.assertEqual((self.ps["riderNumber"], self.ps["riderStepNumber"], self.ps["riderTimeStamp"]), (2, 0, 0))
+        self.ps.update(riderStepNumber=5, riderTimeStamp=123)
+        self.komut("rider_select", "0")
+        self.assertEqual((self.ps["riderNumber"], self.ps["riderStepNumber"], self.ps["riderTimeStamp"]), (0, 0, 0))
+
+    def test_binici_sonraki_adim(self):
+        """PopupDragonRiderTraining/onGameSuccess @36-149: rider_next_step ['1'], adım + 1, zaman = sunucu zamanı."""
+        self.ps.update(riderStepNumber=2, riderTimeStamp=0)
+        self.zamanla("rider_next_step", "1")
+        self.assertEqual((self.ps["riderStepNumber"], self.ps["riderTimeStamp"]), (3, self.SIMDI))
+
+    def test_dunya_yuvasi_ikinci_argumandan(self):
+        """DNT-48. ExplorationsManager/evalUserPositionNotConquered @286-376: oyuncunun yuvası (yerel6) fethedilmemiş
+        rakibin yuvasıyla (yerel5) yer değiştirir; komut [yerel6, yerel5]: oyuncunun yeni yuvası ikinci argüman."""
+        from oyun import ada
+        self.komut("modify_position_univers", 7, 3)
+        self.assertEqual(ada.kendi_konumu(self.kayit), 3)
+
+    def test_strateji(self):
+        """PopUpBattleOptions/closeWindow @67-90: set_strategy [defensiveStrategy]; Base/processAttacks @1700-1713
+        privateState.strategy'yi defensiveStrategy'ye okur."""
+        self.komut("set_strategy", 4)
+        self.assertEqual(self.ps["strategy"], 4)
+
+    def test_bilgi_gosterildi(self):
+        """PlayerStatus/setInfoShowed @28-58: set_info_showed [indeks, değer] ve infoShowed[indeks] = değer."""
+        self.ps["infoShowed"] = [0, 0]
+        self.komut("set_info_showed", 3, 1)
+        self.komut("set_info_showed", 0, 1)
+        self.assertEqual((self.ps["infoShowed"][3], self.ps["infoShowed"][0], self.ps["infoShowed"][1]), (1, 1, 0))
+
+    def test_mesaj_ve_dunya_degisimi_temizlenir(self):
+        """clear_message argümansız (PopupManager/checkStartPopup'ın kapanışı ?1486); ExplorationsManager/
+        onContinentLoaded @390-447: worldChange 1 ise reset_world_change ve istemci worldChange = 0 yazar."""
+        self.ps.update(message={"m": "x"}, worldChange=1)
+        self.komut("clear_message")
+        self.komut("reset_world_change")
+        self.assertEqual((self.ps["message"], self.ps["worldChange"]), (None, 0))
+
+    def test_sahte_komsular(self):
+        """Base/testABFakeNeighbours @186-268: üç kimlik, eksik olan '0'."""
+        self.komut("set_fake_neighbors", "5", "0", "0")
+        self.assertEqual(self.ps["fakeNeighbors"], ["5"])
+
+    def test_capraz_tanitim(self):
+        """PopupCrossPromotion/_onGetReward @20-147: kimlik düğme adının son iki harfi, ödül bir kez."""
+        self.komut("cross_promotion_finished", "ab")
+        self.komut("cross_promotion_finished", "ab")
+        self.assertEqual(self.ps["crossPromotionsFinished"], ["ab"])
+
+    def test_gorev_degiskeni(self):
+        """CustomQuestNew/saveQuestStatus @17-58: [townID, anahtar, JSON.encode(questStatus[anahtar])]."""
+        self.komut("set_quest_var", 0, "kesilen", json.dumps({"agac": 3}))
+        self.assertEqual(self.harita["currentQuestVars"], {"kesilen": {"agac": 3}})
+
+    def test_hayatta_kalma_cani(self):
+        """PopupSurvival/refreshLifes: 3 can; survivalVidaTimeStamp'teki damga + SURVIVAL_HOURS_LIVE_REGENERATE saat
+        geçmemişse can harcanmış; üstüne survivalVidasExtra. start_survival argümansız
+        (PopupLoadingSurvival/startSurvival)."""
+        self.ps.update(survivalVidaTimeStamp=[], survivalVidasExtra=2)
+        self.zamanla("start_survival")
+        self.assertEqual(self.ps["survivalVidaTimeStamp"], [self.SIMDI])
+        dort_saat = self.SIMDI - 4 * 3600
+        self.ps["survivalVidaTimeStamp"] = [dort_saat, dort_saat, self.SIMDI - 3600]
+        sahte = dict(self.komutlar.globals_(), SURVIVAL_HOURS_LIVE_REGENERATE=5)
+        with mock.patch.object(self.komutlar, "globals_", lambda: sahte):
+            self.zamanla("start_survival")  # 5 saatte üç can da harcanmış: ek can gider
+        self.assertEqual((len(self.ps["survivalVidaTimeStamp"]), self.ps["survivalVidasExtra"]), (3, 1))
+
+    def test_agir_kusatma_baslar(self):
+        """MapInitializer$/attacksInit @96-149: heavySiegeAttackTimestamp 0 ise = istemci zamanı, start_heavy_siege [].
+        PlayerStatus/Init bunu timeStampHeavySiegeAttack'tan okur."""
+        self.zamanla("start_heavy_siege")
+        self.assertEqual(self.ps["timeStampHeavySiegeAttack"], self.SIMDI)
+
+    def test_canavar_yuvasi(self):
+        """PopupMonstersNest/clickAction @46-220: next_monster_step [_stepCash], nakit düşer, adım + 1, damga = şimdi.
+        nextMonster @16-84: adım 0, canavar + 1 (next_monster ['0']). desactivateNest @17-111: monsterNumber, adım ve
+        damga 0, monsterNestActive 0."""
+        self.ps.update(stepMonsterNumber=1, monsterNumber=0, monsterNestActive=1)
+        once = self.cash
+        self.zamanla("next_monster_step", 4)
+        self.assertEqual((once - self.cash, self.ps["stepMonsterNumber"], self.ps["timeStampTakeCareMonster"]),
+                         (4, 2, self.SIMDI))
+        self.komut("next_monster", "0")
+        self.assertEqual((self.ps["stepMonsterNumber"], self.ps["monsterNumber"]), (0, 1))
+        self.komut("desactivate_monster")
+        self.assertEqual((self.ps["monsterNestActive"], self.ps["monsterNumber"], self.ps["stepMonsterNumber"]),
+                         (0, 0, 0))
+        self.assertLessEqual(self.ps["timeStampTakeCareMonster"], 0)
+
+    def test_ejderha_yardimi_temizlenir(self):
+        """PopupDragons/closeHireResults @168-224: finish_dragon_help [JSON] ve dragonSocialHelp = []."""
+        self.ps["dragonSocialHelp"] = ["a", "b"]
+        self.komut("finish_dragon_help", json.dumps(["a", "b"]))
+        self.assertEqual(self.ps["dragonSocialHelp"], [])
+
+    def test_tapinak_sifirlanir(self):
+        """PopupBahamutSupremeInvocationTemple/resetTempleProgress @181-229: timeStampTemple 0, templeStep []."""
+        self.ps.update(timeStampTemple=55, templeStep=[1, 2])
+        self.komut("reset_temple")
+        self.assertEqual((self.ps["timeStampTemple"], self.ps["templeStep"]), (0, []))
+
+    def test_dart_sifirlama_ve_bedava_atis(self):
+        """PopupDarts$/resetDartGame @2-137: iki damga = sunucu zamanı, balonlar [], tohum = gönderilen, bedava atış
+        var, ek yok. PopupDarts$/newFree @2-56: timeStampDartsNewFree = şimdi, dartsHasFree true."""
+        self.ps.update(dartsBalloonsShot=[1, 2], dartsHasFree=False, dartsGotExtra=True)
+        self.zamanla("darts_reset", 777)
+        self.assertEqual({k: self.ps[k] for k in ("timeStampDartsReset", "timeStampDartsNewFree", "dartsBalloonsShot",
+                                                   "dartsRandomSeed", "dartsHasFree", "dartsGotExtra")},
+                         {"timeStampDartsReset": self.SIMDI, "timeStampDartsNewFree": self.SIMDI,
+                          "dartsBalloonsShot": [], "dartsRandomSeed": 777, "dartsHasFree": True,
+                          "dartsGotExtra": False})
+        self.ps.update(dartsHasFree=False, timeStampDartsNewFree=0)
+        self.zamanla("darts_new_free")
+        self.assertEqual((self.ps["timeStampDartsNewFree"], self.ps["dartsHasFree"]), (self.SIMDI, True))
+
+    def test_yardim_paylasimi_binaya_yazilir(self):
+        """PopupSocialFeeds/onPost @185-236: [tx, ty, townID, bina id, arkadaş]; PopupSocialFeeds/<kurucu> @558-596
+        binanın attrs.sif'ini okur."""
+        self.komut("assist_send_feed", 20, 20, 0, 19, "arkadas")
+        self.assertEqual(self.harita["items"][1][7], {"sif": {"arkadas": True}})
+        self.assertEqual(len(self.harita["items"][0]), 6)  # öteki bina değişmez
+
+    def test_muttefik_pazari_kaynagi(self):
+        """PopupSelectResource/onSelect @47-178: set_resource_allies [kaynak, tx, ty, townID, iID]; seçimde bina üretime
+        baştan başlar (collected_at 0). IsoElement/collect @506-563: toplanınca 'n' yollanır, sayaç değişmez."""
+        self.harita["items"][1][4] = 5
+        self.zamanla("set_resource_allies", "w", 20, 20, 0, 19)
+        self.assertEqual((self.harita["resourceAlliesMarket"], self.harita["items"][1][4]), ("w", self.SIMDI))
+        self.harita["items"][1][4] = 5
+        self.zamanla("set_resource_allies", "n", 20, 20, 0, 19)
+        self.assertEqual((self.harita["resourceAlliesMarket"], self.harita["items"][1][4]), ("n", 5))
+
+    def test_hayvan_eklenir(self):
+        """MapInitializer$/spawnAnimals @215-314: admin_add_animal [alt kategori, adet], arrayAnimals[alt] += adet."""
+        self.ps["arrayAnimals"] = {"7": 2}
+        self.komut("admin_add_animal", "7", 3)
+        self.komut("admin_add_animal", "9", 1)
+        self.assertEqual(self.ps["arrayAnimals"], {"7": 5, "9": 1})
+
+    def test_hedefler_sifirlanir(self):
+        """GoalsManager/resetGoals @106-123: reset_completed_missions []."""
+        self.ps.update(completedMissions=[1, 2], rewardedMissions=[1])
+        self.komut("reset_completed_missions")
+        self.assertEqual((self.ps["completedMissions"], self.ps["rewardedMissions"]), ([], []))
+
+    def test_oyuncuya_saldiri_kaydi_degistirmez(self):
+        """Assault$/assaultEnemy @103-121 ve ExplorationsManager/doAttack @69-112: attack_player [kurban]; sonucu
+        end_attack taşır, başlangıç bir şey değiştirmez."""
+        import copy
+        once = copy.deepcopy(self.kayit)
+        self.komut("attack_player", "rakip")
+        self.assertEqual(self.kayit, once)
+
+    def test_oyun_durumu_kaydi_degistirmez(self):
+        """game_status istemcinin izleme bildirimidir: Base/init @1351-1382 ['MapLoaded', 'INIT', spRefCat],
+        Base/_drawMap @99-130 ['LOAD_MAP', çıkılan, girilen]. Kayıtta karşılığı yok."""
+        import copy
+        once = copy.deepcopy(self.kayit)
+        self.komut("game_status", "MapLoaded", "INIT", "")
+        self.assertEqual(self.kayit, once)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -1,10 +1,10 @@
 {
   "surum": "0.08a",
-  "guncelleme": "2026-11-11",
+  "guncelleme": "2026-11-12",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #75 birleşti. Sırada TST-02 (25 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "madde": "GEC-09",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #75 birleşti; TST-02 son grup (DNT-46…48) #76'da. Sırada GEC-09 (tablet, v0.1.0). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1364,13 +1364,13 @@
       "baslik": "Durum değiştiren eski komutların yaklaşık yarısının testi yok",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetçinin sayımı (5.11.2026): durum değiştiren 125 komuttan 65'inin testi yok; nakit ya da kaynak değiştirenler dahil (buy_cash, buy_attacks_pack, tournament_substract/refund_resources, next_temple_step, end_quest, apply_rewards_ranking, pop_sell, finish_collection, rt_level_up, kill). expand, exchange_cash_new ve graveyard_buy_potions'a TST-01'de test eklendi. Sayı ◐: denetçinin elle sayımı, araçla yeniden sayılmadı. Araçla yeniden sayım (5.11.2026, coverage.py 7.17.2): 128 komut işleyicisinin 60'ı hiçbir testte çalışmıyor (✔).",
       "test": "tests/test_istemci_kaynakli.py, tests/test_degismezler.py",
-      "pr": null,
+      "pr": "#76",
       "onay": null,
-      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler. 12.11.2026 (2): buy_warehouse_capacity_single ve buy_pvp_territory (PopupUnitWarehouse/onBuyMoreSlots, PopupBuyTerritoryPvp/onBuy: globals fiyatları; 4 bozma düştü), increase_population (PlayerStatus/Init _mapInfo), place_stored_item ve place_gift (DNT-43) testli. Testsiz kalan 40 komut. 12.11.2026 (3): buy_step_cash, buy_monster_step_cash, rider_buy_step_cash, buy_temple_step_cash (clickGetnow'lar; yuvada sunucu -1, istemci 0 yazar, NestsManager/check ve getDragonTimeLeft'e göre ikisi de 'hazır': fark yok) ve darts_shoot_balloon (PopupDarts/onClickPlay, hitBalloon: DART_COST_CASH yalnızca ücretli atışta) testli; 4 bozma düştü. Testsiz kalan 35 komut. 12.11.2026 (4): end_quest testli (DNT-44 bulundu). Testsiz kalan 34 komut. 12.11.2026 (5): place_iphone, sell_iphone_item (DNT-45), assist_neighbor (FauxBar2/update: ASSIST_REWARD_GOLD/XP), next_step (PopupDragons/goNextStep) testli. Testsiz kalan 30 komut. 12.11.2026 (6): activate_dragon/activate_monster (PopupInactiveNest/goBuy: bedel artık istemci gibi her yuvanın globals.ACTIVATE_<DRAGON|MONSTER>_NEST_<CASH|GOLD> anahtarından; önce sunucu sabitiydi, değerler aynıydı), desactivate_dragon, next_dragon, next_temple_step (doAction: kaynak adımı data'yı düşer; kurban birimi ayrı sell [.., PARAM_DONT_MODIFY_RESOURCES] ile gider; koleksiyon adımı parça harcamaz) testli; 5 bozma düştü. Testsiz kalan 25 komut."
+      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler. 12.11.2026 (2): buy_warehouse_capacity_single ve buy_pvp_territory (PopupUnitWarehouse/onBuyMoreSlots, PopupBuyTerritoryPvp/onBuy: globals fiyatları; 4 bozma düştü), increase_population (PlayerStatus/Init _mapInfo), place_stored_item ve place_gift (DNT-43) testli. Testsiz kalan 40 komut. 12.11.2026 (3): buy_step_cash, buy_monster_step_cash, rider_buy_step_cash, buy_temple_step_cash (clickGetnow'lar; yuvada sunucu -1, istemci 0 yazar, NestsManager/check ve getDragonTimeLeft'e göre ikisi de 'hazır': fark yok) ve darts_shoot_balloon (PopupDarts/onClickPlay, hitBalloon: DART_COST_CASH yalnızca ücretli atışta) testli; 4 bozma düştü. Testsiz kalan 35 komut. 12.11.2026 (4): end_quest testli (DNT-44 bulundu). Testsiz kalan 34 komut. 12.11.2026 (5): place_iphone, sell_iphone_item (DNT-45), assist_neighbor (FauxBar2/update: ASSIST_REWARD_GOLD/XP), next_step (PopupDragons/goNextStep) testli. Testsiz kalan 30 komut. 12.11.2026 (6): activate_dragon/activate_monster (PopupInactiveNest/goBuy: bedel artık istemci gibi her yuvanın globals.ACTIVATE_<DRAGON|MONSTER>_NEST_<CASH|GOLD> anahtarından; önce sunucu sabitiydi, değerler aynıydı), desactivate_dragon, next_dragon, next_temple_step (doAction: kaynak adımı data'yı düşer; kurban birimi ayrı sell [.., PARAM_DONT_MODIFY_RESOURCES] ile gider; koleksiyon adımı parça harcamaz) testli; 5 bozma düştü. Testsiz kalan 25 komut. 12.11.2026 (7): kalan 25 komutun hepsi testli (KalanKomutlar sınıfı, her biri istemcinin gönderen yönteminden): complete_tutorial (DNT-46), rider_select (DNT-47), modify_position_univers (DNT-48), rider_next_step, set_strategy, set_info_showed, clear_message, reset_world_change, set_fake_neighbors, cross_promotion_finished, set_quest_var, start_survival (yenilenme süresi artık globals.SURVIVAL_HOURS_LIVE_REGENERATE'ten; config'te 3, değer aynı), start_heavy_siege, desactivate_monster, next_monster_step, next_monster, finish_dragon_help, reset_temple, darts_reset, darts_new_free, assist_send_feed, set_resource_allies, admin_add_animal, reset_completed_missions, attack_player; ayrıca game_status. 27 bozma denemesinin 27'si düştü. Araçla sayım: @komut adı geçmeyen komut kalmadı. finish_dragon_help: PopupDragons/closeHireResults arkadaş kiralamasından sonra gelir; dragonSocialHelp çevrimdışı hiç dolmadığı için bu yol oynanmaz (goNextStep(false,false) zamanı değiştirmez, sunucunun next_step'i değiştirir: ayrım yalnızca bu yolda; tek kişilik oyunda yok). Açık kalan tek soru kill'in birim/düşman binası xp'si (?)."
     },
     {
       "id": "TST-03",
@@ -2580,6 +2580,45 @@
       "pr": "#74",
       "onay": null,
       "notlar": "_mobil_depodan_cikar artık bulup çıkarırsa True döner; yerleştirme ve iade yalnızca o zaman. 2 bozma düştü. TST-02 sırasında bulundu. Mobil kutu (iphoneBox) çevrimdışı oyunda büyük olasılıkla boş; etki küçük. 12.11.2026: #74 birleşti (CI yeşil, sinama dahil)."
+    },
+    {
+      "id": "DNT-46",
+      "baslik": "1.4.07 eğitimi sunucuda hiç bitmiş sayılmıyordu: her açılışta eğitim baştan başlıyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "complete_tutorial yalnızca 31 ve üstü adımda completed_tutorial = 1 yazıyordu (0926 istemcisinin kuralı). 1.4.07 eğitimi 15 adım (TutorialMain/init: 15 adım nesnesi); nextStep @457 her adımda completarTutorial(currentStep), endTutorial @97 sonda 15 yollar. Base/completarTutorial @105 adımı completed_tutorial'a yazar; Base/tutorialCheck @36 açılışta parseInt(completed_tutorial) 0 ve townID 0 ise eğitimi 0. adımdan başlatır. villages/initial.json'da completed_tutorial 0: yeni oyuncu eğitimi bitirip F5 atınca eğitim yeniden başlıyordu.",
+      "test": "tests/test_komutlar.py test_egitim_adimi_kaydedilir_ve_sonda_biter",
+      "pr": "#76",
+      "onay": null,
+      "notlar": "Sunucu artık istemci gibi gelen adımı yazar (0'dan büyükse). dragonNestActive'i eğitimde 1 yapan eski kural kalktı: 1.4.07 completarTutorial onu değiştirmez, initial.json'da zaten 1. Bozma (eski kurala dönüş) testi düşürdü. Oyun içinde yeni köyle denenmedi (◐ o kısım). TST-02 sırasında bulundu."
+    },
+    {
+      "id": "DNT-47",
+      "baslik": "Yeni binici seçilince eğitim adımı sıfırlanmıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "PopupDragonRiders/onRiderFieldClick @38-85 türü seçilen, dragonRiderTrainingStep ve zamanı 0 yapar, sonra select_rider [tür] yollar; PopupDragonRiderTraining/onTrainClick @89-139 ['0'] yollar ve üçünü de 0 yapar. PlayerStatus/Init bunları riderNumber, riderStepNumber, riderTimeStamp'ten okur. Sunucu 1-3 için yalnızca riderNumber'ı yazıyordu: F5'ten sonra yeni binici önceki binicinin adımıyla açılırdı.",
+      "test": "tests/test_komutlar.py test_binici_secimi_adimi_sifirlar",
+      "pr": "#76",
+      "onay": null,
+      "notlar": "Sunucu her seçimde adımı ve zamanı 0 yapar (sıfırlamada da zaman -1 yerine istemci gibi 0; getTimeLeft için ikisi de 'hazır'). Bozma düştü."
+    },
+    {
+      "id": "DNT-48",
+      "baslik": "Dünya haritasında yuva değişiminde sunucu argümanları ters okuyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "ExplorationsManager/evalUserPositionNotConquered @286-376: oyuncu fethedilmiş bir yuvadaysa ilk fethedilmemiş rakiple yer değiştirir; komut [yerel6 = oyuncunun eski yuvası, yerel5 = yeni yuvası]. Sunucu kita_konum'a ilk argümanı (eski yuvayı) yazıyordu; docs/inceleme/1407-komutlar.md'deki [yerel6, yerel5] kaydıyla da çelişiyordu.",
+      "test": "tests/test_komutlar.py test_dunya_yuvasi_ikinci_argumandan",
+      "pr": "#76",
+      "onay": null,
+      "notlar": "Sunucu ikinci argümanı yazar. Çevrimdışı oyunda oyuncunun yuvası (varsayılan 7) fethedilenler listesine girmediği için bu yolun bugün tetiklenip tetiklenmediği doğrulanmadı (?). oyun/ada.py yer değiştiren rakibi hep 7. yuvaya koyar; ikinci bir yer değişiminde istemciyle ayrışabilir (açık, küçük). Bozma düştü."
     }
   ]
 }
