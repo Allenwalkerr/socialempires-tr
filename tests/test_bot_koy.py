@@ -274,16 +274,15 @@ class IcSur(unittest.TestCase):
                     if ESYA[int(e[0])].get("subcategory_id") == "21":
                         kuleler |= karolar(e)
                 for c, r in bks:
-                    if (c + 1, r) in bks:
-                        cizgi = [((c + 1) * 20, r * 20 + j) for j in range(1, 19)]
-                    elif (c, r + 1) in bks:
-                        cizgi = [(c * 20 + j, (r + 1) * 20) for j in range(1, 19)]
-                    else:
-                        continue
-                    self.assertTrue(set(cizgi) & kuleler, (sv, k, c, r))  # kapının yanında kule
-                    dolu = sum(t in surlar for t in cizgi)
-                    self.assertGreaterEqual(dolu, 10, (sv, k, c, r))
-                    self.assertLess(dolu, len(cizgi), (sv, k, c, r))  # kapı boşluğu
+                    for dc, dr in ((1, 0), (0, 1)):  # iki yön ayrı ayrı (#81 incelemesi: elif güney çizgiyi atlıyordu)
+                        if (c + dc, r + dr) not in bks:
+                            continue
+                        cizgi = ([((c + 1) * 20, r * 20 + j) for j in range(1, 19)] if dc
+                                 else [(c * 20 + j, (r + 1) * 20) for j in range(1, 19)])
+                        self.assertTrue(set(cizgi) & kuleler, (sv, k, c, r, dc))  # kapının yanında kule
+                        dolu = sum(t in surlar for t in cizgi)
+                        self.assertGreaterEqual(dolu, 10, (sv, k, c, r, dc))
+                        self.assertLess(dolu, len(cizgi), (sv, k, c, r, dc))  # kapı boşluğu
         _, acik = bot_koy.koy_kur(12, "dengeli", "iki", 0)
         self.assertEqual(len(acik), 2)  # iki karoluk köyde iç sur yok (Arthur30 gibi tek avlu)
 
@@ -311,9 +310,6 @@ class YenidenKur(unittest.TestCase):
         self.assertFalse(bot_koy.yeniden_kur(k, 100))
         self.assertEqual(k["maps"][0]["items"], [[512, 41, 41, 0, 0, 0, [], {}]])
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class Arazi(unittest.TestCase):
@@ -354,3 +350,7 @@ class Arazi(unittest.TestCase):
         self.assertTrue(bot_koy.yeniden_kur(k, 0))
         self.assertEqual(k["maps"][0]["skin"], bot_koy.arazi_sec(bulunan))
         self.assertNotEqual(k["maps"][0]["skin"], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
