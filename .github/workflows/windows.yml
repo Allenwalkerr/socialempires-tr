@@ -1,6 +1,7 @@
 name: windows
 
-# Python kurulu olmayan Windows için iki biçim: tek dosyalık program (.exe, araclar/exe_paketi.py) ve zip
+# Python kurulu olmayan Windows için üç biçim: kurulum programı (araclar/kurulum.iss: masaüstü kısayolu,
+# kaldırıcı), tek dosyalık taşınabilir program (.exe, araclar/exe_paketi.py) ve zip
 # (gömülü Python + .bat, araclar/windows_paketi.py; .exe'yi antivirüs engellerse yedek yol). Etiket (v*)
 # gönderilince ikisi de üretilir, temiz bir Windows makinesinde sınanır ve SHA-256 özetiyle GitHub sürümüne
 # yüklenir. Paket betikleri değişen PR'larda yalnızca üretilip sınanır.
@@ -13,6 +14,7 @@ on:
       - araclar/windows_paketi.py
       - araclar/exe_paketi.py
       - araclar/exe_giris.py
+      - araclar/kurulum.iss
       - requirements.txt
       - requirements-exe.txt
       - .github/workflows/windows.yml
@@ -162,9 +164,89 @@ jobs:
           path: dist/
           if-no-files-found: error
 
+  kurulum:
+    # Kurulum programı Windows'ta derlenir, sessizce kurulur ve kurulu oyun boş başlangıçtan açılıp sınanır:
+    # masaüstü kısayolu, kaldırıcı ve programın yanındaki kayıt klasörü; kaldırınca kayıtlar kalır.
+    needs: paket
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Derleme araçları
+        run: |
+          pip install -r requirements-exe.txt
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup --version=6.4.3 -y --no-progress }
+      - name: Program klasörü ve simge
+        run: |
+          python araclar/exe_paketi.py --ad SocialEmpiresTR --cikti dist --klasor
+          python -c "import sys; sys.path.insert(0, 'araclar'); import exe_paketi as p; p.simge_ico(p.SIMGE, 'dist/simge.ico')"
+      - name: Kurulum programı
+        env:
+          AD: ${{ needs.paket.outputs.ad }}
+        run: |
+          $surum = if ($env:GITHUB_REF_TYPE -eq "tag") { $env:GITHUB_REF_NAME.TrimStart("v") } else { "0.0.0" }
+          $kok = (Get-Location).Path
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DSurum=$surum" "/DKaynak=$kok\dist\SocialEmpiresTR" `
+            "/DCikti=$kok\kurulum" "/DSimge=$kok\dist\simge.ico" "/DAd=$env:AD-kurulum" araclar\kurulum.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC: $LASTEXITCODE" }
+          $ozet = (Get-FileHash "kurulum/$env:AD-kurulum.exe" -Algorithm SHA256).Hash.ToLower()
+          "$ozet  $env:AD-kurulum.exe" | Out-File -Encoding ascii "kurulum/$env:AD-kurulum.exe.sha256"
+      - name: Sessiz kur, aç, sına, kaldır
+        shell: pwsh
+        env:
+          AD: ${{ needs.paket.outputs.ad }}
+        run: |
+          $kurulum = Start-Process "kurulum/$env:AD-kurulum.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/TASKS=masaustu" -Wait -PassThru
+          if ($kurulum.ExitCode -ne 0) { throw "Kurulum çıkış kodu $($kurulum.ExitCode)" }
+          $uyg = "$env:LOCALAPPDATA\Programs\SocialEmpiresTR"
+          $kisayol = Join-Path ([Environment]::GetFolderPath("Desktop")) "Social Empires Türkçe.lnk"
+          foreach ($yol in @("$uyg\SocialEmpiresTR.exe", "$uyg\unins000.exe", "$uyg\saves", $kisayol)) {
+            if (-not (Test-Path $yol)) { throw "Kurulumdan sonra yok: $yol" }
+          }
+          $env:SE_TARAYICI_ACMA = "1"
+          $sure = [Diagnostics.Stopwatch]::StartNew()
+          $surec = Start-Process -FilePath "$uyg\SocialEmpiresTR.exe" -WorkingDirectory $uyg -PassThru `
+            -RedirectStandardOutput cikti.txt -RedirectStandardError hata.txt
+          $hazir = $false
+          while ($sure.Elapsed.TotalSeconds -lt 90 -and -not $surec.HasExited) {
+            try {
+              $r = Invoke-WebRequest "http://127.0.0.1:5050/saglik/hazir" -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) { $hazir = $true; break }
+            } catch {}
+            Start-Sleep -Milliseconds 500
+          }
+          Write-Host ("Hazır olma süresi: {0:N1} sn" -f $sure.Elapsed.TotalSeconds)
+          if ($hazir) {
+            $r = Invoke-WebRequest "http://127.0.0.1:5050/ruffle/0.7.1/ruffle.js" -UseBasicParsing
+            if ($r.StatusCode -ne 200) { $hazir = $false; Write-Host "Ruffle yok" }
+            foreach ($yol in @("$uyg\mods\mods.txt", "$uyg\ayarlar.json")) {
+              if (-not (Test-Path $yol)) { $hazir = $false; Write-Host "Programın yanında yok: $yol" }
+            }
+            if ((Get-ChildItem "$uyg\saves" -Filter *.save.json).Count -lt 1) { $hazir = $false; Write-Host "Kayıt yok" }
+          }
+          if (-not $surec.HasExited) { Stop-Process -Id $surec.Id -Force }
+          Get-Content cikti.txt -Tail 30
+          Get-Content hata.txt -Tail 30
+          if (-not $hazir) { throw "Kurulu oyun 90 saniye içinde hazır olmadı" }
+          Start-Sleep -Seconds 2
+          $kaldir = Start-Process "$uyg\unins000.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait -PassThru
+          if ($kaldir.ExitCode -ne 0) { throw "Kaldırma çıkış kodu $($kaldir.ExitCode)" }
+          Start-Sleep -Seconds 3   # kaldırıcı kendini sonradan siler
+          if (Test-Path "$uyg\SocialEmpiresTR.exe") { throw "Kaldırma programı silmedi" }
+          if (Test-Path $kisayol) { throw "Kaldırma kısayolu silmedi" }
+          if ((Get-ChildItem "$uyg\saves" -Filter *.save.json).Count -lt 1) { throw "Kaldırma kayıtları sildi" }
+          Write-Host "Kur, aç, kaldır: tamam; kayıtlar kaldı"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-kurulum
+          path: kurulum/
+          if-no-files-found: error
+
   surum:
     if: github.ref_type == 'tag'
-    needs: [paket, sinama, exe]
+    needs: [paket, sinama, exe, kurulum]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -177,6 +259,10 @@ jobs:
         with:
           name: windows-exe
           path: dist
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: windows-kurulum
+          path: dist
       - name: GitHub sürümü
         env:
           GH_TOKEN: ${{ github.token }}
@@ -184,5 +270,5 @@ jobs:
           # Android iş akışı da aynı sürümü kurar; hangisi önce biterse o kurar, öteki ekler
           gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
             gh release create "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" \
-              --title "Social Empires Türkçe ${GITHUB_REF_NAME}" --notes "Windows: .exe dosyasını bir klasöre koyup çift tıklayın (Python gerekmez; kayıtlar yanındaki saves klasöründe). Antivirüs .exe'yi engellerse zip'i açıp \"Social Empires.bat\" dosyasına çift tıklayın. SmartScreen uyarısında \"Ek bilgi\" > \"Yine de çalıştır\". Android: .apk dosyasını telefona/tablete indirip kurun (ANDROID.md). Dosyaların SHA-256 özetleri yanlarındaki .sha256 dosyalarında." || true
+              --title "Social Empires Türkçe ${GITHUB_REF_NAME}" --notes "Windows: ...-kurulum.exe dosyasını indirip çift tıklayın; masaüstüne kısayol konur, oyunu kısayoldan açın (Python gerekmez, yönetici izni istemez). Kurmadan oynamak için tek dosyalık .exe'yi bir klasöre koyup çift tıklayın (kayıtlar yanındaki saves klasöründe). Antivirüs .exe'yi engellerse zip'i açıp \"Social Empires.bat\" dosyasına çift tıklayın. SmartScreen uyarısında \"Ek bilgi\" > \"Yine de çalıştır\". Android: .apk dosyasını telefona/tablete indirip kurun (ANDROID.md). Dosyaların SHA-256 özetleri yanlarındaki .sha256 dosyalarında." || true
           gh release upload "${GITHUB_REF_NAME}" dist/* --repo "${GITHUB_REPOSITORY}" --clobber

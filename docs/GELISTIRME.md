@@ -123,10 +123,13 @@ gerekenleri (Hypothesis) ekler; oyuna ve paketlere girmez.
 Testlerin hata yakalama gücü ölçülür, tahmin edilmez: yöntem, kaynaklar ve son
 ölçüm `docs/TEST_OLCUMU.md`'de; ölçüm aracı `araclar/mutasyon_olc.py`.
 
-## Windows programı (.exe) ve zip
+## Windows kurulumu, programı (.exe) ve zip
 
-Sürümde iki Windows biçimi çıkar (`.github/workflows/windows.yml`):
+Sürümde üç Windows biçimi çıkar (`.github/workflows/windows.yml`):
 
+- **Kurulum programı:** `araclar/kurulum.iss` (Inno Setup 6), `exe_paketi.py --klasor` ile üretilen klasörü
+  `%LOCALAPPDATA%\Programs\SocialEmpiresTR`'ye kurar (yönetici izni istemez), masaüstüne ve Başlat menüsüne kısayol
+  koyar, kaldırıcı ekler. `saves/` kaldırmada silinmez. CI kurar, açar, kaldırır ve kayıtların kaldığını denetler.
 - **Tek dosyalık program:** `araclar/exe_paketi.py` PyInstaller `--onefile` ile üretir; giriş
   `araclar/exe_giris.py`. Oyun dosyaları ve Ruffle (SHA-512 denetlenmiş) `.exe`'nin içindedir. Kayıtlar,
   ayarlar ve modlar `.exe`'nin yanında durur (`oyun/yollar.py` BASE_DIR); ilk açılışta `ayarlar.json` ve

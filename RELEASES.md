@@ -1,8 +1,8 @@
 # Sürümler
 
 Bu projenin (Social Empires Türkçe) sürümleri
-[Sürümler](https://github.com/lahmacunveayran/socialempires-tr/releases) sayfasındadır: Windows için tek dosyalık
-`.exe` ve yedek `.zip`, Android için `.apk`. İlk sürüm v0.1.0 henüz yayınlanmadı.
+[Sürümler](https://github.com/lahmacunveayran/socialempires-tr/releases) sayfasındadır: Windows için kurulum programı
+(masaüstü kısayolu), tek dosyalık `.exe` ve yedek `.zip`, Android için `.apk`. Deneme sürümü v0.1.0-deneme1 12.11.2026'da açıldı; asıl v0.1.0 henüz yayınlanmadı.
 
 ## Kaynak projenin sürümleri (AcidCaos/socialemperors)
 

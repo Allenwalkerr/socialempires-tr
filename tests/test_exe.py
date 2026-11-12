@@ -117,6 +117,29 @@ class Paketleme(unittest.TestCase):
                          ("oyun", os.path.join(KOK, "araclar", "exe_giris.py")))
         self.assertIn("--onefile", k)
 
+    def test_klasor_kipi_ve_simge(self):
+        k = self.paket.komut("SE", "/c", "/g", None, klasor=True, simge="/g/simge.ico")
+        self.assertIn("--onedir", k)
+        self.assertNotIn("--onefile", k)
+        self.assertEqual(k[k.index("--icon") + 1], "/g/simge.ico")
+
+    def test_simge_png_degismeden_ico_icinde(self):
+        """ICO biçimi (Microsoft ICONDIR/ICONDIRENTRY, Vista'dan beri PNG görüntü): 6 bayt başlık (0, tür 1, adet 1),
+        16 bayt kayıt (genişlik, yükseklik, renk, 0, düzlem 1, 32 bit, boyut, konum 22), ardından PNG olduğu gibi.
+        CLAUDE.md: görsel yeniden çizilmez; simge uygulamanın kendi simgesidir."""
+        import struct
+        with tempfile.TemporaryDirectory() as d:
+            ico = self.paket.simge_ico(self.paket.SIMGE, os.path.join(d, "s.ico"))
+            with open(ico, "rb") as f:
+                veri = f.read()
+        with open(self.paket.SIMGE, "rb") as f:
+            png = f.read()
+        self.assertEqual(veri[22:], png)
+        self.assertEqual(struct.unpack("<HHH", veri[:6]), (0, 1, 1))
+        self.assertEqual(struct.unpack("<BBBBHHII", veri[6:22]), (192, 192, 0, 0, 1, 32, len(png), 22))
+        with self.assertRaises(SystemExit):  # 512 piksel ICO'ya sığmaz
+            self.paket.simge_ico(os.path.join(KOK, "templates", "img", "simge-512.png"), os.path.join(d, "b.ico"))
+
     def test_ruffle_ozeti_tutmazsa_paket_yapilmaz(self):
         with tempfile.NamedTemporaryFile(suffix=".tgz", delete=False) as f:
             f.write(b"sahte ruffle")
@@ -139,6 +162,34 @@ class Paketleme(unittest.TestCase):
                 continue
             self.assertRegex(s, r"^[A-Za-z0-9_.-]+==\d+(\.\d+)*(; sys_platform == \"win32\")?$", s)
         self.assertIn("pyinstaller==6.11.1", satirlar)
+
+
+class KurulumTarifi(unittest.TestCase):
+    """araclar/kurulum.iss (Inno Setup 6). Beklenenin kaynağı: sahibinin isteği (12.11.2026) "exe kurulumu yapar,
+    masaüstüne kısayol koyar"; KAR-32 kayıtlar programın yanında; Inno Setup belgeleri (PrivilegesRequired=lowest
+    yönetici istemez, uninsneveruninstall kaldırmada silmez, UTF-8 betik BOM ile)."""
+
+    def setUp(self):
+        with open(os.path.join(KOK, "araclar", "kurulum.iss"), "rb") as f:
+            self.ham = f.read()
+        self.metin = self.ham.decode("utf-8-sig")
+
+    def test_yonetici_istemez_ve_kullanici_klasorune_kurar(self):
+        self.assertIn("PrivilegesRequired=lowest", self.metin)
+        self.assertIn(r"DefaultDirName={localappdata}\Programs\SocialEmpiresTR", self.metin)
+
+    def test_masaustu_ve_baslat_kisayolu(self):
+        self.assertIn(r'Name: "{userdesktop}\Social Empires Türkçe"; Filename: "{app}\SocialEmpiresTR.exe"', self.metin)
+        self.assertIn(r'Name: "{group}\Social Empires Türkçe"; Filename: "{app}\SocialEmpiresTR.exe"', self.metin)
+
+    def test_kayitlar_kaldirmada_silinmez(self):
+        self.assertIn(r'Name: "{app}\saves"; Flags: uninsneveruninstall', self.metin)
+        self.assertNotIn("[UninstallDelete]", self.metin)
+
+    def test_kimlik_sabit_turkce_ve_utf8(self):
+        self.assertTrue(self.ham.startswith(b"\xef\xbb\xbf"))
+        self.assertIn("AppId={{6E0C5A2B-2F4E-4C1B-9B57-5E3D2B8A41C7}", self.metin)
+        self.assertIn(r'MessagesFile: "compiler:Languages\Turkish.isl"', self.metin)
 
 
 if __name__ == "__main__":
