@@ -11,12 +11,14 @@ Rastgelelik sabit tohumla ya da yamayla belirlenir; saat dunya.time yamasıyla s
 """
 
 import contextlib
+import json
+import os
 import random
 import types
 import unittest
 from unittest import mock
 
-from ortak import bos_kayit
+from ortak import KOK, bos_kayit
 from oyun import denge, dunya
 from oyun.config import get_game_config
 
@@ -733,6 +735,45 @@ class SeferTestleri(DunyaTesti):
             d._seferleri_yurut(d._botlar(), SIMDI)
             self.assertEqual(3 - sefer["kalan"], akin, (son, seviye))
             self.assertEqual(len(self.kayitlar["p"]["privateState"].get("attacksReceived") or []), akin)
+
+
+class SaatteBirAkinTestleri(DunyaTesti):
+    """DNT-32, KAR-30 (sahibinin kararı, 12.11.2026: 'Saatte en çok bir'): oyuncuya iki bot akını arasında en az bir
+    saat; intikam seferi de aynı aralığa uyar (önce yarısıydı); sunucu yeniden başlayınca son akın oyuncunun saldırı
+    günlüğünden (PVPattacksReceived attackTime) okunur."""
+
+    def kur_saat(self, son_gunlukte=None):
+        d = self.kur(a=koy("a", birim=10, ittifak=0), m=koy("m", ittifak=0), p=koy("p", birim=3, bot=False))
+        d.ayar["oyuncu_saldiri_araligi"] = dunya.VARSAYILAN_AYAR["oyuncu_saldiri_araligi"]
+        if son_gunlukte is not None:
+            self.kayitlar["p"]["privateState"]["PVPattacksReceived"] = {
+                str(son_gunlukte): {"attackTime": son_gunlukte, "id": "a"}, "bozuk": "x"}
+        return d
+
+    def test_varsayilan_bir_saat(self):
+        self.assertEqual(dunya.VARSAYILAN_AYAR["oyuncu_saldiri_araligi"], 3600)
+        with open(os.path.join(KOK, "ayarlar.json"), encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["dunya"]["oyuncu_saldiri_araligi"], 3600)
+
+    def test_sefer_de_bir_saat_bekler(self):
+        for son, akin in ((SIMDI - 1800, 0), (SIMDI - 3599, 0), (SIMDI - 3600, 1)):
+            d = self.kur_saat()
+            sefer = d._sefer_ilan(0, "p", "Oyuncu", "Köy m", oyuncu=True)
+            d._son_oyuncu_saldiri = son
+            d._seferleri_yurut(d._botlar(), SIMDI)
+            self.assertEqual(3 - sefer["kalan"], akin, son)
+
+    def test_yeniden_baslatmada_gunlukten_okunur(self):
+        d = self.kur_saat(son_gunlukte=SIMDI - 1800)  # bellekte 0: sunucu yeni açıldı
+        d.ayar["oyuncuya_saldiri"] = 1.0
+        self.assertIsNone(self.secilen(d, "a", ["a", "m"]))
+        d = self.kur_saat(son_gunlukte=SIMDI - 1800)  # sefer yolu da kendi başına okur (önceki çağrının belleği yok)
+        sefer = d._sefer_ilan(0, "p", "Oyuncu", "Köy m", oyuncu=True)
+        d._seferleri_yurut(d._botlar(), SIMDI)
+        self.assertEqual(sefer["kalan"], 3)
+        d = self.kur_saat(son_gunlukte=SIMDI - 3600)
+        d.ayar["oyuncuya_saldiri"] = 1.0
+        self.assertEqual(self.secilen(d, "a", ["a", "m"]), "p")
 
 
 class IttifakDegisimiTestleri(DunyaTesti):

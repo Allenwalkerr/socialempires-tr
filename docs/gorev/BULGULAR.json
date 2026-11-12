@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-27",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti; DNT-25, 29, 36 ve HIZ-04 PR'da. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-35",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti; DNT-32 (KAR-30) ve DNT-27 PR'da. Sırada DNT-35, 37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1584,14 +1584,14 @@
       "sinif": "hata",
       "test": null,
       "pr": null,
-      "onay": null,
+      "onay": "Sahibi, 12 Kasım 2026",
       "id": "DNT-08",
       "baslik": "0.06a kaydın görev numarası çevirisi göç öncesi yedeğin bulunduğu makineye bağlı",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "karar_verildi",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim KYG-04 (denetçi ✔ yazdı; yeniden üretilmedi): kayit.eski_gorev_numaralari yalnızca yerel backups/<uid>.goc-*.save.json'a bakar; içe aktarılan 0.06a kayıtta eski numaralar çevrilmez.",
-      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır)."
+      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır). 12.11.2026 KAR-31: sahibi 'Olduğu gibi kalsın' dedi; kod değişmez."
     },
     {
       "sinif": "hata",
@@ -2066,13 +2066,13 @@
       "baslik": "Denetim EKF-04: Zaman ölçeği yalnızca 4 süre alanını ölçekliyor; yüksek/düşük ölçekte bozuk değer",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-04, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_hiz.py OlcekliSure (3 test)",
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur. 12.11.2026 (✔ bayt kodu ve çalıştırma): üstel biçim istemcide bozulmuyor (StaticData/<kurucu> activation'ı parseFloat ile okur, training_time ve sm_training_time int yuvasında; ikisi de '1.728e+06'yı doğru okur), yani o kısım çürütüldü. Asıl sorun: int yuvası küsuratı atar; 10 katta (seçicinin en yükseği) 63 birimin eğitimi 0'a düşüp anında bitiyordu. zaman.olcekle: ölçekli süre en az 1 (tabanda 1'den kısa süre olduğu gibi kalır); zaman.metin üstel gösterimsiz yazar. config, komutlar.egitim_suresi ve yokken aynı yardımcıyı kullanır. Ölçeklenmeyen süreler (COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı, TIME_MACHINE) zaman.py'de belgelendi; istemci sabitleri. 4 bozma denemesinin 4'ü düştü."
+      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur. 12.11.2026 (✔ bayt kodu ve çalıştırma): üstel biçim istemcide bozulmuyor (StaticData/<kurucu> activation'ı parseFloat ile okur, training_time ve sm_training_time int yuvasında; ikisi de '1.728e+06'yı doğru okur), yani o kısım çürütüldü. Asıl sorun: int yuvası küsuratı atar; 10 katta (seçicinin en yükseği) 63 birimin eğitimi 0'a düşüp anında bitiyordu. zaman.olcekle: ölçekli süre en az 1 (tabanda 1'den kısa süre olduğu gibi kalır); zaman.metin üstel gösterimsiz yazar. config, komutlar.egitim_suresi ve yokken aynı yardımcıyı kullanır. Ölçeklenmeyen süreler (COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı, TIME_MACHINE) zaman.py'de belgelendi; istemci sabitleri. 4 bozma denemesinin 4'ü düştü. 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-26",
@@ -2092,13 +2092,13 @@
       "baslik": "Denetim EKF-08: Yükseltmede (sell + buy) XP ve fark bedeli kayda istemciden farklı yansıyor olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-08, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_komutlar.py test_yukseltmede_satis_iadesi_yok",
       "pr": null,
       "onay": null,
-      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak."
+      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak. 12.11.2026 bayt kodu (✔): XP kısmı çürütüldü. İstemci de sunucu da yalnızca yeni binanın xp'sini ekler, eski binanınkini geri almaz (denetçinin gördüğü negatif değer bedel, xp değil). Bedel kısmı doğrulandı: yükseltmede istemci iade vermez (Base/removeElement kaynağa dokunmaz; IsoEngine/getDifferenceCost yeni binanın tam bedelini döndürür), sunucu ise sell [.., 0, 'UPGR'] için %5 iade veriyordu. Düzeltme: neden 'UPGR' ise iade yok. Bozma düştü. docs/inceleme/1407-formuller.md'ye yazıldı."
     },
     {
       "id": "DNT-28",
@@ -2118,13 +2118,13 @@
       "baslik": "Denetim SNK-06: orient/upgrade/push_unit/pop_unit binayı yalnızca (x, y) ile buluyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-06, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_komutlar.py test_kimliksiz_bina_komutlari_karedeki_birimi_degil_binayi_bulur",
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü)."
+      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü). 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-30",
@@ -2157,13 +2157,13 @@
       "baslik": "Denetim DPT-07: Oyuncuya bot akınının sıklığı ve toplam kaybı sınırlı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-07, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_dunya.py SaatteBirAkinTestleri (3 test)",
       "pr": null,
       "onay": null,
-      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde."
+      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde. 12.11.2026 KAR-30 (sahibi: saatte en çok bir): oyuncu_saldiri_araligi 600 → 3600 (ayarlar.json ve dunya.VARSAYILAN_AYAR). İntikam seferi önce aralığın yarısını bekliyordu, artık tamamını bekliyor. Son akın bellekte 0 ise (sunucu yeni açıldı) oyuncunun PVPattacksReceived attackTime'ından okunur (_oyuncuya_son_akin); yeniden başlatma sınırı aşamaz. 5 bozma denemesinin 5'i düştü (ilk turda sefer yolunun günlük okuması sağ kaldı, çünkü önceki çağrı belleği dolduruyordu; test ayrı dünya kurar)."
     },
     {
       "id": "DNT-33",
@@ -2209,13 +2209,13 @@
       "baslik": "Denetim TRA-04: docs/RESIM_KAYNAKLARI.md silinmiş görselleri anlatıyor; templates/img'deki dosyaların kaynağı yazılı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-04, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli."
+      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli. 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-37",
@@ -2463,6 +2463,32 @@
       "pr": null,
       "onay": null,
       "notlar": "◐: gerçek tablet ve telefonda ölçülmedi. Yavaş cihazda dünya turunun kilidi birkaç kat uzar (100 ms → belki 0,5-1 sn, dakikada bir); fark edilirse tur kilitsiz hesaplanıp yalnızca yazım kilitlenir. Bilinen eski çökme yolları kapalı: DAG-07 (zayıf GPU'da WebGL çizici), DAG-08 (Ruffle 60 sn betik sınırı). Tablet denemesi GEC-09'da; sahibi donma görürse ne yaparken olduğunu söylerse oradan ölçülür."
+    },
+    {
+      "id": "KAR-30",
+      "baslik": "Oyuncuya bot akını saatte en çok bir",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "DNT-32 için soruldu (12.11.2026). Seçenekler: 'Saatte en çok bir' (önerilen), 'Oyun kapalıyken akın yok', 'Günde en çok 6 akın', 'Olduğu gibi kalsın'. Soruda verilen bilgi: 6. seviyeden sonra en sık 10 dakikada bir akın, oyun kapalıyken de; kaybedilen akında kaynak başına %10 (en çok 50.000) ve savunan askerlerin yaklaşık yarısı. Cevap: 'Saatte en çok bir'.",
+      "test": "tests/test_dunya.py SaatteBirAkinTestleri",
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "İntikam seferi de aynı aralığa uyar (önce yarısıydı: 5 dk). Oyun kapalıyken kural aynı."
+    },
+    {
+      "id": "KAR-31",
+      "baslik": "0.06a kaydının görev çevirisi göç yedeğine bağlı kalır (DNT-08)",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "DNT-08 için soruldu (12.11.2026): 'Olduğu gibi kalsın' (önerilen) / 'Yedeğe ekle'. Cevap: 'Olduğu gibi kalsın'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Yalnızca 0.06a ara sürümünde doğmuş ve göç yedeği olmayan makineye taşınmış kayıtları etkiler; kod değişmez."
     }
   ]
 }
