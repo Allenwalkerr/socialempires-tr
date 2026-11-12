@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-27",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti; DNT-32 (KAR-30) PR'da. Sırada DNT-27, 35, 37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-35",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti; DNT-32 (KAR-30) ve DNT-27 PR'da. Sırada DNT-35, 37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
