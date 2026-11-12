@@ -15,7 +15,7 @@ import random
 
 from oyun.config import get_item_from_id
 
-TASARIM_SURUMU = 2
+TASARIM_SURUMU = 4  # 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -89,12 +89,66 @@ def birim_sec(seviye, kisi, rng):
     return kademeler[-1][1]
 
 
+def _uretim(seviye, kisi, rng):
+    """Ekonomi binaları (kişiliğe göre adet)."""
+    tuccar = kisi == "tuccar"
+    liste = []
+    liste += [kademe(DEGIRMEN, seviye)] * (3 if tuccar else 2)
+    liste += [kademe(ALTIN, seviye)] * (2 if tuccar else 1)
+    liste += [kademe(MARANGOZ, seviye)] * (2 if seviye >= 15 else 1)
+    liste += [kademe(TAS, seviye)] * (2 if seviye >= 20 else 1)
+    return [k for k in liste if k]
+
+
+def _askeri(seviye, kisi):
+    binalar = []
+    agirlik = KISILIK.get(kisi, KISILIK["dengeli"])["kollar"]
+    for kol, a in sorted(agirlik.items(), key=lambda t: -t[1]):
+        kademeler = acik_kademeler(kol, seviye)
+        if a > 0 and kademeler:
+            binalar.append(kademeler[-1][0])
+    if kisi == "agresif" and acik_kademeler("piyade", seviye):
+        binalar.append(acik_kademeler("piyade", seviye)[-1][0])
+    return binalar
+
+
+BOSTAN = [(1, 10), (9, 8), (21, 9), (28, 200), (34, 201)]  # Tarla, Balkabağı, Patlıcan, Havuç, Karpuz Bostanı
+
+# Köyün biçimi: büyük karo (sütun, satır) kümeleri; hepsi başlangıç karosunu (2, 2 = genişleme 13) içerir.
+# Arthur köyleri gibi kare olmak zorunda değil (Arthur30 20×40, Arthur31 L).
+_IKI = [{(2, 2), (3, 2)}, {(2, 2), (2, 3)}, {(1, 2), (2, 2)}, {(2, 1), (2, 2)}]
+_UC = [{(2, 2), (2 + dx, 2), (2, 2 + dy)} for dx in (-1, 1) for dy in (-1, 1)]
+_DORT = [{(2, 2), (2 + dx, 2), (2, 2 + dy), (2 + dx, 2 + dy)} for dx in (-1, 1) for dy in (-1, 1)]
+_ALTI = [{(c, r) for c in range(c0, c0 + 3) for r in range(r0, r0 + 2)} for c0 in (1, 2) for r0 in (1, 2)
+         if c0 <= 2 < c0 + 3] + [{(c, r) for c in range(c0, c0 + 2) for r in range(r0, r0 + 3)}
+                                 for c0 in (1, 2) for r0 in (1, 2)]
+
+
+def sekil(seviye, rng):
+    """Büyük karo kümesi: seviye büyüdükçe köy büyür (1-9: 1, 10-19: 2 (Arthur30 gibi dikdörtgen), 20-29: 3 (Arthur31
+    gibi L), 30+: 4 (Arthur32 gibi 40×40))."""
+    if seviye < 10:
+        return {(2, 2)}
+    secenek = _IKI if seviye < 20 else _UC if seviye < 30 else _DORT  # en çok 40×40 (Arthur32 gibi)
+    return set(rng.choice(secenek))
+
+
+def genisleme_kimligi(sutun, satir):
+    """Genişleme kimliği: satır·5 + sütun + 1; x = sütun·20, y = satır·20 (Arthur30: [18, 13] → x 40..59, y 40..79)."""
+    return satir * 5 + sutun + 1
+
+
+def karolari(genislemeler):
+    """Genişleme kimliklerinin kapladığı karolar."""
+    sonuc = set()
+    for g in genislemeler:
+        satir, sutun = divmod(int(g) - 1, 5)
+        sonuc |= {(sutun * BUYUK_KARO + i, satir * BUYUK_KARO + j) for i in range(BUYUK_KARO) for j in range(BUYUK_KARO)}
+    return sonuc
+
+
 def genislemeler(seviye):
-    """Açık büyük karolar ve alanın sınırları (en küçük, en büyük karo; iki eksende aynı)."""
-    if seviye >= 30:
-        return [7, 8, 9, 12, 13, 14, 17, 18, 19], 20, 79
-    if seviye >= 15:
-        return [13, 14, 18, 19], 40, 79
+    """Geriye uyum: seviyenin en küçük köyünün alanı (kimlikler, alt, üst)."""
     return [13], 40, 59
 
 
@@ -113,20 +167,20 @@ def kapladigi(esya):
     return {(i, j) for i in range(x - w + 1, x + 1) for j in range(y - h + 1, y + 1)}
 
 
-class _Plan:
-    """Yerel koordinatlarda (0..n-1) yerleşim; sonra döndürülüp haritaya taşınır."""
+class _Alan:
+    """Harita koordinatlarında yerleşim; yalnızca köyün karolarına, boş ve ayrılmamış yere konur."""
 
-    def __init__(self, n, rng):
-        self.n, self.rng = n, rng
+    def __init__(self, karolar, rng, simdi):
+        self.karolar, self.rng, self.simdi = karolar, rng, simdi
         self.dolu, self.ayrik = set(), set()
-        self.ogeler = []  # (kimlik, x0, y0, w) yerel, sol üst köşe
+        self.items = []
+        self.kule_sayisi = {}
 
     def bos_mu(self, x0, y0, w, h, ayrik_serbest=False):
-        if x0 < 0 or y0 < 0 or x0 + w > self.n or y0 + h > self.n:
-            return False
         for i in range(x0, x0 + w):
             for j in range(y0, y0 + h):
-                if (i, j) in self.dolu or (not ayrik_serbest and (i, j) in self.ayrik):
+                t = (i, j)
+                if t not in self.karolar or t in self.dolu or (not ayrik_serbest and t in self.ayrik):
                     return False
         return True
 
@@ -139,230 +193,271 @@ class _Plan:
         for i in range(x0, x0 + w):
             for j in range(y0, y0 + h):
                 self.dolu.add((i, j))
-        self.ogeler.append((kimlik, x0, y0, w))
+        self.items.append([kimlik, x0 + w - 1, y0 + h - 1, 0, self.simdi, 0, [], {}])  # kayıtta en büyük köşe
         return True
 
-    def ayir(self, x0, y0, w, h):
-        for i in range(x0, x0 + w):
-            for j in range(y0, y0 + h):
-                self.ayrik.add((i, j))
+    def kule_koy(self, kimlik, x, y):
+        bk = (x // BUYUK_KARO, y // BUYUK_KARO)
+        if self.kule_sayisi.get(bk, 0) >= KULE_SINIRI:
+            return False
+        if self.koy(kimlik, x, y, ayrik_serbest=True):
+            self.kule_sayisi[bk] = self.kule_sayisi.get(bk, 0) + 1
+            return True
+        return False
 
-    def sirala(self, kimlikler, x0, y0, x1, y1, ara=1):
-        """Kimlikleri [x0, x1) × [y0, y1) kutusuna satır satır dizer (raf yerleşimi); konamayanları döndürür."""
-        kalan = []
-        x, y, satir = x0, y0, 0
-        for kimlik in kimlikler:
-            w, h = boyut(kimlik)
-            konuldu = False
-            while y + h <= y1:
-                if x + w > x1:
-                    x, y, satir = x0, y + satir + ara, 0
-                    continue
-                if self.koy(kimlik, x, y):
-                    x += w + ara
-                    satir = max(satir, h)
-                    konuldu = True
-                    break
-                x += 1
-            if not konuldu:
-                kalan.append(kimlik)
+    def ayir(self, karolar):
+        self.ayrik |= set(karolar)
+
+    def serit(self, kimlikler, x0, y0, w, h, yatay=True):
+        """Kimlikleri [x0, x0+w) × [y0, y0+h) şeridine boşluksuz dizer (Arthur'un sura yaslı mahalleleri gibi);
+        yatayda önce x boyunca, dikeyde önce y boyunca. Konamayanları döndürür."""
+        kalan = list(kimlikler)
+        uzun, kisa = (range(x0, x0 + w), range(y0, y0 + h)) if yatay else (range(y0, y0 + h), range(x0, x0 + w))
+        for b in kisa:
+            for a in uzun:
+                if not kalan:
+                    return kalan
+                x, y = (a, b) if yatay else (b, a)
+                kw, kh = boyut(kalan[0])
+                if x + kw <= x0 + w and y + kh <= y0 + h and self.koy(kalan[0], x, y):
+                    kalan.pop(0)
         return kalan
 
-    def serpistir(self, kimlikler, x0, y0, x1, y1, deneme=40):
-        for kimlik in kimlikler:
-            w, h = boyut(kimlik)
-            for _ in range(deneme):
-                if x1 - w < x0 or y1 - h < y0:
-                    break
-                if self.koy(kimlik, self.rng.randint(x0, x1 - w), self.rng.randint(y0, y1 - h)):
-                    break
+    def kume(self, kimlikler, x, y):
+        """Birimleri (x, y) çevresinde düzensiz bir küme (manga) hâlinde dizer; yer kalmazsa döndürür."""
+        kalan = list(kimlikler)
+        if kalan:
+            bos = sorted((t for t in self.karolar if t not in self.dolu and t not in self.ayrik),
+                         key=lambda t: (abs(t[0] - x) + abs(t[1] - y), t))
+            if bos:
+                x, y = bos[0]
+        uc = [(x, y)]
+        gorulen = {(x, y)}
+        while kalan and uc:
+            # Merkeze en yakın uçlardan biri: toplu ama kenarı düzensiz bir manga
+            uc.sort(key=lambda t: abs(t[0] - x) + abs(t[1] - y) + self.rng.random() * 1.5)
+            cx, cy = uc.pop(0)
+            if self.koy(kalan[0], cx, cy):
+                kalan.pop(0)
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1)):
+                    t = (cx + dx, cy + dy)
+                    if t not in gorulen:
+                        gorulen.add(t)
+                        uc.append(t)
+        return kalan
 
 
-def _uretim(seviye, kisi, rng):
-    """Ekonomi binaları (kişiliğe göre adet)."""
-    tuccar = kisi == "tuccar"
-    liste = []
-    liste += [kademe(DEGIRMEN, seviye)] * (3 if tuccar else 2)
-    liste += [kademe(ALTIN, seviye)] * (2 if tuccar else 1)
-    liste += [kademe(MARANGOZ, seviye)] * (2 if seviye >= 15 else 1)
-    liste += [kademe(TAS, seviye)] * (2 if seviye >= 20 else 1)
-    return [k for k in liste if k]
+def _halka(karolar):
+    """Köyün kenar karoları (dört komşusundan biri köyün dışında): sur buradan geçer (Arthur köyleri gibi)."""
+    return {(x, y) for x, y in karolar
+            if any((x + dx, y + dy) not in karolar for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
 
 
-def _tarlalar(seviye, kisi, n):
-    ciftlik = kisi in ("dengeli", "tuccar")
-    tarla = (4 if n == 20 else 8) + (4 if ciftlik else 0)
-    agil = [k for k in (kademe(KOYUN, seviye), kademe(INEK, seviye)) if k]
-    if n == 20:
-        agil = agil[:1]
-    return [10] * tarla, agil * (2 if ciftlik and n > 20 else 1)
+def _kenarlar(bks):
+    """Dışa bakan büyük karo kenarları: (sütun, satır, yön) yön ∈ {K, G, B, D} (y-, y+, x-, x+)."""
+    sonuc = []
+    for c, r in sorted(bks):
+        for yon, (dc, dr) in (("K", (0, -1)), ("G", (0, 1)), ("B", (-1, 0)), ("D", (1, 0))):
+            if (c + dc, r + dr) not in bks:
+                sonuc.append((c, r, yon))
+    return sonuc
 
 
-def _askeri(seviye, kisi):
-    binalar = []
-    agirlik = KISILIK.get(kisi, KISILIK["dengeli"])["kollar"]
-    for kol, a in sorted(agirlik.items(), key=lambda t: -t[1]):
-        kademeler = acik_kademeler(kol, seviye)
-        if a > 0 and kademeler:
-            binalar.append(kademeler[-1][0])
-    if kisi == "agresif" and acik_kademeler("piyade", seviye):
-        binalar.append(acik_kademeler("piyade", seviye)[-1][0])
-    return binalar
+def _serit_kutusu(c, r, yon, derinlik):
+    """Büyük karonun dış kenarı boyunca, surun hemen içinde (köşelerden ikişer karo içeride) şerit kutusu."""
+    x0, y0 = c * BUYUK_KARO, r * BUYUK_KARO
+    if yon == "K":
+        return x0 + 2, y0 + 1, BUYUK_KARO - 4, derinlik, True
+    if yon == "G":
+        return x0 + 2, y0 + BUYUK_KARO - 1 - derinlik, BUYUK_KARO - 4, derinlik, True
+    if yon == "B":
+        return x0 + 1, y0 + 2, derinlik, BUYUK_KARO - 4, False
+    return x0 + BUYUK_KARO - 1 - derinlik, y0 + 2, derinlik, BUYUK_KARO - 4, False
+
+
+def _mahalle(tur, seviye, kisi):
+    """Şerit türünün öğeleri ve derinliği (karo)."""
+    if tur == "ev":
+        return [kademe(EV, seviye)] * 16, 4
+    if tur == "bostan":
+        return [kademe(BOSTAN, seviye)] * 24, 6
+    if tur == "kisla":
+        return _askeri(seviye, kisi) * 2, 3
+    if tur == "agil":
+        return [k for k in (kademe(KOYUN, seviye), kademe(INEK, seviye)) if k] * 2, 4
+    return _uretim(seviye, kisi, None), 2
+
+
+SERIT_SIRASI = {
+    "agresif": ["kisla", "ev", "uretim", "bostan", "kisla", "agil"],
+    "savunmaci": ["ev", "kisla", "uretim", "bostan", "ev", "agil"],
+    "tuccar": ["ev", "uretim", "bostan", "agil", "ev", "uretim"],
+    "dengeli": ["bostan", "ev", "agil", "kisla", "uretim", "bostan"],
+}
 
 
 def koy_kur(seviye, kisi, tohum, simdi):
-    """(items, expansions): botun köyü. Aynı tohum aynı köyü verir."""
+    """(items, expansions): botun köyü. Aynı tohum aynı köyü verir. Arthur köylerindeki düzen: sur köyün kenarında,
+    köşelerde kule öbekleri, kapı bir boşluk ve iki yanında kule, içeri ağaçlı bir yol; mahalleler sura yaslı
+    boşluksuz şeritler; ortada çiçekli meydan; askerler düzensiz mangalar; aralarda çimen."""
     rng = random.Random(str(tohum))
     seviye = max(1, int(seviye))
     kisi = kisi if kisi in KISILIK else "dengeli"
-    duzen = KISILIK[kisi]["duzen"]
-    acik, alt, ust = genislemeler(seviye)
-    n = ust - alt + 1
-    p = _Plan(n, rng)
-    c = n // 2
+    bks = sekil(seviye, rng)
+    acik = sorted(genisleme_kimligi(c, r) for c, r in bks)
+    karolar = karolari(acik)
+    a = _Alan(karolar, rng, simdi)
+    halka = _halka(karolar)
+    kenarlar = _kenarlar(bks)
+    rng.shuffle(kenarlar)
 
-    # Sur halkası: küçük köyde alanın kenarından bir karo içeride; büyük köyde çekirdeğin çevresinde
-    if n == 20:
-        r0, r1 = 1, n - 2
-    elif n == 40:
-        r0, r1 = 6, n - 7
-    else:
-        r0, r1 = 12, n - 13
-    if duzen == "ciftlik" and n > 20:
-        r0, r1 = r0 + 3, r1 - 3  # çiftlik köyünde sur daha dar, tarlalar dışarıda geniş
+    # 1. Kapılar: dış kenarların ortasında 3 karoluk boşluk; içeri 6 karoluk yol ayrılır
+    kapilar = kenarlar[:1 if seviye < 20 else 2]
+    yol = set()
+    for c, r, yon in kapilar:
+        x0, y0 = c * BUYUK_KARO, r * BUYUK_KARO
+        for k in range(9, 12):
+            for d in range(0, 7):
+                if yon == "K":
+                    yol.add((x0 + k, y0 + d))
+                elif yon == "G":
+                    yol.add((x0 + k, y0 + BUYUK_KARO - 1 - d))
+                elif yon == "B":
+                    yol.add((x0 + d, y0 + k))
+                else:
+                    yol.add((x0 + BUYUK_KARO - 1 - d, y0 + k))
+    a.ayir(yol)
 
-    # 1. Meydan: belediye ortada, çevresinde bir karo boş meydan; kapıya giden yol (yerel güneye, +y) boş kalır
-    p.koy(kademe(BELEDIYE, seviye), c - 2, c - 2)
-    p.ayir(c - 3, c - 3, 6, 6)
-    p.ayir(c - 1, c + 3, 2, r1 - c - 2)  # ana yol
-    kapi_x = c - 1
-    # Meydanın köşelerinde süs (çeşme, heykel)
-    meydan_susu = [CESME[1] if seviye >= CESME[0] else ATES[1]]
+    # 2. Belediye ve meydan: başlangıç karosunun ortasında; çevresi çiçek halısı, köşelerinde çeşme ve heykel
+    mx, my = 2 * BUYUK_KARO + 8, 2 * BUYUK_KARO + 8
+    a.koy(kademe(BELEDIYE, seviye), mx, my)
+    meydan = {(i, j) for i in range(mx - 2, mx + 6) for j in range(my - 2, my + 6)}
+    a.ayir(meydan)
+    cicek = [k for s, k in CICEK if s <= seviye]
+    hali = rng.choice(cicek)
+    for i in range(mx - 1, mx + 5):
+        for j in (my - 1, my + 4):
+            a.koy(hali, i, j, ayrik_serbest=True)
+    for j in range(my, my + 4):
+        for i in (mx - 1, mx + 4):
+            a.koy(hali, i, j, ayrik_serbest=True)
     heykeller = [k for s, k in HEYKEL if s <= seviye]
-    meydan_susu += [rng.choice(heykeller) for _ in range(3)]
-    for (x, y), kimlik in zip(((c - 3, c - 3), (c + 2, c - 3), (c - 3, c + 2), (c + 2, c + 2)), meydan_susu):
-        p.koy(kimlik, x, y, ayrik_serbest=True)
+    sus = [CESME[1] if seviye >= CESME[0] else ATES[1], rng.choice(heykeller), rng.choice(heykeller),
+           CESME[1] if seviye >= CESME[0] else rng.choice(heykeller)]
+    for (i, j), k in zip(((mx - 2, my - 2), (mx + 5, my - 2), (mx - 2, my + 5), (mx + 5, my + 5)), sus):
+        a.koy(k, i, j, ayrik_serbest=True)
 
-    # 2. Sur ve kapı (sur 3. seviyede açılır)
-    sur = kademe(SUR, seviye)
-    kapi = SUR_KAPISI[1] if seviye >= SUR_KAPISI[0] else None
-    if sur:
-        if kapi:
-            kapi = kapi if p.koy(kapi, kapi_x - 1, r1 - 2, ayrik_serbest=True) else None  # yolun ucunda, 3×3
-        acik_yol = range(kapi_x - 1, kapi_x + 2) if kapi else range(kapi_x, kapi_x + 2)
-        halkalar = [(r0, r1)]
-        if duzen == "kale" and seviye >= 14 and n > 20:
-            halkalar.append((r0 - 3, r1 + 3))  # dış halka
-        for q0, q1 in halkalar:
-            for i in range(q0, q1 + 1):
-                p.koy(sur, i, q0)
-                if i not in acik_yol:
-                    p.koy(sur, i, q1)
-            for j in range(q0 + 1, q1):
-                p.koy(sur, q0, j)
-                p.koy(sur, q1, j)
-        p.ayir(kapi_x - 1, r1 - 2, 4, 5)  # kapı önü boş
-
-    # 3. Kuleler: dört köşe, kapının iki yanı, sonra sur boyunca eşit aralıkla
-    kule = kademe(KULE, seviye)
-    kule_sayisi = KISILIK[kisi]["kule"] + seviye // 15
+    # 3. Sur (3. seviyeden) ve kuleler: köşelerde üçlü öbek, kapının iki yanında birer, kalan bütçe sur boyunca
+    sur, kule = kademe(SUR, seviye), kademe(KULE, seviye)
+    kapi_bosluk = {t for t in yol if t in halka}
     if kule:
-        ic0, ic1 = r0 + 1, r1 - 1
-        yerler = [(ic0, ic0), (ic1, ic0), (ic0, ic1), (ic1, ic1), (kapi_x - 2, ic1 - 2), (kapi_x + 3, ic1 - 2)]
-        adim = max(2, (ic1 - ic0) // 4)
-        for k in range(ic0 + adim, ic1, adim):
-            yerler += [(k, ic0), (ic0, k), (ic1, k)]
-        konan = 0
-        for x, y in yerler:
-            if konan >= kule_sayisi:
-                break
-            if p.koy(kule, x, y, ayrik_serbest=True):
-                konan += 1
+        for x, y in sorted(halka):
+            dis = sum((x + dx, y + dy) not in karolar for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if dis >= 2:  # dış köşe: köşe ve iki yanı
+                for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+                    t = (x + dx, y + dy)
+                    if t in halka and t not in kapi_bosluk:
+                        a.kule_koy(kule, *t)
+        for x, y in sorted(kapi_bosluk):
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                t = (x + dx, y + dy)
+                if t in halka and t not in kapi_bosluk:
+                    a.kule_koy(kule, *t)
+        fazla = KISILIK[kisi]["kule"] + seviye // 15
+        kalan_halka = [t for t in sorted(halka) if t not in a.dolu and t not in kapi_bosluk]
+        adim = max(5, len(kalan_halka) // max(1, fazla))
+        for t in kalan_halka[rng.randrange(adim)::adim][:fazla]:
+            a.kule_koy(kule, *t)
+    if sur:
+        for t in sorted(halka - kapi_bosluk):
+            a.koy(sur, *t, ayrik_serbest=True)
+        if seviye >= SUR_KAPISI[0] and kapilar:  # ilk kapıya Sur Kapısı (3×3), boşluğun içine
+            c, r, yon = kapilar[0]
+            x0, y0 = c * BUYUK_KARO, r * BUYUK_KARO
+            yer = {"K": (x0 + 9, y0), "G": (x0 + 9, y0 + BUYUK_KARO - 3), "B": (x0, y0 + 9),
+                   "D": (x0 + BUYUK_KARO - 3, y0 + 9)}[yon]
+            a.koy(SUR_KAPISI[1], *yer, ayrik_serbest=True)
+    # Kapıdan içeri yolun iki yanında ağaç
+    agaclar = [k for s, k in AGAC if s <= seviye]
+    agac = rng.choice(agaclar)
+    for c, r, yon in kapilar:
+        x0, y0 = c * BUYUK_KARO, r * BUYUK_KARO
+        for d in range(2, 7, 2):
+            for k in (8, 12):
+                t = {"K": (x0 + k, y0 + d), "G": (x0 + k, y0 + BUYUK_KARO - 1 - d), "B": (x0 + d, y0 + k),
+                     "D": (x0 + BUYUK_KARO - 1 - d, y0 + k)}[yon]
+                a.koy(agac, *t, ayrik_serbest=True)
 
-    ic0, ic1 = r0 + 2, r1 - 1  # surun içi (kule sırası hariç)
-    # 4. Kale (savunmacı, 10. seviyeden): meydanın kuzeyinde
-    if duzen == "kale":
-        p.koy(kademe(KALE, seviye) if seviye >= 10 else None, c - 2, c - 8 if n > 20 else ic0)
+    # 4. Mahalleler: her dış kenar boyunca surun içinde boşluksuz şerit (kişiliğin sırasıyla)
+    sira = list(SERIT_SIRASI[kisi])
+    rng.shuffle(sira[2:])
+    ic_kenarlar = [k for k in kenarlar]
+    kullanilan = set()
+    for n, (c, r, yon) in enumerate(ic_kenarlar):
+        tur = sira[n % len(sira)]
+        if tur in ("kisla", "agil") and tur in kullanilan:  # ordugâh ve ağıl birer şerit; fazlası ev
+            tur = "ev"
+        kullanilan.add(tur)
+        ogeler, derinlik = _mahalle(tur, seviye, kisi)
+        x0, y0, w, h, yatay = _serit_kutusu(c, r, yon, derinlik)
+        a.serit(ogeler, x0, y0, w, h, yatay)
+        # Şeridin iç kenarında seyrek ağaç sırası (Arthur31'deki gibi mahalleyi çimenden ayırır)
+        if tur in ("ev", "bostan") and rng.random() < 0.6:
+            for s in range(0, (w if yatay else h), 3):
+                t = (x0 + s, y0 + h) if yatay and yon == "K" else (x0 + s, y0 - 1) if yatay else \
+                    (x0 + w, y0 + s) if yon == "B" else (x0 - 1, y0 + s)
+                a.koy(agac, *t)
 
-    # 5. Ordugâh: askeri binalar kapıya yakın (yerel güneydoğu), önünde talim alanı
-    askeri = _askeri(seviye, kisi)
-    og_x0, og_y0 = c + 3, c + 1
-    kalan_askeri = p.sirala(askeri, og_x0, og_y0, ic1, ic1 - 1)
-    # 6. Evler: yolun iki yanında sıra sıra (yerel batı yarısı ve kuzey)
-    ev = kademe(EV, seviye)
-    ev_sayisi = 4 + seviye // 6 + (2 if duzen == "carsi" else 0)
-    evler = [ev] * min(ev_sayisi, 14 if n > 20 else 8)
-    kalan_ev = p.sirala(evler, ic0, c + 1, c - 1, ic1 - 1)
-    kalan_ev = p.sirala(kalan_ev, ic0, ic0, c - 3, c - 3)
-    # 7. Pazar, inanç binası (çarşı köyünde meydanın yanında)
-    pazar = kademe(PAZAR, seviye)
-    ozel = [pazar] if pazar and (duzen == "carsi" or seviye >= 12) else []
-    if kademe(INANC, seviye) and seviye >= 20:
-        ozel.append(kademe(INANC, seviye))
-    kalan_ozel = p.sirala(ozel, c - 2, ic0, ic1, c - 3)
-    # 8. Üretim: surun içinde kuzey ve doğu kenarı
-    uretim = _uretim(seviye, kisi, rng)
-    kalan_uretim = p.sirala(uretim, c + 3, ic0, ic1, c)
-    # 9. Tarlalar ve ağıllar: büyük köyde surun dışında çiftlik kuşağı, küçük köyde içeride kalan yerde
-    tarlalar, agillar = _tarlalar(seviye, kisi, n)
-    if n > 20:
-        disari = [(1, 1, n - 1, r0 - 1), (1, r1 + 2, n - 1, n - 1), (1, r0, r0 - 1, r1 + 1),
-                  (r1 + 2, r0, n - 1, r1 + 1)]
-        rng.shuffle(disari)
-        bekleyen = agillar + tarlalar + kalan_uretim + kalan_ev + kalan_ozel + kalan_askeri
-        for x0, y0, x1, y1 in disari:
-            bekleyen = p.sirala(bekleyen, x0, y0, x1, y1)
+    # 5. Mahalle blokları: her büyük karonun ortasında 10×10'luk sık blok (Arthur32'deki ev ve bostan blokları gibi);
+    #    başlangıç karosunda meydanın doğusu ve güneyi
+    buyukler = [k for k in (kademe(PAZAR, seviye), kademe(INANC, seviye) if seviye >= 20 else None,
+                            kademe(KALE, seviye) if kisi == "savunmaci" and seviye >= 10 else None) if k]
+    bloklar = {"ev": [kademe(EV, seviye)] * 25, "bostan": [kademe(BOSTAN, seviye)] * 25,
+               "kisla": _askeri(seviye, kisi) * 4, "carsi": buyukler + _uretim(seviye, kisi, None) * 2}
+    turler = list(SERIT_SIRASI[kisi])
+    rng.shuffle(turler)
+    turler = ["carsi"] + [t if t in bloklar and not (t == "kisla" and "kisla" in kullanilan) else "ev" for t in turler]
+    diger = [(c, r) for c, r in sorted(bks) if (c, r) != (2, 2)]
+    rng.shuffle(diger)
+    for n, (c, r) in enumerate(diger):
+        tur = turler[n % len(turler)]
+        a.serit(bloklar[tur], c * BUYUK_KARO + 5, r * BUYUK_KARO + 5, 10, 10, rng.random() < 0.5)
+    if not diger:  # tek karolu köy: pazar ve üretim meydanın yanında
+        a.serit(bloklar["carsi"], mx + 6, my - 3, 6, 6)
     else:
-        bekleyen = p.sirala(kalan_uretim + kalan_ozel + kalan_askeri + agillar + tarlalar[:4], ic0, ic0, ic1, ic1)
-        p.sirala(kalan_ev, ic0, ic0, ic1, ic1)
+        a.serit(_uretim(seviye, kisi, None)[:3], mx + 6, my - 3, 6, 9)
 
-    # 10. Ordu: talim alanında düzenli sıralar (bir karo arayla), yer kalmazsa surun içine dağılır
+    # 6. Ordu: kışlaların önünde ve meydanda 2-4 düzensiz manga
     ordu = [birim_sec(seviye, kisi, rng) for _ in range(ordu_buyuklugu(seviye, kisi))]
     ordu.sort()
-    kalan = p.sirala(ordu, c + 3, c + 1 + 4, ic1, ic1 - 1)
-    p.serpistir(kalan, ic0, ic0, ic1, ic1)
+    manga_sayisi = min(4, 2 + seviye // 20)
+    adaylar = [(mx + rng.randint(-1, 4), my + 6 + rng.randint(0, 2))]
+    for c, r in sorted(bks):
+        adaylar.append((c * BUYUK_KARO + rng.randint(6, 13), r * BUYUK_KARO + rng.randint(6, 13)))
+    rng.shuffle(adaylar)
+    boy = max(1, len(ordu) // manga_sayisi)
+    kalan = []
+    for m in range(manga_sayisi):
+        parca = ordu[m * boy:(m + 1) * boy] if m < manga_sayisi - 1 else ordu[m * boy:]
+        x, y = adaylar[m % len(adaylar)]
+        kalan += a.kume(parca, x, y)
+    for _ in range(4):  # sığmayanlar yeni bir manga olur (boş çimende)
+        if not kalan:
+            break
+        x, y = rng.choice(sorted(karolar))
+        kalan = a.kume(kalan, x, y)
 
-    # 11. Süs: yol kenarında çiçek, kapıda bayrak, sur dışında ağaç kümeleri
-    cicek = [k for s, k in CICEK if s <= seviye]
-    for j in range(c + 4, r1 - 2, 2):
-        p.koy(rng.choice(cicek), c - 2, j, ayrik_serbest=True)
-        p.koy(rng.choice(cicek), c + 1, j, ayrik_serbest=True)
+    # 7. Süs: çimende ağaç öbekleri, kapı kulelerinin içinde bayrak
     bayraklar = [k for s, k in BAYRAK if s <= seviye]
     bayrak = 174 if rng.random() < 0.35 else rng.choice(bayraklar)
-    for x in (kapi_x - 3, kapi_x + 4):
-        p.koy(bayrak, x, r1 + 1, ayrik_serbest=True) or p.koy(bayrak, x, r1 - 1, ayrik_serbest=True)
-    agaclar = [k for s, k in AGAC if s <= seviye]
-    kume = 6 if n == 20 else 14
-    for _ in range(kume):
-        ox, oy = rng.randint(0, n - 1), rng.randint(0, n - 1)
-        if r0 - 1 <= ox <= r1 + 1 and r0 - 1 <= oy <= r1 + 1 and n > 20:
-            continue
+    for t in sorted(yol)[:: max(1, len(yol) // 4)]:
+        a.koy(bayrak, t[0] + 2, t[1], ayrik_serbest=False)
+    for _ in range(2 + 2 * len(bks)):
+        x, y = rng.choice(sorted(karolar))
         tur = rng.choice(agaclar)
-        for _ in range(rng.randint(3, 7)):
-            p.koy(tur, ox + rng.randint(-2, 2), oy + rng.randint(-2, 2))
-
-    return _haritaya(p, alt, rng.randrange(8), simdi), acik
-
-
-def _haritaya(p, alt, donus, simdi):
-    """Yerel yerleşimi 8 simetriden biriyle (dönme, ayna) haritaya taşır; kayıttaki konum en büyük köşedir."""
-    n = p.n
-    items = []
-    for kimlik, x0, y0, w in p.ogeler:
-        x1, y1 = x0 + w - 1, y0 + w - 1
-        koseler = []
-        for x, y in ((x0, y0), (x1, y1)):
-            if donus & 1:
-                x, y = y, x
-            if donus & 2:
-                x = n - 1 - x
-            if donus & 4:
-                y = n - 1 - y
-            koseler.append((x, y))
-        mx = max(koseler[0][0], koseler[1][0])
-        my = max(koseler[0][1], koseler[1][1])
-        items.append([kimlik, alt + mx, alt + my, 0, simdi, 0, [], {}])
-    return items
+        for _ in range(rng.randint(3, 6)):
+            a.koy(tur, x + rng.randint(-1, 1), y + rng.randint(-1, 1))
+    return a.items, acik
 
 
 def ordu_dolu_mu(kayit):
@@ -387,9 +482,9 @@ def birim_ekle(kayit, kimlik, simdi, rng=random):
             dolu |= kapladigi(e)
         except (TypeError, ValueError, IndexError):
             continue
-    _, alt, ust = genislemeler(seviye)
-    for _ in range(60):
-        x, y = rng.randint(alt + 2, ust - 2), rng.randint(alt + 2, ust - 2)
+    alan = sorted(karolari(harita.get("expansions") or [13]) - dolu)
+    for _ in range(60 if alan else 0):
+        x, y = rng.choice(alan)
         if (x, y) not in dolu:
             items.append([kimlik, x, y, 0, simdi, 0, [], {}])
             return True

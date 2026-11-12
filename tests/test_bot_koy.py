@@ -25,12 +25,28 @@ def karolar(e):
 
 
 def acik_karolar(genislemeler):
+    """x = ((g - 1) mod 5)·20, y = ((g - 1) div 5)·20 (Arthur30 dosyası: [18, 13] → x 40..59, y 40..79; test aşağıda)."""
     sonuc = set()
     for g in genislemeler:
         satir, sutun = divmod(g - 1, 5)
         sonuc |= {(sutun * 20 + i, satir * 20 + j) for i in range(20) for j in range(20)}
-        sonuc |= {(satir * 20 + i, sutun * 20 + j) for i in range(20) for j in range(20)}
     return sonuc
+
+
+def buyuk_karolar(genislemeler):
+    return {((g - 1) % 5, (g - 1) // 5) for g in genislemeler}
+
+
+def bagli_mi(bks):
+    bks = set(bks)
+    gorulen, yigin = set(), [next(iter(bks))]
+    while yigin:
+        c, r = yigin.pop()
+        if (c, r) in gorulen:
+            continue
+        gorulen.add((c, r))
+        yigin += [(c + dc, r + dr) for dc, dr in ((1, 0), (-1, 0), (0, 1), (0, -1)) if (c + dc, r + dr) in bks]
+    return gorulen == bks
 
 
 def guc(items):
@@ -132,6 +148,66 @@ class Yerlesim(unittest.TestCase):
         self.assertEqual(bot_koy.koy_kur(20, "tuccar", "abc", 5), bot_koy.koy_kur(20, "tuccar", "abc", 5))
 
 
+class ArthurDuzeni(unittest.TestCase):
+    """Sahibi (12.11.2026): 'Arthur'un köyüne bak, hakikaten güzel; birebir yapma'. Oyunun kendi Arthur köyleri
+    (villages/Arthur30, 31, 32.json; FriendButton/mouseUsed oyuncu seviyesi <= 10 → 30, <= 20 → 31, sonra 32):
+    30 iki büyük karoluk dikdörtgen, 31 L, 32 40×40; sur köyün kenarında; köşelerde kule; askerler küme küme."""
+
+    def test_genisleme_eksenleri_arthur30_dosyasindan(self):
+        import json
+        import os
+        with open(os.path.join(KOK, "villages", "Arthur30.json"), encoding="utf-8") as f:
+            harita = json.load(f)["maps"][0]
+        alan = acik_karolar(harita["expansions"])
+        self.assertEqual(sorted(harita["expansions"]), [13, 18])
+        for e in harita["items"]:
+            self.assertLessEqual(karolar(e), alan, e)
+        self.assertEqual(bot_koy.karolari([13, 18]), alan)
+
+    def test_koy_seviyeyle_asama_asama_buyur(self):
+        beklenen = {1: 1, 9: 1, 10: 2, 19: 2, 20: 3, 29: 3, 30: 4, 60: 4}
+        for sv, adet in beklenen.items():
+            for i in range(6):
+                _, acik = bot_koy.koy_kur(sv, list(bot_koy.KISILIK)[i % 4], "b%d-%d" % (sv, i), 0)
+                bks = buyuk_karolar(acik)
+                self.assertEqual(len(bks), adet, (sv, acik))
+                self.assertIn((2, 2), bks)
+                self.assertTrue(bagli_mi(bks), acik)
+                if adet == 3:  # L: hepsi aynı satırda ya da sütunda değil
+                    self.assertTrue(len({c for c, _ in bks}) == 2 and len({r for _, r in bks}) == 2, acik)
+                if adet == 4:  # 2×2
+                    self.assertTrue(len({c for c, _ in bks}) == 2 and len({r for _, r in bks}) == 2, acik)
+
+    def test_sur_kenarda_ve_koselerde_kule(self):
+        for sv in (5, 15, 25, 45):
+            for k in bot_koy.KISILIK:
+                items, acik = bot_koy.koy_kur(sv, k, "s%d%s" % (sv, k), 0)
+                alan = acik_karolar(acik)
+                kenar = {(x, y) for x, y in alan
+                         if any((x + dx, y + dy) not in alan for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+                savunma = set()
+                kule = set()
+                for e in items:
+                    if ESYA[int(e[0])].get("subcategory_id") in ("21", "22"):
+                        savunma |= karolar(e)
+                    if ESYA[int(e[0])].get("subcategory_id") == "21":
+                        kule |= karolar(e)
+                self.assertGreaterEqual(len(kenar & savunma) / len(kenar), 0.9, (sv, k))  # yalnızca kapı boşlukları
+                koseler = {(x, y) for x, y in kenar
+                           if sum((x + dx, y + dy) not in alan for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))) >= 2}
+                self.assertLessEqual(koseler, kule, (sv, k))
+
+    def test_askerler_kume_kume(self):
+        for sv in (10, 30, 55):
+            for k in bot_koy.KISILIK:
+                items, _ = bot_koy.koy_kur(sv, k, "a%d%s" % (sv, k), 0)
+                birimler = {(int(e[1]), int(e[2])) for e in items if ESYA[int(e[0])]["type"] == "u"}
+                yalniz = [t for t in birimler
+                          if not any((t[0] + dx, t[1] + dy) in birimler for dx in (-1, 0, 1) for dy in (-1, 0, 1)
+                                     if dx or dy)]
+                self.assertLessEqual(len(yalniz), len(birimler) * 0.2, (sv, k, len(yalniz), len(birimler)))
+
+
 class YenidenKur(unittest.TestCase):
     def kayit(self, **pi):
         return {"playerInfo": dict({"pid": "p1", "name": "Balrog", "bot": True, "bot_kisi": "agresif"}, **pi),
@@ -144,7 +220,9 @@ class YenidenKur(unittest.TestCase):
         self.assertEqual((k["playerInfo"]["pid"], k["playerInfo"]["name"], k["maps"][0]["coins"],
                           k["maps"][0]["level"], k["privateState"]["attacksReceived"]),
                          ("p1", "Balrog", 777, 25, [{"time": 5}]))
-        self.assertEqual(k["maps"][0]["expansions"], [13, 14, 18, 19])  # 15-29: 40..79
+        acik = k["maps"][0]["expansions"]  # 20-29: üç büyük karo, L (Arthur31 gibi)
+        self.assertEqual(len(acik), 3)
+        self.assertIn(13, acik)
         self.assertGreater(len(k["maps"][0]["items"]), 50)
         self.assertFalse(bot_koy.yeniden_kur(k, 200))  # bir kez
 

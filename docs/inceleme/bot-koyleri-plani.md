@@ -82,3 +82,22 @@ Beklenen değerlerin kaynağı config ve Config sabitleri; üreticinin kendi ç�
 - Yeni bina, birim ya da süs çizilmez; mağazada olmayan (in_store 0) ya da nakitle alınan özel binalar kullanılmaz
   (Kale I-III hariç: oyunun kendi savunma binası).
 - Var olan bot kayıtları: üretici `mevcut_botlari_sil` ile yalnızca botları yeniler; oyuncu kaydına dokunmaz.
+
+## 5. Sürüm 2: Arthur köyleri örnek (12.11.2026)
+
+Sahibi ilk sonucu "çok bot gibi, çok yapay" buldu: "Arthur'un köyüne bak, hakikaten güzel; birebir yapma". Oyunun
+kendi Arthur köyleri (villages/Arthur30, 31, 32.json) incelendi:
+
+- Hangisinin görüneceğini istemci seçer (FriendButton/mouseUsed): oyuncu seviyesi ≤ 10 → 100000030, ≤ 20 → 100000031,
+  öteki her seviye → 100000032. Çubukta Arthur'un seviyesi oyuncunun seviyesi × 1,2 (FriendsWindow/<kurucu>); köyün
+  kendisi yalnızca bu üç aşamada değişir. SWF'deki öteki 1000000xx kimlikleri görev ve hayatta kalma haritalarıdır.
+- Arthur30: iki büyük karo (20×40 dikdörtgen); Arthur31: L; Arthur32: 40×40.
+- Sur köyün kenarında; köşelerde kule öbekleri, sur boyunca kule dizileri; kapı bir boşluk, iki yanında kule, içeri
+  ağaçlı yol. Evler, bostanlar, kışlalar sura yaslı boşluksuz şeritler ve sık bloklar; belediyenin çevresi çiçek;
+  askerler düzensiz kümeler; aralarda çimen.
+
+Uygulama (oyun/bot_koy.py, tasarım sürümü 4): köy seviyeyle büyür (1-9: 1 büyük karo, 10-19: 2 (dikdörtgen),
+20-29: 3 (L), 30+: 4 (2×2)); sur alanın kenarından geçer; her dış köşede kule; kapı boşluğu ve ağaçlı yol; her dış
+kenarda kişiliğin sırasıyla bir mahalle şeridi; her büyük karonun ortasında 10×10'luk blok; meydan çiçek halısıyla;
+ordu 2-4 toplu manga. Denetim tests/test_bot_koy.py ArthurDuzeni (genişleme eksenleri Arthur30 dosyasıyla, aşamalar,
+sur kenarda ve köşelerde kule, askerler küme küme).
