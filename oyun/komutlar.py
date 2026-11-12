@@ -1179,10 +1179,11 @@ def increase_population(save, a):
 
 @komut("complete_tutorial")
 def complete_tutorial(save, a):
-    """[adim] - 31. adımdan (ejderha seçimi) sonra eğitim bitmiş sayılır."""
-    if a.tam(0) >= 31:
-        save["playerInfo"]["completed_tutorial"] = 1
-        save["privateState"]["dragonNestActive"] = 1
+    """[adim] - istemci gelen adımı completed_tutorial'a yazar (Base/completarTutorial @105). Her adımda
+    (TutorialMain/nextStep @457) ve sonda 15 ile (endTutorial @97) gelir; açılışta 0 değilse eğitim bitmiş sayılır
+    (Base/tutorialCheck @36). DNT-46: eski istemcinin "31. adım" kuralı 15 adımlı 1.4.07 eğitimini hiç bitirmiyordu."""
+    if a.tam(0) > 0:
+        save["playerInfo"]["completed_tutorial"] = a.tam(0)
 
 
 def _odul_seviyesi(save):
@@ -1491,10 +1492,12 @@ def set_quest_var(save, a):
 
 @komut("start_survival")
 def start_survival(save, a):
-    """Bir can harcanır (3 saatte bir yenilenir)."""
+    """Bir can harcanır. PopupSurvival/refreshLifes: 3 can; harcanan can SURVIVAL_HOURS_LIVE_REGENERATE saatte
+    yenilenir, sonra survivalVidasExtra."""
     ps = save["privateState"]
     simdi = timestamp_now()
-    canlar = [t for t in ps.get("survivalVidaTimeStamp", []) if int(t) > simdi - 3 * 3600]
+    sure = int(globals_().get("SURVIVAL_HOURS_LIVE_REGENERATE", 3)) * 3600
+    canlar = [t for t in ps.get("survivalVidaTimeStamp", []) if int(t) + sure > simdi]
     if len(canlar) < 3:
         canlar.append(simdi)
     elif int(ps.get("survivalVidasExtra", 0)) > 0:
@@ -1799,12 +1802,10 @@ def rider_next_step(save, a):
 
 @komut("rider_select")
 def rider_select(save, a):
-    """[binici_no] - 0 sıfırlar."""
+    """[binici_no] - 0 sıfırlar. İstemci her seçimde adımı ve zamanı 0 yapar (PopupDragonRiders/onRiderFieldClick
+    @38-61, PopupDragonRiderTraining/onTrainClick @115-139). DNT-47: yeni binicide eski adım kalıyordu."""
     ps = save["privateState"]
-    if a.tam(0) in (1, 2, 3):
-        ps["riderNumber"] = a.tam(0)
-    else:
-        ps.update(riderNumber=0, riderStepNumber=0, riderTimeStamp=-1)
+    ps.update(riderNumber=a.tam(0) if a.tam(0) in (1, 2, 3) else 0, riderStepNumber=0, riderTimeStamp=0)
 
 
 @komut("next_temple_step")
@@ -2267,8 +2268,10 @@ def set_attack_team(save, a):
 
 @komut("modify_position_univers")
 def modify_position_univers(save, a):
-    """[yeni_yuva, eski_yuva] - oyuncunun dünya haritasındaki yuvası."""
-    save["privateState"]["kita_konum"] = a.tam(0) % 8
+    """[eski_yuva, yeni_yuva] - oyuncunun dünya haritasındaki yuvası. İstemci (ExplorationsManager/
+    evalUserPositionNotConquered @286-376) oyuncunun yuvasını (yerel6) ilk, geçtiği yuvayı (yerel5) ikinci gönderir.
+    DNT-48: sunucu ilk argümanı yeni yuva sanıyordu."""
+    save["privateState"]["kita_konum"] = a.tam(1) % 8
 
 
 @komut("attack_player")
