@@ -187,3 +187,15 @@ ada ve beş viral teklif kayan 30 günlük pencereyle (`config.etkinlik_penceres
 - `attrs.si = si.slice(0, min(len, 4) − num_recruitments)` (@250-318); ödül `privateState.recruitmentPrices`'a
   (@340). Alınmış ödül bir daha sunulmaz.
 - Çevrimdışı ulaşılamıyor: `si` yalnızca `showPopupSEHelpSocialItem` (JS, arkadaş daveti) ile dolar.
+
+## Bina satışı ve yükseltme (`sell`, `buy`; DNT-27)
+
+- **Normal satış (`Base/bulldozeBuilding`):** İstemci iadeyi ekranda kendisi verir: `cost / Config.DIVISOR_SELL`
+  (%5). Sunucu da `sell`'in 5. argümanı 0 iken aynı iadeyi yazar (`satis_iadesi`).
+- **Yükseltme (`IsoBuilding/upgrade` @525-619):**
+  - İstemci yeni binanın tam bedelini düşer. `IsoEngine/getDifferenceCost` adına rağmen fark değil, `[yeni.cost, yeni.cost_type]` döndürür.
+  - Yeni binanın `xp`'si eklenir (`adjustStatByType(−bedel, tür, yeni.xp)`).
+  - Eski bina `Base/removeElement(..., "UPGR")` ile kaldırılır. Bu sırada `sell [x, y, id, kasaba, 0, "UPGR"]` gider ama ekranda iade verilmez.
+  - Ardından `buy [id, x, y, 1, kasaba, 0, 1, tür]` gider.
+  - Sunucu, neden `"UPGR"` olan satışta iade vermez. Önce verirdi; kayıt, ekrandakinden eski bedelin %5'i kadar fazla tutardı.
+  - Eski binanın xp'si iki tarafta da geri alınmaz.

@@ -39,6 +39,17 @@ class EsyaKomutlari(KomutTesti):
         self.assertEqual(len(self.harita["items"]), 1)
         self.assertEqual(self.harita["wood"], 1000 + 1)  # 30 * 0.05
 
+    def test_yukseltmede_satis_iadesi_yok(self):
+        """DNT-27 (denetim EKF-08). 1.4.07 bayt kodu: IsoBuilding/upgrade eski binayı Base/removeElement(..., "UPGR")
+        ile kaldırır ve sell [x, y, id, kasaba, 0, "UPGR"] yollar; ekranda iade vermez, yalnızca yeni binanın tam
+        bedelini düşer (IsoEngine/getDifferenceCost = [yeni.cost, yeni.cost_type]) ve yeni binanın xp'sini ekler; ardından
+        buy [id, x, y, 1, kasaba, 0, 1, tür]. Ev I: 30 odun, 3 xp (config)."""
+        self.komut("sell", 10, 10, 1, 0, 0, "UPGR")
+        self.komut("buy", 1, 10, 10, 1, 0, 0, 1, "b")
+        self.assertEqual(self.harita["wood"], 1000 - 30)  # iade yok: istemcinin gösterdiğiyle aynı
+        self.assertEqual(self.harita["xp"], 3)
+        self.assertEqual([e[:3] for e in self.harita["items"]].count([1, 10, 10]), 1)
+
     def test_olmayan_esya_satilinca_iade_yok(self):
         self.komut("sell", 99, 99, 1, 0, 0, "")
         self.assertEqual(self.harita["wood"], 1000)

@@ -2092,13 +2092,13 @@
       "baslik": "Denetim EKF-08: Yükseltmede (sell + buy) XP ve fark bedeli kayda istemciden farklı yansıyor olabilir",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-08, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_komutlar.py test_yukseltmede_satis_iadesi_yok",
       "pr": null,
       "onay": null,
-      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak."
+      "notlar": "Denetçi ? işaretledi; IsoBuilding/upgrade bayt kodundan okunacak. 12.11.2026 bayt kodu (✔): XP kısmı çürütüldü. İstemci de sunucu da yalnızca yeni binanın xp'sini ekler, eski binanınkini geri almaz (denetçinin gördüğü negatif değer bedel, xp değil). Bedel kısmı doğrulandı: yükseltmede istemci iade vermez (Base/removeElement kaynağa dokunmaz; IsoEngine/getDifferenceCost yeni binanın tam bedelini döndürür), sunucu ise sell [.., 0, 'UPGR'] için %5 iade veriyordu. Düzeltme: neden 'UPGR' ise iade yok. Bozma düştü. docs/inceleme/1407-formuller.md'ye yazıldı."
     },
     {
       "id": "DNT-28",

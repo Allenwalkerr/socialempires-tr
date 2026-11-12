@@ -348,7 +348,11 @@ def sell(save, a):
     if esya is None:
         return
     h["items"].remove(esya)
-    if not a.tam(4):
+    # Yükseltmede (IsoBuilding/upgrade → Base/removeElement, neden "UPGR") istemci iade vermez, yalnızca yeni binanın
+    # tam bedelini düşer (IsoEngine/getDifferenceCost: [yeni.cost, yeni.cost_type]); normal satışta
+    # (Base/bulldozeBuilding) iadeyi cost / DIVISOR_SELL ile kendisi de ekler. Sunucu yükseltmede iade verirse kayıt
+    # ekrandakinden fazla kaynak tutar (DNT-27, denetim EKF-08).
+    if not a.tam(4) and a.metin(5) != SELL_REASON_UPGRADE:
         satis_iadesi(save, h, esya_id)
     if a.tam(6):
         mezarliga_ekle(save, esya_id)
@@ -1589,6 +1593,7 @@ def reset_potions_received(save, a):
 # HIGHELF 557; IsoFightingElement/checkPutToGraveyard@181-295 bunları kahraman mezarlığına (deadHeroes) ayırır.
 KAHRAMANLAR = frozenset((533, 534, 535, 550, 554, 555, 556, 557))
 SELL_REASON_KILL = "KILL"  # Constants.SELL_REASON_KILL
+SELL_REASON_UPGRADE = "UPGR"  # Constants.SELL_REASON_UPGRADE (1.4.07)
 RESURRECT_MULTIPLIER = 500  # Config.RESURRECT_MULTIPLIER; PopupResurrectHeroes/onBuyItem@90-101
 
 
