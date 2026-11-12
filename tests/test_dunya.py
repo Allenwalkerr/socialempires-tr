@@ -442,8 +442,9 @@ class SavasTestleri(DunyaTesti):
         öfkelenir; kaybeden saldıran da öfkelenir'."""
         import math
         yuzde = get_game_config()["globals"]["PERCENT_UNITS_RECOVERED_DEFENDER"]
-        for a_birim, v_birim, kazanir in ((20, 6, True), (5, 40, False)):
-            d = self.kur(a=koy("a", birim=a_birim, ittifak=0), v=koy("v", birim=v_birim, ittifak=1))
+        for a_birim, v_birim, kazanir, v_bot in ((20, 6, True, True), (5, 40, False, True), (20, 6, True, False)):
+            # kural her savunana: bot hedef (bot bota) ve oyuncu hedef
+            d = self.kur(a=koy("a", birim=a_birim, ittifak=0), v=koy("v", birim=v_birim, ittifak=1, bot=v_bot))
             a, v = self.kayitlar["a"], self.kayitlar["v"]
             d._savas("a", a, "v", v, SIMDI)
             r = v["privateState"]["attacksReceived"][-1]["description"]
