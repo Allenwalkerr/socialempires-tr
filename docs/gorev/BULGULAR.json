@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor;"
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor; DNT-60: internet taramasından bot köylerine dört öneri (simetrik avlu, çift sur, asker geçidi, arazi türü) sahibinin cevabını bekliyor."
   },
   "maddeler": [
     {
@@ -2853,6 +2853,19 @@
       "pr": "#81",
       "onay": null,
       "notlar": "Plan: docs/inceleme/bot-koyleri-plani.md. oyun/bot_koy.py: dört düzen (kale, çarşı, ordugâh, çiftlik) kişiliğe göre, 8 simetriden biri, köy seviyeyle büyür (1-14 tek büyük karo, 15-29 2×2, 30+ 3×3). Ordu kişiliğin kol ağırlığıyla, açık en yüksek iki kademeden; büyüklük 8 + seviye (en çok 60) × kişilik oranı. Kule sayısı büyük karo başına 10'u aşmaz. Var olan botlar açılışta bir kez yeni tasarıma geçer (bot_tasarim 2; kimlik, ad, kaynak, seviye, geçmiş kalır). Dünya simülasyonu birimi aynı kuralla seçer, boş karoya koyar, ordu sınırında durur. Test, Belediye'nin açılış seviyesini (config 0, tabloda 1) yakaladı. 10 bozmanın 10'u test düşürüyor. 12.11.2026, ikinci tur: sahibi 'çok bot gibi/yapay' dedi, Arthur köylerini gösterdi. Arthur30/31/32 incelendi (plan §5). Hangi Arthur köyünün açılacağı istemcide üç aşama (FriendButton/mouseUsed: ≤10, ≤20, öteki; bayt kodu okundu); çubuktaki seviye oyuncu × 1,2 (FriendsWindow/<kurucu>). Sahibi '40, 50, 60, 70'te de değişiyor' dedi: bu sürümün istemcisinde ve dosyalarında yalnızca üç Arthur köyü var, öteki 1000000xx kimlikleri görev ve hayatta kalma haritaları; sahibine ekran görüntüsü soruldu. Yeni yerleşim (tasarım 4): Arthur kuralları; Ruffle'da İblis Kıran ve Balrog yeniden görüldü (sık mahalleler, çiçekli meydan, asker mangaları). 13 bozmanın 12'si test düşürüyor; kalan, mangaların büyüme sırası (rastgele karıştırma da kümeyi bozmuyor). #81 incelemesi: (1) rng.shuffle(sira[2:]) dilim kopyasını karıştırıyordu, şerit sırası hiç değişmiyordu; serit_sirasi ilk ikiyi sabit tutup kalanı karıştırır, tasarım 5. (2) birim_ekle'nin kayıttaki genişlemede kalması için test eklendi (düzeltme tasarım 4'te). (3) Hiç okunmayan 'duzen' alanını denetleyen test satırı, SERIT_SIRASI'nın dört kişilikte farklı başladığını sınayan denetimle değiştirildi. İki yeni test kendi bozmasında düşüyor."
+    },
+    {
+      "id": "DNT-60",
+      "baslik": "Gerçek oyuncu köylerinden bot köylerine öneriler; arazi türü (skin) oyunda var",
+      "sinif": "ozellik",
+      "onem": "Düşük",
+      "durum": "onay_bekliyor",
+      "isaret": "✔",
+      "kanit": "İnternet taraması 15 dilde, YouTube'da 52 Social Empires videosu, köy gösteren 16'sının kapağı ve üç karesi incelendi (docs/inceleme/koy-tasarim-taramasi.md). Arazi türü bayt koduyla doğrulandı: Base/_parseLoadedInfo map.skin → skinMap (Config.BG_SKIN_COLORS), Base/addExpandedTileBuilding arazi öğesi 1000 + skinMap; config 1000-1006 (çimen, çöl, buz, deniz, maden, orman, bulut); sunucuda set_skin (oyun/komutlar.py).",
+      "test": null,
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Öneriler (sahibine soruldu): simetrik avlular ve iç surlar, çift sur, avluda asker geçidi, bazı botlara arazi türü. terreno*.swf çizimlerinin yedisi de (çimen terreno.swf dahil) config/onindirme.tsv'de 2. öncelikte (PAKETLER temel 1); arazi türü uygulanırsa temel pakete alınmalı (≈1,8 MB) ve çimenin de denetlenmesi gerekir."
     }
   ]
 }
