@@ -967,8 +967,9 @@ class KaynakYenilemeTestleri(unittest.TestCase):
     (altın, taş) ve spawnRemainingResources (ağaç, hayvan) çağırır. Gövde uzunlukları 837, 672, 119; istisna tabloları
     boş. Çok adlılar: Base 1, Items 110, globals 175 (Base/loadGameConfigSuccess@542-550: 60 01 66 6e 66 af01), Main 12,
     gameModeCurrent 194, GameMode 156, NORMAL 283 (FriendButton/mouseUsed@41-58), NUM_TREE_CLUSTERS 12596 (QName genel
-    ad alanı), MapInitializer 141, cleanBorderTiles 833. AVM2: iftrue 0x11, ifne 0x14, jump 0x10 (s24, komutun
-    sonundan), returnvoid 0x47."""
+    ad alanı), townID 197, dizi erişimi [] 1631 (MultinameL; MissionPopup/refreshGoals), MapInitializer 141,
+    cleanBorderTiles 833. Kasaba değişince config yeniden istenmez (TownManager$/loadTown): bayrak kasaba başına.
+    AVM2: iftrue 0x11, ifne 0x14, jump 0x10 (s24, komutun sonundan), returnvoid 0x47."""
 
     @staticmethod
     def _coz(kod):
@@ -983,15 +984,17 @@ class KaynakYenilemeTestleri(unittest.TestCase):
         return cikti
 
     def _kosul(self, ek):
-        """Koşulun AVM2 akışı: (globals.NUM_TREE_CLUSTERS doğruysa ya da mod NORMAL değilse) eklemenin sonuna geçer."""
+        """Koşulun AVM2 akışı: (globals.NUM_TREE_CLUSTERS[Main.townID] doğruysa ya da mod NORMAL değilse) eklemenin
+        sonuna geçer."""
         islemler = self._coz(ek)
         adlar = [(i.ad, i.isl[0] if i.isl else None) for i in islemler]
-        self.assertEqual(adlar[:11], [("getlex", 1), ("getproperty", 110), ("getproperty", 175), ("getproperty", 12596),
+        self.assertEqual(adlar[:15], [("getlex", 1), ("getproperty", 110), ("getproperty", 175), ("getproperty", 12596),
+                                      ("getlex", 1), ("getproperty", 12), ("getproperty", 197), ("getproperty", 1631),
                                       ("iftrue", None), ("getlex", 1), ("getproperty", 12), ("getproperty", 194),
                                       ("getlex", 156), ("getproperty", 283), ("ifne", None)])
-        self.assertEqual(islemler[4].hedefler, (len(ek),))   # bayrak varsa: asıl koda
-        self.assertEqual(islemler[10].hedefler, (len(ek),))  # NORMAL değilse (komşu, saldırı, görev, eğitim): asıl koda
-        return islemler[11:]
+        self.assertEqual(islemler[8].hedefler, (len(ek),))   # bu kasabanın bayrağı varsa: asıl koda
+        self.assertEqual(islemler[14].hedefler, (len(ek),))  # NORMAL değilse (komşu, saldırı, görev, eğitim): asıl koda
+        return islemler[15:]
 
     def test_kosul_bayrak_yoksa_kendi_koyunde_doner_ya_da_atlar(self):
         self.assertEqual([i.ad for i in self._kosul(swf_yama.KAYNAK_DONUS)], ["returnvoid"])
@@ -1012,7 +1015,8 @@ class KaynakYenilemeTestleri(unittest.TestCase):
             self.assertEqual(uzunluk, {"spawnRemainingResources": 837, "spawnInitResources": 672, "spawnInit": 119}[ad])
             beklenen += swf_yama._u30_yaz(uzunluk + len(ek)) + bas[:yer] + ek + bas[yer:] + dolgu
         self.assertEqual(yeni, beklenen)
-        self.assertEqual(swf_yama._u30_oku(swf_yama._u30_yaz(119 + len(swf_yama.KAYNAK_ATLA)), 0)[0], 154)
+        # spawnInit'in uzunluğu bir bayttan (119 < 128) iki bayta çıkar: çapa uzunluk önekini de değiştirir
+        self.assertEqual((len(swf_yama._u30_yaz(119)), len(swf_yama._u30_yaz(119 + len(swf_yama.KAYNAK_ATLA)))), (1, 2))
 
     def test_capalardan_biri_eksikse_dokunmaz(self):
         parcalar = [swf_yama._u30_yaz(u) + bas for _, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI]

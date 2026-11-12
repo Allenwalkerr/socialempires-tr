@@ -75,33 +75,41 @@ def _oyuncu_seviyesi(kayit):
         return None
 
 
-KAYNAK_GUNU = "kaynakYenilemeGunu"  # privateState: ağaç, taş ve altının son yenilendiği gün ("YYYY-AA-GG")
+KAYNAK_GUNU = "kaynakYenilemeGunu"  # privateState: {"kasaba no": son yenilendiği gün "YYYY-AA-GG"}
 
 
-def kaynak_yenilenir_mi(uid, kayit, bugun=None):
-    """Sahibinin kararı (12.11.2026, "Günde bir yenilensin"): istemci kendi köyündeki ağaç, taş ve altını yalnızca
-    günün ilk açılışında yeniler (oyun/swf_yama.py kaynaklari_gunde_bir). Config her sayfa açılışında bir kez istenir
-    (Base/loadGameConfigSuccess); günün ilk config'i yenilemeye izin verir ve günü kayda yazar. Kayıt yoksa izin verir
-    (yeni köyün ilk kaynakları)."""
-    if kayit is None:
-        return True
+def _kaynak_gunleri(kayit):
+    gunler = (kayit or {}).get("privateState", {}).get(KAYNAK_GUNU)
+    return gunler if isinstance(gunler, dict) else {}
+
+
+def kaynak_bayraklari(kayit, bugun=None):
+    """Sahibinin kararı (12.11.2026, "Günde bir yenilensin"): istemci kendi köyündeki ağaç, taş ve altını kasaba başına
+    günde bir yeniler (oyun/swf_yama.py kaynaklari_gunde_bir: globals.NUM_TREE_CLUSTERS[Base.Main.townID]). Config
+    sayfa açılışında bir kez gelir (Base/loadGameConfigSuccess), kasaba değişince yeniden istenmez; bu yüzden her kasabanın
+    bayrağı birlikte gider: o gün yenilenmemişse 1. Kayıttaki kasabalardan bir fazlası (yeni alınan kasaba) da 1."""
     from oyun.config import yerel_bugun
     gun = (bugun or yerel_bugun()).isoformat()
-    with save_lock:
-        ps = kayit.setdefault("privateState", {})
-        if ps.get(KAYNAK_GUNU) == gun:
-            return False
-        ps[KAYNAK_GUNU] = gun
-        save_session(uid)
-    return True
+    gunler = _kaynak_gunleri(kayit)
+    sayi = len((kayit or {}).get("maps") or []) + 1
+    return tuple(0 if gunler.get(str(i)) == gun else 1 for i in range(sayi))
+
+
+def kaynak_yenilendi(kayit, kasaba, bugun=None):
+    """Kendi kasabasının haritası yüklendi (get_player_info): o kasabanın yenilenme günü bugün. Gün config'te değil
+    burada yazılır: config'ten sonra yarıda kalan açılış günü harcamaz (#82 incelemesi). Kilit altında çağrılır."""
+    from oyun.config import yerel_bugun
+    gunler = _kaynak_gunleri(kayit)
+    gunler[str(int(kasaba))] = (bugun or yerel_bugun()).isoformat()
+    kayit.setdefault("privateState", {})[KAYNAK_GUNU] = gunler
 
 
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
 def get_game_config_response():
     # İstemcinin dil ayarından bağımsız olarak metinler OYUN_DILI'nde gönderilir.
-    uid, kayit = _oturumdaki_kayit()
+    _, kayit = _oturumdaki_kayit()
     seviye = _oyuncu_seviyesi(kayit)
-    yenile = kaynak_yenilenir_mi(uid, kayit)
+    yenile = kaynak_bayraklari(kayit)
     try:
         return get_client_game_config(OYUN_DILI, seviye=seviye, kaynak_yenile=yenile)
     except Exception:
@@ -123,6 +131,7 @@ def get_player_info_response():
         with save_lock:  # get_player_info günlük ödülü kayda yazabilir (KAR-24): komutlarla aynı kilit
             yer_bildir(uid, True)  # DNT-49: kendi adası yüklendi
             kompu_donemini_guncelle(kayit)
+            kaynak_yenilendi(kayit, harita_no)
             return (get_player_info(uid, harita_no), 200)
     if gecerli_uid(uid):
         # DNT-49: Base/realLoadMap @129-169 user'ı yalnızca loadMapParams.userId doluysa ekler: komşu ya da görev haritası

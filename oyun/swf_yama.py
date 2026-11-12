@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"13"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"14"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -434,15 +434,18 @@ def komsudan_komsuya(t: bytes):
 # spawnRemainingResources (ağaç, NUM_TREE_CLUSTERS 10 küme + NUM_TREE_DISPERSE 100; hayvanlar) çağırır: kesilen ağaç
 # ve taş her açılışta yerine gelir, dış halka her açılışta baştan kurulur. Sayılar MapInitializer'ın sabitleri; config'ten
 # okunmaz. Bu üç yerin önüne aynı koşul konur:
-#     if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL) atla;
-# Sunucu NUM_TREE_CLUSTERS'ı (çok adlı 12596, QName genel ad alanı: globals'ta dinamik özellik olarak bulunur) oyuncunun
-# günün ilk açılışında 1, sonra 0 yollar (oyun/istemci.py). Komşu, saldırı, görev ve eğitimde (mod NORMAL değil) her şey
-# eskisi gibi. Bayt (AVM2): getlex Base 60 01, getproperty Items 66 6e, getproperty globals 66 af01, getproperty
-# NUM_TREE_CLUSTERS 66 b462 (Base/loadGameConfigSuccess@542-550 ile aynı yol); getproperty Main 66 0c, gameModeCurrent
+#     if (!Base.Items.globals.NUM_TREE_CLUSTERS[Base.Main.townID] && Base.Main.gameModeCurrent == GameMode.NORMAL) atla;
+# Sunucu NUM_TREE_CLUSTERS'ı (çok adlı 12596, QName genel ad alanı: globals'ta dinamik özellik olarak bulunur) kasaba
+# başına bir dizi yollar: o gün yenilenmemiş kasaba 1, yenilenmiş 0 (oyun/istemci.py). Dizi kasaba başınadır, çünkü kasaba
+# değişince istemci config'i yeniden istemez (TownManager$/loadTown@22-113: townID, Commands.Init1, harita yeniden
+# yüklenir; #82 incelemesi). Komşu, saldırı, görev ve eğitimde (mod NORMAL değil) her şey eskisi gibi. Bayt (AVM2):
+# getlex Base 60 01, getproperty Items 66 6e, getproperty globals 66 af01, getproperty NUM_TREE_CLUSTERS 66 b462
+# (Base/loadGameConfigSuccess@542-550 ile aynı yol), getproperty Main 66 0c, getproperty townID 66 c501 (çok adlı 197),
+# getproperty [] 66 df0c (MultinameL 1631, MissionPopup/refreshGoals'taki dizi erişimi); gameModeCurrent
 # 66 c201, getlex GameMode 60 9c01, getproperty NORMAL 66 9b02; iftrue 11, ifne 14, jump 10 (s24, komutun sonundan),
 # returnvoid 47. Göreli dallar eklemenin önünden arkasına geçmediği için kaymaz (tests/test_swf_yama.py, gerçek istemciyle);
 # istisna tabloları boş. Kod uzunluğu (u30) gövdenin kodundan hemen öncedir; çapa uzunluk + kodun başıdır.
-_BAYRAK = "6001666e66af0166b462"
+_BAYRAK = "6001666e66af0166b462" "6001660c66c501" "66df0c"
 _NORMAL_MI = "6001660c66c201609c01669b02"
 KAYNAK_DONUS = bytes.fromhex(_BAYRAK + "11120000" + _NORMAL_MI + "1401000047")       # yoksa dön
 KAYNAK_ATLA = bytes.fromhex(_BAYRAK + "11150000" + _NORMAL_MI + "14040000" "10070000")  # yoksa 7 baytlık çağrıyı atla

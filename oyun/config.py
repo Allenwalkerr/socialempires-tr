@@ -251,14 +251,15 @@ def teklif_pencereleri(seviye=None, gun=None):
 
 
 def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: int = None,
-                            kaynak_yenile: bool = True) -> dict:
+                            kaynak_yenile=None) -> dict:
     """İstemciye gönderilecek config'i döndürür.
 
     - `dil` "tr" ise metinler Türkçeleştirilir (ceviri/tr.json).
     - Zaman ölçeği 1.0 değilse eşyaların süre alanları ölçeğe bölünür.
     - `seviye` verilirse yalnızca o seviyeye gelmiş hedefler gider (DNT-51; istemci min_level'e bakmaz).
-    - `kaynak_yenile` False ise istemci kendi köyünde ağaç, taş ve altını yenilemez (globals.NUM_TREE_CLUSTERS 0;
-      oyun/swf_yama.py kaynaklari_gunde_bir). Yamalı istemci bayrağı bulamazsa yenilemez: her config onu taşır.
+    - `kaynak_yenile`: kasaba başına 1/0 (globals.NUM_TREE_CLUSTERS); 0 olan kasabada istemci ağaç, taş ve altını
+      yenilemez (oyun/swf_yama.py kaynaklari_gunde_bir). Yamalı istemci bayrağı bulamazsa yenilemez: her config onu
+      taşır; verilmezse beş kasabanın hepsi 1.
     Sunucunun kullandığı asıl config ve kayıtlar değiştirilmez.
     """
     olcek = zaman_olcegi()
@@ -272,8 +273,9 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
     milli = takvim.milli_bayram()
     pencere = tuple(sorted(teklif_pencereleri(seviye).items()))
     sinirli = gunun_sinirli_esyasi(acik=takvim_setleri or frozenset())
+    kaynak = (1,) * 5 if kaynak_yenile is None else tuple(1 if b else 0 for b in kaynak_yenile)
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
-               tuple(h["id"] for h in bayram), milli, pencere, seviye, sinirli, bool(kaynak_yenile))
+               tuple(h["id"] for h in bayram), milli, pencere, seviye, sinirli, kaynak)
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
@@ -302,7 +304,7 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: in
                 esya["in_store"] = "1"
     sinirli_id, bitis = sinirli
     kopya.setdefault("globals", {})["LIMITED_EDITION_EXPIRATION"] = bitis
-    kopya["globals"][KAYNAK_BAYRAGI] = 1 if kaynak_yenile else 0
+    kopya["globals"][KAYNAK_BAYRAGI] = list(kaynak)
     # Yalnızca "takvim" kipinde döner: "hepsi açık" (True) kipinde sınırlı öğeler zaten mağazada, "hiçbiri" (False)
     # kipinde tema seti öğesi mağazaya hiç açılmaz (ayarlar.json _magaza_tema_setleri; #81 incelemesi)
     if tema_seti_kipi() == "takvim":
