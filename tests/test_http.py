@@ -180,6 +180,12 @@ class HttpDumanTestleri(unittest.TestCase):
         self.assertEqual(json.dumps(session(UID), sort_keys=True), once)
         self.assertEqual(self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": "kimse-yok"}).status_code, 404)
         self.assertEqual(self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": UID, "map": "abc"}).status_code, 200)
+        # DNT-49: kendi adası yüklenince oyuncu evde, komşu ya da görev haritası yüklenince değil (kill ödülü buna bakar)
+        from oyun import komutlar
+        self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": UID, "user": "100000001"})
+        self.assertIs(komutlar._EVDE.get(UID), False)
+        self.istemci.post(f"{BASE}/get_player_info.php", data={"USERID": UID})
+        self.assertIs(komutlar._EVDE.get(UID), True)
         from oyun.kayit import new_village
         baska = new_village()  # gövde artık geçerli sayılıp işlenir: ortak köyün (UID) sayaçları değişmesin
         for uc in ("kompu_try.php", "get_up_data.php"):

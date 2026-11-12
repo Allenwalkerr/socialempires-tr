@@ -1558,6 +1558,54 @@ class KalanKomutlar(KomutTesti):
         self.komut("attack_player", "rakip")
         self.assertEqual(self.kayit, once)
 
+    def test_kendi_adasinda_oldurulen_dusmanin_jetonu(self):
+        """DNT-49. IsoFightingElement/kill @168-511: PLAYER_ENEMY öğe NORMAL kipte ölünce jeton bırakır; Token/onComplete2
+        @20-51 NORMAL kipte değeri komut yollamadan ekler. Birim: Token(TOKEN_GOLD, 5) ve Token(TOKEN_XP, collect_xp)
+        (@438-475). Bina: uiAttack > 0 ise 5 altın ve ceil(Number(floor(cost / 4)) × 0,02) xp, taş bedelli değilse 0
+        (@303-425); uiAttack 0 ise jeton yok. Kuşatma düşmanını istemci doğurur, kayıtta yoktur. Koyun
+        (SUBCATFUNC_UNIT_SHEEP 75) PLAYER_NEUTRAL'dır, jetonu yok. Config: Healer (502) collect_xp 4, Tower II (30)
+        attack 10, 250 taş: ceil(62 × 0,02) = 2; 27 attack 22, 15 nakit: 0 xp."""
+        from oyun.config import get_item_from_id
+        self.komutlar.yer_bildir("test", True)
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.komut("kill", 40, 40, 502, 0, "u")
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp),
+                         (5, int(get_item_from_id(502)["collect_xp"])))
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.komut("kill", 41, 41, 30, 0, "b")
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp), (5, 2))
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.komut("kill", 44, 44, 27, 0, "b")  # saldıran ama taş bedelli değil
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp), (5, 0))
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.komut("kill", 42, 42, 505, 0, "u")  # koyun
+        self.komut("kill", 43, 43, 1, 0, "b")  # saldırmayan bina
+        self.assertEqual((self.harita["coins"], self.harita["xp"]), (altin, xp))
+        self.assertEqual(self.harita["items"], bos_kayit()["maps"][0]["items"])
+
+    def test_savasta_ya_da_bilinmeyen_yerde_oldurme(self):
+        """DNT-49. Görevde, saldırıda, survival'da öldürülen öğenin koordinatı o haritanındır (kill @903-967 kipten
+        bağımsız gider); istemci orada jeton vermez (@186-291). start_quest ile başlayan görevde kendi adasının aynı
+        koordinatlı öğesi silinmez; end_quest'ten sonra yine kendi adası. Yer bilinmiyorsa (sunucu yeni açıldı) eski
+        davranış: kayıttaki öğe silinir, kayıtta olmayana ödül verilmez."""
+        self.komut("start_quest", "Q1", 0)
+        once = json.dumps(self.kayit, sort_keys=True)
+        self.komut("kill", 20, 20, 19, 0, "b")
+        self.komut("kill", 40, 40, 502, 0, "u")
+        self.assertEqual(json.dumps(self.kayit, sort_keys=True), once)
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {}}))
+        self.assertTrue(self.komutlar._EVDE["test"])
+        for baslat, bitir in (("attack_player", ("end_attack", "{}")), ("start_survival", ("end_survival", 1, 0, "{}"))):
+            self.komut(baslat, "rakip") if baslat == "attack_player" else self.komut(baslat)
+            self.assertIs(self.komutlar._EVDE["test"], False)
+            self.komut(*bitir)
+            self.assertIs(self.komutlar._EVDE["test"], True)
+        self.komutlar._EVDE.clear()
+        altin = self.harita["coins"]
+        self.komut("kill", 40, 40, 502, 0, "u")
+        self.komut("kill", 20, 20, 19, 0, "b")
+        self.assertEqual((self.harita["coins"], len(self.harita["items"])), (altin, 1))
+
     def test_oyun_durumu_kaydi_degistirmez(self):
         """game_status istemcinin izleme bildirimidir: Base/init @1351-1382 ['MapLoaded', 'INIT', spRefCat],
         Base/_drawMap @99-130 ['LOAD_MAP', çıkılan, girilen]. Kayıtta karşılığı yok."""

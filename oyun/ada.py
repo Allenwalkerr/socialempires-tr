@@ -6,7 +6,8 @@ Fethedilen yuvaların numaraları `maps[0].universAttackWin` listesinde durur;
 7/7 olunca istemci `worldChange=1` ile sonraki kıtayı ister.
 
 Kayıtta: privateState.kita (kıta no, 1'den), privateState.kita_konum (oyuncunun
-yuvası), privateState.kita_karisim (yer değiştirince rakipler değişir).
+yuvası), privateState.kita_karisim (yer değiştirince rakipler değişir), privateState.kita_dizilis
+(rakip sırası → yuva; yalnızca oyuncu yuva değiştirince yazılır, DNT-48).
 """
 
 from oyun.kayit import all_saves_userid, session
@@ -31,6 +32,31 @@ def kita_no(kayit):
 
 def kendi_konumu(kayit):
     return int(kayit["privateState"].get("kita_konum", YUVA - 1)) % YUVA
+
+
+def _dizilis(kayit):
+    """Rakip k'nin yuvası. Varsayılan: rakip k k. yuvada, oyuncunun yuvasındaki rakip son yuvada (7)."""
+    konum = kendi_konumu(kayit)
+    varsayilan = [YUVA - 1 if k == konum else k for k in range(YUVA - 1)]
+    kayitli = kayit["privateState"].get("kita_dizilis")
+    if (isinstance(kayitli, list) and len(kayitli) == YUVA - 1 and all(isinstance(y, int) for y in kayitli)
+            and sorted(kayitli + [konum]) == list(range(YUVA))):
+        return list(kayitli)
+    return varsayilan
+
+
+def yuva_degistir(kayit, eski, yeni):
+    """ExplorationsManager/evalUserPositionNotConquered @286-376: oyuncu (eski yuva) fethedilmemiş rakiple (yeni yuva)
+    yer değiştirir; rakip oyuncunun eski yuvasına geçer. Sıra saklanır ki ikinci değişimde de istemciyle aynı kalsın."""
+    eski, yeni = int(eski) % YUVA, int(yeni) % YUVA
+    dizilis = _dizilis(kayit)
+    ps = kayit["privateState"]
+    if eski == kendi_konumu(kayit) and yeni in dizilis:
+        dizilis[dizilis.index(yeni)] = eski
+        ps["kita_dizilis"] = dizilis
+    else:  # beklenmeyen eski yuva: rakipler varsayılan sıraya döner
+        ps.pop("kita_dizilis", None)
+    ps["kita_konum"] = yeni
 
 
 def fetihler(kayit):
@@ -68,12 +94,12 @@ def kita_listesi(kayit, kita=None):
     kendi = kita is None or kita == kita_no(kayit)
     kita = kita_no(kayit) if kita is None else max(1, kita)
     if kendi:
-        # Rakip k her zaman k. yuvada; oyuncu bir yuvaya geçerse o yuvanın
-        # rakibi oyuncunun boşalttığı son yuvaya (7) taşınır. Böylece kayıtlı
-        # fetih numaraları kaymaz.
+        # Rakip k k. yuvada; oyuncu bir yuvaya geçerse o yuvanın rakibi oyuncunun
+        # boşalttığı yuvaya taşınır (_dizilis). Böylece kayıtlı fetih numaraları kaymaz.
         konum = kendi_konumu(kayit)
         rakipler = _rakipler(kita, karisim, YUVA - 1)
-        liste = [_giris(YUVA - 1 if k == konum else k, *r) for k, r in enumerate(rakipler)]
+        yuvalar = _dizilis(kayit)
+        liste = [_giris(yuvalar[k], *r) for k, r in enumerate(rakipler)]
         liste.append(_giris(konum, kayit["playerInfo"]["pid"], kayit))
         liste.sort(key=lambda g: g["posicion"])
     else:
@@ -91,6 +117,7 @@ def sonraki_kita(kayit):
     """7 yuva fethedilince (istemci worldChange=1 gönderir) sonraki kıtaya geç."""
     if len(fetihler(kayit)) >= YUVA - 1:
         kayit["privateState"]["kita"] = kita_no(kayit) + 1
+        kayit["privateState"].pop("kita_dizilis", None)  # yeni kıtanın rakipleri varsayılan sırada
         kayit["maps"][0]["universAttackWin"] = []
         return True
     return False
@@ -100,6 +127,7 @@ def yer_degistir(kayit):
     """Oyuncu kıtasını değiştirmek istedi (relocate): rakipler yenilenir."""
     ps = kayit["privateState"]
     ps["kita_karisim"] = int(ps.get("kita_karisim", 0) or 0) + 1
+    ps.pop("kita_dizilis", None)
     kayit["maps"][0]["universAttackWin"] = []
 
 

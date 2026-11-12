@@ -228,6 +228,31 @@ class TurnuvaAdaTestleri(unittest.TestCase):
             oyuncu["privateState"]["kita_konum"] = 5
             self.assertEqual(ada.kita_listesi(oyuncu)[2]["user_id"], rakip["user_id"])
 
+    def test_yuva_degisimi_istemcinin_takasiyla_ayni(self):
+        """DNT-48. Beklenen dizilis istemcinin kendi takasından: ExplorationsManager/evalUserPositionNotConquered
+        @49-376: yerel3 = fethedilmemiş ilk rakip (posicion universAttackWin'de değil, user_id != pid), yerel4 = fethedilmiş
+        yuvadaki oyuncu; iki yuva yer değiştirir, komut [oyuncunun eski yuvası, yeni yuvası]. Aşağıdaki istemci benzetimi
+        bu sırayla yazıldı; sunucu ikinci değişimden sonra da aynı dizilişi vermeli."""
+        from oyun import ada, komutlar
+
+        def istemci(liste, fetih, pid):
+            liste = [dict(g) for g in sorted(liste, key=lambda g: g["posicion"])]
+            y3 = next(i for i, g in enumerate(liste) if g["posicion"] not in fetih and g["user_id"] != pid)
+            y4 = next(i for i, g in enumerate(liste) if g["user_id"] == pid and g["posicion"] in fetih)
+            y5, y6 = liste[y3]["posicion"], liste[y4]["posicion"]
+            liste[y3]["posicion"], liste[y4]["posicion"] = y6, y5
+            return {g["user_id"]: g["posicion"] for g in liste}, [y6, y5]
+
+        kayitlar = botlar(10)
+        with SahteKayitlar(ada, kayitlar):
+            oyuncu = kayitlar["u1"]
+            for fetih in ([0, 1, 7], [0, 1, 2, 7]):  # oyuncunun yuvası (önce 7, sonra 2) fethedilmiş sayılır
+                oyuncu["maps"][0]["universAttackWin"] = list(fetih)
+                beklenen, argumanlar = istemci(ada.kita_listesi(oyuncu), fetih, "u1")
+                komutlar.modify_position_univers(oyuncu, komutlar.Arg(argumanlar))
+                self.assertEqual({g["user_id"]: g["posicion"] for g in ada.kita_listesi(oyuncu)}, beklenen)
+            self.assertEqual(ada.kendi_konumu(oyuncu), 3)
+
     def test_yedi_fetihle_sonraki_kita(self):
         from oyun import ada
         kayitlar = botlar(10)
@@ -236,7 +261,9 @@ class TurnuvaAdaTestleri(unittest.TestCase):
             ilk = {g["user_id"] for g in ada.kita_listesi(oyuncu)}
             for g in ada.kita_listesi(oyuncu)[:7]:
                 ada.fetih_kaydet(oyuncu, {"user_id": g["user_id"]})
+            oyuncu["privateState"]["kita_dizilis"] = [7, 1, 2, 3, 4, 5, 6]  # yuva değişiminden kalan sıra
             self.assertTrue(ada.sonraki_kita(oyuncu))
+            self.assertNotIn("kita_dizilis", oyuncu["privateState"])  # yeni kıtanın rakipleri yeni sırada
             self.assertEqual(ada.kita_no(oyuncu), 2)
             self.assertEqual(oyuncu["maps"][0]["universAttackWin"], [])
             self.assertNotEqual({g["user_id"] for g in ada.kita_listesi(oyuncu)}, ilk)
