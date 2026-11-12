@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma fikri (yeni özellik, sahibiyle sonra konuşulacak); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2957,6 +2957,19 @@
       "pr": "#83",
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "Sahibi: '3 100 olsun'. config/patch/1-mega_patch.json değişmedi."
+    },
+    {
+      "id": "KAR-38",
+      "baslik": "Açık artırma (yeni özellik): biçimi belirlendi, şimdilik bekletiliyor",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "ertelendi",
+      "isaret": "✔",
+      "kanit": "Sahibinin fikri (12.11.2026). İstemcide açık artırma yok (1.4.07 dizelerinde auction/subasta/puja/bid yok; en yakın Dart oyunu PopupDarts). Sahibinin cevapları: 'Sen alırsın' (her gün birkaç nadir birlik ya da eşya, botlarla yarış, kazanılan Depo'ya), para 'Altın', süre 'Birkaç saat', 'Açık arttırma lvl 15 te açılsın'. Sonra: 'ya da bu fikir şimdilik kalsın'.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Yapılırsa: oyunun yanındaki sayfada (Diyar sayfası gibi), yalnızca oyunun kendi resimleriyle (CLAUDE.md); tek kişilik, rakipler botlar. Sahibi yeniden isteyince bu biçimle başlanır."
     }
   ]
 }
