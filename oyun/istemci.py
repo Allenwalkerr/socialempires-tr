@@ -372,9 +372,10 @@ def kullanici_resmi(kimlik):
     Toplama ve teklif pencerelerindeki yardımcı yuvaları, KAR-26/27). Facebook yok: köyün kendi resmine (botlarda oyunun
     birim resmi, oyun/bot_kimlik.py) yönlendirilir; bilinmeyen kimlikte oyunun varsayılan profil resmi."""
     k = neighbor_session(kimlik) if gecerli_uid(kimlik) else None
-    resim = ((k or {}).get("playerInfo") or {}).get("pic") or "/img/profile/1025.png"
-    if not resim.startswith("/"):
-        resim = "/img/profile/1025.png"  # yalnızca bu sunucunun kendi yolları (açık yönlendirme olmasın)
+    resim = str(((k or {}).get("playerInfo") or {}).get("pic") or "")
+    # Yalnızca bu sunucunun kendi yolları (açık yönlendirme olmasın): "//site" ve "/\\site" tarayıcıda dış adrestir.
+    if not resim.startswith("/") or resim.startswith("//") or "\\" in resim:
+        resim = "/img/profile/1025.png"
     return redirect(resim)
 
 

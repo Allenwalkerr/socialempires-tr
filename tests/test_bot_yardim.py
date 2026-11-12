@@ -111,10 +111,12 @@ class Yardim(unittest.TestCase):
         self.assertEqual((r.status_code, r.headers["Location"]), (302, neighbor_session(bot)["playerInfo"]["pic"]))
         r = self.istemci.get(istemci.DINAMIK + "/graph.facebook.com/kimse/picture")
         self.assertEqual(r.headers["Location"], "/img/profile/1025.png")
-        kotu = {"playerInfo": {"pic": "https://kotu.site/x.png"}}
-        with mock.patch.object(istemci, "neighbor_session", lambda u: kotu):
-            r = self.istemci.get(istemci.DINAMIK + "/graph.facebook.com/%s/picture" % bot)
-        self.assertEqual(r.headers["Location"], "/img/profile/1025.png")  # açık yönlendirme yok
+        # Açık yönlendirme yok: tam adres, protokolsüz "//" ve tarayıcıların "//" okuduğu "/\\"; dizge olmayan değer 500 vermez.
+        for pic in ("https://kotu.site/x.png", "//kotu.site/x.png", "/\\kotu.site/x.png", 5):
+            kotu = {"playerInfo": {"pic": pic}}
+            with mock.patch.object(istemci, "neighbor_session", lambda u: kotu):
+                r = self.istemci.get(istemci.DINAMIK + "/graph.facebook.com/%s/picture" % bot)
+            self.assertEqual((r.status_code, r.headers["Location"]), (302, "/img/profile/1025.png"), pic)
 
 
 class Pencere(unittest.TestCase):
