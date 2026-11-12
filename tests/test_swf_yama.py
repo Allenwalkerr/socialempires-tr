@@ -958,3 +958,98 @@ class KomsudanKomsuyaTestleri(unittest.TestCase):
         self.assertNotIn(self.ESKI, abc)
         self.assertIn(bytes.fromhex("020293742401"), abc)
         self.assertEqual(sayi, 1)
+
+
+class KaynakYenilemeTestleri(unittest.TestCase):
+    """Sahibinin kararı (12.11.2026, "Günde bir yenilensin"): ağaç, taş ve altın her açılışta değil, günde bir yenilensin.
+    1.4.07 bayt kodu (araclar/abc_okur.py): MapInitializer$/Init@462-503 her açılışta spawnInit (@25-31 getlex
+    MapInitializer, callpropvoid cleanBorderTiles 0: orta 3×3 dışındaki halkayı CLEAN_0 ile satar), spawnInitResources
+    (altın, taş) ve spawnRemainingResources (ağaç, hayvan) çağırır. Gövde uzunlukları 837, 672, 119; istisna tabloları
+    boş. Çok adlılar: Base 1, Items 110, globals 175 (Base/loadGameConfigSuccess@542-550: 60 01 66 6e 66 af01), Main 12,
+    gameModeCurrent 194, GameMode 156, NORMAL 283 (FriendButton/mouseUsed@41-58), NUM_TREE_CLUSTERS 12596 (QName genel
+    ad alanı), MapInitializer 141, cleanBorderTiles 833. AVM2: iftrue 0x11, ifne 0x14, jump 0x10 (s24, komutun
+    sonundan), returnvoid 0x47."""
+
+    @staticmethod
+    def _coz(kod):
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc
+        p, cikti = 0, []
+        while p < len(kod):
+            isl = Abc._islem(kod, p)
+            cikti.append(isl)
+            p = isl.sonraki
+        return cikti
+
+    def _kosul(self, ek):
+        """Koşulun AVM2 akışı: (globals.NUM_TREE_CLUSTERS doğruysa ya da mod NORMAL değilse) eklemenin sonuna geçer."""
+        islemler = self._coz(ek)
+        adlar = [(i.ad, i.isl[0] if i.isl else None) for i in islemler]
+        self.assertEqual(adlar[:11], [("getlex", 1), ("getproperty", 110), ("getproperty", 175), ("getproperty", 12596),
+                                      ("iftrue", None), ("getlex", 1), ("getproperty", 12), ("getproperty", 194),
+                                      ("getlex", 156), ("getproperty", 283), ("ifne", None)])
+        self.assertEqual(islemler[4].hedefler, (len(ek),))   # bayrak varsa: asıl koda
+        self.assertEqual(islemler[10].hedefler, (len(ek),))  # NORMAL değilse (komşu, saldırı, görev, eğitim): asıl koda
+        return islemler[11:]
+
+    def test_kosul_bayrak_yoksa_kendi_koyunde_doner_ya_da_atlar(self):
+        self.assertEqual([i.ad for i in self._kosul(swf_yama.KAYNAK_DONUS)], ["returnvoid"])
+        atla = self._kosul(swf_yama.KAYNAK_ATLA)
+        self.assertEqual([i.ad for i in atla], ["jump"])
+        cagri = [y for y in swf_yama.KAYNAK_YAMALARI if y[0] == "spawnInit"][0]
+        sonraki = cagri[2][cagri[3]:]
+        self.assertEqual([(i.ad, i.isl) for i in self._coz(sonraki)], [("getlex", (141,)), ("callpropvoid", (833, 0))])
+        self.assertEqual(atla[0].hedefler, (len(swf_yama.KAYNAK_ATLA) + len(sonraki),))  # yalnızca halka temizliği atlanır
+
+    def test_uc_govde_uzar_ve_kodun_geri_kalani_ayni(self):
+        dolgu = b"\x47" * 50
+        govde = _do_abc(["x"]) + b"".join(swf_yama._u30_yaz(u) + bas + dolgu for _, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI)
+        yeni, sayi = swf_yama.kaynaklari_gunde_bir(govde)
+        self.assertEqual(sayi, 3)
+        beklenen = _do_abc(["x"])
+        for ad, uzunluk, bas, yer, ek in swf_yama.KAYNAK_YAMALARI:
+            self.assertEqual(uzunluk, {"spawnRemainingResources": 837, "spawnInitResources": 672, "spawnInit": 119}[ad])
+            beklenen += swf_yama._u30_yaz(uzunluk + len(ek)) + bas[:yer] + ek + bas[yer:] + dolgu
+        self.assertEqual(yeni, beklenen)
+        self.assertEqual(swf_yama._u30_oku(swf_yama._u30_yaz(119 + len(swf_yama.KAYNAK_ATLA)), 0)[0], 154)
+
+    def test_capalardan_biri_eksikse_dokunmaz(self):
+        parcalar = [swf_yama._u30_yaz(u) + bas for _, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI]
+        for eksik in range(3):
+            govde = _do_abc(["x"]) + b"".join(p for i, p in enumerate(parcalar) if i != eksik)
+            self.assertEqual(swf_yama.kaynaklari_gunde_bir(govde), (govde, 0))
+        govde = _do_abc(["x"]) + b"".join(parcalar) + parcalar[0]
+        self.assertEqual(swf_yama.kaynaklari_gunde_bir(govde), (govde, 0))
+
+    def test_turkcelestir_yamayi_uygular(self):
+        icerik = b"".join(swf_yama._u30_yaz(u) + bas for _, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI)
+        with mock.patch.object(swf_yama, "_turkce_fontlar", return_value={}):
+            girdi = _swf(_etiket(82, _do_abc(["x"]) + icerik), _etiket(1, b""), surum=13)
+            cikti, sayi = swf_yama.turkcelestir(girdi, {"metin_alanlari": {}})
+        abc = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 82][0]
+        self.assertEqual(abc.count(swf_yama.KAYNAK_DONUS), 2)
+        self.assertEqual(abc.count(swf_yama.KAYNAK_ATLA), 1)
+        self.assertEqual(sayi, 3)
+
+    def test_gercek_istemcide_dallar_kaymaz(self):
+        """SWF depoda yok (indirilen varlık); SE_ISTEMCI_SWF verilirse gerçek istemcide denenir."""
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc, abc_etiketleri
+        et = [e for _, e in abc_etiketleri(open(yol, "rb").read()) if b"spawnRemainingResources" in e][0]
+        yeni, sayi = swf_yama.kaynaklari_gunde_bir(et)
+        self.assertEqual(sayi, 3)
+        eski_abc, yeni_abc = Abc(et), Abc(yeni)
+        adlar = eski_abc.yontem_adlari()
+        for ad, _, _, yer, ek in swf_yama.KAYNAK_YAMALARI:
+            i = [k for k, v in adlar.items() if v == "MapInitializer$/" + ad][0]
+            self.assertEqual(eski_abc.govdeler[i].istisnalar, [])
+            eski, yeni_isl = eski_abc.coz(eski_abc.govdeler[i]), yeni_abc.coz(yeni_abc.govdeler[i])
+            kay = lambda o: o if o < yer else o + len(ek)  # noqa: E731
+            for o, isl in eski.items():
+                karsi = yeni_isl[kay(o)]
+                self.assertEqual((karsi.ad, karsi.isl, karsi.hedefler), (isl.ad, isl.isl, tuple(map(kay, isl.hedefler))))

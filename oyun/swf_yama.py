@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"12"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"13"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -428,6 +428,45 @@ def komsudan_komsuya(t: bytes):
     return t.replace(KOMSU_KOSULU, KOMSU_KOSULU_YENI), 1
 
 
+# Ağaç, taş ve altın günde bir yenilenir (sahibinin kararı, 12.11.2026: "Günde bir yenilensin").
+# 1.4.07 MapInitializer$/Init@462-503 her harita açılışında spawnInit (@25-31: cleanBorderTiles, orta 3×3 büyük karonun
+# dışındaki halkayı CLEAN_0 ile satar), spawnInitResources (altın ve taş, NUM_GOLD/STONE_CLUSTERS 3 küme) ve
+# spawnRemainingResources (ağaç, NUM_TREE_CLUSTERS 10 küme + NUM_TREE_DISPERSE 100; hayvanlar) çağırır: kesilen ağaç
+# ve taş her açılışta yerine gelir, dış halka her açılışta baştan kurulur. Sayılar MapInitializer'ın sabitleri; config'ten
+# okunmaz. Bu üç yerin önüne aynı koşul konur:
+#     if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL) atla;
+# Sunucu NUM_TREE_CLUSTERS'ı (çok adlı 12596, QName genel ad alanı: globals'ta dinamik özellik olarak bulunur) oyuncunun
+# günün ilk açılışında 1, sonra 0 yollar (oyun/istemci.py). Komşu, saldırı, görev ve eğitimde (mod NORMAL değil) her şey
+# eskisi gibi. Bayt (AVM2): getlex Base 60 01, getproperty Items 66 6e, getproperty globals 66 af01, getproperty
+# NUM_TREE_CLUSTERS 66 b462 (Base/loadGameConfigSuccess@542-550 ile aynı yol); getproperty Main 66 0c, gameModeCurrent
+# 66 c201, getlex GameMode 60 9c01, getproperty NORMAL 66 9b02; iftrue 11, ifne 14, jump 10 (s24, komutun sonundan),
+# returnvoid 47. Göreli dallar eklemenin önünden arkasına geçmediği için kaymaz (tests/test_swf_yama.py, gerçek istemciyle);
+# istisna tabloları boş. Kod uzunluğu (u30) gövdenin kodundan hemen öncedir; çapa uzunluk + kodun başıdır.
+_BAYRAK = "6001666e66af0166b462"
+_NORMAL_MI = "6001660c66c201609c01669b02"
+KAYNAK_DONUS = bytes.fromhex(_BAYRAK + "11120000" + _NORMAL_MI + "1401000047")       # yoksa dön
+KAYNAK_ATLA = bytes.fromhex(_BAYRAK + "11150000" + _NORMAL_MI + "14040000" "10070000")  # yoksa 7 baytlık çağrıyı atla
+# (ad, eski kod uzunluğu, kodun başı, ekleme yeri, eklenen)
+KAYNAK_YAMALARI = (
+    ("spawnRemainingResources", 837,
+     bytes.fromhex("d0302400100d000094025777766304c6a19205c202d62400d724006304240063055ea80f5d084a08"), 2, KAYNAK_DONUS),
+    ("spawnInitResources", 672,
+     bytes.fromhex("d0302400100b00003070a174d787a6c3070804d52400d62400d724006304240063055ea80f5d084a"), 2, KAYNAK_DONUS),
+    ("spawnInit", 119,
+     bytes.fromhex("d030607c100900002090af2630c464a5c52cdda2014f810101608d014fc10600"), 25, KAYNAK_ATLA),
+)
+
+
+def kaynaklari_gunde_bir(t: bytes):
+    """(yeni_etiket, değişen): üç gövdeye kaynak koşulu; çapalardan biri tek değilse hiçbirine dokunmaz."""
+    capalar = [(_u30_yaz(uzunluk) + bas, uzunluk, bas, yer, ek) for _, uzunluk, bas, yer, ek in KAYNAK_YAMALARI]
+    if any(t.count(capa) != 1 for capa, *_ in capalar):
+        return t, 0
+    for capa, uzunluk, bas, yer, ek in capalar:
+        t = t.replace(capa, _u30_yaz(uzunluk + len(ek)) + bas[:yer] + ek + bas[yer:])
+    return t, len(capalar)
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -454,9 +493,10 @@ def turkcelestir(veri: bytes, sozluk=None):
             t, sayi = abc_dizelerini_degistir(govde[bas:son], as3) if as3 else (govde[bas:son], 0)
             t, kaldirilan = buyutmeyi_kaldir(t)
             t, komsu = komsudan_komsuya(t)
-            if sayi or kaldirilan or komsu:
+            t, kaynak = kaynaklari_gunde_bir(t)
+            if sayi or kaldirilan or komsu or kaynak:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan + komsu
+                degisen += sayi + kaldirilan + komsu + kaynak
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]

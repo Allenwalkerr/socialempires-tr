@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08). #81 birleşti (DNT-53…60, KAR-34 uygulaması, CEV-09). #82 açık (DNT-61…63, KAR-36: asker paketleri; birleştirmeden önce sahibine sorulur). Sahibinin ilk oyunda bildirdiklerinden hedefler (DNT-51), asker paketi (DNT-62 çürütüldü, KAR-36 uygulandı, #82) ve pazarda 'Dostlarını tut' kapandı. Sırada: (1) ağaç ve taş her açılışta yeniden çıkıyor (istemcinin kuralı: MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS); sahibi 12.11.2026'da 'Günde bir yenilensin' dedi, uygulanacak; (2) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (3) savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (4) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08). #81 birleşti (DNT-53…60, KAR-34 uygulaması, CEV-09). #82 açık (DNT-61…63, KAR-36: asker paketleri; birleştirmeden önce sahibine sorulur). Sahibinin ilk oyunda bildirdiklerinden hedefler (DNT-51), asker paketi (DNT-62 çürütüldü, KAR-36 uygulandı, #82) ve pazarda 'Dostlarını tut' kapandı. Ağaç, taş ve altın günde bir yenileniyor (DNT-64, #82). Sırada: (2) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (3) savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (4) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2931,6 +2931,19 @@
       "pr": null,
       "onay": null,
       "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı."
+    },
+    {
+      "id": "DNT-64",
+      "baslik": "Ağaç, taş ve altın her açılışta yeniden çıkıyor: günde bir yenilensin",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): ağaç ve taş her açılışta yeniden çıkıyor; soruya cevabı 'Günde bir yenilensin'. 1.4.07 bayt kodu: MapInitializer$/Init@462-503 her harita açılışında spawnInit (@25-31 cleanBorderTiles: safeAreaClean ile orta 3×3 büyük karonun dışındaki halkayı CLEAN_0 nedeniyle satar), spawnInitResources (altın 73-75+80 ve taş 69-71+81 sayılır; NUM_GOLD/STONE_CLUSTERS 3, küme 5-7) ve spawnRemainingResources (ağaç 19-21 sayılır; NUM_TREE_CLUSTERS 10, küme 16-20, NUM_TREE_DISPERSE 100; hayvanlar) çağırır; sayılar MapInitializer sabitleri, config'ten okunmaz. Eklenenler buyElementNoResources ile buy komutu olarak kayda girer. Ruffle'da denendi (12.11.2026, 180 ağaçlı kayıttan 100'ü silinmiş): yamasız her açılışta 139 sell (CLEAN_0) ve 104 buy; köşeye konan 200 yer tutucu ağaç da CLEAN_0 ile satıldı (sunucu tarafında sayı hilesi olmuyor). Komşu köyde istemci buy/sell yollamıyor (LOAD_MAP NEIGH sonrası komut yok); bot köylerinde yamadan önce de çevrede ağaç yok.",
+      "test": "tests/test_swf_yama.py KaynakYenilemeTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar), tests/test_kaynak_yenileme.py; Ruffle'da iki açılış (elle)",
+      "pr": "#82",
+      "onay": null,
+      "notlar": "oyun/swf_yama.py kaynaklari_gunde_bir (YAMA_SURUMU 13): üç gövdenin önüne `if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL)` dön (spawnInitResources, spawnRemainingResources) ya da halka temizliğini atla (spawnInit). Komşu, saldırı, görev, eğitimde değişmez. Sunucu (oyun/istemci.py kaynak_yenilenir_mi) günün ilk config'inde 1 yollar ve günü privateState.kaynakYenilemeGunu'na yazar, sonra 0; kayıt yoksa 1. Ruffle'da aynı gün ikinci açılış: 0 buy, 0 sell, görüntü aynı. İki bozma testlerde düştü (dal konumu, gün denetimi). Hayvanların yenilenmesi de günde bire iner (aynı işlev)."
     }
   ]
 }

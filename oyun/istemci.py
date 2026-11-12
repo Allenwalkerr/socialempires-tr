@@ -61,27 +61,53 @@ def track_game_status_response():
     return ("", 200)
 
 
-def _oyuncu_seviyesi():
-    """Oturumdaki oyuncunun seviyesi (DNT-51: istemciye yalnızca bu seviyeye gelmiş hedefler gider); yoksa None."""
+def _oturumdaki_kayit():
     from flask import session as oturum
     uid = oturum.get("USERID") or request.values.get("USERID", "")
-    kayit = kayit_oturumu(uid) if gecerli_uid(uid) else None
+    return (uid, kayit_oturumu(uid)) if gecerli_uid(uid) else (uid, None)
+
+
+def _oyuncu_seviyesi(kayit):
+    """Oyuncunun seviyesi (DNT-51: istemciye yalnızca bu seviyeye gelmiş hedefler gider); yoksa None."""
     try:
         return int(kayit["maps"][0].get("level", 1)) if kayit else None
     except (KeyError, IndexError, TypeError, ValueError):
         return None
 
 
+KAYNAK_GUNU = "kaynakYenilemeGunu"  # privateState: ağaç, taş ve altının son yenilendiği gün ("YYYY-AA-GG")
+
+
+def kaynak_yenilenir_mi(uid, kayit, bugun=None):
+    """Sahibinin kararı (12.11.2026, "Günde bir yenilensin"): istemci kendi köyündeki ağaç, taş ve altını yalnızca
+    günün ilk açılışında yeniler (oyun/swf_yama.py kaynaklari_gunde_bir). Config her sayfa açılışında bir kez istenir
+    (Base/loadGameConfigSuccess); günün ilk config'i yenilemeye izin verir ve günü kayda yazar. Kayıt yoksa izin verir
+    (yeni köyün ilk kaynakları)."""
+    if kayit is None:
+        return True
+    from oyun.config import yerel_bugun
+    gun = (bugun or yerel_bugun()).isoformat()
+    with save_lock:
+        ps = kayit.setdefault("privateState", {})
+        if ps.get(KAYNAK_GUNU) == gun:
+            return False
+        ps[KAYNAK_GUNU] = gun
+        save_session(uid)
+    return True
+
+
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
 def get_game_config_response():
     # İstemcinin dil ayarından bağımsız olarak metinler OYUN_DILI'nde gönderilir.
-    seviye = _oyuncu_seviyesi()
+    uid, kayit = _oturumdaki_kayit()
+    seviye = _oyuncu_seviyesi(kayit)
+    yenile = kaynak_yenilenir_mi(uid, kayit)
     try:
-        return get_client_game_config(OYUN_DILI, seviye=seviye)
+        return get_client_game_config(OYUN_DILI, seviye=seviye, kaynak_yenile=yenile)
     except Exception:
         traceback.print_exc()
         print(" ! Ceviri config'i uretilemedi; Ingilizceye donuluyor")
-        return get_client_game_config("en", seviye=seviye)
+        return get_client_game_config("en", seviye=seviye, kaynak_yenile=yenile)
 
 
 @app.route(DINAMIK + "/get_player_info.php", methods=["POST"])
