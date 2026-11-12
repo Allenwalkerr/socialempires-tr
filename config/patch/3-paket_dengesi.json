@@ -82,12 +82,12 @@
  {
   "op": "replace",
   "path": "/unit_packs/3/banner",
-  "value": "10 kat Ejderha Şansı"
+  "value": "Her Birlik Ejderha"
  },
  {
   "op": "replace",
   "path": "/unit_packs/3/tooltip",
-  "value": "Ejderha çıkma\nşansın 10 kat"
+  "value": "Paketteki her birlik\nbir ejderha"
  },
  {
   "op": "replace",
@@ -288,6 +288,15 @@
  },
  {
   "op": "replace",
+  "path": "/unit_packs/2/pack_category",
+  "value": {
+   "0": 0,
+   "custom": 10.0,
+   "2": 0
+  }
+ },
+ {
+  "op": "replace",
   "path": "/unit_packs/2/carrusel",
   "value": [
    {
@@ -449,6 +458,15 @@
     "chances": 1
    }
   ]
+ },
+ {
+  "op": "replace",
+  "path": "/unit_packs/3/pack_category",
+  "value": {
+   "0": 0,
+   "custom": 10.0,
+   "2": 0
+  }
  },
  {
   "op": "replace",

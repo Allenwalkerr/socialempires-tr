@@ -1282,6 +1282,11 @@ class BirlikPaketleri(KomutTesti):
                 self.assertEqual(birlik["type"], "u")
                 self.assertIn(kelime, birlik["name"], (no, b["id"]))
         self.assertEqual({b["id"] for b in paketler[5]["custom"]}, {608, 609, 610, 611, 539, 540, 541, 574})  # Kraliyet, Güçlü
+        # Birliğin kategorisini pack_category ağırlıkları seçer (docs/inceleme/1407-formuller.md, "Birliklerin seçimi");
+        # yeniden kurulan paketlerde bütün ağırlık custom'da olmalı, yoksa birlik çoğu zaman genel havuzdan çıkar
+        for no in (3, 4, 5):
+            agirlik = {k: float(v) for k, v in paketler[no]["pack_category"].items()}
+            self.assertEqual(sum(agirlik.values()), agirlik["custom"], no)
 
     def test_paketten_cikan_birlik_depoya(self):
         # istemci seçtiği birliği Base/storeItem ile store_add_items [JSON] olarak bildirir
