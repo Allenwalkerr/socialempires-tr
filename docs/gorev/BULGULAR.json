@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KMT-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #66 birleşti. KMT-09 ve OYN-29 (KAR-29) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada kalan denetim bulguları (DNT-25, 27, 29, 32, 33, 35, 36, 37, 40), TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-25",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti. Sırada kalan denetim bulguları (DNT-25, 27, 29, 32, 33, 35, 36, 37, 40), TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1507,13 +1507,13 @@
       "baslik": "Asker Toplama ödülü çevrimdışı oyunda alınamıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "PopupRecruitment: işe al düğmesi si.length >= num_recruitments ise açılır; si yalnızca onFindFriend → ExternalInterface showPopupSEHelpSocialItem ile dolar, templates/js/oyun.js'te yok; btBuy hep gizli (createFotos@474).",
-      "test": "tests/test_bot_yardim.py (8 test)",
-      "pr": "#38",
+      "test": "tests/test_bot_yardim.py (8 test), tests/js/bot_yardimi.test.js (3 test)",
+      "pr": "#67",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
+      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09). 12.11.2026: #67 birleşti (sunucu komutu önceden #38'de) (CI yeşil; sinama'daki iki düşüş ortam, S-72). Ruffle'da uçtan uca deneme GEC-09'da."
     },
     {
       "id": "OYN-18",
@@ -2287,13 +2287,13 @@
       "baslik": "Ada Ocağı ve viral teklifler yazıldı ama oyuncuya kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "docs/inceleme/1407-formuller.md iki yerde 'açılması ayrı karar'; config'te starts_at/duration 0. Komutlar GEC-03'te yazıldı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": "tests/test_bot_yardim.py (8 test)",
-      "pr": null,
+      "test": "tests/test_bot_yardim.py (8 test), tests/js/bot_yardimi.test.js (3 test)",
+      "pr": "#67",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
+      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09). 12.11.2026: #67 birleşti (CI yeşil; sinama'daki iki düşüş ortam, S-72). Ruffle'da uçtan uca deneme GEC-09'da."
     },
     {
       "id": "OYN-30",
