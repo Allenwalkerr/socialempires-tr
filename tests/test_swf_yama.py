@@ -1082,3 +1082,71 @@ class KaynakYenilemeTestleri(unittest.TestCase):
             for o, isl in eski.items():
                 karsi = yeni_isl[kay(o)]
                 self.assertEqual((karsi.ad, karsi.isl, karsi.hedefler), (isl.ad, isl.isl, tuple(map(kay, isl.hedefler))))
+
+
+class HikayeGoreviTestleri(unittest.TestCase):
+    """Sahibinin bildirimi (12.11.2026): kendi adasındaki hikâye görevi (prenses, düşman kampı) hiç çıkmıyor. 0926
+    istemcisi (SocialEmpires0926bsec.swf) MapInitializer$/spawnInit@82-92: findpropstrict spawnQuestInMap, getlex Base,
+    getproperty Main, getproperty currentQuestId, callpropvoid spawnQuestInMap 1. 1.4.07'de bu satır yok; spawnQuestInMap
+    yalnızca AdminPanel komutundan çağrılır. 1.4.07 çok adlıları: spawnQuestInMap 16185, Base 1, Main 12,
+    currentQuestId 474; ekleme yeri @73 (setCorrectQuest sonucu currentQuestId'ye yazıldıktan sonra, tutorialMode'dan
+    önce)."""
+
+    def test_cagri_0926daki_gibi(self):
+        islemler = KaynakYenilemeTestleri._coz(swf_yama.GOREV_CAGRISI)
+        self.assertEqual([(i.ad, i.isl) for i in islemler],
+                         [("findpropstrict", (16185,)), ("getlex", (1,)), ("getproperty", (12,)),
+                          ("getproperty", (474,)), ("callpropvoid", (16185, 1))])
+
+    def test_yer_setCorrectQuestin_ardi(self):
+        islemler = KaynakYenilemeTestleri._coz(swf_yama._GOREV_KOD[:swf_yama.GOREV_YERI])
+        adlar = [i.ad for i in islemler]
+        cagri = adlar.index("callproperty")
+        self.assertEqual(islemler[cagri].isl, (22731, 1))  # setCorrectQuest, 1 argüman
+        self.assertEqual(adlar[cagri + 1:], ["dup", "setlocal_1", "setproperty", "getlocal_1", "kill", "pop"])
+        self.assertEqual(islemler[cagri + 3].isl, (474,))  # setproperty currentQuestId
+
+    def test_yamasiz_ve_kaynak_yamali_govdeye_konur(self):
+        kod = swf_yama._GOREV_KOD
+        for kaynakli in (False, True):
+            govde = _do_abc(["x"]) + b"".join(swf_yama._u30_yaz(u) + bas for ad, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI
+                                              if ad != "spawnInit") + swf_yama._u30_yaz(len(kod)) + kod
+            if kaynakli:
+                govde, sayi = swf_yama.kaynaklari_gunde_bir(govde)
+                self.assertEqual(sayi, 3)
+            yeni, sayi = swf_yama.hikaye_gorevini_kur(govde)
+            self.assertEqual(sayi, 1)
+            self.assertEqual(yeni.count(swf_yama.GOREV_CAGRISI), 1)
+            i = yeni.index(swf_yama.GOREV_CAGRISI)
+            self.assertEqual(yeni[i - 1], 0x29)  # önünde setCorrectQuest bloğunun pop'u
+            self.assertEqual(yeni[i + len(swf_yama.GOREV_CAGRISI):][:5], bytes.fromhex("6001660c66"))  # ardı tutorialMode
+            uzunluk = len(kod) + len(swf_yama.GOREV_CAGRISI) + (len(swf_yama.KAYNAK_ATLA) if kaynakli else 0)
+            self.assertIn(swf_yama._u30_yaz(uzunluk) + kod[:25], yeni)  # gövde uzunluğu eklemeyle büyür
+
+    def test_govde_yoksa_dokunmaz(self):
+        govde = _do_abc(["x"])
+        self.assertEqual(swf_yama.hikaye_gorevini_kur(govde), (govde, 0))
+
+    def test_gercek_istemcide_dallar_kaymaz(self):
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc, abc_etiketleri
+        et = [e for _, e in abc_etiketleri(open(yol, "rb").read()) if b"spawnRemainingResources" in e][0]
+        for kaynakli in (False, True):
+            once = swf_yama.kaynaklari_gunde_bir(et)[0] if kaynakli else et
+            yeni, sayi = swf_yama.hikaye_gorevini_kur(once)
+            self.assertEqual(sayi, 1)
+            a0, a1 = Abc(once), Abc(yeni)
+            i = [k for k, v in a0.yontem_adlari().items() if v == "MapInitializer$/spawnInit"][0]
+            yer = swf_yama.GOREV_YERI + (len(swf_yama.KAYNAK_ATLA) if kaynakli else 0)
+            d = len(swf_yama.GOREV_CAGRISI)
+            eski, yeni_isl = a0.coz(a0.govdeler[i]), a1.coz(a1.govdeler[i])
+            kay = lambda o: o if o < yer else o + d  # noqa: E731
+            for o, isl in eski.items():
+                karsi = yeni_isl[kay(o)]
+                self.assertEqual((karsi.ad, karsi.isl, karsi.hedefler), (isl.ad, isl.isl, tuple(map(kay, isl.hedefler))))
+            self.assertEqual([yeni_isl[o].ad for o in sorted(yeni_isl) if yer <= o < yer + d],
+                             ["findpropstrict", "getlex", "getproperty", "getproperty", "callpropvoid"])

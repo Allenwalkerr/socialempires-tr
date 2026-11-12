@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"16"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"17"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -512,6 +512,34 @@ def kaynaklari_gunde_bir(t: bytes):
     return t, len(capalar)
 
 
+# Kendi adasındaki hikâye görevleri (prenses, hazine köyü, düşman kampı...; sahibinin bildirimi, 12.11.2026: "prenses
+# görevi halen yok"). 0926 istemcisinde MapInitializer$/spawnInit@82-92 setCorrectQuest'ten hemen sonra
+# spawnQuestInMap(Base.Main.currentQuestId) çağırır; 1.4.07'nin spawnInit'inde bu satır yok, spawnQuestInMap'i yalnızca
+# geliştirici konsolu komutu (AdminPanel 'spawnMapQuest') çağırır: görev kampı hiç kurulmaz. spawnQuestInMap'in kendisi
+# iki istemcide aynı (görev numarasına göre spawnPrincessVillage, spawnTreasureVillage...). Çağrı 0926'daki yerine,
+# 1.4.07 spawnInit@73'e (setCorrectQuest'in sonucu currentQuestId'ye yazıldıktan sonra, tutorialMode denetiminden önce)
+# konur. Bayt: findpropstrict spawnQuestInMap (5d b97e, çok adlı 16185), getlex Base (60 01), getproperty Main (66 0c),
+# getproperty currentQuestId (66 da03, 474), callpropvoid spawnQuestInMap 1 (4f b97e 01). Eklemenin önünden arkasına
+# geçen dal yok (jump@4→17, jump@39→52; sonrakiler göreli); kaynak yaması (KAYNAK_ATLA @25) uygulanmışsa da çalışır.
+GOREV_CAGRISI = bytes.fromhex("5db97e" "6001" "660c" "66da03" "4fb97e01")
+_GOREV_KOD = bytes.fromhex(
+    "d030607c100900002090af2630c464a5c52cdda2014f810101608d014fc106006001660c608d011009000096a5ac2ab0951cb173"
+    "6001660c66da0346cbb101012ad561da03d10801296001660c66c902111a00006001660c66933d120f00006001660c262ad561"
+    "cf9801d1080129608d014ff69b010047")
+GOREV_YERI = 73
+
+
+def hikaye_gorevini_kur(t: bytes):
+    """(yeni_etiket, değişen): spawnInit'e spawnQuestInMap çağrısı; gövde (yamasız ya da kaynak yamalı) tek değilse dokunmaz."""
+    adaylar = [_GOREV_KOD[:25] + KAYNAK_ATLA + _GOREV_KOD[25:], _GOREV_KOD]
+    for kod in adaylar:
+        capa = _u30_yaz(len(kod)) + kod
+        if t.count(capa) == 1:
+            yer = GOREV_YERI + (len(kod) - len(_GOREV_KOD))
+            return t.replace(capa, _u30_yaz(len(kod) + len(GOREV_CAGRISI)) + kod[:yer] + GOREV_CAGRISI + kod[yer:]), 1
+    return t, 0
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -539,9 +567,10 @@ def turkcelestir(veri: bytes, sozluk=None):
             t, kaldirilan = buyutmeyi_kaldir(t)
             t, komsu = komsudan_komsuya(t)
             t, kaynak = kaynaklari_gunde_bir(t)
-            if sayi or kaldirilan or komsu or kaynak:
+            t, gorev = hikaye_gorevini_kur(t)
+            if sayi or kaldirilan or komsu or kaynak or gorev:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan + komsu + kaynak
+                degisen += sayi + kaldirilan + komsu + kaynak + gorev
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]

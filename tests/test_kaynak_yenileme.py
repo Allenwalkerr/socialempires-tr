@@ -98,5 +98,39 @@ class GundeBir(unittest.TestCase):
         self.assertFalse(istemci.kaynak_yenilendi(self.kayit, 0, datetime.date(2026, 11, 12), uid=self.uid))
 
 
+
+class HalkaTemizligi(unittest.TestCase):
+    """Kaynak yenilemesi olmayan açılışta istemci MapInitializer$/cleanBorderTiles'ı atlar; hikâye görevi kampı ise her
+    açılışta yeniden kurulur. safeAreaClean@240-507: halkadaki (orta 3×3 dışı) binalar satılır, oyuncunun ırkından
+    birlikler geri çekilir, hayvanlar (inek 504, koyun 505) kalır. Ağaç (19), taş (69), altın (73) yenilenmez, kalır.
+    Kimlikler config'ten: 305 Troll Wall II (b, t), 526 Devious Troll (u, t), 512 Light Knight (u, h)."""
+
+    def harita(self):
+        return {"race": "h", "expansions": [13, 1], "items": [
+            [305, 5, 30, 0], [526, 90, 90, 0], [19, 5, 30, 0], [69, 85, 85, 0], [73, 2, 95, 0],
+            [505, 3, 50, 0], [512, 95, 3, 0], [305, 5, 5, 0], [305, 50, 50, 0], [526, 40, 40, 0]]}
+
+    def test_kamp_silinir_kaynak_hayvan_kendi_birligi_kalir(self):
+        h = self.harita()
+        self.assertEqual(istemci.halkadaki_kampi_temizle(h), 2)
+        self.assertEqual(h["items"], [[19, 5, 30, 0], [69, 85, 85, 0], [73, 2, 95, 0], [505, 3, 50, 0], [512, 95, 3, 0],
+                                      [305, 5, 5, 0],     # genişleme 1 (0..19, 0..19) oyuncunun
+                                      [305, 50, 50, 0], [526, 40, 40, 0]])  # orta 3×3 halkada değil
+
+    def test_izinsiz_acilista_sunucu_temizler(self):
+        tarayici = server.app.test_client()
+        tarayici.post("/", data={"USERID": self.uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        tarayici.get(CONFIG)
+        tarayici.post(INFO, data={"USERID": self.uid, "map": 0})  # izinli açılış: istemci kendisi temizler
+        h = session(self.uid)["maps"][0]
+        h["items"] += [[305, 5, 30, 0], [526, 90, 90, 0]]  # istemcinin kurduğu kamp
+        tarayici.post(INFO, data={"USERID": self.uid, "map": 0})  # aynı oturumda dönüş: izin kullanıldı
+        self.assertNotIn([305, 5, 30, 0], h["items"])
+        self.assertNotIn([526, 90, 90, 0], h["items"])
+
+    def setUp(self):
+        self.uid = server.new_village()
+
+
 if __name__ == "__main__":
     unittest.main()
