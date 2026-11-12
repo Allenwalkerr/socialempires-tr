@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "DNT-27",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti; DNT-32 (KAR-30) PR'da. Sırada DNT-27, 35, 37, 40, TST-02, GEC-09. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1584,14 +1584,14 @@
       "sinif": "hata",
       "test": null,
       "pr": null,
-      "onay": null,
+      "onay": "Sahibi, 12 Kasım 2026",
       "id": "DNT-08",
       "baslik": "0.06a kaydın görev numarası çevirisi göç öncesi yedeğin bulunduğu makineye bağlı",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "karar_verildi",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim KYG-04 (denetçi ✔ yazdı; yeniden üretilmedi): kayit.eski_gorev_numaralari yalnızca yerel backups/<uid>.goc-*.save.json'a bakar; içe aktarılan 0.06a kayıtta eski numaralar çevrilmez.",
-      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır)."
+      "notlar": "Yeniden üretilecek; davranış kararı gerekebilir (yedek yoksa ne yapılır). 12.11.2026 KAR-31: sahibi 'Olduğu gibi kalsın' dedi; kod değişmez."
     },
     {
       "sinif": "hata",
@@ -2157,13 +2157,13 @@
       "baslik": "Denetim DPT-07: Oyuncuya bot akınının sıklığı ve toplam kaybı sınırlı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) DPT-07, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_dunya.py SaatteBirAkinTestleri (3 test)",
       "pr": null,
       "onay": null,
-      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde."
+      "notlar": "Yalnızca 10 dk aralık (oyuncu_saldiri_araligi 600). KAR-15 kimlerin öldüğünü kapsıyor, sıklığı değil: denge kararı sahibinde. 12.11.2026 KAR-30 (sahibi: saatte en çok bir): oyuncu_saldiri_araligi 600 → 3600 (ayarlar.json ve dunya.VARSAYILAN_AYAR). İntikam seferi önce aralığın yarısını bekliyordu, artık tamamını bekliyor. Son akın bellekte 0 ise (sunucu yeni açıldı) oyuncunun PVPattacksReceived attackTime'ından okunur (_oyuncuya_son_akin); yeniden başlatma sınırı aşamaz. 5 bozma denemesinin 5'i düştü (ilk turda sefer yolunun günlük okuması sağ kaldı, çünkü önceki çağrı belleği dolduruyordu; test ayrı dünya kurar)."
     },
     {
       "id": "DNT-33",
@@ -2463,6 +2463,32 @@
       "pr": null,
       "onay": null,
       "notlar": "◐: gerçek tablet ve telefonda ölçülmedi. Yavaş cihazda dünya turunun kilidi birkaç kat uzar (100 ms → belki 0,5-1 sn, dakikada bir); fark edilirse tur kilitsiz hesaplanıp yalnızca yazım kilitlenir. Bilinen eski çökme yolları kapalı: DAG-07 (zayıf GPU'da WebGL çizici), DAG-08 (Ruffle 60 sn betik sınırı). Tablet denemesi GEC-09'da; sahibi donma görürse ne yaparken olduğunu söylerse oradan ölçülür."
+    },
+    {
+      "id": "KAR-30",
+      "baslik": "Oyuncuya bot akını saatte en çok bir",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "DNT-32 için soruldu (12.11.2026). Seçenekler: 'Saatte en çok bir' (önerilen), 'Oyun kapalıyken akın yok', 'Günde en çok 6 akın', 'Olduğu gibi kalsın'. Soruda verilen bilgi: 6. seviyeden sonra en sık 10 dakikada bir akın, oyun kapalıyken de; kaybedilen akında kaynak başına %10 (en çok 50.000) ve savunan askerlerin yaklaşık yarısı. Cevap: 'Saatte en çok bir'.",
+      "test": "tests/test_dunya.py SaatteBirAkinTestleri",
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "İntikam seferi de aynı aralığa uyar (önce yarısıydı: 5 dk). Oyun kapalıyken kural aynı."
+    },
+    {
+      "id": "KAR-31",
+      "baslik": "0.06a kaydının görev çevirisi göç yedeğine bağlı kalır (DNT-08)",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "DNT-08 için soruldu (12.11.2026): 'Olduğu gibi kalsın' (önerilen) / 'Yedeğe ekle'. Cevap: 'Olduğu gibi kalsın'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Yalnızca 0.06a ara sürümünde doğmuş ve göç yedeği olmayan makineye taşınmış kayıtları etkiler; kod değişmez."
     }
   ]
 }

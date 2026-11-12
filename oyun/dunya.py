@@ -29,6 +29,7 @@ VARSAYILAN_AYAR = {
     "olay_saklama": 200,
     "intikam_olasiligi": 0.35,   # bir bot yenilince ittifakının intikam seferi ilan etmesi
     "oyuncuya_intikam": 0.5,     # oyuncu bir bota saldırınca
+    "oyuncu_saldiri_araligi": 3600,  # oyuncuya iki bot akını arasında en az (sn); sahibinin kararı KAR-30: saatte bir
 }
 
 # İttifaklar: aynı ittifaktaki botlar birbirine saldırmaz. Üyelik bot kaydında (bot_hafiza.ittifak) durur;
@@ -249,6 +250,24 @@ class Dunya:
         self._son_sonuc = None       # son akının sonucu (seferin hesabı için)
 
     # -- erişim -----------------------------------------------------------
+    def _oyuncuya_son_akin(self):
+        """Oyuncuya son bot akınının zamanı. Bellekteki değer sunucu yeniden başlayınca 0'a döner; o zaman oyuncu
+        kayıtlarının saldırı günlüğünden (PVPattacksReceived attackTime, yeni_gunluge_ekle) okunur. Böylece "saatte
+        en çok bir akın" yeniden başlatmayla aşılmaz (DNT-32, KAR-30)."""
+        if not self._son_oyuncu_saldiri:
+            son = 0
+            for _, k in self.oyuncular():
+                if k.get("playerInfo", {}).get("bot"):
+                    continue
+                gunluk = k.get("privateState", {}).get("PVPattacksReceived")
+                for kayit in (gunluk.values() if isinstance(gunluk, dict) else ()):
+                    try:
+                        son = max(son, int(kayit.get("attackTime", 0)))
+                    except (AttributeError, TypeError, ValueError):
+                        continue
+            self._son_oyuncu_saldiri = son
+        return self._son_oyuncu_saldiri
+
     def oyuncular(self):
         oyuncular = []
         for uid in all_saves_userid():
@@ -454,9 +473,9 @@ class Dunya:
                 self._sefer_bitir(sefer)
                 continue
             if sefer["oyuncu"]:
-                # Oyuncuya akınlar da aralıklı ve kalkana saygılı
-                yarim = int(self.ayar.get("oyuncu_saldiri_araligi", 600)) // 2
-                if (simdi - self._son_oyuncu_saldiri < yarim or int(hedef["maps"][0].get("level", 1)) < 6
+                # Oyuncuya akınlar da aralıklı ve kalkana saygılı; sefer de aynı aralığa uyar (KAR-30: saatte en çok bir)
+                aralik_o = int(self.ayar.get("oyuncu_saldiri_araligi", 3600))
+                if (simdi - self._oyuncuya_son_akin() < aralik_o or int(hedef["maps"][0].get("level", 1)) < 6
                         or pvp_yeni.kalkan_bitisi(hedef) > simdi):
                     continue
             uyeler = [(u, k) for u, k in botlar
@@ -635,8 +654,8 @@ class Dunya:
             adaylar.append((u, k, max(0.05, agirlik)))
 
         # Oyuncuya saldırı: belirli aralıktan sık değil
-        aralik = int(self.ayar.get("oyuncu_saldiri_araligi", 600))
-        if oyuncu_hedefleri and simdi - self._son_oyuncu_saldiri >= aralik:
+        aralik = int(self.ayar.get("oyuncu_saldiri_araligi", 3600))
+        if oyuncu_hedefleri and simdi - self._oyuncuya_son_akin() >= aralik:
             if random.random() < float(self.ayar.get("oyuncuya_saldiri", 0.15)):
                 for u, k in oyuncu_hedefleri:
                     if int(k["maps"][0].get("level", 1)) < 6:
