@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #76 birleşti; DNT-48 genişletmesi ve DNT-49 #77'de. Sırada depo toparlama ve tek .exe (sahibinin isteği 12.11.2026), sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #77 birleşti; tek .exe ve depo toparlama (DAG-15, KAR-32) #78'de; Windows .exe'si o PR'ın CI'ında derlenip sınanır. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2592,7 +2592,7 @@
       "test": "tests/test_komutlar.py test_egitim_adimi_kaydedilir_ve_sonda_biter",
       "pr": "#76",
       "onay": null,
-      "notlar": "Sunucu artık istemci gibi gelen adımı yazar (0'dan büyükse). dragonNestActive'i eğitimde 1 yapan eski kural kalktı: 1.4.07 completarTutorial onu değiştirmez, initial.json'da zaten 1. Bozma (eski kurala dönüş) testi düşürdü. Oyun içinde yeni köyle denenmedi (◐ o kısım). TST-02 sırasında bulundu."
+      "notlar": "Sunucu artık istemci gibi gelen adımı yazar (0'dan büyükse). dragonNestActive'i eğitimde 1 yapan eski kural kalktı: 1.4.07 completarTutorial onu değiştirmez, initial.json'da zaten 1. Bozma (eski kurala dönüş) testi düşürdü. 12.11.2026 oyun içinde doğrulandı (✔): paketlenmiş sunucuyla yeni köyde eğitim açıldı; complete_tutorial 15 (endTutorial) ve F5'ten sonra eğitim açılmadı, oyun Hedefler'le normal başladı. TST-02 sırasında bulundu."
     },
     {
       "id": "DNT-47",
@@ -2632,6 +2632,32 @@
       "pr": "#77",
       "onay": "Sahibi 12.11.2026: \"Dikkatli düzelt\" (seçenek: sunucu görev/saldırı başı ve sonunu izler, ödülü yalnızca kendi adasında verir).",
       "notlar": "Sunucu oyuncunun yerini bellekte tutar (kayda yazılmaz): kendi adası yüklenince evde; komşu ya da görev haritası yüklenince, start_quest, attack_player, begin_attack_new, start_survival'da dışarıda; end_quest, end_attack, end_attack_new, end_survival'da evde. Dışarıdayken kill kendi adasına dokunmaz. Evdeyken kayıtta olmayan düşmana istemcinin jetonu verilir; tarafsız hayvanlar (SUBCATFUNC_UNIT_COW/SHEEP/HORSE/BOAR 74/75/88/90) ödülsüz. Yer bilinmiyorsa (sunucu yeni açıldı, sayfa yenilenmedi) eski davranış. Kayıtta bulunan öğede eski kural sürer (collect_xp; tükenen çiftlik DNT-42). Jeton toplanmadan sayfa kapanırsa istemci de vermemiş olur, sunucu vermiş olur (küçük fark, kabul). 15 bozma denemesinin hepsi düştü. Oyun içinde denenmedi (◐ o kısım)."
+    },
+    {
+      "id": "DAG-15",
+      "baslik": "Tek dosyalık Windows programı (.exe)",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Sahibinin isteği (12.11.2026): 'tek bir .exe haline getir'. araclar/exe_paketi.py PyInstaller 6.11.1 --onefile ile üretir; giriş araclar/exe_giris.py. Yerelde Linux'ta aynı betikle tek dosyalık program üretildi (29 MB) ve boş klasörden açıldı (✔): 5 sn'de hazır, Ruffle 200, giriş sayfası 200; saves/, mods/, ayarlar.json programın yanında; modlar uygulandı (kompu, turnuva, yeni_icerik). Aynı programla tarayıcıda yeni köy açıldı, DNT-46 oyun içinde doğrulandı. Windows .exe'si CI'da (windows.yml exe işi) derlenip sınanacak: ◐ o kısım.",
+      "test": "tests/test_exe.py; .github/workflows/windows.yml exe",
+      "pr": "#78",
+      "onay": null,
+      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma). #78 CI (windows-latest) ilk derlemede yakaladı: çıktı dosyaya yönlendirilince kodlama cp1252, kayıt adındaki 'ı' programı düşürdü (S-77). exe_giris.konsolu_hazirla stdout/stderr'i UTF-8'e çevirir; test ve 2 bozma."
+    },
+    {
+      "id": "KAR-32",
+      "baslik": "Windows'ta .exe ve zip birlikte; kayıtlar .exe'nin yanında; distr/ silinir; savaş jetonu dikkatli düzeltilir",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "12.11.2026 soruldu. Savaş XP'si: 'Olduğu gibi kalsın' (önerilen) / 'Dikkatli düzelt' → 'Dikkatli düzelt' (DNT-49). .exe: 'İkisi de olsun' (önerilen) / 'Yalnızca .exe' → 'İkisi de olsun'. Kayıt yeri: '.exe'nin yanında' (önerilen) / 'Belgelerim içinde' → '.exe'nin yanında'. distr/ (Adobe Flash Player kurulum dosyaları, 41 MB): 'Silinsin' (önerilen) / 'Kalsın' → 'Silinsin'.",
+      "test": null,
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "distr/ hiçbir kodda kullanılmıyordu (Ruffle); FLASH.md arşiv bağlantılarını veriyor. Git geçmişinde durur."
     }
   ]
 }

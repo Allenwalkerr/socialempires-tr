@@ -57,21 +57,26 @@ indirmek için gerekir.
 
 ---
 
-## En kolay yol: hazır Windows paketi
+## En kolay yol: tek dosyalık Windows programı
 
 Python kurmanız gerekmez.
 
 1. [Sürümler](https://github.com/lahmacunveayran/socialempires-tr/releases)
-   sayfasından en yeni `SocialEmpiresTR-...-windows.zip` dosyasını indirin.
+   sayfasından en yeni `SocialEmpiresTR-...-windows.exe` dosyasını indirin.
    (İlk sürüm v0.1.0 henüz yayınlanmadı; o zamana kadar aşağıdaki kaynak koddan kurulum kullanılır.)
-2. Zip'i bir klasöre açın ve `Social Empires.bat` dosyasına çift tıklayın.
-3. Tarayıcı kendiliğinden açılır: <http://127.0.0.1:5050/>
+2. Dosyayı kendine ait bir klasöre koyun (ör. Belgeler\SocialEmpires) ve çift tıklayın.
+3. Tarayıcı kendiliğinden açılır: <http://127.0.0.1:5050/>. Oyunu kapatmak için siyah pencereyi kapatın.
+
+Kayıtlar, ayarlar ve modlar `.exe`'nin yanındaki `saves`, `ayarlar.json` ve `mods` içinde durur;
+`.exe`'yi yeni sürümle değiştirdiğinizde korunur. Açılış birkaç saniye sürer (program kendini geçici
+klasöre açar).
 
 Windows "bilgisayarınızı korudu" (SmartScreen) derse **Ek bilgi** >
-**Yine de çalıştır**'a basın; paket imzasızdır. İndirilen dosyanın
-değişmediğini yanındaki `.sha256` dosyasıyla denetleyebilirsiniz
-(PowerShell: `Get-FileHash dosya.zip -Algorithm SHA256`). Her paket
-yayınlanmadan önce temiz bir Windows makinesinde açılıp sınanır.
+**Yine de çalıştır**'a basın; program imzasızdır. Antivirüs `.exe`'yi engellerse aynı sayfadaki
+`SocialEmpiresTR-...-windows.zip`'i kullanın: zip'i açıp `Social Empires.bat` dosyasına çift tıklayın.
+İndirilen dosyanın değişmediğini yanındaki `.sha256` dosyasıyla denetleyebilirsiniz
+(PowerShell: `Get-FileHash dosya.exe -Algorithm SHA256`). Her sürüm yayınlanmadan önce temiz bir
+Windows makinesinde açılıp sınanır.
 
 ## Android telefon ve tablet
 
@@ -174,7 +179,7 @@ Testler gerçek `saves/` klasörüne dokunmaz; geçici bir klasör kullanır.
 | `oyun/hiz.py`, `oyun/yokken.py` | Sayfadan hız seçimi, "Sen yokken" özeti |
 | `oyun/ev_agi.py`, `oyun/tasima.py`, `oyun/kayit_yedek.py` | Ev ağı, Wi-Fi ile taşıma, yedek indir/yükle |
 | `oyun/hile.py` | Yerel hile paneli (`/cheat`) |
-| `araclar/` | Bot köyü üretimi, çeviri ve birim yaması araçları, Windows ve Android paketleri |
+| `araclar/` | Bot köyü üretimi, çeviri ve birim yaması araçları, Windows (.exe ve zip) ve Android paketleri |
 | `android/` | Android uygulaması (Chaquopy + WebView) |
 | `config/`, `villages/`, `templates/`, `ceviri/` | Oyun verisi, köyler, sayfalar, çeviriler |
 | `tests/` | Testler |

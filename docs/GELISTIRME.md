@@ -123,6 +123,23 @@ gerekenleri (Hypothesis) ekler; oyuna ve paketlere girmez.
 Testlerin hata yakalama gücü ölçülür, tahmin edilmez: yöntem, kaynaklar ve son
 ölçüm `docs/TEST_OLCUMU.md`'de; ölçüm aracı `araclar/mutasyon_olc.py`.
 
+## Windows programı (.exe) ve zip
+
+Sürümde iki Windows biçimi çıkar (`.github/workflows/windows.yml`):
+
+- **Tek dosyalık program:** `araclar/exe_paketi.py` PyInstaller `--onefile` ile üretir; giriş
+  `araclar/exe_giris.py`. Oyun dosyaları ve Ruffle (SHA-512 denetlenmiş) `.exe`'nin içindedir. Kayıtlar,
+  ayarlar ve modlar `.exe`'nin yanında durur (`oyun/yollar.py` BASE_DIR); ilk açılışta `ayarlar.json` ve
+  `mods/` yanına kopyalanır, var olanlara dokunulmaz. Sunucu hazır olunca tarayıcı açılır (`SE_TARAYICI_ACMA=1`
+  açmaz). PyInstaller yalnızca kendi sisteminin programını üretir: `.exe` CI'da `windows-latest`'te derlenir
+  ve boş klasörden açılıp sınanır. Yerelde aynı betik o sistemin tek dosyalık programını üretir:
+  ```bat
+  python -m pip install -r requirements-exe.txt
+  python araclar\exe_paketi.py --cikti dist
+  ```
+- **Zip:** `araclar/windows_paketi.py` (gömülü Python + `Social Empires.bat`); antivirüs `.exe`'yi engellerse
+  yedek yol.
+
 ## Servis istekleri ve imza
 
 Komutlar dışındaki bazı istekler (büyücü iksirleri, turnuvalar, hata
