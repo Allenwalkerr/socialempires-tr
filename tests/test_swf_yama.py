@@ -968,7 +968,9 @@ class KaynakYenilemeTestleri(unittest.TestCase):
     boş. Çok adlılar: Base 1, Items 110, globals 175 (Base/loadGameConfigSuccess@542-550: 60 01 66 6e 66 af01), Main 12,
     gameModeCurrent 194, GameMode 156, NORMAL 283 (FriendButton/mouseUsed@41-58), NUM_TREE_CLUSTERS 12596 (QName genel
     ad alanı), townID 197, dizi erişimi [] 1631 (MultinameL; MissionPopup/refreshGoals), MapInitializer 141,
-    cleanBorderTiles 833. Kasaba değişince config yeniden istenmez (TownManager$/loadTown): bayrak kasaba başına.
+    cleanBorderTiles 833, Config 29, BG_SKIN_COLORS 5501 (Config/<sınıf> Const yuvası: oturum boyunca aynı Array). Kasaba
+    değişince ve komşudan dönüşte config yeniden istenmez (TownManager$/loadTown, Base/realLoadMap): bayrak kasaba
+    başına, oturum işareti Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS'ta (globals her okumada yeni nesne: OData/get v).
     AVM2: iftrue 0x11, ifne 0x14, jump 0x10 (s24, komutun sonundan), returnvoid 0x47."""
 
     @staticmethod
@@ -983,27 +985,49 @@ class KaynakYenilemeTestleri(unittest.TestCase):
             p = isl.sonraki
         return cikti
 
-    def _kosul(self, ek):
-        """Koşulun AVM2 akışı: (globals.NUM_TREE_CLUSTERS[Main.townID] doğruysa ya da mod NORMAL değilse) eklemenin
-        sonuna geçer."""
+    MOD = [("getlex", 1), ("getproperty", 12), ("getproperty", 194), ("getlex", 156), ("getproperty", 283)]
+    KASABA = [("getlex", 1), ("getproperty", 12), ("getproperty", 197)]
+    BAYRAK = [("getlex", 1), ("getproperty", 110), ("getproperty", 175), ("getproperty", 12596)] + KASABA + [
+        ("getproperty", 1631)]
+    ISARET = [("getlex", 29), ("getproperty", 5501), ("getproperty", 12596)]
+    BIT = ISARET + KASABA + [("rshift", None), ("pushbyte", 1), ("bitand", None)]
+
+    def _kosul(self, ek, tuket=False):
+        """Koşulun AVM2 akışı: mod NORMAL değilse asıl koda; NORMAL'de bayrak[townID] yoksa ya da bu oturumda o kasaba
+        zaten yenilendiyse (işaret biti) izin yok; izin varsa (tuket) işarete bit konur ve asıl koda geçilir.
+        Dönen: izin yokken çalışan kuyruk."""
         islemler = self._coz(ek)
         adlar = [(i.ad, i.isl[0] if i.isl else None) for i in islemler]
-        self.assertEqual(adlar[:15], [("getlex", 1), ("getproperty", 110), ("getproperty", 175), ("getproperty", 12596),
-                                      ("getlex", 1), ("getproperty", 12), ("getproperty", 197), ("getproperty", 1631),
-                                      ("iftrue", None), ("getlex", 1), ("getproperty", 12), ("getproperty", 194),
-                                      ("getlex", 156), ("getproperty", 283), ("ifne", None)])
-        self.assertEqual(islemler[8].hedefler, (len(ek),))   # bu kasabanın bayrağı varsa: asıl koda
-        self.assertEqual(islemler[14].hedefler, (len(ek),))  # NORMAL değilse (komşu, saldırı, görev, eğitim): asıl koda
-        return islemler[15:]
+        tuketme = [("getlex", 29), ("getproperty", 5501)] + self.ISARET + [("pushbyte", 1)] + self.KASABA + [
+            ("lshift", None), ("bitor", None), ("setproperty", 12596)] if tuket else []
+        bas = self.MOD + [("ifne", None)] + self.BAYRAK + [("iffalse", None)] + self.BIT + [("iftrue", None)] + tuketme
+        self.assertEqual(adlar[:len(bas) + 1], bas + [("jump", None)])
+        sira = {ad: i for i, (ad, _) in enumerate(adlar[:len(bas) + 1]) if ad in ("ifne", "iffalse", "iftrue", "jump")}
+        kuyruk = islemler[len(bas) + 1].ofset
+        self.assertEqual(islemler[sira["ifne"]].hedefler, (len(ek),))     # NORMAL değil (komşu, akın, eğitim): asıl koda
+        self.assertEqual(islemler[sira["iffalse"]].hedefler, (kuyruk,))   # bu kasabanın bugünkü bayrağı yok
+        self.assertEqual(islemler[sira["iftrue"]].hedefler, (kuyruk,))    # bu oturumda zaten yenilendi
+        self.assertEqual(islemler[sira["jump"]].hedefler, (len(ek),))     # izin var: asıl koda
+        return islemler[len(bas) + 1:]
 
-    def test_kosul_bayrak_yoksa_kendi_koyunde_doner_ya_da_atlar(self):
-        self.assertEqual([i.ad for i in self._kosul(swf_yama.KAYNAK_DONUS)], ["returnvoid"])
+    def test_kosul_izin_yoksa_kendi_koyunde_doner_ya_da_atlar(self):
+        self.assertEqual([i.ad for i in self._kosul(swf_yama.KAYNAK_DONUS)], ["returnvoid"])  # spawnInitResources
+        self.assertEqual([i.ad for i in self._kosul(swf_yama.KAYNAK_DONUS_SON, tuket=True)], ["returnvoid"])
         atla = self._kosul(swf_yama.KAYNAK_ATLA)
         self.assertEqual([i.ad for i in atla], ["jump"])
         cagri = [y for y in swf_yama.KAYNAK_YAMALARI if y[0] == "spawnInit"][0]
         sonraki = cagri[2][cagri[3]:]
         self.assertEqual([(i.ad, i.isl) for i in self._coz(sonraki)], [("getlex", (141,)), ("callpropvoid", (833, 0))])
         self.assertEqual(atla[0].hedefler, (len(swf_yama.KAYNAK_ATLA) + len(sonraki),))  # yalnızca halka temizliği atlanır
+
+    def test_isareti_yalniz_son_cagri_koyar(self):
+        """spawnRemainingResources Init'te üçünün sonuncusu (@500): işaret ondan önce konursa altın, taş ve halka o
+        oturumda hiç yenilenmezdi; hiç konmazsa komşudan dönüşte (config yeniden gelmez) yine yenilenirdi."""
+        ekler = {y[0]: y[4] for y in swf_yama.KAYNAK_YAMALARI}
+        self.assertEqual(ekler, {"spawnRemainingResources": swf_yama.KAYNAK_DONUS_SON,
+                                 "spawnInitResources": swf_yama.KAYNAK_DONUS, "spawnInit": swf_yama.KAYNAK_ATLA})
+        setleri = {ad: sum(i.ad == "setproperty" for i in self._coz(ek)) for ad, ek in ekler.items()}
+        self.assertEqual(setleri, {"spawnRemainingResources": 1, "spawnInitResources": 0, "spawnInit": 0})
 
     def test_uc_govde_uzar_ve_kodun_geri_kalani_ayni(self):
         dolgu = b"\x47" * 50
@@ -1032,7 +1056,8 @@ class KaynakYenilemeTestleri(unittest.TestCase):
             girdi = _swf(_etiket(82, _do_abc(["x"]) + icerik), _etiket(1, b""), surum=13)
             cikti, sayi = swf_yama.turkcelestir(girdi, {"metin_alanlari": {}})
         abc = [ic for k, _, ic in _etiketleri_ayir(_ac(cikti)) if k == 82][0]
-        self.assertEqual(abc.count(swf_yama.KAYNAK_DONUS), 2)
+        self.assertEqual(abc.count(swf_yama.KAYNAK_DONUS), 1)
+        self.assertEqual(abc.count(swf_yama.KAYNAK_DONUS_SON), 1)
         self.assertEqual(abc.count(swf_yama.KAYNAK_ATLA), 1)
         self.assertEqual(sayi, 3)
 
