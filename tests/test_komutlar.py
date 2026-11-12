@@ -530,10 +530,17 @@ class GorevVeBonusKomutlari(KomutTesti):
         self.assertEqual(self.ps["comebackBonusCollected"], [3])
 
     def test_hazine_dogru_kasabaya(self):
-        # [altin, xp, gorev, x, y, kasaba]
-        self.komut("collect_treasure", 500, 60, 1, 0, 0, 0)
-        self.assertEqual(self.harita["coins"], 50500)
-        self.assertEqual(self.harita["xp"], 60)
+        """DNT-50. QuestsInMap$/finalizeQuest @442-465: [altın, xp, sıradaki görev, yiyecek (yerel1), taş (yerel2), townID];
+        istemci dördünü de ekler (@356-400) ve timestampLastTreasure = sunucu zamanı (@91-120). Açılışta
+        map.idCurrentTreasure ve map.timestampLastTreasure'ı okur (TownManager$/onEndLoadTown @65-105).
+        Config.NUM_QUESTS 30: görev 0..29."""
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_000):
+            self.komut("collect_treasure", 500, 60, 1, 70, 80, 0)
+        h = self.harita
+        self.assertEqual((h["coins"], h["xp"], h["food"], h["stone"]), (50500, 60, 1070, 1080))
+        self.assertEqual((h["idCurrentTreasure"], h["timestampLastTreasure"]), (1, 2_000_000_000))
+        self.komut("collect_treasure", 0, 0, 30, 0, 0, 0)  # NUM_QUESTS dışı: görev değişmez
+        self.assertEqual(h["idCurrentTreasure"], 1)
 
     def test_teklif_paketi(self):
         self.kayit["playerInfo"]["cash"] = 100

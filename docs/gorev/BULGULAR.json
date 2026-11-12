@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; kurulum programı hazır. Sahibi v0.1.0-deneme2 sürümünü açınca sayfaya ...-windows-kurulum.exe gelir. Sonra GEC-09: tablet ve v0.1.0. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 (kurulum programı) yayında. DNT-50 (hikâye görevleri) ve KAR-33 (20 nakit) #80'de. Sahibinin oyun içi bildirdikleri sırada: pazarda 'Dostlarını tut' çalışmıyor; ilk seviyelerde etkinlik hedefi çıkıyor; 'pazar al' hedefi 'o bina sende yok' diyor; çevrimdışı paket sayfasında 'iniyor' yazısı kalıyor. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2671,6 +2671,32 @@
       "pr": "#79",
       "onay": null,
       "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü. #79 incelemesi: yükseltmede eski sürümün _internal verisi (config/patch, villages dizin taranarak okunur) kalıp yeniden uygulanırdı; [InstallDelete] {app}\\_internal'ı kopyadan önce siler. CI eski dosya bırakıp üzerine kurar, dosyanın gittiğini ve kayıt sayısının değişmediğini denetler. Test ve bozma. 12.11.2026: #79 birleşti."
+    },
+    {
+      "id": "DNT-50",
+      "baslik": "Kendi adasındaki hikâye görevleri (prenses, tutsaklar, hazine...) F5'te ilk göreve dönüyordu; görevin yiyecek ve taş ödülü kayboluyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Oyunda normalde hikaye serisi vardı prensesi kurtar falan o yok'. QuestsInMap$/finalizeQuest @356-465: istemci altın, xp, yiyecek (yerel1) ve taşı ekler, currentQuestId = (id + 1) % NUM_QUESTS (30) yapar, timestampLastTreasure = sunucu zamanı (@91-120) ve collect_treasure [altın, xp, sıradaki görev, yiyecek, taş, townID] yollar. MapInitializer$/setCorrectQuest @274 düzeltilen görevi de [0, 0, görev, 0, 0, townID] ile yollar. Açılışta görev map.idCurrentTreasure'dan, zaman map.timestampLastTreasure'dan okunur (Base/loadPlayerInfoSuccess @614-641, TownManager$/onEndLoadTown @65-105). Sunucu yalnızca altın ve xp'yi işliyordu; argümanları [altın, xp, görev, x, y, kasaba] sanıyordu.",
+      "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
+      "pr": "#80",
+      "onay": null,
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir."
+    },
+    {
+      "id": "KAR-33",
+      "baslik": "Yeni oyuncu 20 nakitle başlar",
+      "sinif": "karar",
+      "onem": "Düşük",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Birde oyuncu oyuna 20 nakitle başlasın bundan sonra böyle çok zor'. villages/initial.json playerInfo.cash 0 → 20.",
+      "test": "tests/test_http.py test_yeni_oyuncu_20_nakitle_baslar",
+      "pr": "#80",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Yalnızca yeni köyler; var olan kayıtlara dokunulmaz. Bozma (0'a dönüş) testi düşürdü."
     }
   ]
 }
