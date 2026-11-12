@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37, DNT-40/41 PR'da. Sırada TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #71 birleşti. Sırada TST-02 (44 testsiz komut; kill'in ölen birim ve düşman binası xp'si açık), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2261,13 +2261,13 @@
       "baslik": "Kayıt göçü denetim alanı yarım kaldı",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "docs/denetim/kayit-goc.md başlığı 'Yarım rapor': dört bulgudan sonrası yazılmadı (surum.py göç adımları, tasima.py, kayit_yedek.py tam denetlenmedi). KAR-13 notu 'altı alanın raporu tamam' diyordu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
-      "pr": null,
+      "pr": "#71",
       "onay": null,
-      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı."
+      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "TST-06",
@@ -2521,26 +2521,26 @@
       "baslik": "Yedek yükleme ve Wi-Fi taşıma bot dünyasının yazılmamış değişikliklerini siliyordu (KYG-05)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "kayit_yedek.geri_yukle load_saved_villages()'dan önce dunya.etkin.bekleyenleri_yaz()'ı çağırmıyordu (sunucu.login çağırıyor). Test: bellekteki bot değişikliği yedek yüklemeden sonra kayboluyordu.",
       "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
-      "pr": null,
+      "pr": "#71",
       "onay": null,
-      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü."
+      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-42",
       "baslik": "Tükenen çiftliğin kill'i sunucuda toplama xp'si veriyordu, istemcide vermiyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "1.4.07 IsoElement/collect @3438-3675: çiftlikte odun yetmezse çiftlik SELL_REASON_FARM_DEPLETED ile kaldırılır, yalnızca kill gider; collect_xp'yi veren @3805-3831 local12 false olduğu için atlanır. Sunucu kill'de apply_collect_xp çağırıyordu (Pumpkin Crop: +2 xp fazla).",
       "test": "tests/test_komutlar.py test_tukenen_ciftligin_kill_i_xp_vermez",
-      "pr": null,
+      "pr": "#71",
       "onay": null,
-      "notlar": "kill çiftlikte (subcat 122) xp vermez. Çiftlik oyuncunun binası; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill yollar, başka yoldan çiftliğe kill gelmez. Bozma düştü. TST-02 sırasında bulundu."
+      "notlar": "kill çiftlikte (subcat 122) xp vermez. Çiftlik oyuncunun binası; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill yollar, başka yoldan çiftliğe kill gelmez. Bozma düştü. TST-02 sırasında bulundu. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
     }
   ]
 }
