@@ -2879,6 +2879,19 @@
       "pr": "#81",
       "onay": null,
       "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi. #81 incelemesi: büyük harfli biçimler kalmıştı; Kaya Delen görevinin üç başlığı (KAYA DELEN), mağaza sekmeleri (DESTANSI KAFATASI EJDERHALARI, VAHŞİ KULUÇKA EJDERHALARI) ve hayatta kalma uyarısı (ELEBAŞI GELİYOR) düzeltildi. 'Aztek Reisi' heykeli (kabile reisi) bilerek bırakıldı."
+    },
+    {
+      "id": "DNT-61",
+      "baslik": "Ruh Kazanı'nda sonuç gölgeleri üst üste biniyor (golem önde, süvari arkada)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "onay_bekliyor",
+      "isaret": "?",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026). Ruffle'da sınandı (yerel sunucu, 10. seviye köy, Ruh Kazanı 1529): boş pencere, tek asker seçimi ve iki asker seçimi düzgün; ortada tek sonuç gölgesi. Bayt kodu: PopupSoulMixer/onUnitSelected → generateResultUnit (sonuç birimi rastgele: Utils.getRandom) → update; update eski AnimatedUnit'i remove() ile kaldırıp unitAnchor'ı temizliyor, yenisini AnimatedUnit(unitAnchor, img_name...) ile eşzamansız yüklüyor. AnimatedUnit/remove yükleme sürerken loader.close() çağırıyor; Ruffle bunu iptal etmezse eski gölge sonradan eklenebilir (iki farklı rastgele sonuç üst üste = sahibinin gördüğü). Çizimler 4-8 sn geciktirilip seçim art arda değiştirilince bir karede iki biçimin birleşimine benzeyen gölge görüldü, kesin değil.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak."
     }
   ]
 }
