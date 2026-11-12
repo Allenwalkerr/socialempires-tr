@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #77 birleşti; tek .exe ve depo toparlama (DAG-15, KAR-32) #78'de; Windows .exe'si o PR'ın CI'ında derlenip sınanır. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #78 birleşti; v0.1.0-deneme1 sahibince açıldı (.exe ve zip yüklendi). Windows kurulum programı (DAG-16) #79'da. Sonra GEC-09: tablet ve v0.1.0. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2638,13 +2638,13 @@
       "baslik": "Tek dosyalık Windows programı (.exe)",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
-      "kanit": "Sahibinin isteği (12.11.2026): 'tek bir .exe haline getir'. araclar/exe_paketi.py PyInstaller 6.11.1 --onefile ile üretir; giriş araclar/exe_giris.py. Yerelde Linux'ta aynı betikle tek dosyalık program üretildi (29 MB) ve boş klasörden açıldı (✔): 5 sn'de hazır, Ruffle 200, giriş sayfası 200; saves/, mods/, ayarlar.json programın yanında; modlar uygulandı (kompu, turnuva, yeni_icerik). Aynı programla tarayıcıda yeni köy açıldı, DNT-46 oyun içinde doğrulandı. Windows .exe'si CI'da (windows.yml exe işi) derlenip sınanacak: ◐ o kısım.",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin isteği (12.11.2026): 'tek bir .exe haline getir'. araclar/exe_paketi.py PyInstaller 6.11.1 --onefile ile üretir; giriş araclar/exe_giris.py. Yerelde Linux'ta aynı betikle tek dosyalık program üretildi (29 MB) ve boş klasörden açıldı (✔): 5 sn'de hazır, Ruffle 200, giriş sayfası 200; saves/, mods/, ayarlar.json programın yanında; modlar uygulandı (kompu, turnuva, yeni_icerik). Aynı programla tarayıcıda yeni köy açıldı, DNT-46 oyun içinde doğrulandı. Windows .exe'si #78 CI'ında windows-latest'te derlendi ve boş klasörden açılıp sınandı (✔): hazır, Ruffle ve giriş sayfası 200, saves/mods/ayarlar.json programın yanında, SHA-256 tutuyor.",
       "test": "tests/test_exe.py; .github/workflows/windows.yml exe",
       "pr": "#78",
       "onay": null,
-      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma). #78 CI (windows-latest) ilk derlemede yakaladı: çıktı dosyaya yönlendirilince kodlama cp1252, kayıt adındaki 'ı' programı düşürdü (S-77). exe_giris.konsolu_hazirla stdout/stderr'i UTF-8'e çevirir; test ve 2 bozma."
+      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma). #78 CI (windows-latest) ilk derlemede yakaladı: çıktı dosyaya yönlendirilince kodlama cp1252, kayıt adındaki 'ı' programı düşürdü (S-77). exe_giris.konsolu_hazirla stdout/stderr'i UTF-8'e çevirir; test ve 2 bozma. 12.11.2026: #78 birleşti."
     },
     {
       "id": "KAR-32",
@@ -2658,6 +2658,19 @@
       "pr": null,
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "distr/ hiçbir kodda kullanılmıyordu (Ruffle); FLASH.md arşiv bağlantılarını veriyor. Git geçmişinde durur."
+    },
+    {
+      "id": "DAG-16",
+      "baslik": "Windows kurulum programı: masaüstü kısayolu, Başlat menüsü, kaldırıcı",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Sahibinin isteği (12.11.2026): 'exeye tıklıcam ... exe kurulumu yapar masaüstüne bir tane kısayol koyar tıkladın mı oynarsın'. v0.1.0-deneme1'de yalnızca tek dosyalık .exe (24,6 MB) ve zip vardı (✔ sürüm sayfası). araclar/kurulum.iss (Inno Setup 6) exe_paketi.py --klasor çıktısını %LOCALAPPDATA%\\Programs\\SocialEmpiresTR'ye kurar, PrivilegesRequired=lowest, masaüstü ve Başlat kısayolu, Türkçe sihirbaz; saves/ uninsneveruninstall. Klasör sürümü yerelde Linux'ta üretilip açıldı (✔): 4 sn'de hazır, Ruffle 200, kayıt/mod/ayar yanında. Windows'ta derleme, sessiz kurulum, açılış ve kaldırma CI'da (windows.yml kurulum işi) sınanacak: ◐ o kısım.",
+      "test": "tests/test_exe.py (KurulumTarifi, simge, klasör kipi); .github/workflows/windows.yml kurulum",
+      "pr": "#79",
+      "onay": null,
+      "notlar": "Simge uygulamanın kendi simgesi (templates/img/simge-192.png, Android ve web manifesti de kullanır), PNG olduğu gibi ICO kabına konur; yeniden çizilmez. Klasör sürümü her açılışta kendini geçici klasöre açmadığı için tek dosyadan hızlı başlar. Tek dosyalık .exe ve zip de sürümde kalır. 7 bozma düştü. #79 incelemesi: yükseltmede eski sürümün _internal verisi (config/patch, villages dizin taranarak okunur) kalıp yeniden uygulanırdı; [InstallDelete] {app}\\_internal'ı kopyadan önce siler. CI eski dosya bırakıp üzerine kurar, dosyanın gittiğini ve kayıt sayısının değişmediğini denetler. Test ve bozma."
     }
   ]
 }

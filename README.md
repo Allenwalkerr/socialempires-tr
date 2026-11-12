@@ -57,26 +57,29 @@ indirmek için gerekir.
 
 ---
 
-## En kolay yol: tek dosyalık Windows programı
+## En kolay yol: Windows kurulumu
 
-Python kurmanız gerekmez.
+Python kurmanız gerekmez, yönetici izni istemez.
 
 1. [Sürümler](https://github.com/lahmacunveayran/socialempires-tr/releases)
-   sayfasından en yeni `SocialEmpiresTR-...-windows.exe` dosyasını indirin.
-   (İlk sürüm v0.1.0 henüz yayınlanmadı; o zamana kadar aşağıdaki kaynak koddan kurulum kullanılır.)
-2. Dosyayı kendine ait bir klasöre koyun (ör. Belgeler\SocialEmpires) ve çift tıklayın.
-3. Tarayıcı kendiliğinden açılır: <http://127.0.0.1:5050/>. Oyunu kapatmak için siyah pencereyi kapatın.
+   sayfasından en yeni `SocialEmpiresTR-...-windows-kurulum.exe` dosyasını indirin.
+2. Çift tıklayın, kurulum sihirbazını izleyin. Masaüstüne ve Başlat menüsüne **Social Empires Türkçe**
+   kısayolu konur.
+3. Kısayola tıklayın: tarayıcı kendiliğinden açılır (<http://127.0.0.1:5050/>). Oyunu kapatmak için siyah
+   pencereyi kapatın.
 
-Kayıtlar, ayarlar ve modlar `.exe`'nin yanındaki `saves`, `ayarlar.json` ve `mods` içinde durur;
-`.exe`'yi yeni sürümle değiştirdiğinizde korunur. Açılış birkaç saniye sürer (program kendini geçici
-klasöre açar).
+İlk açılışta oyunun resimleri ve sesleri internetten bir kez indirilir; sonra internet gerekmez.
+Kayıtlar kurulum klasöründeki `saves` içindedir (Başlat menüsünde **Kayıtlar klasörü**). Yeni sürümü aynı
+yolla kurduğunuzda kayıtlar korunur; Ayarlar > Uygulamalar'dan kaldırdığınızda da silinmez.
 
-Windows "bilgisayarınızı korudu" (SmartScreen) derse **Ek bilgi** >
-**Yine de çalıştır**'a basın; program imzasızdır. Antivirüs `.exe`'yi engellerse aynı sayfadaki
-`SocialEmpiresTR-...-windows.zip`'i kullanın: zip'i açıp `Social Empires.bat` dosyasına çift tıklayın.
-İndirilen dosyanın değişmediğini yanındaki `.sha256` dosyasıyla denetleyebilirsiniz
-(PowerShell: `Get-FileHash dosya.exe -Algorithm SHA256`). Her sürüm yayınlanmadan önce temiz bir
-Windows makinesinde açılıp sınanır.
+Kurmadan oynamak isterseniz aynı sayfadaki tek dosyalık `SocialEmpiresTR-...-windows.exe`'yi kendine ait bir
+klasöre koyup çift tıklayın (kayıtlar yanındaki `saves` klasörüne yazılır). Antivirüs `.exe`'yi engellerse
+`SocialEmpiresTR-...-windows.zip`'i açıp `Social Empires.bat` dosyasına çift tıklayın.
+
+Windows "bilgisayarınızı korudu" (SmartScreen) derse **Ek bilgi** > **Yine de çalıştır**'a basın; program
+imzasızdır. İndirilen dosyanın değişmediğini yanındaki `.sha256` dosyasıyla denetleyebilirsiniz
+(PowerShell: `Get-FileHash dosya.exe -Algorithm SHA256`). Her sürüm yayınlanmadan önce temiz bir Windows
+makinesinde kurulup açılır ve kaldırılır.
 
 ## Android telefon ve tablet
 
@@ -179,7 +182,7 @@ Testler gerçek `saves/` klasörüne dokunmaz; geçici bir klasör kullanır.
 | `oyun/hiz.py`, `oyun/yokken.py` | Sayfadan hız seçimi, "Sen yokken" özeti |
 | `oyun/ev_agi.py`, `oyun/tasima.py`, `oyun/kayit_yedek.py` | Ev ağı, Wi-Fi ile taşıma, yedek indir/yükle |
 | `oyun/hile.py` | Yerel hile paneli (`/cheat`) |
-| `araclar/` | Bot köyü üretimi, çeviri ve birim yaması araçları, Windows (.exe ve zip) ve Android paketleri |
+| `araclar/` | Bot köyü üretimi, çeviri ve birim yaması araçları, Windows (kurulum, .exe ve zip) ve Android paketleri |
 | `android/` | Android uygulaması (Chaquopy + WebView) |
 | `config/`, `villages/`, `templates/`, `ceviri/` | Oyun verisi, köyler, sayfalar, çeviriler |
 | `tests/` | Testler |
