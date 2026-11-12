@@ -2878,7 +2878,7 @@
       "test": null,
       "pr": "#81",
       "onay": null,
-      "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi."
+      "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi. #81 incelemesi: büyük harfli biçimler kalmıştı; Kaya Delen görevinin üç başlığı (KAYA DELEN), mağaza sekmeleri (DESTANSI KAFATASI EJDERHALARI, VAHŞİ KULUÇKA EJDERHALARI) ve hayatta kalma uyarısı (ELEBAŞI GELİYOR) düzeltildi. 'Aztek Reisi' heykeli (kabile reisi) bilerek bırakıldı."
     }
   ]
 }
