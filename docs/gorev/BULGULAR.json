@@ -2710,6 +2710,19 @@
       "pr": null,
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "Uygulama ayrı PR: istemci config'i oyuncunun seviyesine göre (starts_at/duration) kurulmalı; ilk etkinlik 15, sonrakiler 20, 25, 30...; her etkinliğin yılda belirli haftaları (config/takvim.json gibi). Oyunun içine takvim çizilmez (CLAUDE.md görsel kuralı); liste sayfada, oyunun kendi simgeleriyle. Sahibinin 'aşağıdaki boşluk' dediği yer Doldur görünümü hatası (görev listesi)."
+    },
+    {
+      "id": "DNT-51",
+      "baslik": "Hedeflerin açılış seviyeleri bozuk: 206 hedefin 195'i 1. seviyede; saldırı hedefleri PvP'den önce çıkıyor",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'lvl 6 yım diyo ki git bir oyuncuya akın et ama pvp 8 seviyede açılıyor. Görevlerin acilen titizlikle işlenip düzenlenmesi lazım'; 'eskiden görev sıralaması lvla göre olurdu'. config/goals.json (GEC-02'de upstream'den alındı): min_level dağılımı 1: 195, 8: 10, 12: 1. attack_player hedefleri: 59 (1 oyuncu) 8, 242 (2 oyuncu) ve 243 (3 oyuncu) 1, 244-248 8. GoalsManager/isGoalAvailable her zaman true döner; istemci hedefi min_level ve sırayla gösterir (sortGoals/goalComparison, getActiveGoals incelenecek).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Yapılacak: istemcinin hedef seçme kuralını (GoalsManager/getActiveGoals, sortGoals, activateGoalsAccordingContext) bayt kodundan çıkar; her hedefin gerektirdiği özelliğin açılış seviyesini istemciden ya da config'ten bul (PvP, pazar, ejderha yuvası, görev adaları, etkinlikler) ve min_level'i ona göre düzelt; tutarsız zincirler (59/242/243) düzelir. 'Pazar al' hedefinin git eylemi ayrıca (görev listesi). Etkinlik hedefleri (bayram, GEC-07) KAR-34 ile seviyeye bağlanır."
     }
   ]
 }
