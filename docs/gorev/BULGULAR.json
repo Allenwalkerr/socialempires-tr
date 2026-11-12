@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #72 birleşti; DNT-44 ve TST-02'nin üçüncü grubu PR'da. Sırada TST-02 (34 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #73 birleşti. Sırada TST-02 (34 testsiz komut; kill'in ölen birim ve düşman binası xp'si açık), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2560,13 +2560,13 @@
       "baslik": "Görev zaferi bütün adaları sırasız açıyordu: unlockedQuestIndex'e görev numarası yazılıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "1.4.07 bayt kodu: unlockedQuestIndex globals.ISLE_ORDER'da (28 ada) açık son adanın sırasıdır; PopupQuestsManager/<kurucu> @1207-1232 ada kilitli = isLevelLocked || sıra > unlockedQuestIndex; QuestZeppelin/QuestShip elementCollected de indexOf ile karşılaştırır; istemci değeri kendisi artırmaz (PlayerStatus/Init kayıttan okur). Quest*/sendResults end_quest'e set_unlocked_index 1 (koleksiyon görevleri QuestCollectable1-5: 0) koyar; QuestBossDragon2 anahtarı 'set_unlocked_index:' diye iki noktalı yazar. Sunucu ise kazanılan her görevde unlockedQuestIndex = quest_id + 1 (ör. QUEST_BOSS_GOLEM 100000003 → 100000004) yazıyordu: ilk zaferden sonra seviyesi yeten bütün adalar sırasız açılıyordu, koleksiyon görevi de açıyordu.",
       "test": "tests/test_komutlar.py test_gorev_sonu_ada_sirasi_ve_odul",
-      "pr": null,
+      "pr": "#73",
       "onay": null,
-      "notlar": "Düzeltme: win ve bayrak (iki yazım da) 1 ise unlockedQuestIndex = max(ISLE_ORDER'daki sıra + 1, eski); listede olmayan görev değiştirmez. Var olan kayıtlarda büyük değer olduğu gibi kalır (açılmış adalar geri kilitlenmez, oyuncu bir şey kaybetmez). 5 bozma düştü (ilk turda bayrak denetimi sağ kaldı, test listedeki bir adayla güçlendirildi). TST-02 sırasında bulundu. ◐: oyunda ada haritası görülmedi."
+      "notlar": "Düzeltme: win ve bayrak (iki yazım da) 1 ise unlockedQuestIndex = max(ISLE_ORDER'daki sıra + 1, eski); listede olmayan görev değiştirmez. Var olan kayıtlarda büyük değer olduğu gibi kalır (açılmış adalar geri kilitlenmez, oyuncu bir şey kaybetmez). 5 bozma düştü (ilk turda bayrak denetimi sağ kaldı, test listedeki bir adayla güçlendirildi). TST-02 sırasında bulundu. ◐: oyunda ada haritası görülmedi. 12.11.2026: #73 birleşti (CI yeşil, sinama dahil)."
     }
   ]
 }
