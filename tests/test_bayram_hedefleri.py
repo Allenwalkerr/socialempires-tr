@@ -48,6 +48,7 @@ class Takvim(unittest.TestCase):
         self.assertNotEqual(h["orders"], 0)  # 0 olsa istemci atlar
         self.assertLess(h["orders"], min(x["orders"] for x in hedefler if x["orders"]))  # başa gelir
         self.assertEqual(h["types"], "built_id")
+        self.assertEqual(h["min_level"], 15)  # KAR-34: etkinlikler 15. seviyeden önce açılmaz
         params = json.loads(h["params"])
         self.assertEqual(sorted(params["ids"]), sorted(set(setler["Firavunlar"]) | set(setler["Mısır"])))
         self.assertEqual(params["ammount"], 1)

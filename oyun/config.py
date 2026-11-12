@@ -97,7 +97,10 @@ def hedefleri_ekle():
         for ad in (hedef.get("image"), hedef.get("characters")):
             if ad and ad != "none" and ad not in resimler:
                 resimler[ad] = ""
-    __game_config["goals"] = hedefler
+    from oyun import hedef_seviye
+    # DNT-51: istemci min_level'e bakmaz, order'la sıralar; seviyeler istemcinin açılış seviyelerine göre düzeltilir
+    __game_config["goals"] = hedef_seviye.duzenle(hedefler, __game_config.get("items", []),
+                                                 __game_config.get("globals", {}))
     print(f" * Hedefler yuklendi: {len(hedefler)}")
 
 
@@ -195,11 +198,12 @@ def etkinlik_penceresi(simdi=None):
     return gun_basi - 1, ETKINLIK_SURESI + 1
 
 
-def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
+def get_client_game_config(dil: str = "en", ascii_mode: bool = False, seviye: int = None) -> dict:
     """İstemciye gönderilecek config'i döndürür.
 
     - `dil` "tr" ise metinler Türkçeleştirilir (ceviri/tr.json).
     - Zaman ölçeği 1.0 değilse eşyaların süre alanları ölçeğe bölünür.
+    - `seviye` verilirse yalnızca o seviyeye gelmiş hedefler gider (DNT-51; istemci min_level'e bakmaz).
     Sunucunun kullandığı asıl config ve kayıtlar değiştirilmez.
     """
     olcek = zaman_olcegi()
@@ -213,7 +217,7 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     milli = takvim.milli_bayram()
     pencere = etkinlik_penceresi()
     anahtar = (dil, olcek, bool(ascii_mode), teklif and teklif["id"], takvim_setleri,
-               tuple(h["id"] for h in bayram), milli, pencere)
+               tuple(h["id"] for h in bayram), milli, pencere, seviye)
     if anahtar in __istemci_config_onbellegi:
         return __istemci_config_onbellegi[anahtar]
 
@@ -224,6 +228,9 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
     if bayram:  # GEC-07: süren etkinliklerin hedefleri (metinleri Türkçe yazılı; ASCII kipinde aşağıda çevrilir).
         # Resimleri goals.json'daki bir hedefinkidir; hedefleri_ekle onları zaten `images`'a koyar.
         kopya["goals"] = list(kopya.get("goals", [])) + bayram
+    if seviye is not None:
+        from oyun import hedef_seviye
+        kopya["goals"] = hedef_seviye.seviyeye_gore(kopya.get("goals", []), seviye)
     if dil == "tr" and ascii_mode:
         kopya = ascii_uygula(kopya)
     if teklif:
