@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #74 birleşti; TST-02 beşinci grup PR'da. Sırada TST-02 (25 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #75 birleşti. Sırada TST-02 (25 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
