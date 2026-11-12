@@ -5,6 +5,7 @@ kurulur (Adobe "SWF File Format Specification" v19, aşağıda "belge"). Beklene
 hesaplanmış formüllerden ya da gidiş-dönüş değişmezlerinden gelir; uygulamanın kendi çıktısından değil.
 """
 
+import json
 import os
 import shutil
 import struct
@@ -283,6 +284,26 @@ class BuyutmeTestleri(unittest.TestCase):
         self.assertEqual(sayi, 4)
         (_, _, icerik), _ = _etiketleri_ayir(_ac(cikti))
         self.assertEqual(icerik[len(abc) + 50:len(abc) + 54], b"\x02" * 4)
+
+
+class HarfiEksikYaziTipiTestleri(unittest.TestCase):
+    """DNT-37 (denetim TRA-05). 1.4.07 istemcisinde (yamalı SWF, DefineFont3 kod tablosu) Curse Casual JVE ve Freestyle
+    Script'te Ç ç Ğ ğ İ ı Ş ş yok; Arial Narrow'da yalnızca ACDEHIMNORSUY var. Bu yazı tiplerini kullanan alanlar:
+    703 "REMAINING QUESTS: 3" (oyun kodu da "REMAINING QUESTS: " + sayı yazar), 707 "10/100", 1353 "00:00:00"
+    (Curse Casual), 3213 "SN" (Arial Narrow). Sözlükten gelen çeviride harf eksikse swf_yama._yazi_tipini_uydur alanı
+    Arial Rounded'a geçirir; oyun kodunun çalışırken yazdığı dize ise geçirilemez, çevirisi bu harfler olmadan
+    seçilmelidir."""
+
+    CURSE_CASUAL_EKSIK = set("ÇçĞğİıŞş")
+
+    def test_sefer_sayaci_cevirisi_yazi_tipinin_harfleriyle(self):
+        with open(swf_yama.SOZLUK, encoding="utf-8") as f:
+            sozluk = json.load(f)
+        for kaynak in (sozluk["as3_dizeleri"], sozluk["metin_alanlari"]):
+            for anahtar in ("REMAINING QUESTS: ", "REMAINING QUESTS: 3"):
+                if anahtar in kaynak:
+                    self.assertFalse(set(kaynak[anahtar]) & self.CURSE_CASUAL_EKSIK, (anahtar, kaynak[anahtar]))
+        self.assertIn("REMAINING QUESTS: ", sozluk["as3_dizeleri"])  # çalışırken yazılan dize çevrili
 
 
 # --- swf_yama: DefineEditText ----------------------------------------------------------------------------

@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-37",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-40",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37 çürütüldü (koruma testi). Sırada DNT-40 (kayıt göçü denetimi), TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2222,13 +2222,13 @@
       "baslik": "Denetim TRA-05: Üç gömülü yazı tipinde (Curse Casual JVE, Freestyle Script, Arial Narrow) Türkçe harfler yok",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "curutuldu",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-05, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_swf_yama.py HarfiEksikYaziTipiTestleri",
       "pr": null,
       "onay": null,
-      "notlar": "Şimdilik kullanılmayan alanlarda; CEV-04'ten sonra o alanların çevrilip çevrilmediği denetlenmedi."
+      "notlar": "Şimdilik kullanılmayan alanlarda; CEV-04'ten sonra o alanların çevrilip çevrilmediği denetlenmedi. 12.11.2026 (✔ yamalı SWF tarandı): Curse Casual JVE ve Freestyle Script'te ÇçĞğİıŞş, Arial Narrow'da ACDEHIMNORSUY dışı yok. Bu yazı tiplerini kullanan 4 alan: 703 'KALAN SEFER: 3', 707 '10/100', 1353 '00:00:00' (Curse Casual), 3213 'SN' (Arial Narrow). Sayı ve saatler harf gerektirmiyor; sefer sayacının çevirisi (metin alanı ve oyun kodunun 'REMAINING QUESTS: ' dizesi) bu harflerle seçilmiş. Sözlükten gelen öteki çevirilerde eksik harf varsa _yazi_tipini_uydur alanı Arial Rounded'a geçiriyor. Görünür kusur yok. Koruma testi: sefer sayacının çevirisine Curse Casual'ın eksik harfi girerse düşer (2 bozma düştü; ASCII 'I' geçer)."
     },
     {
       "id": "DNT-38",
