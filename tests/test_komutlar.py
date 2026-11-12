@@ -541,6 +541,11 @@ class GorevVeBonusKomutlari(KomutTesti):
         self.assertEqual((h["idCurrentTreasure"], h["timestampLastTreasure"]), (1, 2_000_000_000))
         self.komut("collect_treasure", 0, 0, 30, 0, 0, 0)  # NUM_QUESTS dışı: görev değişmez
         self.assertEqual(h["idCurrentTreasure"], 1)
+        # MapInitializer$/setCorrectQuest @227-274: ödülsüz [0, 0, görev, 0, 0, townID] yalnızca görevi düzeltir; istemci
+        # timestampLastTreasure'a dokunmaz, bekleme süresi sıfırlanmamalı
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_999):
+            self.komut("collect_treasure", 0, 0, 5, 0, 0, 0)
+        self.assertEqual((h["idCurrentTreasure"], h["timestampLastTreasure"]), (5, 2_000_000_000))
 
     def test_teklif_paketi(self):
         self.kayit["playerInfo"]["cash"] = 100

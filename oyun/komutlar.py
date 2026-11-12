@@ -1420,7 +1420,10 @@ def collect_treasure(save, a):
     kaynak_ekle(save, h, "s", max(0, a.tam(4)))
     if 0 <= a.tam(2, -1) < HARITA_GOREVI_SAYISI:
         h["idCurrentTreasure"] = a.tam(2)
-    h["timestampLastTreasure"] = timestamp_now()
+    # Ödülsüz çağrı MapInitializer$/setCorrectQuest @227-274'ten gelir: yalnızca görev numarasını düzeltir, istemci
+    # zamana dokunmaz (#80 incelemesi). finalizeQuest'te altın seviyeye göre en az 250'dir (@123-283).
+    if a.tam(0) > 0 or a.tam(1) > 0 or a.tam(3) > 0 or a.tam(4) > 0:
+        h["timestampLastTreasure"] = timestamp_now()
 
 
 @komut("apply_rewards_ranking")

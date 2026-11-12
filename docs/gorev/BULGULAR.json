@@ -2683,7 +2683,7 @@
       "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
       "pr": "#80",
       "onay": null,
-      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir."
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma."
     },
     {
       "id": "KAR-33",
