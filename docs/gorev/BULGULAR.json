@@ -2489,6 +2489,19 @@
       "pr": null,
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "Yalnızca 0.06a ara sürümünde doğmuş ve göç yedeği olmayan makineye taşınmış kayıtları etkiler; kod değişmez."
+    },
+    {
+      "id": "TST-07",
+      "baslik": "Uçtan uca: depo, kalkan, savaş, bina, arazi; her biri F5 ve sert yeniden başlatmadan sonra (sahibinin isteği)",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "dogrulandi",
+      "isaret": "◐",
+      "kanit": "12.11.2026, scratchpad betikleri (depoda değil): uctan_uca.py ve f5_akis.js. Gerçek server.py süreci; oyunun yolladığı komutlar command.php'ye gönderildi. Her adımdan sonra: (a) sunucu SIGKILL ile öldürülüp açıldı ve get_player_info okundu: 18/18. (b) Oyun Chromium+Ruffle'da açıkken gerçek F5 yapıldı (sayfa yenilendi, oyun yeniden açıldı, yeni get_player_info karşılaştırıldı): 8 yükleme, sayfa hatası ve Ruffle paniği 0. Sonuçlar: Depo: add_unit_warehouse ve place_warehoused_item kalıcı, ikinci çıkarma çoğaltmıyor. Kalkan: buy_shield 1 → +24 sa ve -10 nakit; yeni oyuncu koruması varsa üstüne eklenir (ShieldManager/buyShield); ikinci kez alınamaz; kalkanlıyken 300 denemede bot akını 0, intikam seferi 0, kalkansız 18/300. Savaş ortasında F5: begin_attack_new kalkanı kaldırır (istemcinin kuralı), get_enemy_new 25 altın düşer; ganimet ve kayıp yok, saldırı hakkı harcanmaz. Savaş sonu F5: +600 altın, +400 odun, +40 xp kalıcı; kurbandan düşüldü, kurbanın günlüğünde. Bina: buy Ev II (48,47) → -60 odun, +6 xp, F5'te yerinde. Arazi: expand 12 gold → -4000 altın (expansion_prices[0]); aynı arazi ikinci kez para almaz; expand 14 cash → -25 nakit (expansion_prices[1]). İstemcinin fiyat sırası aynı (Base/purchaseLand: expansionPriceList[ownedGrid.length - 1]).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "◐: işlemler oyunun arayüzüne tıklanarak değil, oyunun yolladığı komutlarla yapıldı; ekranda kalkan göstergesi ve Ev II, ekran görüntüsünde Ruffle'ın donanım hızlandırma uyarısının altında ya da görüş dışında kaldı. Gerçek tablette elle deneme GEC-09'da."
     }
   ]
 }
