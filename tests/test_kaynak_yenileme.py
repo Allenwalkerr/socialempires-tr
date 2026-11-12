@@ -64,6 +64,15 @@ class GundeBir(unittest.TestCase):
         session(self.uid)["privateState"]["kaynakYenilemeGunu"] = {"0": "2000-01-01", "1": "2000-01-01"}  # ertesi gün
         self.assertEqual(bayrak(), [1, 1, 1])
 
+    def test_aralik_disi_kasaba_numarasi_yuklenen_kasabaya_yazilir(self):
+        # get_player_info aralık dışı map'i 0. kasabaya indirir (oyun/oyuncu.py); gün de 0. kasabanın olmalı
+        tarayici = server.app.test_client()
+        tarayici.post("/", data={"USERID": self.uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        for numara in (7, -1):
+            tarayici.post(INFO, data={"USERID": self.uid, "map": numara})
+        self.assertEqual(set(session(self.uid)["privateState"]["kaynakYenilemeGunu"]), {"0"})
+        self.assertEqual(tarayici.get(CONFIG).get_json()["globals"]["NUM_TREE_CLUSTERS"][0], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

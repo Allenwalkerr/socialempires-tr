@@ -97,11 +97,16 @@ def kaynak_bayraklari(kayit, bugun=None):
 
 def kaynak_yenilendi(kayit, kasaba, bugun=None):
     """Kendi kasabasının haritası yüklendi (get_player_info): o kasabanın yenilenme günü bugün. Gün config'te değil
-    burada yazılır: config'ten sonra yarıda kalan açılış günü harcamaz (#82 incelemesi). Kilit altında çağrılır."""
+    burada yazılır: config'ten sonra yarıda kalan açılış günü harcamaz (#82 incelemesi). Kilit altında çağrılır.
+    Gün değiştiyse True (kayıt yazılmalı)."""
     from oyun.config import yerel_bugun
     gunler = _kaynak_gunleri(kayit)
-    gunler[str(int(kasaba))] = (bugun or yerel_bugun()).isoformat()
+    anahtar, gun = str(int(kasaba)), (bugun or yerel_bugun()).isoformat()
+    if gunler.get(anahtar) == gun and kayit.get("privateState", {}).get(KAYNAK_GUNU) is gunler:
+        return False
+    gunler[anahtar] = gun
     kayit.setdefault("privateState", {})[KAYNAK_GUNU] = gunler
+    return True
 
 
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
@@ -131,8 +136,11 @@ def get_player_info_response():
         with save_lock:  # get_player_info günlük ödülü kayda yazabilir (KAR-24): komutlarla aynı kilit
             yer_bildir(uid, True)  # DNT-49: kendi adası yüklendi
             kompu_donemini_guncelle(kayit)
-            kaynak_yenilendi(kayit, harita_no)
-            return (get_player_info(uid, harita_no), 200)
+            yanit = get_player_info(uid, harita_no)
+            # yüklenen kasaba: get_player_info aralık dışı numarayı 0'a indirir (#82 incelemesi)
+            if kaynak_yenilendi(kayit, kayit["playerInfo"].get("acik_kasaba", 0)):
+                save_session(uid)  # gün hemen kalıcı olsun (komut gelmeden sunucu kapanabilir)
+            return (yanit, 200)
     if gecerli_uid(uid):
         # DNT-49: Base/realLoadMap @129-169 user'ı yalnızca loadMapParams.userId doluysa ekler: komşu ya da görev haritası
         yer_bildir(uid, kullanici == uid)
