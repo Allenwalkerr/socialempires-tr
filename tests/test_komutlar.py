@@ -190,6 +190,58 @@ class EsyaKomutlari(KomutTesti):
             self.komut("next_step", 6)
         self.assertEqual((self.cash, self.ps["stepNumber"], self.ps["timeStampTakeCare"]), (94, 3, 2_000_000_000))
 
+    def test_yuva_acma_kapama_ve_sonraki(self):
+        """TST-02. 1.4.07 PopupInactiveNest/goBuy: bedel globals.ACTIVATE_DRAGON_NEST_CASH/GOLD ya da
+        ACTIVATE_MONSTER_NEST_CASH/GOLD (ekranda düşer); activate_dragon/activate_monster [CostType] yollar ve
+        privateState.dragonNestActive / monsterNestActive = 1 yapar. Yuva kapanınca ve sonraki ejderhaya geçilince adım
+        sayacı sıfırlanır, damga ≤ 0 (NestsManager/check: adım hazır). Config: 50 nakit, 100000 altın."""
+        from oyun.config import get_game_config
+        g = get_game_config()["globals"]
+        self.harita["coins"] = 300000
+        self.komut("activate_dragon", "c")
+        self.komut("activate_monster", "g")
+        self.assertEqual((self.cash, self.harita["coins"]),
+                         (100 - int(g["ACTIVATE_DRAGON_NEST_CASH"]), 300000 - int(g["ACTIVATE_MONSTER_NEST_GOLD"])))
+        self.assertEqual((self.ps["dragonNestActive"], self.ps["monsterNestActive"]), (1, 1))
+        self.ps.update(stepNumber=4, dragonNumber=1)
+        self.komut("next_dragon")
+        self.assertEqual((self.ps["stepNumber"], self.ps["dragonNumber"]), (0, 2))
+        self.assertLessEqual(self.ps["timeStampTakeCare"], 0)
+        self.komut("desactivate_dragon")
+        self.assertEqual((self.ps["dragonNestActive"], self.ps["stepNumber"], self.ps["dragonNumber"]), (0, 0, 0))
+        # bedel her yuvanın kendi anahtarından okunur (config değişirse istemciyle birlikte değişir)
+        from unittest import mock
+        sahte = dict(g, ACTIVATE_DRAGON_NEST_CASH=7, ACTIVATE_MONSTER_NEST_CASH=9,
+                     ACTIVATE_DRAGON_NEST_GOLD=11, ACTIVATE_MONSTER_NEST_GOLD=13)
+        with mock.patch.object(self.komutlar, "globals_", lambda: sahte):
+            once = self.cash
+            self.komut("activate_dragon", "c")
+            self.assertEqual(once - self.cash, 7)
+            self.komut("activate_monster", "c")
+            self.assertEqual(once - self.cash, 16)
+            altin = self.harita["coins"]
+            self.komut("activate_dragon", "g")
+            self.assertEqual(altin - self.harita["coins"], 11)
+            self.komut("activate_monster", "g")
+            self.assertEqual(altin - self.harita["coins"], 24)
+
+    def test_tapinak_adimi(self):
+        """TST-02. 1.4.07 PopupBahamutSupremeInvocationTemple/doAction: next_temple_step [JSON veri, adım]. RESOURCES_SUBSTRACT
+        adımında veri _configTemple[adım].data'dır ({tür: miktar}, mana dahil) ve istemci ekranda düşer (@598-744);
+        SACRIFICE_UNIT'te {"u": birim} gider, birimi MapInitializer$/removeFromMapNoResources ayrı bir sell
+        [.., PARAM_DONT_MODIFY_RESOURCES] ile kaldırır; COMPLETE_COLLECTION'da {"collection": c} gider, parça harcanmaz.
+        privateState.templeStep'e adım eklenir."""
+        from unittest import mock
+        self.ps["mana"] = 10
+        altin = self.harita["coins"]
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_000):
+            self.komut("next_temple_step", json.dumps({"g": 5000, "m": 3}), 2)
+        self.assertEqual((altin - self.harita["coins"], self.ps["mana"], self.ps["templeStep"], self.ps["timeStampTemple"]),
+                         (5000, 7, [2], 2_000_000_000))
+        self.komut("next_temple_step", json.dumps({"u": 512}), 3)  # kurban: kaynak değişmez (birim sell ile gider)
+        self.komut("next_temple_step", json.dumps({"collection": 4}), 4)
+        self.assertEqual((altin - self.harita["coins"], self.ps["mana"], self.ps["templeStep"]), (5000, 7, [2, 3, 4]))
+
     def test_depoya_gecersiz_adet_eklenmez(self):
         self.komut("end_survival", 1, 30, json.dumps({"523": -1, "-2": 1}))
         self.assertEqual(self.ps["gifts"], [])
