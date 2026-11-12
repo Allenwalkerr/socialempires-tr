@@ -240,6 +240,51 @@ class AbcDizeTestleri(unittest.TestCase):
         self.assertEqual(yeni, t.replace(_dize("Cargando"), _dize("Yükleniyor")))
 
 
+class BuyutmeTestleri(unittest.TestCase):
+    """DNT-35 (denetim TRA-02): AS3 toUpperCase Türkçe kuralı bilmez ("Değirmen" → "DEĞIRMEN"). Kaynak 1.4.07 bayt
+    kodu (araclar/abc_okur.py ile okundu): PopUpCollectionComplete/<kurucu> @45 getlocal_0, getlocal_1, getproperty
+    name (multiname 158), @50 callproperty toUpperCase (2767) 0, @54 initproperty buildingStringName (10828); öteki
+    büyütmeler @140, @198, @216. İşlem kodları AVM2 overview: getlocal_0 0xd0, getlocal_1 0xd1, getproperty 0x66,
+    callproperty 0x46, initproperty 0x68, nop 0x02."""
+
+    CAGRI = b"\x46" + _u30(2767) + _u30(0)
+
+    def _kod(self, capa_sayisi=1, bozuk=None):
+        capa = b"\xd0\xd1\x66" + _u30(158) + self.CAGRI + b"\x68" + _u30(10828)
+        kod = bytearray(b"\x01" * 300)  # 0x01 = bkpt: dolgu, çağrı değil
+        kod[45:45 + len(capa)] = capa
+        for yer in (140, 198, 216):
+            kod[yer:yer + 4] = self.CAGRI
+        kod[260:264] = self.CAGRI  # yöntemin dışındaki bir büyütme (ör. StringUtil): dokunulmaz
+        if bozuk:
+            kod[bozuk:bozuk + 4] = b"\x01" * 4
+        kod = bytes(kod)
+        return kod + capa * (capa_sayisi - 1)
+
+    def test_tebrik_penceresinin_dort_buyutmesi_kalkar(self):
+        yeni, sayi = swf_yama.buyutmeyi_kaldir(self._kod())
+        self.assertEqual(sayi, 4)
+        self.assertEqual(len(yeni), 300)  # bayt kaymaz: atlama hedefleri bozulmaz
+        for yer in (50, 140, 198, 216):
+            self.assertEqual(yeni[yer:yer + 4], b"\x02" * 4, yer)
+        self.assertEqual(yeni[260:264], self.CAGRI)
+        eski = self._kod()
+        degisen = [i for i in range(300) if yeni[i] != eski[i]]
+        self.assertEqual(degisen, [y + k for y in (50, 140, 198, 216) for k in range(4)])
+
+    def test_capa_yoksa_iki_kezse_ya_da_bir_yer_uymazsa_dokunmaz(self):
+        for kod in (self._kod(capa_sayisi=2), self._kod(bozuk=198), self._kod(bozuk=216), self.CAGRI * 3):
+            self.assertEqual(swf_yama.buyutmeyi_kaldir(kod), (kod, 0))
+
+    def test_turkcelestir_dizesiz_doabc_de_yamalar(self):
+        abc = _do_abc(["Loading"])
+        girdi = _swf(_etiket(82, abc + self._kod()), surum=13)
+        cikti, sayi = swf_yama.turkcelestir(girdi, {"metin_alanlari": {}})
+        self.assertEqual(sayi, 4)
+        (_, _, icerik), _ = _etiketleri_ayir(_ac(cikti))
+        self.assertEqual(icerik[len(abc) + 50:len(abc) + 54], b"\x02" * 4)
+
+
 # --- swf_yama: DefineEditText ----------------------------------------------------------------------------
 
 class EditTextTestleri(unittest.TestCase):

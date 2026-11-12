@@ -1970,6 +1970,40 @@ KOLEKSIYON_ODULU = {
 }
 
 
+TEKIL_KOLEKSIYONLAR = (21, 22)  # CollectableManager.arUniqueCollections (sınıf kurucusu @1973-1982)
+SUS_ALT_KATEGORISI = 411  # Constants.SUBCATFUNC_BUILDING_DECO
+
+
+def _takas_olur(save, c, odul):
+    """Parçalarla takas (popupCollections/onExchange) istemcide yalnızca şu iki denetim geçerse gider; sunucu aynısını
+    uygular, tekrarlanan ya da bozuk komut ödülü ikinci kez vermesin (DNT-20'nin koleksiyon karşılığı):
+    - CollectableManager$/checkCollectionComplete: beş parçanın her biri > 0; tekil koleksiyonun ödülü depodaysa olmaz.
+    - CollectableManager$/checkCanComplete: tekil koleksiyonda yalnızca depoya bakar; öteki ödül süsse olur, birim ya da
+      binaysa depoda, birimse kasabada ya da bir binanın içinde tek bir tanesi bile varsa olmaz (AVISO_UNIDAD_UNICA)."""
+    parcalar = _koleksiyon(save, c)
+    if any(int(p or 0) <= 0 for p in parcalar[1:6]):
+        return False
+    gifts = save["privateState"].get("gifts")
+    depoda = gifts[odul] if isinstance(gifts, list) and len(gifts) > odul else 0
+    if c in TEKIL_KOLEKSIYONLAR:  # checkCanComplete @59-106: yalnızca depoya bakıp döner; kasabadaki ejderha engel değil
+        return depoda < 1
+    esya = get_item_from_id(odul) or {}
+    if int(esya.get("subcat_functional") or 0) == SUS_ALT_KATEGORISI:
+        return True
+    if esya.get("type") not in ("u", "b"):
+        return False
+    if depoda >= 1:
+        return False
+    if esya.get("type") != "u":
+        # Süs olmayan bina (yalnızca 1410 Bahamut Kalbi): istemci kasabada arPlayerIsoFightingElements'e bakar; binanın
+        # orada olup olmadığı doğrulanmadı. Sunucu istemciden katı olursa ekranda verilen ödül kayda yazılmaz; yalnızca
+        # depo denetlenir.
+        return True
+    # IsoEngine/countPlayerElementsById: kasabadaki birimler ve kapasiteli binaların içindekiler (vUnitsContained).
+    h = harita(save, acik_kasaba(save["playerInfo"].get("pid"), save))
+    return not any(e[0] == odul or (len(e) > 6 and isinstance(e[6], list) and odul in e[6]) for e in h["items"])
+
+
 @komut("finish_collection")
 def finish_collection(save, a):
     """[koleksiyon, (cash_ile=1, cash)] - parçalarla (popupCollections/onExchange) ya da cash ile (onBuy).
@@ -1978,10 +2012,13 @@ def finish_collection(save, a):
     konur (üçüncü argüman false: komut gönderilmez, KMT-05), arCollected[c][0] = true olur (yüklemede
     collections[c][0] == 1'den kurulur, Base/processAttacks) ve sıfırdan büyük her parça bir azalır."""
     c = a.tam(0)
-    if a.tam(1) == 1:
-        cash_ekle(save, -max(0, a.tam(2)))
     odul = KOLEKSIYON_ODULU.get(c)
     if odul is None:
+        return
+    if a.tam(1) == 1:  # popupCollections/onBuy: yalnızca nakit yeterliliği (canAfford) denetlenir
+        cash_ekle(save, -max(0, a.tam(2)))
+    elif not _takas_olur(save, c, odul):
+        print(f" ! finish_collection {c}: istemcinin takas kosulu saglanmiyor, uygulanmadi")
         return
     parcalar = _koleksiyon(save, c)
     parcalar[0] = 1
