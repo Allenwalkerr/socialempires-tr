@@ -22,7 +22,7 @@ from oyun.ekonomi import Yetersiz, apply_collect, apply_collect_xp, apply_cost, 
 from oyun.kayit import all_saves_userid, neighbor_session, save_session, session
 from oyun.oyuncu import acik_kasaba
 from oyun.yollar import VILLAGES_DIR
-from oyun.zaman import zaman_olcegi
+from oyun.zaman import olcekle, zaman_olcegi
 
 KOMUTLAR = {}
 
@@ -668,10 +668,7 @@ def egitim_suresi(birim, ruh_karistirici=False):
         sayi = float(deger)
     except (TypeError, ValueError):
         return 0
-    olcek = zaman_olcegi()
-    if sayi > 0 and olcek != 1.0:
-        sayi = float(f"{sayi / olcek:.6g}")
-    return int(sayi)
+    return int(olcekle(sayi, zaman_olcegi()))
 
 
 def egitim_bedeli(h, birim):

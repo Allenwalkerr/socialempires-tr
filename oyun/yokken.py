@@ -148,8 +148,8 @@ def uretim_suresi(esya, bina, degiskenler):
     if _tam(esya[0]) in degiskenler:
         cp = _tam(esya[7].get("cp")) if len(esya) > 7 and isinstance(esya[7], dict) else 0
         return COLLECT_MINUTES[cp - 1] * 60 if 1 <= cp <= len(COLLECT_MINUTES) else 0
-    olcek = zaman_olcegi()
-    return float(f"{sabit / olcek:.6g}") if olcek != 1.0 else sabit
+    from oyun.zaman import olcekle
+    return olcekle(sabit, zaman_olcegi())
 
 
 def uretimler(kayit):
