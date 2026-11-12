@@ -368,7 +368,12 @@ def kill(save, a):
     h = harita(save, a.tam(3))
     esya = esya_bul(h, a.tam(0), a.tam(1), a.tam(2))
     if esya:
-        apply_collect_xp(h, esya[0])
+        # Tükenen çiftlik (TST-02): IsoElement/collect @3576-3675 odun yetmeyince çiftliği SELL_REASON_FARM_DEPLETED ile
+        # kaldırır ve yalnızca kill yollar; local12 false olduğu için collect_xp'yi veren @3805-3831 atlanır. Çiftlik
+        # oyuncunun kendi binasıdır; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill
+        # yollar (@1062-1091). Bu yüzden çiftliğin kill'i xp vermez.
+        if str((get_item_from_id(esya[0]) or {}).get("subcat_functional")) != SUBCATFUNC_BUILDING_FARM:
+            apply_collect_xp(h, esya[0])
         h["items"].remove(esya)
 
 
