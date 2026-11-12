@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #71 birleşti; DNT-43 ve TST-02'nin ikinci grubu PR'da. Sırada TST-02 (40 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #72 birleşti. Sırada TST-02 (40 testsiz komut; kill'in ölen birim ve düşman binası xp'si açık), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2547,13 +2547,13 @@
       "baslik": "Hediye kutusundan yerleştirilen eşyanın xp'si (seviye heykelinde seviye) kayda yazılmıyordu",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "1.4.07 Base/sendPlaceItemCmd: giftId yolunda (place_gift) istemci xp verir: Level Up Statue (1478, Constants.ID_BUILDING_LEVELUP_STATUE) için uiExpMax − iExperience (@59-84), öteki eşyalarda selectedBuilding.xp (@131-145); komut xp taşımaz. place_stored_item yolu (@352-405) xp vermez. Sunucu iki komutu tek işleyicide işliyor ve hiç xp vermiyordu: ekranda kazanılan xp (heykelde bir seviye) yenilemede kayboluyordu.",
       "test": "tests/test_komutlar.py test_hediye_yerlestirme_xp_verir_depodan_yerlestirme_vermez",
-      "pr": null,
+      "pr": "#72",
       "onay": null,
-      "notlar": "place_gift ve place_stored_item ayrıldı. place_gift xp'yi buy gibi eşyanın konduğu kasabanın haritasına yazar; heykelde config.seviye_araligi(level)[1] − xp (istemcinin uiExpMax'ı), eksiye düşmez. 4 bozma düştü. TST-02 sırasında bulundu. ◐: heykelin ekranda seviye atlatışı ile sunucunun level_up akışı birlikte oyunda denenmedi."
+      "notlar": "place_gift ve place_stored_item ayrıldı. place_gift xp'yi buy gibi eşyanın konduğu kasabanın haritasına yazar; heykelde config.seviye_araligi(level)[1] − xp (istemcinin uiExpMax'ı), eksiye düşmez. 4 bozma düştü. TST-02 sırasında bulundu. ◐: heykelin ekranda seviye atlatışı ile sunucunun level_up akışı birlikte oyunda denenmedi. 12.11.2026: #72 birleşti (CI yeşil; sinama ilk denemede emülatör çöküşüyle düştü, S-72, yeniden çalıştırınca geçti)."
     }
   ]
 }
