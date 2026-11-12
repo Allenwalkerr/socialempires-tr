@@ -2762,6 +2762,19 @@
       "pr": "#80",
       "onay": null,
       "notlar": "ceviri/tr.json mission:56:aciklama: 'Asker ve köylülerinle nüfusunu 40'a çıkar (sağ üstteki sayıların soldaki). Ev kurmak yalnızca sınırı artırır; birim eğitmelisin!'. Kod değişmedi; istemcinin kuralı doğru."
+    },
+    {
+      "id": "DNT-53",
+      "baslik": "Çevrimdışı paket sayfasında indirme bitince 'paket iniyor...' yazısı kalıyordu",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026): iki çubuk dolu, ikisi de 'İndi', altta 'Tam paket iniyor...'. templates/cevrimdisi.html goster(): calisiyor true iken ileti yazılıyor, false olunca yalnızca hata ya da başarısız dosya varsa değiştiriliyordu; başarılı bitişte eski yazı kalıyordu.",
+      "test": "tests/js/cevrimdisi.test.js",
+      "pr": "#81",
+      "onay": null,
+      "notlar": "Bitince 'İndirme bitti.', durdurulunca boş. Düzeltme kaldırılınca iki test de düşüyor."
     }
   ]
 }

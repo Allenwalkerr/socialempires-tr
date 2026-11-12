@@ -67,6 +67,10 @@
                 if (d.calisiyor) ileti.textContent = (d.paket === "tam" ? "Tam" : "Temel") + " paket iniyor...";
                 else if (d.hata) ileti.textContent = "İndirme durdu: " + d.hata;
                 else if (d.basarisiz) ileti.textContent = SAYI.format(d.basarisiz) + " dosya inemedi; internet bağlantısını denetleyip yeniden başlatın.";
+                else {  // biten ya da durdurulan indirmenin "iniyor" yazısı kalmasın
+                    var p = d.paket && d.paketler[d.paket];
+                    ileti.textContent = p && p.inen_dosya >= p.dosya ? "İndirme bitti." : "";
+                }
                 clearTimeout(zamanlayici);
                 if (d.calisiyor) zamanlayici = setTimeout(yokla, 1500);
             }
