@@ -2644,7 +2644,7 @@
       "test": "tests/test_exe.py; .github/workflows/windows.yml exe",
       "pr": "#78",
       "onay": null,
-      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü."
+      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma)."
     },
     {
       "id": "KAR-32",

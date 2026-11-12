@@ -70,6 +70,21 @@ class IlkAcilis(unittest.TestCase):
                                                 os.path.join(self.taban, "ayarlar.json")])
 
 
+class YazilamayanKlasor(unittest.TestCase):
+    def test_hata_yazilir_ve_pencere_bekler(self):
+        """#78 incelemesi: .exe yazılamayan klasörden açılırsa (PermissionError) konsol iletisi okunmadan kapanmasın."""
+        giris = yukle("exe_giris")
+        with mock.patch.object(giris, "hazirla", side_effect=PermissionError("erisim engellendi")), \
+                mock.patch.object(giris.sys, "stdin") as stdin, mock.patch("builtins.input") as bekle, \
+                mock.patch("builtins.print") as yaz:
+            stdin.isatty.return_value = True
+            with self.assertRaises(SystemExit) as son:
+                giris.main()
+        self.assertEqual(son.exception.code, 1)
+        bekle.assert_called_once()
+        self.assertIn("yazilamadi", " ".join(str(a) for c in yaz.call_args_list for a in c.args))
+
+
 class Paketleme(unittest.TestCase):
     def setUp(self):
         self.paket = yukle("exe_paketi")

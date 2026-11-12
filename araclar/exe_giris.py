@@ -64,11 +64,19 @@ def main():
         os.system("title Social Empires Sunucusu")
     print("Social Empires Turkce: oyun tarayicida kendiliginden acilacak:", ADRES)
     print("Oyunu kapatmak icin bu pencereyi kapatin.")
-    hazirla()
-    from oyun import ruffle
-    if not ruffle.hazir_mi() and os.path.exists(RUFFLE_PAKETI):
-        with open(RUFFLE_PAKETI, "rb") as f:
-            ruffle.hazirla(f.read())  # SHA-512 denetlenir; olmazsa ilk oyunda internetten indirilir
+    try:
+        hazirla()
+        from oyun import ruffle
+        if not ruffle.hazir_mi() and os.path.exists(RUFFLE_PAKETI):
+            with open(RUFFLE_PAKETI, "rb") as f:
+                ruffle.hazirla(f.read())  # SHA-512 denetlenir; olmazsa ilk oyunda internetten indirilir
+    except OSError as hata:
+        # .exe yazılamayan klasörde (Program Files, salt okunur USB, kilitli eşitleme klasörü): pencere hemen kapanmasın
+        print(f"\nHATA: {TABAN} klasorune yazilamadi ({hata}).")
+        print("Kayitlar programin yaninda durur: .exe'yi yazilabilir bir klasore (or. Belgeler) tasiyip yeniden acin.")
+        if sys.stdin is not None and sys.stdin.isatty():
+            input("Kapatmak icin Enter'a basin...")
+        raise SystemExit(1)
     if not os.environ.get("SE_TARAYICI_ACMA"):
         threading.Thread(target=tarayiciyi_ac, name="tarayici", daemon=True).start()
     from oyun.sunucu import calistir
