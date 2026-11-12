@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-25",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti. Sırada kalan denetim bulguları (DNT-25, 27, 29, 32, 33, 35, 36, 37, 40), TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-27",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti; DNT-25, 29, 36 ve HIZ-04 PR'da. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2450,6 +2450,19 @@
       "pr": null,
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "'Günde bir' her yer (bina ya da teklif) için ayrı uygulandı: Asker Toplama'nın 4 yuvası 4 günde, boru 5 günde dolar."
+    },
+    {
+      "id": "HIZ-04",
+      "baslik": "Oyunda donma, kasma ya da çökme var mı (sahibinin isteği, 12.11.2026)",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "◐",
+      "kanit": "Masaüstü Chromium (Playwright, swiftshader yazılım GPU) ile ölçüldü, 12.11.2026. Betik: scratchpad dayaniklilik.js, depoda değil. Oyun 7 dakika açık tutuldu, 15 saniyede bir haritaya tıklandı ve ölçüm alındı. Sonuçlar: sayfa hatası, Ruffle paniği, düşen istek ve sayfa çökmesi 0. JS belleği 5,8-7,9 MB arasında, büyüme yok. Kare hızı 10,1-11,1 arasında sabit; mutlak değer yazılım GPU'sunun, düşüş yok. Sunucu tarafı (tests/ortak ile, 50 bot): dünya turu save_lock altında ortalama 29 ms, medyan 9 ms, en çok 109 ms (bot kayıtlarının yazıldığı 5. tur); istemci config'i ilk 103 ms, sonra önbellekten 1,5 ms; save_session 1-4 ms (DNT-33). track_game_status tarayıcıda 1 sn görünüyor ama sunucu 1-2 ms'de yanıtlıyor (curl); boş yanıtın kapanışı. Oyun beklemiyor. Açılışta her durum iki kez bildiriliyor; ruffle-player 1, get_game_config ve get_player_info birer kez, yani çift oyun kopyası yok.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "◐: gerçek tablet ve telefonda ölçülmedi. Yavaş cihazda dünya turunun kilidi birkaç kat uzar (100 ms → belki 0,5-1 sn, dakikada bir); fark edilirse tur kilitsiz hesaplanıp yalnızca yazım kilitlenir. Bilinen eski çökme yolları kapalı: DAG-07 (zayıf GPU'da WebGL çizici), DAG-08 (Ruffle 60 sn betik sınırı). Tablet denemesi GEC-09'da; sahibi donma görürse ne yaparken olduğunu söylerse oradan ölçülür."
     }
   ]
 }
