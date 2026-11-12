@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "TST-02",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37, DNT-40/41 PR'da. Sırada TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #71 birleşti; DNT-43 ve TST-02'nin ikinci grubu PR'da. Sırada TST-02 (40 testsiz komut), GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1370,7 +1370,7 @@
       "test": "tests/test_istemci_kaynakli.py, tests/test_degismezler.py",
       "pr": null,
       "onay": null,
-      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler."
+      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler. 12.11.2026 (2): buy_warehouse_capacity_single ve buy_pvp_territory (PopupUnitWarehouse/onBuyMoreSlots, PopupBuyTerritoryPvp/onBuy: globals fiyatları; 4 bozma düştü), increase_population (PlayerStatus/Init _mapInfo), place_stored_item ve place_gift (DNT-43) testli. Testsiz kalan 40 komut."
     },
     {
       "id": "TST-03",
@@ -2261,13 +2261,13 @@
       "baslik": "Kayıt göçü denetim alanı yarım kaldı",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "docs/denetim/kayit-goc.md başlığı 'Yarım rapor': dört bulgudan sonrası yazılmadı (surum.py göç adımları, tasima.py, kayit_yedek.py tam denetlenmedi). KAR-13 notu 'altı alanın raporu tamam' diyordu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
-      "pr": null,
+      "pr": "#71",
       "onay": null,
-      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı."
+      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "TST-06",
@@ -2521,26 +2521,39 @@
       "baslik": "Yedek yükleme ve Wi-Fi taşıma bot dünyasının yazılmamış değişikliklerini siliyordu (KYG-05)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "kayit_yedek.geri_yukle load_saved_villages()'dan önce dunya.etkin.bekleyenleri_yaz()'ı çağırmıyordu (sunucu.login çağırıyor). Test: bellekteki bot değişikliği yedek yüklemeden sonra kayboluyordu.",
       "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
-      "pr": null,
+      "pr": "#71",
       "onay": null,
-      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü."
+      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-42",
       "baslik": "Tükenen çiftliğin kill'i sunucuda toplama xp'si veriyordu, istemcide vermiyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "1.4.07 IsoElement/collect @3438-3675: çiftlikte odun yetmezse çiftlik SELL_REASON_FARM_DEPLETED ile kaldırılır, yalnızca kill gider; collect_xp'yi veren @3805-3831 local12 false olduğu için atlanır. Sunucu kill'de apply_collect_xp çağırıyordu (Pumpkin Crop: +2 xp fazla).",
       "test": "tests/test_komutlar.py test_tukenen_ciftligin_kill_i_xp_vermez",
+      "pr": "#71",
+      "onay": null,
+      "notlar": "kill çiftlikte (subcat 122) xp vermez. Çiftlik oyuncunun binası; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill yollar, başka yoldan çiftliğe kill gelmez. Bozma düştü. TST-02 sırasında bulundu. 12.11.2026: #71 birleşti (CI yeşil, sinama dahil)."
+    },
+    {
+      "id": "DNT-43",
+      "baslik": "Hediye kutusundan yerleştirilen eşyanın xp'si (seviye heykelinde seviye) kayda yazılmıyordu",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "1.4.07 Base/sendPlaceItemCmd: giftId yolunda (place_gift) istemci xp verir: Level Up Statue (1478, Constants.ID_BUILDING_LEVELUP_STATUE) için uiExpMax − iExperience (@59-84), öteki eşyalarda selectedBuilding.xp (@131-145); komut xp taşımaz. place_stored_item yolu (@352-405) xp vermez. Sunucu iki komutu tek işleyicide işliyor ve hiç xp vermiyordu: ekranda kazanılan xp (heykelde bir seviye) yenilemede kayboluyordu.",
+      "test": "tests/test_komutlar.py test_hediye_yerlestirme_xp_verir_depodan_yerlestirme_vermez",
       "pr": null,
       "onay": null,
-      "notlar": "kill çiftlikte (subcat 122) xp vermez. Çiftlik oyuncunun binası; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill yollar, başka yoldan çiftliğe kill gelmez. Bozma düştü. TST-02 sırasında bulundu."
+      "notlar": "place_gift ve place_stored_item ayrıldı. place_gift xp'yi buy gibi eşyanın konduğu kasabanın haritasına yazar; heykelde config.seviye_araligi(level)[1] − xp (istemcinin uiExpMax'ı), eksiye düşmez. 4 bozma düştü. TST-02 sırasında bulundu. ◐: heykelin ekranda seviye atlatışı ile sunucunun level_up akışı birlikte oyunda denenmedi."
     }
   ]
 }
