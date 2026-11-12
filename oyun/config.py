@@ -4,7 +4,7 @@ import os
 import time
 import jsonpatch
 from oyun.yollar import MODS_DIR, CONFIG_DIR, CONFIG_PATCH_DIR, json_oku
-from oyun.zaman import zaman_olcegi
+from oyun.zaman import metin as sure_metni, olcekle, zaman_olcegi
 from oyun.turkce import turkce_uygula, ascii_uygula
 
 __game_config = json_oku(os.path.join(CONFIG_DIR, "game_config_20120826.json"))
@@ -252,7 +252,7 @@ def get_client_game_config(dil: str = "en", ascii_mode: bool = False) -> dict:
                 except (TypeError, ValueError):
                     continue
                 if sayi > 0:
-                    esya[alan] = f"{sayi / olcek:.6g}"
+                    esya[alan] = sure_metni(olcekle(sayi, olcek))
         print(f" [+] Zaman olcegi {olcek}: uretim/insaat sureleri {olcek} kat kisaltildi")
 
     __istemci_config_onbellegi.clear()

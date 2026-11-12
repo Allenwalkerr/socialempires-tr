@@ -8,7 +8,7 @@ Neden: mutasyon ölçümünde (docs/TEST_OLCUMU.md) kalan mutantların en kalaba
 (`a.tam(2)` yerine `a.tam(1)`). Eski testler tek kasaba ve x = y olan eşyalarla (10,10), (20,20) yazıldığı için
 bunları göremiyordu. Burada her argümana ayrı bir değer verilir; ikinci kasaba vardır ve x ≠ y'dir.
 
-Sınama: `harita`, `esya_bul` ve `esya_ekle` izlenir. İstemci kasaba gönderiyorsa her `harita` çağrısı o kasabayı
+Sınama: `harita`, `esya_bul`, `bina_bul` (kimliksiz bina arama, DNT-29) ve `esya_ekle` izlenir. İstemci kasaba gönderiyorsa her `harita` çağrısı o kasabayı
 almalı; her (x, y) çifti bir `esya_bul`/`esya_ekle` çağrısına aynı sırayla gitmeli; çiftin eşya id'si de
 gönderiliyorsa `esya_bul` onu (ya da hiç id) almalı.
 """
@@ -143,8 +143,8 @@ class ArgumanSirasi(ortak.KomutTesti):
         super().setUp()
         self.cagrilar = []
         k = self.komutlar
-        self._asil = (k.harita, k.esya_bul, k.esya_ekle)
-        harita, esya_bul, esya_ekle = self._asil
+        self._asil = (k.harita, k.esya_bul, k.esya_ekle, k.bina_bul)
+        harita, esya_bul, esya_ekle, bina_bul = self._asil
 
         def harita_izle(save, town_id):
             self.cagrilar.append(("harita", town_id))
@@ -154,14 +154,19 @@ class ArgumanSirasi(ortak.KomutTesti):
             self.cagrilar.append(("bul", x, y, esya_id))
             return esya_bul(h, x, y, esya_id)
 
+        def bina_bul_izle(h, x, y):  # kimlik almaz: "id yok" ile aynı
+            self.cagrilar.append(("bul", x, y, None))
+            return bina_bul(h, x, y)
+
         def esya_ekle_izle(h, esya_id, x, y, yon=0):
             self.cagrilar.append(("ekle", x, y, esya_id))
             return esya_ekle(h, esya_id, x, y, yon)
 
-        k.harita, k.esya_bul, k.esya_ekle = harita_izle, esya_bul_izle, esya_ekle_izle
+        k.harita, k.esya_bul, k.esya_ekle, k.bina_bul = harita_izle, esya_bul_izle, esya_ekle_izle, bina_bul_izle
 
     def tearDown(self):
-        self.komutlar.harita, self.komutlar.esya_bul, self.komutlar.esya_ekle = self._asil
+        k = self.komutlar
+        k.harita, k.esya_bul, k.esya_ekle, k.bina_bul = self._asil
         super().tearDown()
 
     def test_istemcinin_kasaba_ve_koordinat_sirasi(self):

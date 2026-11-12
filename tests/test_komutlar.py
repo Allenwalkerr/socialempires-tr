@@ -228,6 +228,26 @@ class UretimKomutlari(KomutTesti):
         self.assertEqual(self.harita["items"][1][6], [])
         self.assertEqual(self.harita["items"][-1][:4], [512, 4, 4, 2])
 
+    def test_kimliksiz_bina_komutlari_karedeki_birimi_degil_binayi_bulur(self):
+        """DNT-29 (denetim SNK-06): orient/upgrade/push_unit/pop_unit'te istemci bina kimliği yollamaz (bayt kodu
+        argümanları, bu dosyanın öteki testleri). Birimler bina kapısında doğar: aynı karede önce birim olsa da komut
+        binaya (config type "b") gider."""
+        from oyun.config import get_item_from_id
+        self.assertEqual((get_item_from_id(512)["type"], get_item_from_id(19)["type"]), ("u", "b"))
+        birim = [512, 20, 20, 0, 0, 0]
+        self.harita["items"].insert(1, birim)  # liste sırasında binadan önce
+        bina = self.harita["items"][2]
+        self.komut("orient", 20, 20, 3, 0)
+        self.komut("upgrade", 20, 20, 0)
+        self.komut("push_unit", 3, 3, 513, 20, 20, 0)
+        self.assertEqual((bina[3], bina[5], bina[6]), (3, 1, [513]))
+        self.assertEqual(birim, [512, 20, 20, 0, 0, 0])
+        self.komut("pop_unit", 20, 20, 0, 513, 4, 4, 2)
+        self.assertEqual(bina[6], [])
+        self.harita["items"].remove(bina)
+        self.komut("orient", 20, 20, 2, 0)  # karede bina yoksa eskisi gibi ilk eşya
+        self.assertEqual(birim[3], 2)
+
     def test_birim_deposu(self):
         self.harita["items"].append([512, 3, 3, 0, 0, 0])
         self.komut("add_unit_warehouse", 3, 3, 0, 512)

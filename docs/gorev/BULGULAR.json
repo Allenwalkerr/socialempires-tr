@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KMT-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #66 birleşti. KMT-09 ve OYN-29 (KAR-29) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada kalan denetim bulguları (DNT-25, 27, 29, 32, 33, 35, 36, 37, 40), TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "DNT-27",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti; DNT-25, 29, 36 ve HIZ-04 PR'da. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1507,13 +1507,13 @@
       "baslik": "Asker Toplama ödülü çevrimdışı oyunda alınamıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "PopupRecruitment: işe al düğmesi si.length >= num_recruitments ise açılır; si yalnızca onFindFriend → ExternalInterface showPopupSEHelpSocialItem ile dolar, templates/js/oyun.js'te yok; btBuy hep gizli (createFotos@474).",
-      "test": "tests/test_bot_yardim.py (8 test)",
-      "pr": "#38",
+      "test": "tests/test_bot_yardim.py (8 test), tests/js/bot_yardimi.test.js (3 test)",
+      "pr": "#67",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
+      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09). 12.11.2026: #67 birleşti (sunucu komutu önceden #38'de) (CI yeşil; sinama'daki iki düşüş ortam, S-72). Ruffle'da uçtan uca deneme GEC-09'da."
     },
     {
       "id": "OYN-18",
@@ -2066,13 +2066,13 @@
       "baslik": "Denetim EKF-04: Zaman ölçeği yalnızca 4 süre alanını ölçekliyor; yüksek/düşük ölçekte bozuk değer",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-04, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_hiz.py OlcekliSure (3 test)",
       "pr": null,
       "onay": null,
-      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur."
+      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur. 12.11.2026 (✔ bayt kodu ve çalıştırma): üstel biçim istemcide bozulmuyor (StaticData/<kurucu> activation'ı parseFloat ile okur, training_time ve sm_training_time int yuvasında; ikisi de '1.728e+06'yı doğru okur), yani o kısım çürütüldü. Asıl sorun: int yuvası küsuratı atar; 10 katta (seçicinin en yükseği) 63 birimin eğitimi 0'a düşüp anında bitiyordu. zaman.olcekle: ölçekli süre en az 1 (tabanda 1'den kısa süre olduğu gibi kalır); zaman.metin üstel gösterimsiz yazar. config, komutlar.egitim_suresi ve yokken aynı yardımcıyı kullanır. Ölçeklenmeyen süreler (COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı, TIME_MACHINE) zaman.py'de belgelendi; istemci sabitleri. 4 bozma denemesinin 4'ü düştü."
     },
     {
       "id": "DNT-26",
@@ -2118,13 +2118,13 @@
       "baslik": "Denetim SNK-06: orient/upgrade/push_unit/pop_unit binayı yalnızca (x, y) ile buluyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-06, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_komutlar.py test_kimliksiz_bina_komutlari_karedeki_birimi_degil_binayi_bulur",
       "pr": null,
       "onay": null,
-      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir."
+      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü)."
     },
     {
       "id": "DNT-30",
@@ -2170,13 +2170,13 @@
       "baslik": "Denetim DPT-08: Profil resmi kaydın içinde (~400 KB); her komutta bütün kayıt yeniden yazılıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "curutuldu",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) DPT-08, docs/denetim/dunya-pvp-turnuva.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "oyun/profil.py kayit['profil_resmi'] base64; command() her pakette save_session (fsync). Ölçülmedi. Öneri: ayrı dosya."
+      "notlar": "oyun/profil.py kayit['profil_resmi'] base64; command() her pakette save_session (fsync). Ölçülmedi. Öneri: ayrı dosya. 12.11.2026 ölçüm (✔ bu makinede, ◐ Android'de ölçülmedi): yeni köy kaydı 2 KB; 256×256 tipik resimle (40 KB JPEG) kayıt 56 KB, save_session ortalama 1,00 → 1,39 ms; izin verilen en büyük resimle (300 KB, profil.EN_BUYUK) 402 KB, 1,00 → 3,69 ms (30 yazmanın ortalaması). Komutlar birkaç saniyede bir toplu geldiği için yük önemsiz. Resim bilerek kayıtta: yedek, Wi-Fi taşıma ve göç onu da götürür (oyun/profil.py belge dizesi). Ayrı dosyaya taşımak bu üç yolu değiştirir; yarar ölçülen yükü karşılamıyor. Android'de belirgin yavaşlık görülürse yeniden açılır."
     },
     {
       "id": "DNT-34",
@@ -2209,13 +2209,13 @@
       "baslik": "Denetim TRA-04: docs/RESIM_KAYNAKLARI.md silinmiş görselleri anlatıyor; templates/img'deki dosyaların kaynağı yazılı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-04, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması."
+      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli."
     },
     {
       "id": "DNT-37",
@@ -2287,13 +2287,13 @@
       "baslik": "Ada Ocağı ve viral teklifler yazıldı ama oyuncuya kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
+      "durum": "duzeltildi",
+      "isaret": "✔",
       "kanit": "docs/inceleme/1407-formuller.md iki yerde 'açılması ayrı karar'; config'te starts_at/duration 0. Komutlar GEC-03'te yazıldı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": "tests/test_bot_yardim.py (8 test)",
-      "pr": null,
+      "test": "tests/test_bot_yardim.py (8 test), tests/js/bot_yardimi.test.js (3 test)",
+      "pr": "#67",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
+      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09). 12.11.2026: #67 birleşti (CI yeşil; sinama'daki iki düşüş ortam, S-72). Ruffle'da uçtan uca deneme GEC-09'da."
     },
     {
       "id": "OYN-30",
@@ -2450,6 +2450,19 @@
       "pr": null,
       "onay": "Sahibi, 12 Kasım 2026",
       "notlar": "'Günde bir' her yer (bina ya da teklif) için ayrı uygulandı: Asker Toplama'nın 4 yuvası 4 günde, boru 5 günde dolar."
+    },
+    {
+      "id": "HIZ-04",
+      "baslik": "Oyunda donma, kasma ya da çökme var mı (sahibinin isteği, 12.11.2026)",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "◐",
+      "kanit": "Masaüstü Chromium (Playwright, swiftshader yazılım GPU) ile ölçüldü, 12.11.2026. Betik: scratchpad dayaniklilik.js, depoda değil. Oyun 7 dakika açık tutuldu, 15 saniyede bir haritaya tıklandı ve ölçüm alındı. Sonuçlar: sayfa hatası, Ruffle paniği, düşen istek ve sayfa çökmesi 0. JS belleği 5,8-7,9 MB arasında, büyüme yok. Kare hızı 10,1-11,1 arasında sabit; mutlak değer yazılım GPU'sunun, düşüş yok. Sunucu tarafı (tests/ortak ile, 50 bot): dünya turu save_lock altında ortalama 29 ms, medyan 9 ms, en çok 109 ms (bot kayıtlarının yazıldığı 5. tur); istemci config'i ilk 103 ms, sonra önbellekten 1,5 ms; save_session 1-4 ms (DNT-33). track_game_status tarayıcıda 1 sn görünüyor ama sunucu 1-2 ms'de yanıtlıyor (curl); boş yanıtın kapanışı. Oyun beklemiyor. Açılışta her durum iki kez bildiriliyor; ruffle-player 1, get_game_config ve get_player_info birer kez, yani çift oyun kopyası yok.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "◐: gerçek tablet ve telefonda ölçülmedi. Yavaş cihazda dünya turunun kilidi birkaç kat uzar (100 ms → belki 0,5-1 sn, dakikada bir); fark edilirse tur kilitsiz hesaplanıp yalnızca yazım kilitlenir. Bilinen eski çökme yolları kapalı: DAG-07 (zayıf GPU'da WebGL çizici), DAG-08 (Ruffle 60 sn betik sınırı). Tablet denemesi GEC-09'da; sahibi donma görürse ne yaparken olduğunu söylerse oradan ölçülür."
     }
   ]
 }

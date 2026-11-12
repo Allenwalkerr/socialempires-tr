@@ -22,7 +22,7 @@ from oyun.ekonomi import Yetersiz, apply_collect, apply_collect_xp, apply_cost, 
 from oyun.kayit import all_saves_userid, neighbor_session, save_session, session
 from oyun.oyuncu import acik_kasaba
 from oyun.yollar import VILLAGES_DIR
-from oyun.zaman import zaman_olcegi
+from oyun.zaman import olcekle, zaman_olcegi
 
 KOMUTLAR = {}
 
@@ -103,6 +103,20 @@ def esya_bul(h, x, y, esya_id=None):
         if esya[1] == x and esya[2] == y and (esya_id is None or esya[0] == esya_id):
             return esya
     return None
+
+
+def bina_bul(h, x, y):
+    """Kimlik taşımayan bina komutları (orient, upgrade, push_unit, pop_unit; istemci yalnızca x, y yollar) için: aynı
+    karede birden çok eşya varsa binayı (config type "b") seçer. Birimler bina kapısında doğduğundan aynı karede birim
+    olabilir; o zaman liste sırasındaki ilk eşya birim çıkıp yanlış eşya döner, yükselir ya da içine birim yazılırdı
+    (DNT-29, denetim SNK-06). Karede bina yoksa eskisi gibi ilk eşya."""
+    ilk = None
+    for esya in h["items"]:
+        if esya[1] == x and esya[2] == y:
+            if (get_item_from_id(esya[0]) or {}).get("type") == "b":
+                return esya
+            ilk = ilk or esya
+    return ilk
 
 
 def esya_ekle(h, esya_id, x, y, yon=0):
@@ -320,7 +334,7 @@ def move(save, a):
 @komut("orient")
 def orient(save, a):
     """[x, y, yon, kasaba]"""
-    esya = esya_bul(harita(save, a.tam(3)), a.tam(0), a.tam(1))
+    esya = bina_bul(harita(save, a.tam(3)), a.tam(0), a.tam(1))
     if esya:
         esya[3] = a.tam(2)
 
@@ -410,7 +424,7 @@ def store_add_items(save, a):
 @komut("upgrade")
 def upgrade(save, a):
     """[x, y, kasaba] - aynı binanın seviyesi bir artar."""
-    esya = esya_bul(harita(save, a.tam(2)), a.tam(0), a.tam(1))
+    esya = bina_bul(harita(save, a.tam(2)), a.tam(0), a.tam(1))
     if esya:
         ozellikler(esya)
         esya[5] = int(esya[5] or 0) + 1
@@ -601,7 +615,7 @@ def push_unit(save, a):
     """[birim_x, birim_y, birim_id, bina_x, bina_y, kasaba]"""
     h = harita(save, a.tam(5))
     birim_id = a.tam(2)
-    bina = esya_bul(h, a.tam(3), a.tam(4))
+    bina = bina_bul(h, a.tam(3), a.tam(4))
     if bina:
         ozellikler(bina)
         bina[6].append(birim_id)
@@ -615,7 +629,7 @@ def pop_unit(save, a):
     """[bina_x, bina_y, kasaba, birim_id, (x, y, yon)]"""
     h = harita(save, a.tam(2))
     birim_id = a.tam(3)
-    bina = esya_bul(h, a.tam(0), a.tam(1))
+    bina = bina_bul(h, a.tam(0), a.tam(1))
     if bina and len(bina) > 6 and birim_id in bina[6]:
         bina[6].remove(birim_id)
     if len(a) > 4:
@@ -668,10 +682,7 @@ def egitim_suresi(birim, ruh_karistirici=False):
         sayi = float(deger)
     except (TypeError, ValueError):
         return 0
-    olcek = zaman_olcegi()
-    if sayi > 0 and olcek != 1.0:
-        sayi = float(f"{sayi / olcek:.6g}")
-    return int(sayi)
+    return int(olcekle(sayi, zaman_olcegi()))
 
 
 def egitim_bedeli(h, birim):
