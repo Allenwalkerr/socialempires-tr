@@ -2833,13 +2833,13 @@
       "baslik": "Sağdaki teklif simgeleri (asma kilit, ateş yumurtası, sandık) sürekli parlıyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "◐",
       "kanit": "Sahibinin ekran görüntüsü (12.11.2026, seviye 6): 'aç beni' sandığı, parıltılı asma kilit, ateş yumurtası. Asma kilit ve yumurta viral teklif simgeleridir (SpecialDayOfferManager/checkViralButton: timeLeft > 0 ise eklenir); kayan 30 günlük pencereyle (KAR-29) herkese açıktı. KAR-34 uygulamasından (#81) sonra seviye 15'ten önce ve takvim dışında starts_at/duration 0: Chromium'da yeni köyde yalnızca 'aç beni' kaldı. Sandık FirstOfferButton (viral_icons'ta tek active 1 giriş, oyunun kendi ilk alım teklifi: 28 nakde 20K altın + 40K yemek).",
       "test": "tests/test_bot_yardim.py Pencere",
       "pr": "#81",
-      "onay": null,
-      "notlar": "Sandığın gizlenip gizlenmeyeceği sahibine soruldu (viral_icons FirstOfferButton active 0 yapılırsa simge ve teklif kalkar)."
+      "onay": "Sahibi, 12 Kasım 2026 ('1 ve 2'ye sen en iyi kararı ver')",
+      "notlar": "Sandığın gizlenip gizlenmeyeceği sahibine soruldu (viral_icons FirstOfferButton active 0 yapılırsa simge ve teklif kalkar). Karar: 'aç beni' sandığı kalır. Oyunun kendi ilk alım teklifi (viral_icons'ta açık tek giriş) ve oyuncuya değer veriyor; sahibini rahatsız eden parıltılı kilit ve yumurta simgeleri KAR-34 ile kalktı. İnceleme yorumları da aynı yetkiyle cevaplanıp kapatıldı (8 konuşma)."
     },
     {
       "id": "DNT-59",
