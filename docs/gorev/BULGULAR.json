@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "DNT-37",
-    "sonraki_adim": "Bulut oturumu 12.11.2026, sahibi kullanım sınırı yüzünden durdurdu. İlk iş: PR #70 (DNT-35, KMT-10) CI'ı yeşilse sahibine birleştirmeyi sor (KAR-19). Sonra DNT-37, 40, TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti. Sırada DNT-37, 40, TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2196,13 +2196,13 @@
       "baslik": "Denetim TRA-02: İstemci toUpperCase/toLowerCase ile Türkçe metni bozuyor (Değirmen → DEĞIRMEN)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-02, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_swf_yama.py BuyutmeTestleri (3 test)",
-      "pr": null,
+      "pr": "#70",
       "onay": null,
-      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok. 12.11.2026 (✔ bayt kodu): istemcide 11 toUpperCase var; ekrana Türkçe çıkan tek yer PopUpCollectionComplete/<kurucu>: bina adını buildingStringName'e (@50), POPUP_EDIFICIO_ENHORABUENA tebrik metnine (@140) ve vurgunun yerini bulan iki indexOf'a (@198, @216) büyüterek verir. Ötekiler: BaseButton/LabelButton 'selected' durum adı, StringUtil karşılaştırması, SelectionTeamWindow/formatFirstUppercase, JSONTokenizer, TournamentManager sonuç kodu; infoFriendAssistPopup AUX_ACEPTAR'ı büyütür (çeviri sözlüğünde bu anahtar yok, İngilizce). BuildingWindow/passFilter arama süzgecinde toLowerCase iki tarafa da uygulanır; ekrana çıkmaz, büyük İ ile aramada eşleşme kaçabilir (küçük etki, dokunulmadı). Düzeltme: swf_yama.buyutmeyi_kaldir o dört callproperty toUpperCase'i (4 bayt) nop yapar; ad 'Değirmen' yazılır, indexOf yine bulur. Çapa (getlocal_0 getlocal_1 getproperty name callproperty toUpperCase initproperty buildingStringName) gerçek SWF'de bir kez; uymazsa dokunulmaz. YAMA_SURUMU 8. Yamalı SWF Ruffle'da açıldı (oyun eğitim adımına kadar yüklendi, ✔). ◐: tebrik penceresi ekranda görülmedi (koleksiyon tamamlamak gerekiyor). 5 bozma denemesinin 5'i düştü."
+      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok. 12.11.2026 (✔ bayt kodu): istemcide 11 toUpperCase var; ekrana Türkçe çıkan tek yer PopUpCollectionComplete/<kurucu>: bina adını buildingStringName'e (@50), POPUP_EDIFICIO_ENHORABUENA tebrik metnine (@140) ve vurgunun yerini bulan iki indexOf'a (@198, @216) büyüterek verir. Ötekiler: BaseButton/LabelButton 'selected' durum adı, StringUtil karşılaştırması, SelectionTeamWindow/formatFirstUppercase, JSONTokenizer, TournamentManager sonuç kodu; infoFriendAssistPopup AUX_ACEPTAR'ı büyütür (çeviri sözlüğünde bu anahtar yok, İngilizce). BuildingWindow/passFilter arama süzgecinde toLowerCase iki tarafa da uygulanır; ekrana çıkmaz, büyük İ ile aramada eşleşme kaçabilir (küçük etki, dokunulmadı). Düzeltme: swf_yama.buyutmeyi_kaldir o dört callproperty toUpperCase'i (4 bayt) nop yapar; ad 'Değirmen' yazılır, indexOf yine bulur. Çapa (getlocal_0 getlocal_1 getproperty name callproperty toUpperCase initproperty buildingStringName) gerçek SWF'de bir kez; uymazsa dokunulmaz. YAMA_SURUMU 8. Yamalı SWF Ruffle'da açıldı (oyun eğitim adımına kadar yüklendi, ✔). ◐: tebrik penceresi ekranda görülmedi (koleksiyon tamamlamak gerekiyor). 5 bozma denemesinin 5'i düştü. 12.11.2026: #70 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-36",
@@ -2508,13 +2508,13 @@
       "baslik": "Koleksiyon takası istemcinin koşulunu denetlemiyordu: eksik parçayla ödül yeniden veriliyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Sahibinin 'koleksiyon işi nasıl' sorusu üzerine uçtan uca denendi (12.11.2026, gerçek sunucu ve tarayıcıda F5): parçalar tamamlanmadan gelen ikinci finish_collection [1] Piramit'i (176) yeniden verdi (gifts[176] 1 → 2). 1.4.07 bayt kodu: popupCollections/onExchange komutu yalnızca CollectableManager$/checkCollectionComplete (p1..p5'in her biri > 0; arUniqueCollections [21, 22] ödülü depodaysa olmaz) ve checkCanComplete (tekil koleksiyonda yalnızca depo; ödül süs, SUBCATFUNC_BUILDING_DECO 411, ise olur; birim ya da binaysa açık kasabada ya da depoda bir tanesi varsa olmaz, AVISO_UNIDAD_UNICA) geçerse yollar. popupCollections/onBuy yalnızca canAfford'a bakar.",
       "test": "tests/test_komutlar.py test_takas_istemcinin_kosulu_yoksa_uygulanmaz",
-      "pr": null,
+      "pr": "#70",
       "onay": null,
-      "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez. #70 incelemesi: istemci kasabada binaların içindeki birimleri de sayar (IsoEngine/countPlayerElementsById: vUnitsContained, ✔ bayt kodu); sunucu da sayar. Kasabadaki süs olmayan bina ödülünü (yalnızca 1410) istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements, ?): sunucu orada yalnızca depoya bakar, istemciden katı olup ödülü kaybettirmesin. 3 bozma daha düştü."
+      "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez. #70 incelemesi: istemci kasabada binaların içindeki birimleri de sayar (IsoEngine/countPlayerElementsById: vUnitsContained, ✔ bayt kodu); sunucu da sayar. Kasabadaki süs olmayan bina ödülünü (yalnızca 1410) istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements, ?): sunucu orada yalnızca depoya bakar, istemciden katı olup ödülü kaybettirmesin. 3 bozma daha düştü. 12.11.2026: #70 birleşti (CI yeşil, sinama dahil)."
     }
   ]
 }
