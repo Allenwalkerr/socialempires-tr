@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #77 birleşti; tek .exe ve depo toparlama (DAG-15, KAR-32) #78'de; Windows .exe'si o PR'ın CI'ında derlenip sınanır. Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #78 birleşti (TST-02 kapandı, DNT-46…49, tek .exe DAG-15). Sırada GEC-09: tablet denemesi ve v0.1.0 etiketi (etiket .exe, zip ve apk'yı sürüme yükler). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2638,13 +2638,13 @@
       "baslik": "Tek dosyalık Windows programı (.exe)",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "ci_bekliyor",
-      "isaret": "◐",
-      "kanit": "Sahibinin isteği (12.11.2026): 'tek bir .exe haline getir'. araclar/exe_paketi.py PyInstaller 6.11.1 --onefile ile üretir; giriş araclar/exe_giris.py. Yerelde Linux'ta aynı betikle tek dosyalık program üretildi (29 MB) ve boş klasörden açıldı (✔): 5 sn'de hazır, Ruffle 200, giriş sayfası 200; saves/, mods/, ayarlar.json programın yanında; modlar uygulandı (kompu, turnuva, yeni_icerik). Aynı programla tarayıcıda yeni köy açıldı, DNT-46 oyun içinde doğrulandı. Windows .exe'si CI'da (windows.yml exe işi) derlenip sınanacak: ◐ o kısım.",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibinin isteği (12.11.2026): 'tek bir .exe haline getir'. araclar/exe_paketi.py PyInstaller 6.11.1 --onefile ile üretir; giriş araclar/exe_giris.py. Yerelde Linux'ta aynı betikle tek dosyalık program üretildi (29 MB) ve boş klasörden açıldı (✔): 5 sn'de hazır, Ruffle 200, giriş sayfası 200; saves/, mods/, ayarlar.json programın yanında; modlar uygulandı (kompu, turnuva, yeni_icerik). Aynı programla tarayıcıda yeni köy açıldı, DNT-46 oyun içinde doğrulandı. Windows .exe'si #78 CI'ında windows-latest'te derlendi ve boş klasörden açılıp sınandı (✔): hazır, Ruffle ve giriş sayfası 200, saves/mods/ayarlar.json programın yanında, SHA-256 tutuyor.",
       "test": "tests/test_exe.py; .github/workflows/windows.yml exe",
       "pr": "#78",
       "onay": null,
-      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma). #78 CI (windows-latest) ilk derlemede yakaladı: çıktı dosyaya yönlendirilince kodlama cp1252, kayıt adındaki 'ı' programı düşürdü (S-77). exe_giris.konsolu_hazirla stdout/stderr'i UTF-8'e çevirir; test ve 2 bozma."
+      "notlar": "Zip de kalır (antivirüs .exe'yi engellerse). Kayıtlar .exe'nin yanında (KAR-32). Derleme araçları requirements-exe.txt'te sabit (DGV-08); pefile 2024.8.26'yı PyInstaller dışlar (S-76). 6 bozma düştü. #78 incelemesi: .exe yazılamayan klasörden açılırsa (Program Files, salt okunur USB) hata yazılır ve pencere Enter bekler; önce iletisiz kapanırdı (test ve bozma). #78 CI (windows-latest) ilk derlemede yakaladı: çıktı dosyaya yönlendirilince kodlama cp1252, kayıt adındaki 'ı' programı düşürdü (S-77). exe_giris.konsolu_hazirla stdout/stderr'i UTF-8'e çevirir; test ve 2 bozma. 12.11.2026: #78 birleşti."
     },
     {
       "id": "KAR-32",
