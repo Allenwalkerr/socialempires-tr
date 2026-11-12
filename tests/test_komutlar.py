@@ -89,6 +89,67 @@ class EsyaKomutlari(KomutTesti):
         self.komut("increase_population", 0)
         self.assertEqual(self.harita["increasedPopulation"], 2)
 
+    def test_yuva_ve_tapinak_adimi_nakitle(self):
+        """TST-02. 1.4.07: PopupDragons/clickGetnow, PopupMonstersNest/clickGetnow, PopupDragonRiderTraining/clickGetNow ve
+        PopupBahamutSupremeInvocationTemple$/clickGetnow nakdi ekranda düşer ve bedeli tek argümanla yollar; zaman damgası
+        sıfırlanır (tapınakta privateState.timeStampTemple = 0). Yuvada istemci 0 yazar; NestsManager/check ve
+        getDragonTimeLeft'e göre damga ≤ 0 iken adım hazırdır (kalan süre = adım − (şimdi − damga) < 0)."""
+        for komut, alan, bedel in (("buy_step_cash", "timeStampTakeCare", 7), ("buy_monster_step_cash", "timeStampTakeCareMonster", 5),
+                                   ("rider_buy_step_cash", "riderTimeStamp", 3)):
+            self.ps[alan] = 2_000_000_000
+            once = self.cash
+            self.komut(komut, bedel)
+            self.assertEqual(self.cash, once - bedel, komut)
+            self.assertLessEqual(self.ps[alan], 0, komut)
+        self.ps["timeStampTemple"] = 2_000_000_000
+        once = self.cash
+        self.komut("buy_temple_step_cash", 4)
+        self.assertEqual((self.cash, self.ps["timeStampTemple"]), (once - 4, 0))
+
+    def test_dart_atisi(self):
+        """TST-02. PopupDarts/onClickPlay: dartsHasFree değilse globals.DART_COST_CASH kadar nakit düşer; hitBalloon
+        darts_shoot_balloon [balon, dartsHasFree ? 0 : 1, gotExtraInThisThrow ? 1 : 0] yollar ve balonu dartsBalloonsShot'a
+        ekler; ödül storeItem(..., true) ile ayrı komutla gelir. Config: DART_COST_CASH."""
+        from oyun.config import get_game_config
+        bedel = int(get_game_config()["globals"]["DART_COST_CASH"])
+        once = self.cash
+        self.komut("darts_shoot_balloon", 3, 0, 0)  # bedava atış
+        self.assertEqual((self.cash, self.ps["dartsBalloonsShot"], self.ps["dartsHasFree"]), (once, [3], False))
+        self.komut("darts_shoot_balloon", 5, 1, 1)  # ücretli, ekstra
+        self.assertEqual((self.cash, self.ps["dartsBalloonsShot"], self.ps["dartsGotExtra"]), (once - bedel, [3, 5], True))
+
+    def test_gorev_sonu_ada_sirasi_ve_odul(self):
+        """DNT-44, TST-02. 1.4.07: Quest*/sendResults end_quest [JSON {map, resources {g, x}, win, quest_id, item_rewards,
+        set_unlocked_index, ...}] yollar; QuestBossGolem: quest_id QUEST_BOSS_GOLEM (100000003), item_rewards {"537": 1}
+        (ödülü storeItem(.., false, false) ile komutsuz depoya koyar), set_unlocked_index 1; QuestCollectable1-5: 0.
+        unlockedQuestIndex globals.ISLE_ORDER'da açık son adanın sırasıdır: PopupQuestsManager/<kurucu> @1207-1232 ada
+        kilitli = isLevelLocked || sıra > unlockedQuestIndex. Config ISLE_ORDER: 100000003 8. sırada (indeks 7)."""
+        from oyun.config import get_game_config
+        sira = [str(g) for g in get_game_config()["globals"]["ISLE_ORDER"]]
+        self.assertEqual(sira.index("100000003"), 7)
+        self.ps["unlockedQuestIndex"] = 2
+        altin, xp = self.harita["coins"], self.harita["xp"]
+        self.ps["gifts"] = []
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 150, "x": 30}, "win": True, "quest_id": 100000003,
+                                            "item_rewards": {"537": 1}, "set_unlocked_index": 1}))
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        self.assertEqual((self.harita["coins"] - altin, self.harita["xp"] - xp, self.ps["gifts"][537]), (150, 30, 1))
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000006,
+                                            "item_rewards": {}, "set_unlocked_index": 1}))  # sıra 0: geri düşmez
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000055,
+                                            "item_rewards": {}, "set_unlocked_index": 0}))  # koleksiyon görevi
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000092,
+                                            "item_rewards": {}, "set_unlocked_index": 0}))  # listedeki ada, bayrak 0
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": False, "quest_id": 100000092,
+                                            "item_rewards": {}, "set_unlocked_index": 1}))  # yenilgi
+        self.assertEqual(self.ps["unlockedQuestIndex"], 8)
+        # QuestBossDragon2/sendResults anahtarı iki noktalı yazar ('set_unlocked_index:', 1); QUEST_BOSS_DRAGON_2 100000033,
+        # ISLE_ORDER'da indeks 17
+        self.komut("end_quest", json.dumps({"map": 0, "resources": {"g": 0, "x": 0}, "win": True, "quest_id": 100000033,
+                                            "item_rewards": {}, "set_unlocked_index:": 1}))
+        self.assertEqual(self.ps["unlockedQuestIndex"], 18)
+
     def test_depoda_olmayan_esya_yerlestirilip_satilamaz(self):
         # tekrarlanan komut: depo boşken eşya çoğalmamalı, iade verilmemeli
         self.ps["gifts"] = [0, 1]
