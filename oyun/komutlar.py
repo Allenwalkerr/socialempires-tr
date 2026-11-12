@@ -1697,11 +1697,14 @@ def resurrect_hero(save, a):
 # Ejderha / canavar yuvası, binici, tapınak
 # ---------------------------------------------------------------------------
 
-def _yuva_etkinlestir(save, a, aktif_alan, sayac_alan):
+def _yuva_etkinlestir(save, a, aktif_alan, sayac_alan, yuva):
+    """PopupInactiveNest/goBuy: bedel globals.ACTIVATE_<DRAGON|MONSTER>_NEST_<CASH|GOLD>'dan (istemci ekranda düşer,
+    komut yalnızca ödeme türünü taşır)."""
+    g = globals_()
     if a.metin(0) == "c":
-        cash_ekle(save, -NEST_PRICE_CASH)
+        cash_ekle(save, -int(g.get(f"ACTIVATE_{yuva}_NEST_CASH", NEST_PRICE_CASH)))
     elif a.metin(0) == "g":
-        kaynak_ekle(save, save["maps"][0], "g", -NEST_PRICE_GOLD)
+        kaynak_ekle(save, save["maps"][0], "g", -int(g.get(f"ACTIVATE_{yuva}_NEST_GOLD", NEST_PRICE_GOLD)))
     save["privateState"][aktif_alan] = 1
     save["privateState"][sayac_alan] = -1
 
@@ -1709,13 +1712,13 @@ def _yuva_etkinlestir(save, a, aktif_alan, sayac_alan):
 @komut("activate_dragon")
 def activate_dragon(save, a):
     """['c'|'g']"""
-    _yuva_etkinlestir(save, a, "dragonNestActive", "timeStampTakeCare")
+    _yuva_etkinlestir(save, a, "dragonNestActive", "timeStampTakeCare", "DRAGON")
 
 
 @komut("activate_monster")
 def activate_monster(save, a):
     """['c'|'g']"""
-    _yuva_etkinlestir(save, a, "monsterNestActive", "timeStampTakeCareMonster")
+    _yuva_etkinlestir(save, a, "monsterNestActive", "timeStampTakeCareMonster", "MONSTER")
 
 
 @komut("desactivate_dragon")
