@@ -68,10 +68,34 @@ class GundeBir(unittest.TestCase):
         # get_player_info aralık dışı map'i 0. kasabaya indirir (oyun/oyuncu.py); gün de 0. kasabanın olmalı
         tarayici = server.app.test_client()
         tarayici.post("/", data={"USERID": self.uid, "GAMEVERSION": "SocialEmpires1.4.07sec_fixed.swf"})
+        tarayici.get(CONFIG)
         for numara in (7, -1):
             tarayici.post(INFO, data={"USERID": self.uid, "map": numara})
         self.assertEqual(set(session(self.uid)["privateState"]["kaynakYenilemeGunu"]), {"0"})
         self.assertEqual(tarayici.get(CONFIG).get_json()["globals"]["NUM_TREE_CLUSTERS"][0], 0)
+
+    def test_izin_gitmeyen_yukleme_gunu_harcamaz(self):
+        """Sayfa gece yarısını geçerek açık kalır: 12.11'in ikinci açılışında bayrak 0 gitti; 13.11'de komşudan dönüşte
+        istemci yenilemez (bayrak 0), gün de yazılmamalı; yoksa 13.11'de hiç yenileme olmaz."""
+        uid, gun = self.uid, datetime.date(2026, 11, 12)
+        istemci.kaynak_yenilendi(self.kayit, 0, gun)  # 12.11'in ilk açılışı
+        istemci.kaynak_bayraklari_gitti(uid, istemci.kaynak_bayraklari(self.kayit, gun))  # ikinci açılış: [0, 1, 1]
+        ertesi = gun + datetime.timedelta(days=1)
+        self.assertFalse(istemci.kaynak_yenilendi(self.kayit, 0, ertesi, uid=uid))
+        self.assertEqual(istemci.kaynak_bayraklari(self.kayit, ertesi)[0], 1)
+
+    def test_izin_oturumda_bir_kez_kullanilir(self):
+        """İstemci her kasabayı oturumda bir kez yeniler: ikinci yükleme (komşudan dönüş) günü yeniden yazmaz."""
+        uid, gun = self.uid, datetime.date(2026, 11, 12)
+        istemci.kaynak_bayraklari_gitti(uid, istemci.kaynak_bayraklari(self.kayit, gun))  # [1, 1, 1]
+        self.assertTrue(istemci.kaynak_yenilendi(self.kayit, 0, gun, uid=uid))
+        ertesi = gun + datetime.timedelta(days=1)  # aynı oturum gece yarısını geçti
+        self.assertFalse(istemci.kaynak_yenilendi(self.kayit, 0, ertesi, uid=uid))
+        self.assertTrue(istemci.kaynak_yenilendi(self.kayit, 1, gun, uid=uid))  # öteki kasabanın izni ayrı
+
+    def test_config_gitmeden_gelen_yukleme_gunu_yazmaz(self):
+        istemci._GIDEN_BAYRAKLAR.pop(self.uid, None)
+        self.assertFalse(istemci.kaynak_yenilendi(self.kayit, 0, datetime.date(2026, 11, 12), uid=self.uid))
 
 
 if __name__ == "__main__":
