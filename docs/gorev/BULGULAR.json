@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "KMT-08",
-    "sonraki_adim": "Bulut oturumu 11.11.2026. #59 … #65 birleşti. Sahibinin kararları KAR-25 … KAR-28. KMT-08 (görev sınırı) ve kalan denetim bulguları PR'da; KMT-09 ve OYN-29 için bayt kodu araştırması sürüyor. Sonra GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "madde": "KMT-09",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #66 birleşti. KMT-09 ve OYN-29 (KAR-29) PR'da; birleştirme sahibine sorulur (KAR-19). Sırada kalan denetim bulguları (DNT-25, 27, 29, 32, 33, 35, 36, 37, 40), TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1494,26 +1494,26 @@
       "baslik": "Görev sınırı (6 saatte 3, Odin heykeliyle 4) uygulanmıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Quest$/getNumQuestsAvailable map.lastQuestTimes'tan sayar (DELAY_ALLOWED = 6 sa, MAX_QUESTS_ON_TIME = 4, getMaxnumOfQuests); istemci lastQuestTimes'a hiç yazmaz, sunucu da yazmıyor: görev sayısı sınırsız.",
       "test": "tests/test_gorev_siniri.py (3 test)",
       "pr": "#66",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Denge kararı sahibinde. Uygulanacaksa start_quest (kasabayı taşır) lastQuestTimes'a şimdiyi ekler, 6 saatten eskileri atar; start_quest_new'de değil (iki kez sayılır). 11.11.2026 (KAR-25), bayt kodu ✔: Quest.DELAY_ALLOWED 21600 sn, MAX_QUESTS_ON_TIME 4; getNumQuestsAvailable en yeniden geriye, aralarında 6 saatten az fark olanları sayar, Odin yoksa 1 eksik; Base/processAttacks@2085 listeyi map.lastQuestTimes'tan okur, istemci yazmaz. start_quest [görev, kasaba] artık o kasabanın lastQuestTimes'ına şimdiyi ekler (son 4). 4 bozma düştü."
+      "notlar": "Denge kararı sahibinde. Uygulanacaksa start_quest (kasabayı taşır) lastQuestTimes'a şimdiyi ekler, 6 saatten eskileri atar; start_quest_new'de değil (iki kez sayılır). 11.11.2026 (KAR-25), bayt kodu ✔: Quest.DELAY_ALLOWED 21600 sn, MAX_QUESTS_ON_TIME 4; getNumQuestsAvailable en yeniden geriye, aralarında 6 saatten az fark olanları sayar, Odin yoksa 1 eksik; Base/processAttacks@2085 listeyi map.lastQuestTimes'tan okur, istemci yazmaz. start_quest [görev, kasaba] artık o kasabanın lastQuestTimes'ına şimdiyi ekler (son 4). 4 bozma düştü. 12.11.2026 (#66 incelemesinin sorusu): oturum içinde de işler ◐: start_quest anında gönderilir (Quest$/start@84 sendCommands), liste her harita yüklenişinde (Base/loadMapHandler@352 processAttacks) map.lastQuestTimes'tan yeniden okunur; göreve gidip dönünce ana harita yeniden yüklenir (Ruffle'da denenmedi)."
     },
     {
       "id": "KMT-09",
       "baslik": "Asker Toplama ödülü çevrimdışı oyunda alınamıyor",
       "sinif": "karar",
       "onem": "Düşük",
-      "durum": "karar_verildi",
-      "isaret": "✔",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
       "kanit": "PopupRecruitment: işe al düğmesi si.length >= num_recruitments ise açılır; si yalnızca onFindFriend → ExternalInterface showPopupSEHelpSocialItem ile dolar, templates/js/oyun.js'te yok; btBuy hep gizli (createFotos@474).",
-      "test": "tests/test_istemci_kaynakli.py: AskerToplama",
+      "test": "tests/test_bot_yardim.py (8 test)",
       "pr": "#38",
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR."
+      "notlar": "Sunucu komutu yazıldı. Açmak arkadaş daveti gerektirir (tek kişilik kural); bot yardımcılarıyla açılması ayrı karar. 11.11.2026: KAR-26 (botlar yardım etsin); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
     },
     {
       "id": "OYN-18",
@@ -2105,7 +2105,7 @@
       "baslik": "Denetim EKF-09: PvP sabitleri (3 hak, 6 saat) üç yerde elle kopya, config globals'tan okunmuyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-09, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_denge.py: test_saldiri_sabitleri_tek_kaynak_istemcinin",
@@ -2131,7 +2131,7 @@
       "baslik": "Denetim SNK-07: Açık kasaba bellekte; sunucu yeniden başlarsa kasaba numarasız komutlar kasaba 0'a gider",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-07, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_komutlar.py: test_acik_kasaba_sunucu_yeniden_baslayinca_kayittan",
@@ -2287,13 +2287,13 @@
       "baslik": "Ada Ocağı ve viral teklifler yazıldı ama oyuncuya kapalı",
       "sinif": "ozellik",
       "onem": "Orta",
-      "durum": "karar_verildi",
-      "isaret": "✔",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
       "kanit": "docs/inceleme/1407-formuller.md iki yerde 'açılması ayrı karar'; config'te starts_at/duration 0. Komutlar GEC-03'te yazıldı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": null,
+      "test": "tests/test_bot_yardim.py (8 test)",
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
-      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR."
+      "notlar": "Açılıp açılmayacağı sahibinin kararı; açılırsa görseller oyunun kendi pencereleri. 11.11.2026: KAR-27 (ikisi de açılır); uygulama ayrı PR. 12.11.2026 (KAR-26, KAR-27, KAR-29): oyunun showPopupSEHelpSocialItem (yalnızca 387) ve showPopupSEHelpOffer ExternalInterface çağrıları sayfada (oyun.js) karşılanır, POST /yardim/bot (oyun/bot_yardim.py) bir bot yazar (Asker Toplama: attrs.si, en çok 4; teklif: viralOffers[no].friends, en çok num_workers; her yer için günde bir; 0 ile başlayan kimlik yok), sonra oyunun forceReloadInfo geri çağrısı. friendsInfo'ya first_name; graph.facebook.com/<id>/picture köyün kendi resmine yönlenir (yalnızca yerel yol). Ada Ocağı ve beş viral teklif istemciye giden config'te kayan 30 günlük pencereyle açık (config.etkinlik_penceresi); sunucu config'i ve viral_icons değişmez. Ada ve ödül ejderhası çizimleri (6 dosya) temel pakette (224,5 MB). 16 bozma düştü (ilk turda 5'i sağ kaldı, test verisi güçlendirildi). Chromium'da kanca istekleri ve ret uyarısı denendi; Ruffle'da uçtan uca (ada yerleşimi, yuva adı/resmi, forceReloadInfo) denenmedi ◐ (GEC-09)."
     },
     {
       "id": "OYN-30",
@@ -2437,6 +2437,19 @@
       "pr": null,
       "onay": "Sahibi, 11 Kasım 2026",
       "notlar": "Değerler tests/test_denge.py ile sabit."
+    },
+    {
+      "id": "KAR-29",
+      "baslik": "Bot yardımı günde bir; teklif düğmelerinde de bot; kayan 30 günlük pencere; ada çizimleri temel pakette",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "docs/inceleme/1407-asker-ada.md araştırmasından sonra dört soru soruldu: 'Günde bir bot / Hemen ve sınırsız' → 'Günde bir bot'; 'Botlar yardım etsin / Yalnızca nakitle' (teklif düğmeleri) → 'Botlar yardım etsin'; 'Hep açık / Kayan 30 gün' → 'Kayan 30 gün'; temel pakete ~14,5 MB → 'Evet, ekle'.",
+      "test": "tests/test_bot_yardim.py",
+      "pr": null,
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "'Günde bir' her yer (bina ya da teklif) için ayrı uygulandı: Asker Toplama'nın 4 yuvası 4 günde, boru 5 günde dolar."
     }
   ]
 }

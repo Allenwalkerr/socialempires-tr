@@ -365,6 +365,19 @@ def _http_gunlugune_yaz(yol):
     print(f"[EKSIK UC] {request.method} /{yol} -> {dict(request.values)}")
 
 
+
+@app.route(DINAMIK + "/graph.facebook.com/<kimlik>/picture")
+def kullanici_resmi(kimlik):
+    """ImageManager/getUserPhoto@39-71: Commands.serverUrl + "graph.facebook.com/<kimlik>/picture?type=..." ister (Asker
+    Toplama ve teklif pencerelerindeki yardımcı yuvaları, KAR-26/27). Facebook yok: köyün kendi resmine (botlarda oyunun
+    birim resmi, oyun/bot_kimlik.py) yönlendirilir; bilinmeyen kimlikte oyunun varsayılan profil resmi."""
+    k = neighbor_session(kimlik) if gecerli_uid(kimlik) else None
+    resim = ((k or {}).get("playerInfo") or {}).get("pic") or "/img/profile/1025.png"
+    if not resim.startswith("/"):
+        resim = "/img/profile/1025.png"  # yalnızca bu sunucunun kendi yolları (açık yönlendirme olmasın)
+    return redirect(resim)
+
+
 @app.route(DINAMIK + "/<path:yol>", methods=["GET", "POST"])
 def bilinmeyen_dinamik_uc(yol):
     _http_gunlugune_yaz(yol)

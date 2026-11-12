@@ -6,7 +6,7 @@ Oyun tam ekran açılır.
 ## Gerekenler
 
 - Android 7.0 ya da üstü; 32 ve 64 bit cihazlar (eski Galaxy Tab A'lardan yeni Tab S'lere kadar).
-- Yaklaşık 250 MB boş yer; çevrimdışı temel paketi de indirecekseniz ayrıca ~210 MB.
+- Yaklaşık 250 MB boş yer; çevrimdışı temel paketi de indirecekseniz ayrıca ~225 MB.
 - **İlk açılışta internet.** Oyunun resimleri, sesleri ve haritaları (~60 MB) bir kez indirilir; sonra
   internet gerekmez.
 
@@ -30,7 +30,8 @@ Oyun tam ekran açılır.
 
 Oyun sayfasının üstündeki **çevrimdışı paket** bağlantısı:
 
-- **Temel paket (~210 MB):** oyun, arayüz, efektler, müzik, mağazadaki bütün bina ve birimler. İnternetsiz
+- **Temel paket (~225 MB):** oyun, arayüz, efektler, müzik, mağazadaki bütün bina ve birimler, Ada Ocağı'nın adası ve
+  ödül ejderhaları. İnternetsiz
   oynamaya yeter.
 - **Tam paket (~1,1 GB):** üstüne mağazada olmayan ödül, boss ve bot binalarının çizimleri.
 
