@@ -259,6 +259,34 @@ class UretimKomutlari(KomutTesti):
         self.komut("orient", 20, 20, 2, 0)  # karede bina yoksa eskisi gibi ilk eşya
         self.assertEqual(birim[3], 2)
 
+    def test_kurban_binasindan_birim_satisi(self):
+        """TST-02: pop_sell [bina_x, bina_y, kasaba, bina_id, birim_id]. 1.4.07 bayt kodu: IsoBuilding/PopSell birimi
+        vUnitsContained'den çıkarır, komutu yollar, bina boşalınca activation ve collected_at'i 0 yapar (üretim yeniden
+        başlar); altın iadesini IsoElement/collect @2762-2830 verir: birimin bedeli altınsa Token(TOKEN_GOLD,
+        floor(cost / Config.DIVISOR_SELL)), DIVISOR_SELL 20. Light Knight (512): 75 altın → 3."""
+        from unittest import mock
+        bina = [7, 20, 20, 0, 1000, 0, [512, 512], {}]
+        self.harita["items"].append(bina)
+        altin = self.harita["coins"]
+        with mock.patch.object(self.komutlar, "timestamp_now", return_value=2_000_000_000):
+            self.komut("pop_sell", 20, 20, 0, 7, 512)
+            self.assertEqual((bina[6], bina[4], self.harita["coins"] - altin), ([512], 1000, 3))
+            self.komut("pop_sell", 20, 20, 0, 7, 512)
+            self.assertEqual((bina[6], bina[4], self.harita["coins"] - altin), ([], 2_000_000_000, 6))
+
+    def test_tukenen_ciftligin_kill_i_xp_vermez(self):
+        """TST-02: 1.4.07 IsoElement/collect @3438-3675: çiftlikte (SUBCATFUNC_BUILDING_FARM) Math.round(collect / 3) odun
+        yetmezse çiftlik SELL_REASON_FARM_DEPLETED ile kaldırılır ve kill [x, y, id, kasaba, tür] gider; collect_xp'yi
+        veren @3805-3831 local12 false olduğu için atlanır. Pumpkin Crop (8): config collect_xp 2. (Ölen birimin ve yıkılan
+        düşman binasının kill'indeki xp ayrı bir soru, TST-02 notu.)"""
+        from oyun.config import get_item_from_id
+        self.assertEqual((get_item_from_id(8)["subcat_functional"], get_item_from_id(8)["collect_xp"]), ("122", "2"))
+        self.harita["items"].append([8, 30, 30, 0, 0, 0])
+        xp = self.harita["xp"]
+        self.komut("kill", 30, 30, 8, 0, "b")
+        self.assertEqual(self.harita["xp"], xp)
+        self.assertNotIn([8, 30, 30], [e[:3] for e in self.harita["items"]])
+
     def test_birim_deposu(self):
         self.harita["items"].append([512, 3, 3, 0, 0, 0])
         self.komut("add_unit_warehouse", 3, 3, 0, 512)

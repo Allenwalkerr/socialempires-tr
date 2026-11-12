@@ -260,6 +260,26 @@ class YuklemeDayanikliligi(unittest.TestCase):
             self.assertEqual(f.read(), onceki)
         self.assertEqual(kayit.session(uid)["maps"][0]["coins"], 5)
 
+    def test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez(self):
+        """DNT-40: bot dünyası bot kayıtlarını BOT_YAZMA_ARALIGI (5) turda bir yazar (_bekleyen_botlar). Yedek yükleme ve
+        Wi-Fi taşıma (geri_yukle) bütün kayıtları diskten yeniden okur; giriş sayfası (sunucu.login) gibi önce
+        bekleyenleri yazmalı, yoksa botun son turlardaki değişikliği kaybolur."""
+        from unittest import mock
+        from oyun import dunya, kayit_yedek
+        bot = kayit.new_village()
+        kayit.session(bot)["playerInfo"]["bot"] = True
+        kayit.save_session(bot)
+        d = dunya.Dunya()
+        kayit.session(bot)["maps"][0]["coins"] = 123456  # bir tur: yalnızca bellekte
+        d._bekleyen_botlar.add(bot)
+        uid = kayit.new_village()
+        with open(self._yol(uid), "rb") as f:
+            ham = f.read()
+        with mock.patch.object(dunya, "etkin", d):
+            kayit_yedek.geri_yukle(uid, ham)
+        self.assertEqual(kayit.session(bot)["maps"][0]["coins"], 123456)
+        self.assertEqual(d._bekleyen_botlar, set())
+
     def test_geri_yukleme_kotu_kimligi_reddeder(self):
         """CodeQL (#46): yedek yolu kimlikten kurulur; yol geçişi taşıyan kimlik hiçbir dosyaya yazılmaz."""
         from oyun import kayit_yedek

@@ -3,8 +3,8 @@
   "guncelleme": "2026-11-11",
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
-    "madde": "DNT-37",
-    "sonraki_adim": "Bulut oturumu 12.11.2026, sahibi kullanım sınırı yüzünden durdurdu. İlk iş: PR #70 (DNT-35, KMT-10) CI'ı yeşilse sahibine birleştirmeyi sor (KAR-19). Sonra DNT-37, 40, TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "madde": "TST-02",
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #70 birleşti; DNT-37, DNT-40/41 PR'da. Sırada TST-02, GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -1370,7 +1370,7 @@
       "test": "tests/test_istemci_kaynakli.py, tests/test_degismezler.py",
       "pr": null,
       "onay": null,
-      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık."
+      "notlar": "Öneri: KAR-13'ün bağımsız denetiminde alan alan kapatılsın; her komut için elle hesaplanmış beklenen değer ve en az bir sınır durumu. TST-03'te 9 komuta istemcinin bayt kodundan beklenen değerli test eklendi (buy_cash, add_survival_vida_extra, buy_survival_map, reset_heavy_siege, buy_attacks_pack, buy_spyings_pack, apply_rewards_ranking, tournament_substract/refund_resources) ve finish_collection'a iki test; bütün komutlar ayrıca değişmez testinde koşuyor. Kalanlar açık. 12.11.2026: pop_sell testi (IsoBuilding/PopSell ve IsoElement/collect @2762-2830: floor(cost/DIVISOR_SELL 20) altın; bina boşalınca üretim sıfırlanır; 3 bozma düştü). kill: tükenen çiftlik (IsoElement/collect @3576-3675) istemcide xp vermez, sunucu collect_xp veriyordu; düzeltildi (DNT-42), test ve bozma. Açık: ölen birimin (IsoFightingElement/kill @912) ve yıkılan düşman binasının (@1091) kill'inde istemci jeton bırakır (uiAttack'a göre 5 altın ve collect_xp ya da ceil(stone_cost/4 × 0,02) xp); sunucunun collect_xp'si bunlarla eşleşiyor mu doğrulanmadı (?). Testsiz kalan 44 komut: place_stored_item, end_quest, increase_population, buy_*_step_cash, darts_*, assist_neighbor, buy_warehouse_capacity_single, buy_pvp_territory ve ötekiler."
     },
     {
       "id": "TST-03",
@@ -2196,13 +2196,13 @@
       "baslik": "Denetim TRA-02: İstemci toUpperCase/toLowerCase ile Türkçe metni bozuyor (Değirmen → DEĞIRMEN)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-02, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_swf_yama.py BuyutmeTestleri (3 test)",
-      "pr": null,
+      "pr": "#70",
       "onay": null,
-      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok. 12.11.2026 (✔ bayt kodu): istemcide 11 toUpperCase var; ekrana Türkçe çıkan tek yer PopUpCollectionComplete/<kurucu>: bina adını buildingStringName'e (@50), POPUP_EDIFICIO_ENHORABUENA tebrik metnine (@140) ve vurgunun yerini bulan iki indexOf'a (@198, @216) büyüterek verir. Ötekiler: BaseButton/LabelButton 'selected' durum adı, StringUtil karşılaştırması, SelectionTeamWindow/formatFirstUppercase, JSONTokenizer, TournamentManager sonuç kodu; infoFriendAssistPopup AUX_ACEPTAR'ı büyütür (çeviri sözlüğünde bu anahtar yok, İngilizce). BuildingWindow/passFilter arama süzgecinde toLowerCase iki tarafa da uygulanır; ekrana çıkmaz, büyük İ ile aramada eşleşme kaçabilir (küçük etki, dokunulmadı). Düzeltme: swf_yama.buyutmeyi_kaldir o dört callproperty toUpperCase'i (4 bayt) nop yapar; ad 'Değirmen' yazılır, indexOf yine bulur. Çapa (getlocal_0 getlocal_1 getproperty name callproperty toUpperCase initproperty buildingStringName) gerçek SWF'de bir kez; uymazsa dokunulmaz. YAMA_SURUMU 8. Yamalı SWF Ruffle'da açıldı (oyun eğitim adımına kadar yüklendi, ✔). ◐: tebrik penceresi ekranda görülmedi (koleksiyon tamamlamak gerekiyor). 5 bozma denemesinin 5'i düştü."
+      "notlar": "PopUpCollectionComplete, infoFriendAssistPopup, TournamentManager, BuildingWindow/passFilter; yamada karşılığı yok. 12.11.2026 (✔ bayt kodu): istemcide 11 toUpperCase var; ekrana Türkçe çıkan tek yer PopUpCollectionComplete/<kurucu>: bina adını buildingStringName'e (@50), POPUP_EDIFICIO_ENHORABUENA tebrik metnine (@140) ve vurgunun yerini bulan iki indexOf'a (@198, @216) büyüterek verir. Ötekiler: BaseButton/LabelButton 'selected' durum adı, StringUtil karşılaştırması, SelectionTeamWindow/formatFirstUppercase, JSONTokenizer, TournamentManager sonuç kodu; infoFriendAssistPopup AUX_ACEPTAR'ı büyütür (çeviri sözlüğünde bu anahtar yok, İngilizce). BuildingWindow/passFilter arama süzgecinde toLowerCase iki tarafa da uygulanır; ekrana çıkmaz, büyük İ ile aramada eşleşme kaçabilir (küçük etki, dokunulmadı). Düzeltme: swf_yama.buyutmeyi_kaldir o dört callproperty toUpperCase'i (4 bayt) nop yapar; ad 'Değirmen' yazılır, indexOf yine bulur. Çapa (getlocal_0 getlocal_1 getproperty name callproperty toUpperCase initproperty buildingStringName) gerçek SWF'de bir kez; uymazsa dokunulmaz. YAMA_SURUMU 8. Yamalı SWF Ruffle'da açıldı (oyun eğitim adımına kadar yüklendi, ✔). ◐: tebrik penceresi ekranda görülmedi (koleksiyon tamamlamak gerekiyor). 5 bozma denemesinin 5'i düştü. 12.11.2026: #70 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-36",
@@ -2222,13 +2222,13 @@
       "baslik": "Denetim TRA-05: Üç gömülü yazı tipinde (Curse Casual JVE, Freestyle Script, Arial Narrow) Türkçe harfler yok",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "curutuldu",
+      "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) TRA-05, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
-      "test": null,
+      "test": "tests/test_swf_yama.py HarfiEksikYaziTipiTestleri",
       "pr": null,
       "onay": null,
-      "notlar": "Şimdilik kullanılmayan alanlarda; CEV-04'ten sonra o alanların çevrilip çevrilmediği denetlenmedi."
+      "notlar": "Şimdilik kullanılmayan alanlarda; CEV-04'ten sonra o alanların çevrilip çevrilmediği denetlenmedi. 12.11.2026 (✔ yamalı SWF tarandı): Curse Casual JVE ve Freestyle Script'te ÇçĞğİıŞş, Arial Narrow'da ACDEHIMNORSUY dışı yok. Bu yazı tiplerini kullanan 4 alan: 703 'KALAN SEFER: 3', 707 '10/100', 1353 '00:00:00' (Curse Casual), 3213 'SN' (Arial Narrow). Sayı ve saatler harf gerektirmiyor; sefer sayacının çevirisi (metin alanı ve oyun kodunun 'REMAINING QUESTS: ' dizesi) bu harflerle seçilmiş. Sözlükten gelen öteki çevirilerde eksik harf varsa _yazi_tipini_uydur alanı Arial Rounded'a geçiriyor. Görünür kusur yok. Koruma testi: sefer sayacının çevirisine Curse Casual'ın eksik harfi girerse düşer (2 bozma düştü; ASCII 'I' geçer)."
     },
     {
       "id": "DNT-38",
@@ -2261,13 +2261,13 @@
       "baslik": "Kayıt göçü denetim alanı yarım kaldı",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "✔",
       "kanit": "docs/denetim/kayit-goc.md başlığı 'Yarım rapor': dört bulgudan sonrası yazılmadı (surum.py göç adımları, tasima.py, kayit_yedek.py tam denetlenmedi). KAR-13 notu 'altı alanın raporu tamam' diyordu (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": null,
+      "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
       "pr": null,
       "onay": null,
-      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır."
+      "notlar": "Alan yeniden denetlenecek; başlamadan sahibine kullanım payı hatırlatılır. 12.11.2026: rapor tamamlandı (docs/denetim/kayit-goc.md KYG-05…07 ve sorunsuz bulunanlar). surum.py, kayit_yedek.py, tasima.py okundu. KYG-05 düzeltildi (DNT-41). KYG-06 (taşınan kayıttaki bot kimlikleri yeni cihazda yok: yalnızca görünüş, istemci null denetimi var) ve KYG-07 (tanınmayan sürüm: zararsız) dokunulmadı."
     },
     {
       "id": "TST-06",
@@ -2508,13 +2508,39 @@
       "baslik": "Koleksiyon takası istemcinin koşulunu denetlemiyordu: eksik parçayla ödül yeniden veriliyordu",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Sahibinin 'koleksiyon işi nasıl' sorusu üzerine uçtan uca denendi (12.11.2026, gerçek sunucu ve tarayıcıda F5): parçalar tamamlanmadan gelen ikinci finish_collection [1] Piramit'i (176) yeniden verdi (gifts[176] 1 → 2). 1.4.07 bayt kodu: popupCollections/onExchange komutu yalnızca CollectableManager$/checkCollectionComplete (p1..p5'in her biri > 0; arUniqueCollections [21, 22] ödülü depodaysa olmaz) ve checkCanComplete (tekil koleksiyonda yalnızca depo; ödül süs, SUBCATFUNC_BUILDING_DECO 411, ise olur; birim ya da binaysa açık kasabada ya da depoda bir tanesi varsa olmaz, AVISO_UNIDAD_UNICA) geçerse yollar. popupCollections/onBuy yalnızca canAfford'a bakar.",
       "test": "tests/test_komutlar.py test_takas_istemcinin_kosulu_yoksa_uygulanmaz",
+      "pr": "#70",
+      "onay": null,
+      "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez. #70 incelemesi: istemci kasabada binaların içindeki birimleri de sayar (IsoEngine/countPlayerElementsById: vUnitsContained, ✔ bayt kodu); sunucu da sayar. Kasabadaki süs olmayan bina ödülünü (yalnızca 1410) istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements, ?): sunucu orada yalnızca depoya bakar, istemciden katı olup ödülü kaybettirmesin. 3 bozma daha düştü. 12.11.2026: #70 birleşti (CI yeşil, sinama dahil)."
+    },
+    {
+      "id": "DNT-41",
+      "baslik": "Yedek yükleme ve Wi-Fi taşıma bot dünyasının yazılmamış değişikliklerini siliyordu (KYG-05)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "kayit_yedek.geri_yukle load_saved_villages()'dan önce dunya.etkin.bekleyenleri_yaz()'ı çağırmıyordu (sunucu.login çağırıyor). Test: bellekteki bot değişikliği yedek yüklemeden sonra kayboluyordu.",
+      "test": "tests/test_kayit_gocu.py test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez",
       "pr": null,
       "onay": null,
-      "notlar": "komutlar._takas_olur istemcinin iki denetimini uygular; nakitle alım (finish_collection [c, 1, bedel]) değişmedi. Normal oyunda istemci bu komutu göndermez; tekrarlanan ya da bozuk komut ödülü çoğaltmasın diye (DNT-20'nin karşılığı). Eski üç test, istemcinin hiç gönderemeyeceği eksik parçalı takası varsayıyordu: beklenen değerleri değişmedi, başlangıç parçaları takasın olabileceği hale getirildi. 9 bozma denemesinin 9'u düştü (ilk turda tekil koleksiyon dalı sağ kaldı; bayt kodu yeniden okununca tekil koleksiyonda kasabanın denetlenmediği görüldü, kod ve test düzeltildi). Gerçek sunucu ve tarayıcıda F5 ile: takas 1 ödül, eksik parçayla ikinci takas reddedildi; birim koleksiyonunun +1 nakdi bir kez. #70 incelemesi: istemci kasabada binaların içindeki birimleri de sayar (IsoEngine/countPlayerElementsById: vUnitsContained, ✔ bayt kodu); sunucu da sayar. Kasabadaki süs olmayan bina ödülünü (yalnızca 1410) istemcinin sayıp saymadığı doğrulanmadı (arPlayerIsoFightingElements, ?): sunucu orada yalnızca depoya bakar, istemciden katı olup ödülü kaybettirmesin. 3 bozma daha düştü."
+      "notlar": "Bekleyenler, yedek yazımı ve yeniden okuma aynı RLock altında. Bozma (çağrı kaldırıldı) düştü."
+    },
+    {
+      "id": "DNT-42",
+      "baslik": "Tükenen çiftliğin kill'i sunucuda toplama xp'si veriyordu, istemcide vermiyor",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "1.4.07 IsoElement/collect @3438-3675: çiftlikte odun yetmezse çiftlik SELL_REASON_FARM_DEPLETED ile kaldırılır, yalnızca kill gider; collect_xp'yi veren @3805-3831 local12 false olduğu için atlanır. Sunucu kill'de apply_collect_xp çağırıyordu (Pumpkin Crop: +2 xp fazla).",
+      "test": "tests/test_komutlar.py test_tukenen_ciftligin_kill_i_xp_vermez",
+      "pr": null,
+      "onay": null,
+      "notlar": "kill çiftlikte (subcat 122) xp vermez. Çiftlik oyuncunun binası; IsoFightingElement/kill'in bina yolu yalnızca PlayerID != PLAYER_SELF için kill yollar, başka yoldan çiftliğe kill gelmez. Bozma düştü. TST-02 sırasında bulundu."
     }
   ]
 }

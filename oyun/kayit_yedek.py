@@ -90,7 +90,12 @@ def geri_yukle(kimlik, ham):
     yol = _yol(kimlik) if isinstance(kimlik, str) and gecerli_uid(kimlik) else None
     if yol is None:  # zarfi_ac denetler; Wi-Fi taşıma gibi öteki çağıranlar için de burada
         raise YedekHatasi("kimlik")
-    with save_lock:
+    with save_lock:  # RLock: aynı kilit altında bot dünyası yazılır, yedek yazılır, kayıtlar yeniden okunur
+        # DNT-40: bot dünyası bot kayıtlarını BOT_YAZMA_ARALIGI turda bir yazar; diskten yeniden okumadan önce biriken
+        # değişiklikler yazılmazsa kaybolur (giriş sayfası da böyle yapar, oyun/sunucu.py login).
+        from oyun import dunya
+        if dunya.etkin is not None:
+            dunya.etkin.bekleyenleri_yaz()
         if os.path.exists(yol):
             shutil.copyfile(yol, yol + ".bak")  # copy2 değil: Android öznitelik kopyalamayı reddeder
             # .bak ilk kayıtta ezilir (DNT-07): önceki hâl adlı bir yedekte de kalır. Ad `<kimlik>-` ile başlamaz,
@@ -106,7 +111,7 @@ def geri_yukle(kimlik, ham):
             f.flush()
             os.fsync(f.fileno())
         os.replace(gecici, yol)
-    load_saved_villages()
+        load_saved_villages()
 
 
 @app.route("/kayit/indir")

@@ -1,6 +1,7 @@
 # Denetim raporu: kayit-goc (kayıt yazma, yedek, sürüm göçü, taşıma)
 
-> Yarım rapor: denetçi sahibinin isteğiyle (kullanım payı) durduruldu; dört bulgudan sonrası yazılmadı.
+> İlk dört bulgu bağımsız denetçinindir; denetçi sahibinin isteğiyle (kullanım payı) durdurulmuştu. Rapor 12 Kasım 2026'da
+> tamamlandı (DNT-40): KYG-05 ve sonrası `oyun/surum.py`, `oyun/kayit_yedek.py` ve `oyun/tasima.py`'nin denetimidir.
 
 Kod kopyası: `K` (commit `187e84f`). Denemeler `is/kayit-goc/` altında, K'nin kopyasında (`is/kayit-goc/kok`), her biri
 ayrı `SE_KAYIT_DIZINI` ve `SE_TABAN_DIZINI` ile yapıldı. Betikler: `is/kayit-goc/t1.py` … `t5.py`, `alanlar.py`, `bak.py`.
@@ -72,4 +73,65 @@ Not: brief'teki `oyun/aktarim.py` kayıt aktarımı değil, HTTP önbellek/sık�
   alamaz, asıl karşılığı ise yapılmamış görünür). Göç bir kez yapıldığı için (sürüm 0.08a olur) sonradan düzelmez.
 - Öneri: Eski numara kümesini kaydın içine (göç sırasında) yaz ya da zarfa ekle; yedek yoksa davranışı kararlaştırıp
   kayda ve teste bağla.
+
+### KYG-05: Yedek yükleme ve Wi-Fi taşıma, bot dünyasının yazılmamış değişikliklerini siliyor
+- Önem: Düşük
+- İşaret: ✔ (test ve bozma)
+- Yer: `oyun/kayit_yedek.py` `geri_yukle` (yedek yükleme ve `oyun/tasima.py` `tasima_al` bunu kullanır)
+- Kanıt: Bot dünyası bot kayıtlarını `BOT_YAZMA_ARALIGI` (5) turda bir yazar (`dunya._bekleyen_botlar`). `geri_yukle`
+  yazdıktan sonra `load_saved_villages()` ile bütün kayıtları diskten yeniden okuyordu ama önce bekleyenleri yazmıyordu.
+  Giriş sayfası (`oyun/sunucu.py` `login`) bunu yapıyor. Testte bellekteki bot değişikliği (`coins = 123456`) yedek
+  yüklemeden sonra kayboldu.
+- Etki: Yedek yükleme ya da Wi-Fi taşıma anında botların son turlardaki ekonomisi ve akınları kaybolur. Oyuncunun
+  kendi kaydı her komutta yazıldığı için etkilenmez.
+- Düzeltme: `geri_yukle` aynı kilit (RLock) altında önce `dunya.etkin.bekleyenleri_yaz()`'ı çağırır, sonra yedeği
+  yazar ve kayıtları yeniden okur. Test: `tests/test_kayit_gocu.py`
+  `test_geri_yukleme_bot_dunyasinin_bekleyenini_kaybetmez`; çağrı kaldırılınca düşer.
+
+### KYG-06: Taşınan kayıttaki yardımcı ve saldırgan botlar yeni cihazda yok (görünüş)
+- Önem: Düşük
+- İşaret: ✔ (istemci bayt kodu)
+- Yer: bot kimlikleri her cihazda rastgele üretilir (`araclar/bot_koy_uret.py`); taşınan kayıt
+  `attrs.si`, `viralOffers[..].friends`, `PVPattacksReceived` içinde gönderen cihazın bot kimliklerini taşır.
+- Kanıt:
+  - `PopupRecruitment/refreshFotos` @452-472: `friendsInfoMap[kimlik]` yoksa ad atlanır (null denetimi), yuvada "- -" görünür.
+  - Resim isteği `graph.facebook.com/<kimlik>/picture` bilinmeyen kimlikte varsayılan portreye yönlenir (`oyun/istemci.py`).
+  - Saldırı günlüğündeki intikamda `get_neighbor_info` bilinmeyen kimliğe hata yanıtı verir, 500 değil (`oyun/oyuncu.py`).
+- Etki: Çökme yok. Taşıma sonrasında eski yardımcıların adı görünmez, eski saldırganlara intikam alınamaz. Sayılar
+  (yardımcı sayısı, ödül) doğru kalır.
+- Karar: Düzeltilmedi, tek kişilik kullanımda önemsiz. Gerekirse taşıma bot kayıtlarını da götürür.
+
+### KYG-07: Tanınmayan sürüm etiketi göç adımlarına uymuyor
+- Önem: Düşük
+- İşaret: ✔ (okuma)
+- Yer: `oyun/surum.py` `migrate_loaded_save`
+- Kanıt: Sürüm `version_code`'dan farklı ama bilinen adımların hiçbirine uymuyorsa (ör. daha yeni bir uygulamadan gelen
+  `0.09a`) işlev hiçbir şeyi değiştirmeden True döner. Kayıt yine `kaydi_dogrula`'nın 1.4.07 alan denetiminden
+  (`guvence_hatalari`) geçmek zorundadır. Eksik alanı olan kayıt yüklenmez, kenara alınır.
+- Etki: Böyle bir kayıt her açılışta bir kez gereksiz yere yazılır. Veri kaybı yok.
+- Karar: Dokunulmadı.
+
+### Denetlenip sorunsuz bulunanlar (✔ okuma)
+
+- **`kayit_yedek.zarfi_ac`:**
+  - Biçim ve SHA-256 özeti denetleniyor.
+  - Kayıt bir kopyada göç ettirilip `kaydi_dogrula`'dan geçiriliyor.
+  - Kimliğin `str` olması, zarfla aynı olması ve `gecerli_uid` şartı var (KYG-01).
+  - Başka imparatorluğun üzerine yazma engelleniyor (`cakisma`).
+- **`geri_yukle`:**
+  - Yol kimlikten `safe_join` ile kuruluyor, kötü kimlik reddediliyor.
+  - Önceki hâl hem `.bak`'a hem adlı kalıcı yedeğe alınıyor (KYG-02).
+  - Yazım geçici dosya, `fsync` ve `os.replace` ile yapılıyor.
+- **`tasima`:**
+  - Gönderici ayrı bir sunucu; yalnızca iki uç sunuyor ve 10 dakika açık kalıyor.
+  - Kod başlıkta gidiyor, `hmac.compare_digest` ile karşılaştırılıyor.
+  - Adres başına 5 ve toplam 30 yanlış denemeden sonra kod geçersiz oluyor.
+  - Alan taraf yalnızca özel IPv4 adresine bağlanıyor ve yönlendirmeyi izlemiyor.
+  - Okunan veri `EN_BUYUK` ile sınırlı.
+  - Botlar listelenmiyor.
+  - Alınan kayıt yedek yüklemenin bütün denetimlerinden geçiyor.
+  - Not: `_gonderim["gonderilen"]` kilitsiz artıyor; yalnızca ekrandaki sayaç, önemsiz.
+- **`surum.migrate_loaded_save`:**
+  - Adımlar sırayla ve yalnızca kendi sürümünde çalışıyor.
+  - 0.06a→0.07a görev çevirisinin makineye bağlılığı KYG-04'te anlatıldı (KAR-31: olduğu gibi kalır).
 
