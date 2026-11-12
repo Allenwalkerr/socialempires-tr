@@ -15,7 +15,7 @@ import random
 
 from oyun.config import get_item_from_id
 
-TASARIM_SURUMU = 7  # 7: arazi türü; 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
+TASARIM_SURUMU = 8  # 8: iç sur kapı kuleleri; 7: arazi türü; 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -373,6 +373,14 @@ def koy_kur(seviye, kisi, tohum, simdi):
     # 3. Sur (3. seviyeden) ve kuleler: köşelerde üçlü öbek, kapının iki yanında birer, kalan bütçe sur boyunca
     sur, kule = kademe(SUR, seviye), kademe(KULE, seviye)
     kapi_bosluk = {t for t in yol if t in halka}
+    # İç sur kapılarının iki yanındaki kuleler önce konur: büyük karonun 10 kuleli bütçesi dış köşelerde tükenmesin
+    if sur and kule and len(bks) >= 3:
+        for c, r in sorted(bks):
+            for dc, dr in ((1, 0), (0, 1)):
+                if (c + dc, r + dr) in bks:
+                    for k in (7, 13):
+                        a.kule_koy(kule, *(((c + 1) * BUYUK_KARO, r * BUYUK_KARO + k) if dc
+                                          else (c * BUYUK_KARO + k, (r + 1) * BUYUK_KARO)))
     if kule:
         for x, y in sorted(halka):
             dis = sum((x + dx, y + dy) not in karolar for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
@@ -423,11 +431,7 @@ def koy_kur(seviye, kisi, tohum, simdi):
                     if 8 <= k <= 12:  # kapı ve iki yanında birer karo boşluk
                         a.ayir([(x, y), (x - dc, y - dr), (x + dc, y + dr)])
                         continue
-                    a.koy(sur, x, y, ayrik_serbest=True)
-                if kule:
-                    for k in (7, 13):
-                        a.kule_koy(kule, *(((c + 1) * BUYUK_KARO, r * BUYUK_KARO + k) if dc
-                                          else (c * BUYUK_KARO + k, (r + 1) * BUYUK_KARO)))
+                    a.koy(sur, x, y, ayrik_serbest=True)  # kapı kulelerinin yeri doluysa (yukarıda konan) atlanır
 
     # 4. Mahalleler: her dış kenar boyunca surun içinde boşluksuz şerit (kişiliğin sırasıyla)
     sira = serit_sirasi(kisi, rng)

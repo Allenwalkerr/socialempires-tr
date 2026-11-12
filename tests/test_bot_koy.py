@@ -267,10 +267,12 @@ class IcSur(unittest.TestCase):
             for k in bot_koy.KISILIK:
                 items, acik = bot_koy.koy_kur(sv, k, "i%d%s" % (sv, k), 0)
                 bks = buyuk_karolar(acik)
-                surlar = set()
+                surlar, kuleler = set(), set()
                 for e in items:
                     if ESYA[int(e[0])].get("subcategory_id") in ("21", "22"):
                         surlar |= karolar(e)
+                    if ESYA[int(e[0])].get("subcategory_id") == "21":
+                        kuleler |= karolar(e)
                 for c, r in bks:
                     if (c + 1, r) in bks:
                         cizgi = [((c + 1) * 20, r * 20 + j) for j in range(1, 19)]
@@ -278,6 +280,7 @@ class IcSur(unittest.TestCase):
                         cizgi = [(c * 20 + j, (r + 1) * 20) for j in range(1, 19)]
                     else:
                         continue
+                    self.assertTrue(set(cizgi) & kuleler, (sv, k, c, r))  # kapının yanında kule
                     dolu = sum(t in surlar for t in cizgi)
                     self.assertGreaterEqual(dolu, 10, (sv, k, c, r))
                     self.assertLess(dolu, len(cizgi), (sv, k, c, r))  # kapı boşluğu
