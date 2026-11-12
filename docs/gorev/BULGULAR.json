@@ -2339,13 +2339,13 @@
       "baslik": "Savunmada kurtarılabilen birimler iki incelemede ters yazılmış (protect)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "onay_bekliyor",
+      "isaret": "✔",
       "kanit": "docs/inceleme/1407-mezarlik.md:60-61 'yalnızca protect==1 kurtarılabilir', 1407-pvp.md:148 'protect==1 düşülmez'; kodda protect geçmiyor, savunmacı kaybı sabit oran (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Doğru yön bayt kodundan okunacak."
+      "notlar": "Doğru yön bayt kodundan okunacak. 12.11.2026: yön bayt kodundan okundu (Assault$/recoverEnemyUnits@283-288): protect == 1 ise RemoveFromCountedArray atlanır, yani protect == 1 hep kurtarılır, kalıcı kayıp yalnızca protect != 1 birimlerde. 1407-mezarlik.md doğru, 1407-pvp.md §8 ters yazmıştı: düzeltildi. Gerçek PvP'de sorun yok: savunmacının kurtarmasını saldıranın istemcisi yapar, victim_units [id, başlangıç, ölen, kurtarılan] net gelir, sunucu neti siler (oyun/pvp.py _olenler). Fark dünya simülasyonunda (oyun/dunya.py botun oyuncuya saldırısı): savunan, bot kazanınca birliklerinin %45'ini (kaybederse %20'sini) kalıcı kaybeder; oyunun kuralı: ölenlerin PERCENT_UNITS_RECOVERED_DEFENDER %95'i kurtarılır, protect == 1 birimler (config'te 510 öğe) hiç kaybedilmez. Denge kararı sahibine soruldu."
     },
     {
       "id": "BLG-01",
@@ -2885,13 +2885,13 @@
       "baslik": "Ruh Kazanı'nda sonuç gölgeleri üst üste biniyor (golem önde, süvari arkada)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "karar_verildi",
       "isaret": "?",
       "kanit": "Sahibinin ekran görüntüsü (12.11.2026). Ruffle'da sınandı (yerel sunucu, 10. seviye köy, Ruh Kazanı 1529): boş pencere, tek asker seçimi ve iki asker seçimi düzgün; ortada tek sonuç gölgesi. Bayt kodu: PopupSoulMixer/onUnitSelected → generateResultUnit (sonuç birimi rastgele: Utils.getRandom) → update; update eski AnimatedUnit'i remove() ile kaldırıp unitAnchor'ı temizliyor, yenisini AnimatedUnit(unitAnchor, img_name...) ile eşzamansız yüklüyor. AnimatedUnit/remove yükleme sürerken loader.close() çağırıyor; Ruffle bunu iptal etmezse eski gölge sonradan eklenebilir (iki farklı rastgele sonuç üst üste = sahibinin gördüğü). Çizimler 4-8 sn geciktirilip seçim art arda değiştirilince bir karede iki biçimin birleşimine benzeyen gölge görüldü, kesin değil.",
       "test": null,
       "pr": null,
-      "onay": null,
-      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak."
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak. Sahibi oyunda gördükten sonra (12.11.2026): 'tamam olmuş bu devam et'. Yavaş inişte üst üste binme olasılığı not olarak kalır."
     },
     {
       "id": "DNT-62",
