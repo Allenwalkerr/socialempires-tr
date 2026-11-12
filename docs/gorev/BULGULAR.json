@@ -2313,13 +2313,13 @@
       "baslik": "Upstream'in veri ve davranış düzeltmeleri tek tek değerlendirilmedi",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "curutuldu",
+      "isaret": "✔",
       "kanit": "docs/inceleme/2026-10-30-upstream-tarama1.md §6 ve tarama2 §6(a): efb753b, 1a51219, ba02772, a437e92, 6f9d792 (Konak ev sınırı), e989ba1 (ejderha yuvası istismarı), 2d39fb4/d76d1ae (baskın köylüleri). Hiçbiri kitapta yok (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Veri düzeltmeleri 54df29e yamalarıyla büyük olasılıkla içeride (?); davranış düzeltmeleri bizim komutlar.py için okunmadı."
+      "notlar": "Veri düzeltmeleri 54df29e yamalarıyla büyük olasılıkla içeride (?); davranış düzeltmeleri bizim komutlar.py için okunmadı. 12.11.2026 (sahibinin isteği: 'onun deposunda çalışan fakat bizde eksik veya çalışmayan şeyler için de bak'): AcidCaos/socialemperors nerroth-rewrite dalı indirilip sekiz commit tek tek okundu, bizim son config'imiz (get_game_config) ve komutlar.py ile karşılaştırıldı. Veri: efb753b tarla zinciri 10→8→9→200→201→0, 1a51219 üretim binaları (77-79, 300-301, 312-313, 315-316, 318-319) upgrades_to 0, ba02772 Müttefik Binası 234/361 subcat_functional 139, e989ba1 Ejderha Yuvası 1233 bedel 0 xp 0, a437e92 Firavun Altın Ocağı 1372 collect_type g: beşi de bizde aynı. 6f9d792 TOWNHALL_HOUSE_LIMIT: 26/289 14, 139/321 17, 140/322 20, 141 25 aynı; tek fark Altın Belediye 412: bizde 100 (GEC-02, #22), upstream 25; istemcinin varsayılanı yok (Base/checkBuildingConstructionLimit ve AbstractEpIsoElement/setTip config'ten okur), iki değerin de birincil kaynağı bulunmadı; değiştirilmedi (iOS kimlikleri 500xx Flash'ta yok). Davranış: d76d1ae (kayıtta olmayan baskın düşmanını öldürmek jeton verir) bizde DNT-49 _dusman_odulu; 2d39fb4 (baskın köylüsü 501 ile push/pop/depo komutları desync) bizde yok: komutlar eksik öğede hata döndürmez, sessizce geçer (push_unit, pop_unit, add_unit_warehouse, place_warehoused_item). Orada çalışıp bizde eksik bir şey bulunmadı."
     },
     {
       "id": "OYN-31",
