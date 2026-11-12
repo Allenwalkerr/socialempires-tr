@@ -52,3 +52,6 @@ skinMap) arka plan rengini (Config.BG_SKIN_COLORS) ve genişleme arazisini seçe
 Sahibi: "Bir kısmını yap, diğerlerine sen karar ver." Yapıldı: 1 (iç surlarla bölünmüş avlular) ve 3 (asker geçidi).
 Yapılmadı: 2 (çift sur; büyük karo başına 10 kule sınırı köşelere ve kapılara gidiyor) ve 4 (arazi türü; çizimleri
 temel pakette değil, internetsiz oyunda zemin görünmeyebilir).
+
+Sonra (aynı gün) sahibi: "arazi türünü çok değil ama az da olsa değiştirsen güzel olurdu". 4 de yapıldı: botların
+yaklaşık altıda biri çöl, buz, maden ya da orman arazisinde; çimen dahil beş arazi çizimi temel pakete alındı.

@@ -1281,6 +1281,11 @@ buildingsprites/sorpresa2.swf	22413	1
 buildingsprites/taberna.swf	16446	1
 buildingsprites/templooro.swf	26227	1
 buildingsprites/temploresureccion.swf	33285	1
+buildingsprites/terreno.swf	261888	1
+buildingsprites/terrenodesierto.swf	398946	1
+buildingsprites/terrenohielo.swf	386345	1
+buildingsprites/terrenomineral.swf	418307	1
+buildingsprites/terrenoselva.swf	524911	1
 buildingsprites/torreagua.swf	44283	1
 buildingsprites/torredefensa1.swf	11288	1
 buildingsprites/torredefensa2.swf	6079	1
@@ -4689,13 +4694,8 @@ buildingsprites/stonehenge.swf	23112	2
 buildingsprites/tajMahal.swf	87372	2
 buildingsprites/tamborchino.swf	5812	2
 buildingsprites/templosacrificio.swf	17481	2
-buildingsprites/terreno.swf	261888	2
-buildingsprites/terrenodesierto.swf	398946	2
-buildingsprites/terrenohielo.swf	386345	2
 buildingsprites/terrenomar2.swf	45775	2
-buildingsprites/terrenomineral.swf	418307	2
 buildingsprites/terrenonubes.swf	74231	2
-buildingsprites/terrenoselva.swf	524911	2
 buildingsprites/thor.swf	204392	2
 buildingsprites/tigreelfo.swf	695444	2
 buildingsprites/tornado.swf	109753	2

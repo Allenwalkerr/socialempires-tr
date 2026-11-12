@@ -107,6 +107,7 @@ def bot_uret(adet=50):
         harita["timestamp"] = simdi
         harita["resourcesTraded"] = {}
         harita["items"], harita["expansions"] = bot_koy.koy_kur(seviye, kisi, pid, simdi)
+        harita["skin"] = bot_koy.arazi_sec(pid)
 
         ps = kayit["privateState"]
         ps["attacksSent"] = []

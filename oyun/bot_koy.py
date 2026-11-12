@@ -15,7 +15,7 @@ import random
 
 from oyun.config import get_item_from_id
 
-TASARIM_SURUMU = 6  # 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
+TASARIM_SURUMU = 7  # 7: arazi türü; 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -48,6 +48,20 @@ HEYKEL = [(1, 122), (1, 126), (1, 128), (5, 117), (10, 119), (15, 120)]
 CESME = (6, 129)
 ATES = (1, 68)
 BAYRAK = [(1, 174), (5, 110), (12, 112), (15, 113)]
+
+# Arazi türü (haritanın "skin" alanı; Base/_parseLoadedInfo map.skin → skinMap, Base/addExpandedTileBuilding arazi öğesi
+# 1000 + skin): 0 çimen, 1 çöl, 2 buz, 4 maden, 5 orman (3 deniz, 6 bulut kara köyüne uymaz). Sahibi (12.11.2026):
+# "arazi türünü çok değil ama az da olsa değiştirsen güzel olurdu": botların yaklaşık altıda biri. Çizimleri temel pakette
+# (araclar/onindirme_listesi.py).
+BOT_ARAZILERI = (1, 2, 4, 5)
+ARAZI_ORANI = 1 / 6
+
+
+def arazi_sec(tohum):
+    """Botun arazi türü (aynı tohum aynı arazi)."""
+    rng = random.Random("arazi-%s" % tohum)
+    return rng.choice(BOT_ARAZILERI) if rng.random() < ARAZI_ORANI else 0
+
 
 # Kişiliğe göre kol ağırlıkları, kule sayısı, ordu oranı ve düzen
 KISILIK = {
@@ -518,7 +532,6 @@ def birim_ekle(kayit, kimlik, simdi, rng=random):
     if ordu_dolu_mu(kayit):
         return False
     harita = kayit["maps"][0]
-    seviye = max(1, int(harita.get("level", 1)))
     items = harita.setdefault("items", [])
     dolu = set()
     for e in items:
@@ -544,5 +557,6 @@ def yeniden_kur(kayit, simdi):
     harita = kayit["maps"][0]
     items, acik = koy_kur(harita.get("level", 1), pi.get("bot_kisi", "dengeli"), pi.get("pid", ""), simdi)
     harita["items"], harita["expansions"] = items, acik
+    harita["skin"] = arazi_sec(pi.get("pid", ""))
     pi["bot_tasarim"] = TASARIM_SURUMU
     return True

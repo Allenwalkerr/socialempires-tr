@@ -311,3 +311,43 @@ class YenidenKur(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Arazi(unittest.TestCase):
+    """Sahibi (12.11.2026): 'arazi türünü çok değil ama az da olsa değiştirsen güzel olurdu'. 1.4.07: map.skin →
+    skinMap (Base/_parseLoadedInfo), arazi öğesi 1000 + skinMap (Base/addExpandedTileBuilding); config 1001 çöl,
+    1002 buz, 1004 maden, 1005 orman. Çizimleri temel pakette olmalı (internetsiz oyunda zemin görünsün)."""
+
+    def test_botlarin_azi_arazili(self):
+        araziler = [bot_koy.arazi_sec(str(uuid.UUID(int=i + 1))) for i in range(600)]
+        self.assertLessEqual(set(araziler), {0, 1, 2, 4, 5})
+        oran = sum(a != 0 for a in araziler) / len(araziler)
+        self.assertTrue(0.08 < oran < 0.25, oran)  # az da olsa: yaklaşık altıda bir
+        self.assertEqual(len(set(araziler) - {0}), 4)  # dördü de görülür
+        self.assertEqual(bot_koy.arazi_sec("x"), bot_koy.arazi_sec("x"))
+
+    def test_arazi_ogeleri_configde(self):
+        for s in (0,) + bot_koy.BOT_ARAZILERI:
+            e = ESYA[1000 + s]
+            self.assertEqual(e["category_id"], "6")  # Constants.CAT_TERRAIN
+            self.assertEqual((int(e["width"]), int(e["height"])), (20, 20))
+
+    def test_arazi_cizimleri_temel_pakette(self):
+        from oyun import onindirme
+        oncelik = {y: o for y, _, o in onindirme.liste()}
+        for s in (0,) + bot_koy.BOT_ARAZILERI:
+            yol = "buildingsprites/%s.swf" % ESYA[1000 + s]["img_name"]
+            self.assertLessEqual(oncelik[yol], onindirme.PAKETLER["temel"], yol)
+
+    def test_yeniden_kur_araziyi_yazar(self):
+        bulunan = None
+        for i in range(200):
+            pid = "arazi-%d" % i
+            if bot_koy.arazi_sec(pid):
+                bulunan = pid
+                break
+        k = {"playerInfo": {"pid": bulunan, "bot": True, "bot_kisi": "dengeli"},
+             "maps": [{"level": 10, "items": [], "expansions": [13], "skin": 0}], "privateState": {}}
+        self.assertTrue(bot_koy.yeniden_kur(k, 0))
+        self.assertEqual(k["maps"][0]["skin"], bot_koy.arazi_sec(bulunan))
+        self.assertNotEqual(k["maps"][0]["skin"], 0)
