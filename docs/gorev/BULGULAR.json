@@ -2339,13 +2339,13 @@
       "baslik": "Savunmada kurtarılabilen birimler iki incelemede ters yazılmış (protect)",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "onay_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "docs/inceleme/1407-mezarlik.md:60-61 'yalnızca protect==1 kurtarılabilir', 1407-pvp.md:148 'protect==1 düşülmez'; kodda protect geçmiyor, savunmacı kaybı sabit oran (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)).",
-      "test": null,
-      "pr": null,
-      "onay": null,
-      "notlar": "Doğru yön bayt kodundan okunacak. 12.11.2026: yön bayt kodundan okundu (Assault$/recoverEnemyUnits@283-288): protect == 1 ise RemoveFromCountedArray atlanır, yani protect == 1 hep kurtarılır, kalıcı kayıp yalnızca protect != 1 birimlerde. 1407-mezarlik.md doğru, 1407-pvp.md §8 ters yazmıştı: düzeltildi. Gerçek PvP'de sorun yok: savunmacının kurtarmasını saldıranın istemcisi yapar, victim_units [id, başlangıç, ölen, kurtarılan] net gelir, sunucu neti siler (oyun/pvp.py _olenler). Fark dünya simülasyonunda (oyun/dunya.py botun oyuncuya saldırısı): savunan, bot kazanınca birliklerinin %45'ini (kaybederse %20'sini) kalıcı kaybeder; oyunun kuralı: ölenlerin PERCENT_UNITS_RECOVERED_DEFENDER %95'i kurtarılır, protect == 1 birimler (config'te 510 öğe) hiç kaybedilmez. Denge kararı sahibine soruldu."
+      "test": "tests/test_dunya.py SavunmaKurtarmaTestleri, SavasTestleri.test_kayiplar_silinir_kazanan_daha_az_kaybeder_ofke",
+      "pr": "#83",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "Doğru yön bayt kodundan okunacak. 12.11.2026: yön bayt kodundan okundu (Assault$/recoverEnemyUnits@283-288): protect == 1 ise RemoveFromCountedArray atlanır, yani protect == 1 hep kurtarılır, kalıcı kayıp yalnızca protect != 1 birimlerde. 1407-mezarlik.md doğru, 1407-pvp.md §8 ters yazmıştı: düzeltildi. Gerçek PvP'de sorun yok: savunmacının kurtarmasını saldıranın istemcisi yapar, victim_units [id, başlangıç, ölen, kurtarılan] net gelir, sunucu neti siler (oyun/pvp.py _olenler). Fark dünya simülasyonunda (oyun/dunya.py botun oyuncuya saldırısı): savunan, bot kazanınca birliklerinin %45'ini (kaybederse %20'sini) kalıcı kaybeder; oyunun kuralı: ölenlerin PERCENT_UNITS_RECOVERED_DEFENDER %95'i kurtarılır, protect == 1 birimler (config'te 510 öğe) hiç kaybedilmez. Denge kararı sahibine soruldu. Sahibinin kararı (12.11.2026, soruya cevap 'Oyunun kuralı'): oyun/dunya.py savunan_kalici_kayip: simülasyonun ölen sayısı korunur (bot kazanırsa %45, kaybederse %20), kalıcı kayıp n - ceil(n × PERCENT_UNITS_RECOVERED_DEFENDER / 100), protect == 1 birim hiç düşülmez, en çok 500 deneme. Rapordaki victim_units artık [id, başlangıç, ölen, kurtarılan] dolu. Eski testin 'kazanan saldıran savunandan oransal az kaybeder' beklentisi eski dengenin varsayımıydı; kararla yerine formül denetimi kondu. İki bozma düştü (protect denetimi, eski %45 kayıp)."
     },
     {
       "id": "BLG-01",
