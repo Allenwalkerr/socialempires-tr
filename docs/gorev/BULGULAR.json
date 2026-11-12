@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "DNT-27",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #67 birleşti; DNT-25, 29, 36 ve HIZ-04 PR'da. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #68 birleşti. Sırada DNT-27, 32 (sahibine denge sorusu), 35, 37, 40, TST-02, GEC-09. Sahibine sorulacak: DNT-08. Yeni oturumda ilk iş: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2066,13 +2066,13 @@
       "baslik": "Denetim EKF-04: Zaman ölçeği yalnızca 4 süre alanını ölçekliyor; yüksek/düşük ölçekte bozuk değer",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) EKF-04, docs/denetim/ekonomi-formuller.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_hiz.py OlcekliSure (3 test)",
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur. 12.11.2026 (✔ bayt kodu ve çalıştırma): üstel biçim istemcide bozulmuyor (StaticData/<kurucu> activation'ı parseFloat ile okur, training_time ve sm_training_time int yuvasında; ikisi de '1.728e+06'yı doğru okur), yani o kısım çürütüldü. Asıl sorun: int yuvası küsuratı atar; 10 katta (seçicinin en yükseği) 63 birimin eğitimi 0'a düşüp anında bitiyordu. zaman.olcekle: ölçekli süre en az 1 (tabanda 1'den kısa süre olduğu gibi kalır); zaman.metin üstel gösterimsiz yazar. config, komutlar.egitim_suresi ve yokken aynı yardımcıyı kullanır. Ölçeklenmeyen süreler (COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı, TIME_MACHINE) zaman.py'de belgelendi; istemci sabitleri. 4 bozma denemesinin 4'ü düştü."
+      "notlar": "Ölçek 100'de 457 süre alanı 1 sn'nin altında, 0,1'de '1.728e+06' biçimi (oyun/config.py .6g). COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı ölçeklenmiyor. ONR-01 seçici en çok 10 kat verdiği için 100 kat yalnızca TIME_SCALE ile olur. 12.11.2026 (✔ bayt kodu ve çalıştırma): üstel biçim istemcide bozulmuyor (StaticData/<kurucu> activation'ı parseFloat ile okur, training_time ve sm_training_time int yuvasında; ikisi de '1.728e+06'yı doğru okur), yani o kısım çürütüldü. Asıl sorun: int yuvası küsuratı atar; 10 katta (seçicinin en yükseği) 63 birimin eğitimi 0'a düşüp anında bitiyordu. zaman.olcekle: ölçekli süre en az 1 (tabanda 1'den kısa süre olduğu gibi kalır); zaman.metin üstel gösterimsiz yazar. config, komutlar.egitim_suresi ve yokken aynı yardımcıyı kullanır. Ölçeklenmeyen süreler (COLLECT_MINUTES, COLLECT_HELP_SECONDS, PvP hakkı, TIME_MACHINE) zaman.py'de belgelendi; istemci sabitleri. 4 bozma denemesinin 4'ü düştü. 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-26",
@@ -2118,13 +2118,13 @@
       "baslik": "Denetim SNK-06: orient/upgrade/push_unit/pop_unit binayı yalnızca (x, y) ile buluyor",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "✔",
       "kanit": "Bağımsız denetim (KAR-13) SNK-06, docs/denetim/sunucu-komutlar.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": "tests/test_komutlar.py test_kimliksiz_bina_komutlari_karedeki_birimi_degil_binayi_bulur",
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü)."
+      "notlar": "esya_bul(h, x, y, esya_id=None): aynı karede birden çok eşya varsa ilki seçilir. İstemci bu komutlarda kimlik göndermiyor; tür tercihi gerekebilir. 12.11.2026 (✔ çalıştırma): komutlar.bina_bul: aynı karede birden çok eşya varsa config type 'b' olan seçilir (config'te yalnızca 'b' ve 'u' var), bina yoksa eskisi gibi ilk eşya. orient, upgrade, push_unit, pop_unit bunu kullanır; kimlik taşıyan komutlar esya_bul ile kalır. Test: aynı karede binadan önce birim; 6 bozma denemesinin 6'sı düştü (dört komutun her biri ayrı ayrı esya_bul'a döndürüldü). 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-30",
@@ -2209,13 +2209,13 @@
       "baslik": "Denetim TRA-04: docs/RESIM_KAYNAKLARI.md silinmiş görselleri anlatıyor; templates/img'deki dosyaların kaynağı yazılı değil",
       "sinif": "hata",
       "onem": "Düşük",
-      "durum": "ci_bekliyor",
+      "durum": "duzeltildi",
       "isaret": "◐",
       "kanit": "Bağımsız denetim (KAR-13) TRA-04, docs/denetim/turkce-arayuz.md; denetçinin bulgusu, kitaba hiç yazılmamıştı (11.11.2026 .md taraması (yardımcı ajan okudu, ana oturum öbeklerini kodda denetledi)). Yeniden üretilmedi.",
       "test": null,
-      "pr": null,
+      "pr": "#68",
       "onay": null,
-      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli."
+      "notlar": "Belge Wikimedia kulüp logolarını sayıyor (OYN-04 ile silindiler, görsel kuralına aykırı). gift.png, knight.png, sword.png, villager.png hiçbir yerde kullanılmıyor (✔ grep, bu oturum). 11.11.2026: RESIM_KAYNAKLARI'na 'kaldırıldı' notu yazıldı; kullanılmayan gift.png, knight.png, sword.png, villager.png sahibinin onayıyla ('Evet, sil') silindi. Kalan: templates/img'deki dosyaların kaynağının yazılması. 12.11.2026: docs/RESIM_KAYNAKLARI.md'ye templates/img'nin kaynakları yazıldı. 6 dosya çatallanılan projeyle bayt bayt aynı (✔ SHA-1, AcidCaos/socialemperors 54df29e1). templates/img/oyun'daki 11 dosya araclar/swf_resimleri.py ile oyunun SWF'sinden (✔). profile/1025.png ile simge-192/512'nin kaynağı yazılı değil (?), belgede açıkça işaretli. 12.11.2026: #68 birleşti (CI yeşil, sinama dahil)."
     },
     {
       "id": "DNT-37",
