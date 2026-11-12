@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"12"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"16"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -428,6 +428,90 @@ def komsudan_komsuya(t: bytes):
     return t.replace(KOMSU_KOSULU, KOMSU_KOSULU_YENI), 1
 
 
+# Ağaç, taş ve altın günde bir yenilenir (sahibinin kararı, 12.11.2026: "Günde bir yenilensin").
+# 1.4.07 MapInitializer$/Init@462-503 her harita açılışında spawnInit (@25-31: cleanBorderTiles, orta 3×3 büyük karonun
+# dışındaki halkayı CLEAN_0 ile satar), spawnInitResources (altın ve taş, NUM_GOLD/STONE_CLUSTERS 3 küme) ve
+# spawnRemainingResources (ağaç, NUM_TREE_CLUSTERS 10 küme + NUM_TREE_DISPERSE 100; hayvanlar) çağırır: kesilen ağaç
+# ve taş her açılışta yerine gelir, dış halka her açılışta baştan kurulur. Sayılar MapInitializer'ın sabitleri; config'ten
+# okunmaz. Bu üç yerin önüne aynı koşul konur (kendi köyünde, mod NORMAL):
+#     izin = Base.Items.globals.NUM_TREE_CLUSTERS[townID] && !((Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS >> townID) & 1)
+#     izin yoksa: spawnInitResources ve spawnRemainingResources döner, spawnInit halka temizliğini atlar.
+# Komşu, saldırı, görev ve eğitimde (mod NORMAL değil) her şey eskisi gibi.
+# - Config bayrağı (oyun/istemci.py kaynak_bayraklari): kasaba başına dizi, o gün yenilenmemiş kasaba 1. Config sayfa
+#   açılışında bir kez gelir; kasaba değişince yeniden istenmez (TownManager$/loadTown@22-113), dizi bu yüzden kasaba
+#   başına (#82 incelemesi).
+# - Oturum işareti: komşudan, akından ya da öteki kasabadan dönüşte harita yeniden kurulur ama config aynı kalır; işaret
+#   olmazsa günün ilk oturumunda her dönüşte yine yenilenirdi (#82 incelemesi). globals'a yazılamaz: GameDataManager/get
+#   globals → OData/get v her okumada yeni bir nesne kurar. İşaret, oturum boyunca aynı kalan dinamik bir nesnede tutulur:
+#   Config.BG_SKIN_COLORS sabit yuvalı bir Array (Config/<sınıf> özellik 5501, Const); renkleri sayı sırasıyla okunur
+#   (Base/_parseLoadedInfo@283-292), adlı özellik onlara dokunmaz. spawnRemainingResources (Init@500, üçünün sonuncusu)
+#   izinle çalışınca işarete kasabanın bitini koyar: M.NUM_TREE_CLUSTERS |= 1 << townID.
+# Bayt (AVM2, araclar/abc_okur.py): getlex Base 60 01, Items 66 6e, globals 66 af01, NUM_TREE_CLUSTERS 66 b462 (çok
+# adlı 12596, QName genel ad alanı; Base/loadGameConfigSuccess@542-550 ile aynı yol), Main 66 0c, townID 66 c501 (197),
+# [] 66 df0c (MultinameL 1631, MissionPopup/refreshGoals), gameModeCurrent 66 c201, getlex GameMode 60 9c01, NORMAL 66 9b02,
+# getlex Config 60 1d (29), BG_SKIN_COLORS 66 fd2a (5501); pushbyte 24, lshift a5, rshift a6, bitand a8, bitor a9,
+# setproperty 61; iftrue 11, iffalse 12, ifne 14, jump 10 (s24, komutun sonundan), returnvoid 47. Göreli dallar eklemenin
+# önünden arkasına geçmediği için kaymaz (tests/test_swf_yama.py, gerçek istemciyle); istisna tabloları boş. Kod uzunluğu
+# (u30) gövdenin kodundan hemen öncedir; çapa uzunluk + kodun başıdır.
+_NORMAL_MI = "6001660c66c201609c01669b02"            # Base.Main.gameModeCurrent, GameMode.NORMAL
+_BAYRAK = "6001666e66af0166b462" "6001660c66c501" "66df0c"  # globals.NUM_TREE_CLUSTERS[townID]
+_ISARET = "601d66fd2a66b462"                         # Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS
+_KASABA = "6001660c66c501"                           # Base.Main.townID
+_BIT = _ISARET + _KASABA + "a62401a8"                # (işaret >> townID) & 1
+_TUKET = "601d66fd2a" + _ISARET + "2401" + _KASABA + "a5a9" "61b462"  # işaret = işaret | (1 << townID)
+
+
+def _kosul(tuket=False, atla=None):
+    """Koşul baytları. atla None ise izin yokken returnvoid; sayıysa o kadar baytlık çağrının üstünden atlar."""
+    parcalar = [("kod", _NORMAL_MI), ("dal", "14", "CALIS"), ("kod", _BAYRAK), ("dal", "12", "YOK"),
+                ("kod", _BIT), ("dal", "11", "YOK")]
+    if tuket:
+        parcalar.append(("kod", _TUKET))
+    parcalar += [("dal", "10", "CALIS"), ("etiket", "YOK")]
+    parcalar.append(("kod", "47") if atla is None else ("dal_bayt", "10", atla))
+    parcalar.append(("etiket", "CALIS"))
+    konum, etiketler, p = [], {}, 0
+    for parca in parcalar:
+        konum.append(p)
+        if parca[0] == "etiket":
+            etiketler[parca[1]] = p
+        else:
+            p += len(bytes.fromhex(parca[1])) + (3 if parca[0] in ("dal", "dal_bayt") else 0)
+    cikti = b""
+    for parca, p in zip(parcalar, konum):
+        if parca[0] == "kod":
+            cikti += bytes.fromhex(parca[1])
+        elif parca[0] == "dal":
+            cikti += bytes.fromhex(parca[1]) + struct.pack("<i", etiketler[parca[2]] - (p + 4))[:3]
+        elif parca[0] == "dal_bayt":
+            cikti += bytes.fromhex(parca[1]) + struct.pack("<i", parca[2])[:3]
+    return cikti
+
+
+KAYNAK_DONUS = _kosul()                    # spawnInitResources
+KAYNAK_DONUS_SON = _kosul(tuket=True)      # spawnRemainingResources: izinle çalışınca işaret konur
+KAYNAK_ATLA = _kosul(atla=7)               # spawnInit: getlex MapInitializer, callpropvoid cleanBorderTiles 0 (7 bayt)
+# (ad, eski kod uzunluğu, kodun başı, ekleme yeri, eklenen)
+KAYNAK_YAMALARI = (
+    ("spawnRemainingResources", 837,
+     bytes.fromhex("d0302400100d000094025777766304c6a19205c202d62400d724006304240063055ea80f5d084a08"), 2, KAYNAK_DONUS_SON),
+    ("spawnInitResources", 672,
+     bytes.fromhex("d0302400100b00003070a174d787a6c3070804d52400d62400d724006304240063055ea80f5d084a"), 2, KAYNAK_DONUS),
+    ("spawnInit", 119,
+     bytes.fromhex("d030607c100900002090af2630c464a5c52cdda2014f810101608d014fc10600"), 25, KAYNAK_ATLA),
+)
+
+
+def kaynaklari_gunde_bir(t: bytes):
+    """(yeni_etiket, değişen): üç gövdeye kaynak koşulu; çapalardan biri tek değilse hiçbirine dokunmaz."""
+    capalar = [(_u30_yaz(uzunluk) + bas, uzunluk, bas, yer, ek) for _, uzunluk, bas, yer, ek in KAYNAK_YAMALARI]
+    if any(t.count(capa) != 1 for capa, *_ in capalar):
+        return t, 0
+    for capa, uzunluk, bas, yer, ek in capalar:
+        t = t.replace(capa, _u30_yaz(uzunluk + len(ek)) + bas[:yer] + ek + bas[yer:])
+    return t, len(capalar)
+
+
 def turkcelestir(veri: bytes, sozluk=None):
     """SWF baytlarını alır, (yeni_swf_baytları, değişen_alan_sayısı) döndürür."""
     sozluk = _sozluk() if sozluk is None else sozluk
@@ -454,9 +538,10 @@ def turkcelestir(veri: bytes, sozluk=None):
             t, sayi = abc_dizelerini_degistir(govde[bas:son], as3) if as3 else (govde[bas:son], 0)
             t, kaldirilan = buyutmeyi_kaldir(t)
             t, komsu = komsudan_komsuya(t)
-            if sayi or kaldirilan or komsu:
+            t, kaynak = kaynaklari_gunde_bir(t)
+            if sayi or kaldirilan or komsu or kaynak:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan + komsu
+                degisen += sayi + kaldirilan + komsu + kaynak
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]

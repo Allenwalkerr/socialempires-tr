@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08: hikâye görevi, hedef seviyeleri, pazarda dost, 20 nakit, adlar). Sahibinin ilk oyunda bildirdikleri (12.11.2026, öncelik sırasıyla): (1) Hedefler baştan düzenlensin: seviye 6'da 'bir oyuncuya akın et' var ama PvP 8'de açılıyor, ilk seviyelerde etkinlik hedefi çıkıyor, 'pazar al' Build'e götürmek yerine 'o bina sende yok' diyor; (2) asker paketi alındı, kayboldu ('4 Paket hazır'); paket fiyatları dengelensin (karar bekliyor); (3) pazarda 'Dostlarını tut' çalışmıyor (botlar dost olsun, KAR-26 çizgisinde); (9) ağaç ve taş her açılışta yeniden çıkıyor: istemcinin kendi kuralı (MapInitializer$/spawnRemainingResources, NUM_TREE_CLUSTERS), sahibine soruldu, cevap yok; savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (10) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65). Sahibinin yeni bildirimleri (12.11.2026): sağdaki teklif simgeleri sürekli parlıyor;"
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80 birleşti (DNT-50…52, KAR-33…35, CEV-08). #81 birleşti (DNT-53…60, KAR-34 uygulaması, CEV-09). #82 açık (DNT-61…63, KAR-36: asker paketleri; birleştirmeden önce sahibine sorulur). Sahibinin ilk oyunda bildirdiklerinden hedefler (DNT-51), asker paketi (DNT-62 çürütüldü, KAR-36 uygulandı, #82) ve pazarda 'Dostlarını tut' kapandı. Ağaç, taş ve altın günde bir yenileniyor (DNT-64, #82). Sırada: (2) DNT-63: sahibinin sol panelde gördüğü üçüncü simge soruldu (ekran görüntüsü bekleniyor); (3) savaştan sonra askerlerin F5'te eski yere dönmesi doğrulanmadı; (4) açık artırma fikri (yeni özellik, sonra konuşulacak). Odun yerinin adı için sahibi 'marangoz' ya da başka ad önerdi (bıçkıhane yerine). Sonra GEC-09. Yeni oturumda: git config user.name lahmacunveayran (S-65)."
   },
   "maddeler": [
     {
@@ -2683,7 +2683,7 @@
       "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
       "pr": "#80",
       "onay": null,
-      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma."
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma. 12.11.2026, oyunda F5 denemesi (Ruffle, yerel sunucu, 10. seviye köy): görev 0 açıkken istemcinin göndereceği collect_treasure [250, 10, 1, 0, 0, 0] verildi, sayfa yenilendi. Kayıtta idCurrentTreasure 0 → 1, altın 450 → 700, xp +10, timestampLastTreasure yazıldı; haritada eski görev işareti kalktı, yeni görevin nesneleri çıktı (hikâye ilk göreve dönmedi). Görevin savaşla bitirilmesi ve 30 görevin hepsi oyunda oynanmadı."
     },
     {
       "id": "KAR-33",
@@ -2879,6 +2879,71 @@
       "pr": "#81",
       "onay": null,
       "notlar": "Yeni adlar: Elementel (birlik adlarında; hikâye metninde ve seviye 90'da 'Element'), Destansı Kafatası, Kadim Ceset, Vahşi Kuluçka, Kara Punk Ejder Yavrusu, Sınır Büyücüsü, Savaşçı Trol, Zorba Kılıççı/Şövalye, Prizma Ejderhası, İmparatorluk Elf ..., Kaya Delen, Yaradılış Rüzgâr ..., Elebaşı (Kızıl Pullu Elebaşı, Yavru Elebaşı, Altın/Ölümcül Ejderha Elebaşı), Yüce Göksel, Ortaçağ Eter Kurtarıcısı. 79 metin; ekler denetlendi ('Elebaşı'nı'). Bu adlar kodda, bot adlarında ve SWF sözlüğünde geçmiyor. Yaman Trol (KAR-35) değişmedi. #81 incelemesi: büyük harfli biçimler kalmıştı; Kaya Delen görevinin üç başlığı (KAYA DELEN), mağaza sekmeleri (DESTANSI KAFATASI EJDERHALARI, VAHŞİ KULUÇKA EJDERHALARI) ve hayatta kalma uyarısı (ELEBAŞI GELİYOR) düzeltildi. 'Aztek Reisi' heykeli (kabile reisi) bilerek bırakıldı."
+    },
+    {
+      "id": "DNT-61",
+      "baslik": "Ruh Kazanı'nda sonuç gölgeleri üst üste biniyor (golem önde, süvari arkada)",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "onay_bekliyor",
+      "isaret": "?",
+      "kanit": "Sahibinin ekran görüntüsü (12.11.2026). Ruffle'da sınandı (yerel sunucu, 10. seviye köy, Ruh Kazanı 1529): boş pencere, tek asker seçimi ve iki asker seçimi düzgün; ortada tek sonuç gölgesi. Bayt kodu: PopupSoulMixer/onUnitSelected → generateResultUnit (sonuç birimi rastgele: Utils.getRandom) → update; update eski AnimatedUnit'i remove() ile kaldırıp unitAnchor'ı temizliyor, yenisini AnimatedUnit(unitAnchor, img_name...) ile eşzamansız yüklüyor. AnimatedUnit/remove yükleme sürerken loader.close() çağırıyor; Ruffle bunu iptal etmezse eski gölge sonradan eklenebilir (iki farklı rastgele sonuç üst üste = sahibinin gördüğü). Çizimler 4-8 sn geciktirilip seçim art arda değiştirilince bir karede iki biçimin birleşimine benzeyen gölge görüldü, kesin değil.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibi (12.11.2026) yeniden baktı: 'tamam olmuş bu, devam et'. Normal yüklemede görülmüyor; yalnızca çizimler yavaş inerken (ilk açılış, internetten) seçim hızla değiştirilirse olabilir. Kalıcı düzeltme AnimatedUnit/previewAnimationLoaded'a kaldırıldı denetimi eklemek (bayt kodu ekleme gerektirir); tekrar görülürse yapılacak."
+    },
+    {
+      "id": "DNT-62",
+      "baslik": "Asker paketi alınınca askerler kayboluyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'asker paketi aldım 50 altına sonra yok oldu'. Ruffle'da sınandı (yerel sunucu, 10. seviye köy): Mağaza → Asker Paketleri → The Guardian → al. Sunucu günlüğü: buy_unit_pack [1, 1] (altın 500 → 450), store_add_items ['[534]']; kayıt privateState.gifts[534] = 1 (Prens Arthur). Oyunun kendi bilgi penceresi: '6. Bütün askerler kendiliğinden depona gider.' Askerler kaybolmuyor, Depo'ya gidiyor (UnitPacksManager: istemci birliği seçip store_add_items ile bildirir).",
+      "test": "tests/test_komutlar.py BirlikPaketleri",
+      "pr": "#82",
+      "onay": null,
+      "notlar": "Sahibine Depo sekmesine bakması söylendi. Paket fiyatları ayrıca dengelendi (KAR-36)."
+    },
+    {
+      "id": "KAR-36",
+      "baslik": "Asker paketleri dengelenir, metinleri Türkçe olur",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "karar_verildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bir de buraya fiyat dengelemesi yap biraz'. Bulgu: config/patch/1-mega_patch.json unit_packs'te Hardcore, Gladyatör ve iki Öfkeli Ejderha paketi The Guardian'ın birlik listesiyle aynı, açıklamaları 'NOT SET UP / DO NOT BUY', 'You will get ripped off!'; Öfkeli Ejderha paketi iki kez (id 4 ve 5); en güçlü Kadim Ejderhaları veren Working Pack 15 nakit, Destansı 38 nakit. Soruldu: 'Önerimi uygula' / 'Yalnızca metinler ve kopya' / 'Dokunma' → 'Önerimi uygula'.",
+      "test": "tests/test_komutlar.py BirlikPaketleri.test_paket_dengesi_sahibinin_karari",
+      "pr": "#82",
+      "onay": "Sahibi, 12 Kasım 2026",
+      "notlar": "config/patch/3-paket_dengesi.json: Gladyatör Paketi 16 gladyatör, 8 nakit; Öfkeli Ejderhalar Paketi 14 ejderha, 20 nakit; Destansı 38; Vahşi ve Kadim 45; Kadim Ejderhalar (eski Working Pack) 60 nakit; Zorlu Paket (Hardcore) 8.000 altın. Kopya paket (id 5) silinince mağaza ızgarasında '0' yazan boş yuva kaldığı için (istemci store_order'a göre dizer) silinmedi, altınla alınan Kraliyet Paketi oldu (5.000 altın; Kraliyet ve Güçlü birlikler). Bütün paket adları ve metinleri Türkçe. Ruffle'da mağaza ve paket pencereleri görüldü. Yama kaldırılınca dört paket testi düşüyor. İnceleme (#82, github-actions): Gladyatör ve Öfkeli Ejderhalar paketlerinin pack_category'si 1-mega_patch'teki {custom 1.5, 2: 8.5} kalmıştı; istemci kategoriyi bu ağırlıkla seçtiği için (docs/inceleme/1407-formuller.md, Birliklerin seçimi) birliklerin ~%15'i listeden çıkardı. İkisi de Kraliyet Paketi gibi {custom 10, 2: 0} yapıldı; Öfkeli Ejderhalar afişi '10 kat Ejderha Şansı' yerine 'Her Birlik Ejderha'. test_paket_dengesi_sahibinin_karari ağırlığı denetler (bozunca düştü)."
+    },
+    {
+      "id": "DNT-63",
+      "baslik": "Bir hedef bitince sol panele yenisi gelmiyor (sahibinin bildirimi)",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "curutuldu",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'Bir görev bitirdim buraya yenisi gelmedi normalde geliyordu'; 'ilk 2 görevi yaptım onların yerine yenisi geldi ve hep orada 3 görev vardı'; 'oyunun ilk sürümünde vardı acidcaosun kendi reposunda'. 1.4.07 istemcisi sol panelde en çok 2 hedef gösterir: MissionPopup/refreshGoals getActiveGoals().slice(0, 2), yalnızca mcGoal1 ve mcGoal2. acidcaos/socialemperors'un 0926 istemcisinde (SocialEmpires0926bsec.swf) de MissionPopup/refreshGoals yalnızca mcGoal1 ve mcGoal2'yi doldurur, mcGoal3 yok. Sunucu 1. seviyede 58 hedef yollar (get_client_game_config, DNT-51 süzgecinden sonra): hedefler tükenmiş değil. Deneme köyü (1. seviye, 1-3 numaralı hedefler bitmiş) Ruffle'da açıldı: solda iki hedef simgesi. Tam liste (en çok 15, MAX_ACTIVE_GOALS) 'Hedefler' düğmesinde.",
+      "test": "Ruffle'da deneme köyü (elle); bayt kodu MissionPopup/refreshGoals (1.4.07 ve 0926)",
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibinin gördüğü üçüncü simgenin ne olduğu sorulacak (ekran görüntüsü istendi). Aynı gün acidcaos/socialemperors ile karşılaştırma: oradaki 42 komutun hepsi bizde işleniyor; sayfa adresleri, Arthur ve AcidCaos köyleri, 35 görev haritası, modlar bizde aynı; config yamalarındaki öğeler, GRAVEYARD_POTIONS, DRAGONS, level_up_tips, daily_bonus, viral_icons, viral_offers bizim config'te var; villages/initial.json yalnızca 20 nakit ve 'İmparatorluğum' adında ayrılıyor (bilerek). Orada çalışıp bizde eksik bir şey bulunmadı."
+    },
+    {
+      "id": "DNT-64",
+      "baslik": "Ağaç, taş ve altın her açılışta yeniden çıkıyor: günde bir yenilensin",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "duzeltildi",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): ağaç ve taş her açılışta yeniden çıkıyor; soruya cevabı 'Günde bir yenilensin'. 1.4.07 bayt kodu: MapInitializer$/Init@462-503 her harita açılışında spawnInit (@25-31 cleanBorderTiles: safeAreaClean ile orta 3×3 büyük karonun dışındaki halkayı CLEAN_0 nedeniyle satar), spawnInitResources (altın 73-75+80 ve taş 69-71+81 sayılır; NUM_GOLD/STONE_CLUSTERS 3, küme 5-7) ve spawnRemainingResources (ağaç 19-21 sayılır; NUM_TREE_CLUSTERS 10, küme 16-20, NUM_TREE_DISPERSE 100; hayvanlar) çağırır; sayılar MapInitializer sabitleri, config'ten okunmaz. Eklenenler buyElementNoResources ile buy komutu olarak kayda girer. Ruffle'da denendi (12.11.2026, 180 ağaçlı kayıttan 100'ü silinmiş): yamasız her açılışta 139 sell (CLEAN_0) ve 104 buy; köşeye konan 200 yer tutucu ağaç da CLEAN_0 ile satıldı (sunucu tarafında sayı hilesi olmuyor). Komşu köyde istemci buy/sell yollamıyor (LOAD_MAP NEIGH sonrası komut yok); bot köylerinde yamadan önce de çevrede ağaç yok.",
+      "test": "tests/test_swf_yama.py KaynakYenilemeTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar), tests/test_kaynak_yenileme.py; Ruffle'da iki açılış (elle)",
+      "pr": "#82",
+      "onay": null,
+      "notlar": "oyun/swf_yama.py kaynaklari_gunde_bir (YAMA_SURUMU 13): üç gövdenin önüne `if (!Base.Items.globals.NUM_TREE_CLUSTERS && Base.Main.gameModeCurrent == GameMode.NORMAL)` dön (spawnInitResources, spawnRemainingResources) ya da halka temizliğini atla (spawnInit). Komşu, saldırı, görev, eğitimde değişmez. Sunucu (oyun/istemci.py kaynak_yenilenir_mi) günün ilk config'inde 1 yollar ve günü privateState.kaynakYenilemeGunu'na yazar, sonra 0; kayıt yoksa 1. Ruffle'da aynı gün ikinci açılış: 0 buy, 0 sell, görüntü aynı. İki bozma testlerde düştü (dal konumu, gün denetimi). Hayvanların yenilenmesi de günde bire iner (aynı işlev). İnceleme (#82, github-actions): kasaba değişince istemci config'i yeniden istemez (TownManager$/loadTown@22-113), gün oyuncu başına tutulunca ikinci kasaba aynı gün hiç yenilenmeyebilirdi; gün de config istenince yazıldığından yarıda kalan açılış günü harcıyordu. Düzeltme (YAMA_SURUMU 14): bayrak kasaba başına dizi, koşul globals.NUM_TREE_CLUSTERS[Base.Main.townID] (townID 197, MultinameL 1631) okur; gün privateState.kaynakYenilemeGunu {kasaba: gün}, kendi kasabasının get_player_info'sunda yazılır. Bilinen sınır: aynı sayfa oturumunda kasabalar arasında gidip gelinirse config yenilenmediği için o oturumda bayrağı 1 olan kasaba her dönüşte yine yenilenir (eski davranış gibi). Ruffle'da yeniden: ilk açılış 142 kaynak eklemesi, aynı gün ikinci açılış 0. İki bozma düştü (haritada gün yazılmaması, kasabaya bakmayan bayrak). İkinci inceleme: istemcinin map değeri denetlenmeden anahtar yapılıyordu (aralık dışı numarada 0. kasaba yüklenir, gün '7' ya da '-1'e yazılırdı). Gün artık get_player_info'nun yüklediği kasabaya (playerInfo.acik_kasaba) yazılır ve gün değişince kayıt hemen diske yazılır; test aralık dışı numarayla (bozma düştü). Üçüncü inceleme (özet notu): komşudan ya da akından dönüşte config yeniden gelmediği için günün ilk oturumunda kendi köyü her dönüşte yine yenileniyordu; Ruffle'da doğrulandı (dönüşte 91 ekleme, 106 temizlik). İstemcide bayrağı sıfırlamak işe yaramadı: GameDataManager/get globals → OData/get v her okumada yeni nesne kurar. Düzeltme (YAMA_SURUMU 16): oturum işareti Config.BG_SKIN_COLORS.NUM_TREE_CLUSTERS'ta (Const yuvalı Array, oturum boyunca aynı) kasaba başına bit; izin = bayrak[townID] && !(işaret >> townID & 1); spawnRemainingResources izinle çalışınca biti koyar. Bu, kasabalar arasında gidip gelme sınırını da kapattı. Ruffle'da: ilk açılış 158 ekleme ve 81 temizlik; komşudan dönüş ve aynı gün F5'te kaynak eklemesi ve temizlik 0 (yalnızca spawnRemainingIdleTrolls'un 3 trolü, yamanın dışında). Bozmalar düştü (işaret konmaması, bit sınaması). Dördüncü inceleme: izin gitmeyen yüklemede de gün yazılıyordu (gece yarısını geçen oturumda komşudan dönüş yeni günü harcardı). Sunucu son config'te giden bayrakları bellekte tutar (oyun/istemci.py _GIDEN_BAYRAKLAR); gün yalnızca izin giden ve o oturumda kullanılmamış kasabaya yazılır, izin yazılınca kullanılmış sayılır (istemcinin oturum işaretiyle aynı kural); config gitmeden gelen yükleme günü yazmaz. Ruffle'da: ilk açılış 142, dönüş 0, F5 0. Bozmalar düştü."
     }
   ]
 }

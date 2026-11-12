@@ -61,27 +61,85 @@ def track_game_status_response():
     return ("", 200)
 
 
-def _oyuncu_seviyesi():
-    """Oturumdaki oyuncunun seviyesi (DNT-51: istemciye yalnızca bu seviyeye gelmiş hedefler gider); yoksa None."""
+def _oturumdaki_kayit():
     from flask import session as oturum
     uid = oturum.get("USERID") or request.values.get("USERID", "")
-    kayit = kayit_oturumu(uid) if gecerli_uid(uid) else None
+    return (uid, kayit_oturumu(uid)) if gecerli_uid(uid) else (uid, None)
+
+
+def _oyuncu_seviyesi(kayit):
+    """Oyuncunun seviyesi (DNT-51: istemciye yalnızca bu seviyeye gelmiş hedefler gider); yoksa None."""
     try:
         return int(kayit["maps"][0].get("level", 1)) if kayit else None
     except (KeyError, IndexError, TypeError, ValueError):
         return None
 
 
+KAYNAK_GUNU = "kaynakYenilemeGunu"  # privateState: {"kasaba no": son yenilendiği gün "YYYY-AA-GG"}
+
+
+def _kaynak_gunleri(kayit):
+    gunler = (kayit or {}).get("privateState", {}).get(KAYNAK_GUNU)
+    return gunler if isinstance(gunler, dict) else {}
+
+
+def kaynak_bayraklari(kayit, bugun=None):
+    """Sahibinin kararı (12.11.2026, "Günde bir yenilensin"): istemci kendi köyündeki ağaç, taş ve altını kasaba başına
+    günde bir yeniler (oyun/swf_yama.py kaynaklari_gunde_bir: globals.NUM_TREE_CLUSTERS[Base.Main.townID]). Config
+    sayfa açılışında bir kez gelir (Base/loadGameConfigSuccess), kasaba değişince yeniden istenmez; bu yüzden her kasabanın
+    bayrağı birlikte gider: o gün yenilenmemişse 1. Kayıttaki kasabalardan bir fazlası (yeni alınan kasaba) da 1."""
+    from oyun.config import yerel_bugun
+    gun = (bugun or yerel_bugun()).isoformat()
+    gunler = _kaynak_gunleri(kayit)
+    sayi = len((kayit or {}).get("maps") or []) + 1
+    return tuple(0 if gunler.get(str(i)) == gun else 1 for i in range(sayi))
+
+
+# Oyuncuya son config'te giden bayraklar (bellekte; uid -> liste). İstemci her kasabayı oturumda en çok bir kez yeniler
+# (oyun/swf_yama.py oturum işareti); sunucu da aynı kuralla izlenir: izin giden ve henüz kullanılmamış kasaba.
+_GIDEN_BAYRAKLAR = {}
+
+
+def kaynak_bayraklari_gitti(uid, bayraklar):
+    _GIDEN_BAYRAKLAR[str(uid)] = list(bayraklar)
+
+
+def kaynak_yenilendi(kayit, kasaba, bugun=None, uid=None):
+    """Kendi kasabasının haritası yüklendi (get_player_info). İstemci bu yüklemede kaynakları yenilediyse (son config'te
+    o kasabaya izin gitti ve bu oturumda kullanılmadı) yenilenme günü bugün olur. Gün config'te değil burada yazılır:
+    config'ten sonra yarıda kalan açılış günü harcamaz; izin gitmeyen yükleme (gece yarısını geçen oturumda komşudan
+    dönüş) de yeni günü harcamaz (#82 incelemesi). Config gitmeden gelen yükleme (sunucu oturum ortasında yeniden
+    başladı) günü yazmaz: istemcideki bayrak bilinmez, en kötüsü bir yenileme fazladan olur. Kilit altında çağrılır.
+    Gün değiştiyse True (kayıt yazılmalı)."""
+    from oyun.config import yerel_bugun
+    if uid is not None:
+        giden = _GIDEN_BAYRAKLAR.get(str(uid))
+        if not giden or not 0 <= int(kasaba) < len(giden) or not giden[int(kasaba)]:
+            return False
+        giden[int(kasaba)] = 0  # istemci bu oturumda bu kasabayı bir daha yenilemez
+    gunler = _kaynak_gunleri(kayit)
+    anahtar, gun = str(int(kasaba)), (bugun or yerel_bugun()).isoformat()
+    if gunler.get(anahtar) == gun and kayit.get("privateState", {}).get(KAYNAK_GUNU) is gunler:
+        return False
+    gunler[anahtar] = gun
+    kayit.setdefault("privateState", {})[KAYNAK_GUNU] = gunler
+    return True
+
+
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
 def get_game_config_response():
     # İstemcinin dil ayarından bağımsız olarak metinler OYUN_DILI'nde gönderilir.
-    seviye = _oyuncu_seviyesi()
+    uid, kayit = _oturumdaki_kayit()
+    seviye = _oyuncu_seviyesi(kayit)
+    yenile = kaynak_bayraklari(kayit)
+    if kayit is not None:
+        kaynak_bayraklari_gitti(uid, yenile)
     try:
-        return get_client_game_config(OYUN_DILI, seviye=seviye)
+        return get_client_game_config(OYUN_DILI, seviye=seviye, kaynak_yenile=yenile)
     except Exception:
         traceback.print_exc()
         print(" ! Ceviri config'i uretilemedi; Ingilizceye donuluyor")
-        return get_client_game_config("en", seviye=seviye)
+        return get_client_game_config("en", seviye=seviye, kaynak_yenile=yenile)
 
 
 @app.route(DINAMIK + "/get_player_info.php", methods=["POST"])
@@ -97,7 +155,11 @@ def get_player_info_response():
         with save_lock:  # get_player_info günlük ödülü kayda yazabilir (KAR-24): komutlarla aynı kilit
             yer_bildir(uid, True)  # DNT-49: kendi adası yüklendi
             kompu_donemini_guncelle(kayit)
-            return (get_player_info(uid, harita_no), 200)
+            yanit = get_player_info(uid, harita_no)
+            # yüklenen kasaba: get_player_info aralık dışı numarayı 0'a indirir (#82 incelemesi)
+            if kaynak_yenilendi(kayit, kayit["playerInfo"].get("acik_kasaba", 0), uid=uid):
+                save_session(uid)  # gün hemen kalıcı olsun (komut gelmeden sunucu kapanabilir)
+            return (yanit, 200)
     if gecerli_uid(uid):
         # DNT-49: Base/realLoadMap @129-169 user'ı yalnızca loadMapParams.userId doluysa ekler: komşu ya da görev haritası
         yer_bildir(uid, kullanici == uid)

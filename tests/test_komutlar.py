@@ -1235,25 +1235,58 @@ class BirlikPaketleri(KomutTesti):
         self.assertEqual(self.harita["coins"], 50000 - 50)
 
     def test_nakit_tam_yetince_alinir(self):
-        self.kayit["playerInfo"]["cash"] = 11
-        self.komut("buy_unit_pack", 3, 2)  # 11 nakit
+        self.kayit["playerInfo"]["cash"] = 14
+        self.komut("buy_unit_pack", 3, 2)  # 14 nakit (Gladyatör Paketi 8 nakit, KAR-36)
         self.assertEqual((self.cash, self.ps["unitPacks"]), (0, {"3": 2}))
 
     def test_nakitle_toplu_alim_indirimi(self):
         self.kayit["playerInfo"]["cash"] = 1000
-        self.komut("buy_unit_pack", 3, 2)  # 6 nakit × 2 = 12, %10 indirim: int(10,8 + 0,5) = 11
-        self.assertEqual(self.cash, 1000 - 11)
-        self.komut("buy_unit_pack", 3, 8)  # 48, %15 indirim: int(40,8 + 0,5) = 41
-        self.assertEqual(self.cash, 1000 - 11 - 41)
+        self.komut("buy_unit_pack", 3, 2)  # 8 nakit × 2 = 16, %10 indirim: int(14,4 + 0,5) = 14
+        self.assertEqual(self.cash, 1000 - 14)
+        self.komut("buy_unit_pack", 3, 8)  # 64, %15 indirim: int(54,4 + 0,5) = 54
+        self.assertEqual(self.cash, 1000 - 14 - 54)
         self.assertEqual(self.ps["unitPacks"], {"3": 10})
 
     def test_kaynak_yetmezse_ve_bilinmeyen_paket_alinmaz(self):
-        self.kayit["playerInfo"]["cash"] = 5
-        self.komut("buy_unit_pack", 3, 1)
+        self.kayit["playerInfo"]["cash"] = 7
+        self.harita["coins"] = 28799
+        self.komut("buy_unit_pack", 3, 1)  # 8 nakit > 7
         self.komut("buy_unit_pack", 99, 1)
-        self.komut("buy_unit_pack", 2, 4)  # 4 × 20.000 altın > 50.000
-        self.assertEqual((self.cash, self.harita["coins"]), (5, 50000))
+        self.komut("buy_unit_pack", 2, 4)  # 4 × 8.000 altın, %10 indirim: 28.800 > 28.799
+        self.assertEqual((self.cash, self.harita["coins"]), (7, 28799))
         self.assertNotIn("unitPacks", self.ps)
+
+    def test_paket_dengesi_sahibinin_karari(self):
+        """KAR-36 (sahibi, 12.11.2026, 'Önerimi uygula'): kopya Öfkeli Ejderha paketi (id 5) altınla alınan Kraliyet
+        Paketi olur (silinince mağaza ızgarasında boş yuva kalıyordu); ayarsız paketler adlarına uygun birlik verir;
+        fiyat güce göre artar (nakit: Gladyatör 8 < Öfkeli 20 < Destansı 38 < Vahşi ve Kadim 45 < Kadim 60; altın:
+        Kraliyet 5.000, Zorlu 8.000); oyuncuya 'DO NOT BUY' gibi yarım kalmış İngilizce metin gitmez."""
+        from oyun.config import get_game_config, get_item_from_id
+        paketler = {int(p["id"]): p for p in get_game_config()["unit_packs"]}
+        self.assertEqual(sorted(paketler), list(range(1, 9)))
+        self.assertEqual({no: p["price"] for no, p in paketler.items()},
+                         {1: {"g": 50}, 2: {"g": 8000}, 3: {"c": 8}, 4: {"c": 20}, 5: {"g": 5000}, 6: {"c": 38},
+                          7: {"c": 45}, 8: {"c": 60}})
+        # Mağaza yuvaları store_order'a göre dizilir: 1..8 boşluksuz
+        self.assertEqual(sorted(int(p["store_order"]) for p in paketler.values()), list(range(1, 9)))
+        adlar = [p["name"] for p in paketler.values()]
+        self.assertEqual(len(adlar), len(set(adlar)))
+        for p in paketler.values():
+            metin = " ".join(str(p.get(k, "")) for k in ("name", "banner", "tooltip", "description", "data"))
+            for kotu in ("NOT SET UP", "DO NOT BUY", "Do not buy", "ripped off", "Overpowered", "refund"):
+                self.assertNotIn(kotu, metin, p["id"])
+        for no, kelime in ((3, "Gladiator"), (4, "Dragon"), (5, "")):  # yeniden kurulan paketler; çark içerikle aynı
+            self.assertEqual([b["id"] for b in paketler[no]["carrusel"]], [b["id"] for b in paketler[no]["custom"]])
+            for b in paketler[no]["custom"]:
+                birlik = get_item_from_id(str(b["id"]))
+                self.assertEqual(birlik["type"], "u")
+                self.assertIn(kelime, birlik["name"], (no, b["id"]))
+        self.assertEqual({b["id"] for b in paketler[5]["custom"]}, {608, 609, 610, 611, 539, 540, 541, 574})  # Kraliyet, Güçlü
+        # Birliğin kategorisini pack_category ağırlıkları seçer (docs/inceleme/1407-formuller.md, "Birliklerin seçimi");
+        # yeniden kurulan paketlerde bütün ağırlık custom'da olmalı, yoksa birlik çoğu zaman genel havuzdan çıkar
+        for no in (3, 4, 5):
+            agirlik = {k: float(v) for k, v in paketler[no]["pack_category"].items()}
+            self.assertEqual(sum(agirlik.values()), agirlik["custom"], no)
 
     def test_paketten_cikan_birlik_depoya(self):
         # istemci seçtiği birliği Base/storeItem ile store_add_items [JSON] olarak bildirir
