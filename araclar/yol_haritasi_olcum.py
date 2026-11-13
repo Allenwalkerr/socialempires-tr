@@ -22,10 +22,12 @@ Bölümler (YOL_HARITASI_2.md §1 ile aynı sıra):
 """
 
 import ast
+import atexit
 import inspect
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 from collections import Counter, defaultdict
@@ -33,7 +35,11 @@ from collections import Counter, defaultdict
 KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, KOK)
 sys.path.insert(0, os.path.join(KOK, "araclar"))
-os.environ.setdefault("SE_KAYIT_DIZINI", tempfile.mkdtemp(prefix="se-olcum-"))
+# Her zaman geçici dizin: kabukta SE_KAYIT_DIZINI gerçek kayıtları gösterse bile oraya köy açılmasın (oyun kaydına
+# dokunulmaz); çıkışta silinir
+_GECICI = tempfile.mkdtemp(prefix="se-olcum-")
+os.environ["SE_KAYIT_DIZINI"] = _GECICI
+atexit.register(shutil.rmtree, _GECICI, True)
 
 import abc_okur  # noqa: E402
 import komut_imzalari  # noqa: E402

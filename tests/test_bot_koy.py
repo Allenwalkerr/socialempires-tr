@@ -373,19 +373,26 @@ class ProfilBirligiVeTema(unittest.TestCase):
                 items, _ = bot_koy.koy_kur(min(60, 3 + int(i * 1.15)), "dengeli", "p%d" % i, 0, ad=ad)
                 self.assertIn([int(kimlik), 49, 53], [e[:3] for e in items])
 
-    def test_ordu_gucu_artmaz(self):
-        """Profil birliği en zayıflardan başlayarak gücü kadar askerin yerini alır: güç artmaz, en çok ordudaki en
-        güçlü askerin gücü kadar azalır (son çıkan asker ondan güçlü olamaz). Tema seçimleri ayrı rastgele kaynaktan, ordu adsız köyle aynı çekilir."""
+    def test_ordu_gucu_ortalamada_degismez(self):
+        """Profil birliği ortalama bir askerin gücüyle ölçülen ağırlığı kadar askerin yerini alır; tema seçimleri ayrı
+        rastgele kaynaktan, ordu adsız köyle aynı çekilir. 30 tohumda toplam güç adsız köylerinkinin %90-110'u."""
         for i, (ad, _, kimlik) in enumerate(self.BOTLAR):
             sv, kisi = min(60, 3 + int(i * 1.15)), list(bot_koy.KISILIK)[i % 4]
-            for s in range(3):
-                with self.subTest(ad, tohum=s):
-                    adsiz, _ = bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0)
-                    adli, _ = bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0, ad=ad)
-                    en_guclu = max(int(ESYA[int(e[0])]["life"]) * int(ESYA[int(e[0])]["attack"])
-                                   for e in adsiz if ESYA[int(e[0])]["type"] == "u")
-                    self.assertLessEqual(self.guc(adli), self.guc(adsiz))
-                    self.assertGreater(self.guc(adli), self.guc(adsiz) - en_guclu)
+            with self.subTest(ad):
+                adsiz = sum(self.guc(bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0)[0]) for s in range(30))
+                adli = sum(self.guc(bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0, ad=ad)[0]) for s in range(30))
+                self.assertGreaterEqual(adli / adsiz, 0.9)
+                self.assertLessEqual(adli / adsiz, 1.1)
+
+    def test_kurulan_koyun_ordusu_dolu_sayilir(self):
+        """Dünya benzetimi ordu_dolu_mu False iken asker ekler (oyun/dunya.py); kurulan köy dolu sayılmazsa çıkarılan
+        askerler geri dolar ve köy adsız köyden güçlü olur."""
+        for i, (ad, _, _) in enumerate(self.BOTLAR):
+            sv, kisi = min(60, 3 + int(i * 1.15)), list(bot_koy.KISILIK)[i % 4]
+            items, _ = bot_koy.koy_kur(sv, kisi, "d%d" % i, 0, ad=ad)
+            k = {"playerInfo": {"name": ad, "bot_kisi": kisi}, "maps": [{"level": sv, "items": items}]}
+            with self.subTest(ad):
+                self.assertTrue(bot_koy.ordu_dolu_mu(k))
 
     def test_susler_oyunun_kendi_susleri_ve_temel_pakette(self):
         from oyun import onindirme
@@ -412,11 +419,17 @@ class ProfilBirligiVeTema(unittest.TestCase):
                     dolu |= karolar(e)
 
     def test_ordu_dolu_mu_profil_birligini_agirligiyla_sayar(self):
-        """Fırtına Ejderhası (684) 59. seviyede açık en güçlü sıradan birimin (can × saldırı) yaklaşık 9,6 katı."""
-        en_iyi = max(int(ESYA[b]["life"]) * int(ESYA[b]["attack"])
-                     for kol in bot_koy.KOLLAR for s, _, b in bot_koy.KOLLAR[kol] if s <= 59)
-        agirlik = round(int(ESYA[684]["life"]) * int(ESYA[684]["attack"]) / en_iyi)
-        self.assertEqual(bot_koy.profil_agirligi(684, 59), agirlik)
+        """Ağırlık = profil birliğinin gücü / ortalama asker gücü. Ortalama, birim_sec'in kuralıyla config'ten ayrıca
+        hesaplanır: kol kişiliğin kol ağırlığıyla, kolda %70 en yüksek açık kademe, %30 bir altı."""
+        def g(k):
+            return int(ESYA[int(k)]["life"]) * int(ESYA[int(k)]["attack"])
+        kollar = {k: a for k, a in bot_koy.KISILIK["dengeli"]["kollar"].items() if a > 0}
+        toplam = 0.0
+        for kol, a in kollar.items():
+            acik = [b for s, _, b in bot_koy.KOLLAR[kol] if s <= 59]
+            toplam += a * (0.7 * g(acik[-1]) + 0.3 * g(acik[-2]) if len(acik) >= 2 else g(acik[-1]))
+        agirlik = round(g(684) / (toplam / sum(kollar.values())))
+        self.assertEqual(bot_koy.profil_agirligi(684, 59, "dengeli"), agirlik)
         sinir = bot_koy.ordu_buyuklugu(59, "dengeli")
         sirada = next(b for s, _, b in bot_koy.KOLLAR["piyade"] if s <= 59)
         k = {"playerInfo": {"name": "Fırtına Ejderhası", "bot_kisi": "dengeli"},
@@ -424,7 +437,6 @@ class ProfilBirligiVeTema(unittest.TestCase):
         self.assertTrue(bot_koy.ordu_dolu_mu(k))
         k["maps"][0]["items"].pop()
         self.assertFalse(bot_koy.ordu_dolu_mu(k))
-
 
 if __name__ == "__main__":
     unittest.main()

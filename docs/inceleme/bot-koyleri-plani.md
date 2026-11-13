@@ -109,10 +109,12 @@ resimleri ile uygun bir şekilde dekorasyon", "oyunun dengesini bozmayacak cinst
 
 - **Profil birliği:** botun profil resmi oyun/bot_kimlik.py BOTLAR'daki birimin resmidir. O birim meydanda,
   belediyenin önünde durur (49, 53); iki yanında temanın bir süsü.
-- **Denge:** profil birliği, en zayıflardan başlayarak gücü (can × saldırı) kadar sıradan askerin yerini alır. Köyün
-  ordu gücü artmaz; en çok ordudaki en güçlü bir askerin gücü kadar azalır. Örnek: Fırtına Ejderhası (59. seviye)
-  açık en güçlü sıradan birimin yaklaşık 9,6 katı; köyde onun yerine o kadar asker eksik. Dünya benzetimi ordu
-  sayarken profil birliğini bu ağırlıkla sayar (ordu_dolu_mu), böylece eksik askerler sonradan geri dolmaz.
+- **Denge:** profil birliği, ağırlığı kadar sıradan askerin yerini alır. Ağırlık, birliğin gücünün (can × saldırı)
+  ortalama bir askerin gücüne bölümüdür; ortalama, birim_sec'in kuralıyla hesaplanır (kol ağırlıkları, %70 en yüksek
+  kademe, %30 bir altı). Dünya benzetimi orduyu aynı ağırlıkla sayar (ordu_dolu_mu): kurulan köy dolu sayılır,
+  sonradan dolan askerler de aynı kuraldan gelir. Ölçüm: 50 botun her birinde 30 köyün toplam ordu gücü adsız köylerin
+  %96-104'ü. İlk sürümde askerler en zayıftan çıkarılıyordu; geri dolan askerler ortalama güçte olduğu için köy zamanla
+  güçlenebilirdi (PR #84 incelemesi).
 - **Tema:** 15 tema (saray, kuzey, Mısır, Aztek, elf, cehennem, ejderha, göksel, deniz, trol, büyü, antik, doğu,
   altın, savan). Birimden temaya eşleme ve süslerin listesi oyun/bot_kimlik.py TEMALAR'da. Süsler yalnızca oyunun kendi
   süsleri (config category_id 4) ve sprite'ları çevrimdışı pakette. Meydanın dört köşesi, birliğin iki yanı, köye

@@ -113,11 +113,29 @@ def _guc(kimlik):
         return 0.0
 
 
-def profil_agirligi(kimlik, seviye):
-    """Profil birliği kaç sıradan askerin yerini tutar: gücü / o seviyede açık en güçlü sıradan birimin gücü (en az 1).
-    Köyün ordu gücü değişmesin diye (sahibi: 'oyunun dengesini bozmayacak'); ör. Fırtına Ejderhası 59. seviyede 10."""
-    en_iyi = max((_guc(b) for kol in KOLLAR for s, _, b in KOLLAR[kol] if s <= seviye), default=0)
-    return max(1, round(_guc(kimlik) / en_iyi)) if en_iyi else 1
+def beklenen_guc(seviye, kisi):
+    """birim_sec'in seçtiği bir askerin ortalama gücü: kol, kişiliğin kol ağırlığıyla; kolda %70 en yüksek, %30 bir
+    alt kademe (birim_sec ile aynı kural)."""
+    agirlik = {k: a for k, a in KISILIK.get(kisi, KISILIK["dengeli"])["kollar"].items()
+               if a > 0 and acik_kademeler(k, seviye)} or {"piyade": 1}
+    toplam = 0.0
+    for kol, a in agirlik.items():
+        kademeler = acik_kademeler(kol, seviye)
+        if not kademeler:
+            continue
+        g = _guc(kademeler[-1][1])
+        if len(kademeler) >= 2:
+            g = 0.7 * g + 0.3 * _guc(kademeler[-2][1])
+        toplam += a * g
+    return toplam / sum(agirlik.values())
+
+
+def profil_agirligi(kimlik, seviye, kisi="dengeli"):
+    """Profil birliği kaç sıradan askerin yerini tutar: gücü / ortalama bir askerin gücü (en az 1). Köy kurulurken bu
+    kadar asker çıkarılır, dünya benzetimi de orduyu bu ağırlıkla sayar; yeniden dolan askerler de birim_sec'ten
+    geldiği için köyün ortalama ordu gücü adsız köyünkiyle aynı kalır (sahibi: 'oyunun dengesini bozmayacak')."""
+    ortalama = beklenen_guc(seviye, kisi)
+    return max(1, round(_guc(kimlik) / ortalama)) if ortalama else 1
 
 
 def _uretim(seviye, kisi, rng):
@@ -502,11 +520,8 @@ def koy_kur(seviye, kisi, tohum, simdi, ad=None):
 
     # 6. Ordu: kışlaların önünde ve meydanda 2-4 düzensiz manga
     ordu = [birim_sec(seviye, kisi, rng) for _ in range(ordu_buyuklugu(seviye, kisi))]
-    if profil:  # profil birliği gücü kadar askerin yerini alır: en zayıflardan başlayarak, çıkan güç onunkine erişene dek
-        ordu.sort(key=lambda k: (_guc(k), k))
-        cikan = 0.0
-        while ordu and cikan < _guc(profil):
-            cikan += _guc(ordu.pop(0))
+    if profil:  # profil birliği ağırlığı kadar askerin yerini alır (son çekilenler; çekiliş rastgele)
+        ordu = ordu[:max(0, len(ordu) - profil_agirligi(profil, seviye, kisi))]
     ordu.sort()
     # 15. seviyeden bir avluda asker geçidi: ordunun yarısı (en az 8, en çok 16), türüne göre sıra sıra, bir karo arayla
     #     (internet taraması: 55. seviye oyuncu köyünde avluda sıralı ordu; DNT-60)
@@ -573,7 +588,7 @@ def ordu_dolu_mu(kayit):
     seviye = max(1, int(harita.get("level", 1)))
     kisi = kayit.get("playerInfo", {}).get("bot_kisi", "dengeli")
     profil = profil_birimi(kayit.get("playerInfo", {}).get("name"))
-    birimler = sum(profil_agirligi(profil, seviye) if profil and int(e[0]) == profil else 1
+    birimler = sum(profil_agirligi(profil, seviye, kisi) if profil and int(e[0]) == profil else 1
                    for e in harita.get("items", []) if (get_item_from_id(e[0]) or {}).get("type") == "u")
     return birimler >= ordu_buyuklugu(seviye, kisi)
 
