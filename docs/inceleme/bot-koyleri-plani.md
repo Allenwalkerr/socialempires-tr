@@ -101,3 +101,23 @@ Uygulama (oyun/bot_koy.py, tasarım sürümü 4): köy seviyeyle büyür (1-9: 1
 kenarda kişiliğin sırasıyla bir mahalle şeridi; her büyük karonun ortasında 10×10'luk blok; meydan çiçek halısıyla;
 ordu 2-4 toplu manga. Denetim tests/test_bot_koy.py ArthurDuzeni (genişleme eksenleri Arthur30 dosyasıyla, aşamalar,
 sur kenarda ve köşelerde kule, askerler küme küme).
+
+## Profil birliği ve köy teması (tasarım sürümü 9, 13.11.2026)
+
+Sahibinin fikri (12.11.2026): "her botun profil fotoğrafındaki birlik o bot köyünde yer alsın", "botlara profil
+resimleri ile uygun bir şekilde dekorasyon", "oyunun dengesini bozmayacak cinsten".
+
+- **Profil birliği:** botun profil resmi oyun/bot_kimlik.py BOTLAR'daki birimin resmidir. O birim meydanda,
+  belediyenin önünde durur (49, 53); iki yanında temanın bir süsü.
+- **Denge:** profil birliği, en zayıflardan başlayarak gücü (can × saldırı) kadar sıradan askerin yerini alır. Köyün
+  ordu gücü artmaz; en çok ordudaki en güçlü bir askerin gücü kadar azalır. Örnek: Fırtına Ejderhası (59. seviye)
+  açık en güçlü sıradan birimin yaklaşık 9,6 katı; köyde onun yerine o kadar asker eksik. Dünya benzetimi ordu
+  sayarken profil birliğini bu ağırlıkla sayar (ordu_dolu_mu), böylece eksik askerler sonradan geri dolmaz.
+- **Tema:** 15 tema (saray, kuzey, Mısır, Aztek, elf, cehennem, ejderha, göksel, deniz, trol, büyü, antik, doğu,
+  altın, savan). Birimden temaya eşleme ve süslerin listesi oyun/bot_kimlik.py TEMALAR'da. Süsler yalnızca oyunun kendi
+  süsleri (config category_id 4) ve sprite'ları çevrimdışı pakette. Meydanın dört köşesi, birliğin iki yanı, köye
+  serpilen birkaç küçük süs ve meydanın yakınında bir büyük süs (piramit, yanardağ, donmuş mamut, girdap...); elf,
+  cehennem, göksel, büyü ve doğu temalarında ağaçların yarısı da temadan.
+- Tema seçimleri ayrı bir rastgele kaynaktan yapılır; köyün geri kalanı (ordu dahil) eskisiyle aynı çekilir.
+- Denetim: tests/test_bot_koy.py ProfilBirligiVeTema. Ruffle'da İblis Kıran ve Balrog köyleri açıldı: birlik meydanda,
+  yanında Maya ateşleri, Balrog köyünde yanardağ.

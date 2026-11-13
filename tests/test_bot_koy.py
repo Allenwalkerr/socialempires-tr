@@ -352,5 +352,79 @@ class Arazi(unittest.TestCase):
         self.assertNotEqual(k["maps"][0]["skin"], 0)
 
 
+
+class ProfilBirligiVeTema(unittest.TestCase):
+    """Sahibi (12.11.2026): 'her botun profil fotoğrafındaki birlik o bot köyünde yer alsın', 'profil resimleri ile
+    uygun bir şekilde dekorasyon', 'oyunun dengesini bozmayacak'. Profil resmi oyun/bot_kimlik.py BOTLAR'daki birimin
+    resmidir; güç config'teki can × saldırı ile burada ayrıca hesaplanır. Meydan: belediye (4x4) 2·20+8 = 48'de,
+    çevresinde çiçek halısı (47..52), köşeler 46 ve 53; belediyenin önündeki sıra y = 53."""
+
+    from oyun.bot_kimlik import BOTLAR, TEMALAR
+
+    @staticmethod
+    def guc(items):
+        return sum(int(ESYA[int(e[0])]["life"]) * int(ESYA[int(e[0])]["attack"])
+                   for e in items if ESYA[int(e[0])]["type"] == "u")
+
+    def test_her_botun_birligi_meydanda(self):
+        for i, (ad, resim, kimlik) in enumerate(self.BOTLAR):
+            with self.subTest(ad):
+                self.assertEqual(ESYA[int(kimlik)]["img_name"], resim)  # profil resmi bu birimin resmi
+                items, _ = bot_koy.koy_kur(min(60, 3 + int(i * 1.15)), "dengeli", "p%d" % i, 0, ad=ad)
+                self.assertIn([int(kimlik), 49, 53], [e[:3] for e in items])
+
+    def test_ordu_gucu_artmaz(self):
+        """Profil birliği en zayıflardan başlayarak gücü kadar askerin yerini alır: güç artmaz, en çok ordudaki en
+        güçlü askerin gücü kadar azalır (son çıkan asker ondan güçlü olamaz). Tema seçimleri ayrı rastgele kaynaktan, ordu adsız köyle aynı çekilir."""
+        for i, (ad, _, kimlik) in enumerate(self.BOTLAR):
+            sv, kisi = min(60, 3 + int(i * 1.15)), list(bot_koy.KISILIK)[i % 4]
+            for s in range(3):
+                with self.subTest(ad, tohum=s):
+                    adsiz, _ = bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0)
+                    adli, _ = bot_koy.koy_kur(sv, kisi, "g%d-%d" % (i, s), 0, ad=ad)
+                    en_guclu = max(int(ESYA[int(e[0])]["life"]) * int(ESYA[int(e[0])]["attack"])
+                                   for e in adsiz if ESYA[int(e[0])]["type"] == "u")
+                    self.assertLessEqual(self.guc(adli), self.guc(adsiz))
+                    self.assertGreater(self.guc(adli), self.guc(adsiz) - en_guclu)
+
+    def test_susler_oyunun_kendi_susleri_ve_temel_pakette(self):
+        from oyun import onindirme
+        oncelik = {y: o for y, _, o in onindirme.liste()}
+        for ad, tm in self.TEMALAR.items():
+            for k in tm["kucuk"] + tm["orta"] + (tm["agac"] or []):
+                with self.subTest(ad, kimlik=k):
+                    self.assertEqual(ESYA[k]["category_id"], "4")  # süs (CLAUDE.md: yalnızca oyunun görselleri)
+                    self.assertIn("buildingsprites/%s.swf" % ESYA[k]["img_name"], oncelik)
+            for k in tm["kucuk"] + (tm["agac"] or []):
+                self.assertEqual((ESYA[k]["width"], ESYA[k]["height"]), ("1", "1"))
+
+    def test_koyde_tema_susleri_var_ve_cakisma_yok(self):
+        for i, (ad, _, _) in enumerate(self.BOTLAR):
+            from oyun.bot_kimlik import tema
+            tm = tema(ad)
+            items, acik = bot_koy.koy_kur(min(60, 3 + int(i * 1.15)), "tuccar", "t%d" % i, 0, ad=ad)
+            with self.subTest(ad):
+                self.assertGreaterEqual(sum(1 for e in items if e[0] in tm["kucuk"]), 4)
+                dolu = set()
+                for e in items:
+                    self.assertFalse(karolar(e) & dolu, e)
+                    self.assertLessEqual(karolar(e), acik_karolar(acik), e)
+                    dolu |= karolar(e)
+
+    def test_ordu_dolu_mu_profil_birligini_agirligiyla_sayar(self):
+        """Fırtına Ejderhası (684) 59. seviyede açık en güçlü sıradan birimin (can × saldırı) yaklaşık 9,6 katı."""
+        en_iyi = max(int(ESYA[b]["life"]) * int(ESYA[b]["attack"])
+                     for kol in bot_koy.KOLLAR for s, _, b in bot_koy.KOLLAR[kol] if s <= 59)
+        agirlik = round(int(ESYA[684]["life"]) * int(ESYA[684]["attack"]) / en_iyi)
+        self.assertEqual(bot_koy.profil_agirligi(684, 59), agirlik)
+        sinir = bot_koy.ordu_buyuklugu(59, "dengeli")
+        sirada = next(b for s, _, b in bot_koy.KOLLAR["piyade"] if s <= 59)
+        k = {"playerInfo": {"name": "Fırtına Ejderhası", "bot_kisi": "dengeli"},
+             "maps": [{"level": 59, "items": [[684, 50, 50]] + [[sirada, 0, 0]] * (sinir - agirlik)}]}
+        self.assertTrue(bot_koy.ordu_dolu_mu(k))
+        k["maps"][0]["items"].pop()
+        self.assertFalse(bot_koy.ordu_dolu_mu(k))
+
+
 if __name__ == "__main__":
     unittest.main()

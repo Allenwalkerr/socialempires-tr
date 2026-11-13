@@ -94,3 +94,54 @@ def adlari_yenile(kayitlar):
                 rakip["pic"] = portre(rakip["name"])
                 degisen.add(uid)
     return degisen
+
+
+# Profil birliği ve köy teması (sahibinin fikri, 12.11.2026: "her botun profil fotoğrafındaki birlik o bot köyünde
+# yer alsın", "profil resimleri ile uygun bir şekilde dekorasyon"). Süsler yalnızca oyunun kendi süsleridir
+# (config category_id 4; sprite'ı çevrimdışı pakette olanlar, config/onindirme.tsv). "kucuk": 1x1 süsler (meydanın
+# köşeleri, birliğin iki yanı ve köye serpilenler); "orta": meydanın yanına konan büyük süs; "agac": ağaç öbekleri.
+TEMALAR = {
+    "saray": {"kucuk": [122, 126, 123, 125, 129], "orta": [178], "agac": None},  # Kral ve Asker Heykelleri, Bahçe
+    "kuzey": {"kucuk": [128, 114, 118], "orta": [180], "agac": None},  # Viking Heykeli, Kurukafalar; Donmuş Mamut
+    "misir": {"kucuk": [131, 117, 68], "orta": [176, 206], "agac": None},  # Antik Testi; Piramit, Timsah Çukuru
+    "aztek": {"kucuk": [68, 133, 131], "orta": [1457], "agac": None},  # Maya Ateşi, Altın Totem; Yanardağ
+    "elf": {"kucuk": [63, 66, 67], "orta": [207, 178], "agac": [101, 104, 105]},  # çiçekler; Hayat Ağacı, Bahçe
+    "cehennem": {"kucuk": [117, 114, 68], "orta": [1457], "agac": [107]},  # İskelet Heykeli; Yanardağ; Korku Ağacı
+    "ejderha": {"kucuk": [120, 1282], "orta": [1456, 434], "agac": None},  # Ejderha Heykeli, Mavi Anka Yumurtası
+    "goksel": {"kucuk": [63, 129, 122], "orta": [179, 178], "agac": [100]},  # Ak Çiçek, Çeşme; Altın Çeşme
+    "deniz": {"kucuk": [130, 129], "orta": [944], "agac": None},  # Su Kuyusu, Çeşme; Girdap
+    "trol": {"kucuk": [353, 354, 355, 356], "orta": [288], "agac": None},  # Trol Heykelleri; Kaya Delen Kafatası
+    "buyu": {"kucuk": [119, 1282], "orta": [1254], "agac": [101]},  # Minotor Heykeli; Anka Yumurtası
+    "antik": {"kucuk": [115, 118, 132], "orta": [178], "agac": None},  # Roma Sütunu, Miğfer Heykeli, Truva Atı
+    "dogu": {"kucuk": [121, 68], "orta": [1456], "agac": [103]},  # Moğol Heykeli; Çin Ağacı
+    "altin": {"kucuk": [133, 177], "orta": [179], "agac": None},  # Altın Totem, Hazine Sandığı; Altın Çeşme
+    "savan": {"kucuk": [114, 131], "orta": [206], "agac": None},  # Kurukafalar, Antik Testi; Timsah Çukuru
+}
+BIRIM_TEMASI = {
+    "607": "kuzey", "606": "kuzey", "554": "kuzey", "556": "kuzey", "642": "kuzey",
+    "612": "misir", "615": "misir", "614": "misir",
+    "578": "aztek",
+    "628": "elf", "632": "elf", "557": "elf", "629": "elf",
+    "646": "cehennem", "644": "cehennem", "647": "cehennem", "654": "cehennem", "650": "cehennem",
+    "638": "ejderha", "649": "ejderha", "684": "ejderha",
+    "703": "goksel", "699": "goksel", "655": "goksel", "700": "goksel", "706": "goksel",
+    "619": "deniz", "621": "deniz",
+    "564": "trol",
+    "550": "buyu", "652": "buyu",
+    "660": "antik", "661": "antik", "533": "antik",
+    "694": "dogu",
+    "641": "altin",
+    "640": "savan", "603": "savan",
+}
+_BIRIM = {ad: int(kimlik) for ad, _, kimlik in BOTLAR}
+
+
+def profil_birimi(ad):
+    """Botun profil resmindeki birliğin kimliği; bot listede yoksa None."""
+    return _BIRIM.get(ad)
+
+
+def tema(ad):
+    """Botun köy teması (TEMALAR'dan); listede olmayan ya da teması yazılmamış birlikte 'saray'."""
+    kimlik = _BIRIM.get(ad)
+    return TEMALAR[BIRIM_TEMASI.get(str(kimlik), "saray")] if kimlik else TEMALAR["saray"]

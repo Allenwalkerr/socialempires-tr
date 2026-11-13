@@ -3048,6 +3048,19 @@
       "pr": null,
       "onay": null,
       "notlar": "YOL_HARITASI_2 A7, Faz 2."
+    },
+    {
+      "id": "DNT-67",
+      "baslik": "Bot köylerinde profil resmindeki birlik ve ona uygun tema süsleri",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'her botun profil fotoğrafındaki birlik o bot köyünde yer alsın', 'profil resimleri ile uygun bir şekilde dekorasyon', 'oyunun dengesini bozmayacak'. Ölçüm: 50 botun her köyünde birlik meydanda; 40 tohumda ortalama ordu gücü oranı 0,92-1,00 (hiçbiri 1'i aşmıyor). Ruffle'da İblis Kıran ve Balrog köyleri açıldı (ekran görüntüsü).",
+      "test": "tests/test_bot_koy.py ProfilBirligiVeTema (bozma denemeleri: yer değiştirme kaldırılınca 150, birlik konmayınca 183, ağırlık sayılmayınca 1 test düşer)",
+      "pr": "#84",
+      "onay": null,
+      "notlar": "oyun/bot_kimlik.py TEMALAR ve BIRIM_TEMASI; oyun/bot_koy.py koy_kur(ad=...), profil_agirligi, ordu_dolu_mu; TASARIM_SURUMU 9 (var olan bot köyleri açılışta yeniden kurulur; ad, seviye, kaynak ve geçmiş kalır). Plan: docs/inceleme/bot-koyleri-plani.md. YOL_HARITASI_2 B2."
     }
   ]
 }
