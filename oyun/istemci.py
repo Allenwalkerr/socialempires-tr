@@ -133,13 +133,22 @@ def kaynak_yenilendi(kayit, kasaba, bugun=None, uid=None):
 # 0926 spawnInit gibi). Temizliği o açılışta sunucu yapar, yoksa kamp her açılışta üst üste eklenirdi.
 KAYNAK_KIMLIKLERI = frozenset((19, 20, 21, 69, 70, 71, 72, 73, 74, 75, 76, 80, 81))  # ağaç, taş, altın, yenilenen ocaklar
 HAYVAN_TURLERI = frozenset(("74", "75", "88", "90"))
+# Kampın birlikleri MapInitializer$/getEnemyIds'ten gelir (QuestsInMap$/spawnSavedQuest @828-880): kasaba insansa
+# (currentRace == FACTION_HUMAN 'h') trol birlikleri (Constants ID_UNIT_TROLL_1..8, RHINORIDER, HEALER), değilse
+# insan birlikleri (ID_UNIT_FOOTMAN/ARCHER/MOUNTED_1..4, CLERIC_HEALER, CLERIC_MONK). Sunucu yalnızca bunları siler:
+# kayıtta birliğin sahibi (istemcideki PlayerID) yok; oyuncunun başka ırktan birlikleri (kurt, yeti, golem...) halkaya
+# yürümüş olabilir, onlar kalır (#84 incelemesi).
+KAMP_TROLLERI = frozenset((525, 526, 527, 530, 531, 528, 529, 547, 601, 590))
+KAMP_INSANLARI = frozenset((509, 516, 512, 510, 517, 513, 511, 518, 514, 539, 540, 541, 502, 569))
 
 
 def halkadaki_kampi_temizle(harita):
-    """Halkada, oyuncunun genişlemediği büyük karolardaki bina ve yabancı birlikleri kayıttan siler; kaç öğe silindi."""
+    """Halkada, oyuncunun genişlemediği büyük karolardaki binaları ve kampın birliklerini kayıttan siler; kaç öğe
+    silindi."""
     from oyun.config import get_item_from_id
     acik = {int(e) for e in harita.get("expansions") or [] if str(e).lstrip("-").isdigit()}
     irk = harita.get("race") or "h"
+    kamp_birlikleri = KAMP_TROLLERI if irk == "h" else KAMP_INSANLARI
     kalan, silinen = [], 0
     for e in harita.get("items", []):
         try:
@@ -151,7 +160,7 @@ def halkadaki_kampi_temizle(harita):
         buyuk_karo = (y // 20) * 5 + x // 20 + 1
         esya = get_item_from_id(kimlik) or {}
         korunur = (kimlik in KAYNAK_KIMLIKLERI or str(esya.get("subcat_functional")) in HAYVAN_TURLERI
-                   or (esya.get("type") == "u" and esya.get("race") == irk))
+                   or (esya.get("type") == "u" and kimlik not in kamp_birlikleri))
         if halkada and buyuk_karo not in acik and not korunur:
             silinen += 1
             continue

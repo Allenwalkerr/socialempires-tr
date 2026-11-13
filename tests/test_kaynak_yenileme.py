@@ -102,7 +102,8 @@ class GundeBir(unittest.TestCase):
 class HalkaTemizligi(unittest.TestCase):
     """Kaynak yenilemesi olmayan açılışta istemci MapInitializer$/cleanBorderTiles'ı atlar; hikâye görevi kampı ise her
     açılışta yeniden kurulur. safeAreaClean@240-507: halkadaki (orta 3×3 dışı) binalar satılır, oyuncunun ırkından
-    birlikler geri çekilir, hayvanlar (inek 504, koyun 505) kalır. Ağaç (19), taş (69), altın (73) yenilenmez, kalır.
+    birlikler geri çekilir, hayvanlar (inek 504, koyun 505) kalır. Sunucu birliklerden yalnızca kampın birliklerini
+    (getEnemyIds) siler. Ağaç (19), taş (69), altın (73) yenilenmez, kalır.
     Kimlikler config'ten: 305 Troll Wall II (b, t), 526 Devious Troll (u, t), 512 Light Knight (u, h)."""
 
     def harita(self):
@@ -116,6 +117,23 @@ class HalkaTemizligi(unittest.TestCase):
         self.assertEqual(h["items"], [[19, 5, 30, 0], [69, 85, 85, 0], [73, 2, 95, 0], [505, 3, 50, 0], [512, 95, 3, 0],
                                       [305, 5, 5, 0],     # genişleme 1 (0..19, 0..19) oyuncunun
                                       [305, 50, 50, 0], [526, 40, 40, 0]])  # orta 3×3 halkada değil
+
+    def test_oyuncunun_baska_irktan_birligi_kalir(self):
+        """#84 incelemesi: kayıtta birliğin sahibi yok; halkaya yürümüş oyuncu birliği silinmemeli. Kamp birlikleri
+        MapInitializer$/getEnemyIds'ten gelir (insan kasabada trol: Constants ID_UNIT_TROLL_*, ör. 525, 547, 590).
+        Config: 523 Wolf (n), 544 Yeti (a), 538 Stone Golem (e), 564 Ravager Troll (h, kamp listesinde değil)."""
+        h = {"race": "h", "expansions": [13], "items": [
+            [523, 2, 2, 0], [544, 3, 3, 0], [538, 4, 4, 0], [564, 6, 6, 0], [525, 5, 5, 0], [547, 7, 7, 0],
+            [590, 8, 8, 0]]}
+        self.assertEqual(istemci.halkadaki_kampi_temizle(h), 3)
+        self.assertEqual(h["items"], [[523, 2, 2, 0], [544, 3, 3, 0], [538, 4, 4, 0], [564, 6, 6, 0]])
+
+    def test_trol_kasabada_kamp_insanlardan(self):
+        """getEnemyIds: kasaba insan değilse kamp insan birliklerinden (509 Spearman, 569 Monk); trol kasabanın kendi
+        trolleri (526) halkada kalır: sahibi bilinmeyen birlik silinmez (veri kaybından kaçınılır)."""
+        h = {"race": "t", "expansions": [13], "items": [[509, 2, 2, 0], [569, 3, 3, 0], [526, 4, 4, 0]]}
+        self.assertEqual(istemci.halkadaki_kampi_temizle(h), 2)
+        self.assertEqual(h["items"], [[526, 4, 4, 0]])
 
     def test_izinsiz_acilista_sunucu_temizler(self):
         tarayici = server.app.test_client()
