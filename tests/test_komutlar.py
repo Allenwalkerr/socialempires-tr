@@ -150,6 +150,25 @@ class EsyaKomutlari(KomutTesti):
                                             "item_rewards": {}, "set_unlocked_index:": 1}))
         self.assertEqual(self.ps["unlockedQuestIndex"], 18)
 
+    def test_gorev_zaferi_zorlugu_kaydeder(self):
+        """DNT-66. Sahibi: 'adayı bitirdim, zorluk seçemiyorum, yıldız kazanılmıyor'. Quest*/sendResults end_quest'e
+        'difficulty' (Quest.difficulty, 1-3) ve 'quest_id' koyar (QuestIslaTrollsGeneric/sendResults @147-156).
+        İstemci questsRank'i hiç yazmaz, yalnızca okur: PlayerStatus/Init privateState.questsRank'ten alır;
+        PopupLoadingQuest/<kurucu> @1674-1755 rank 1 ya da 2 ise rank + 1'i açar, 3 yıldız tavandır. Değer, adada
+        kazanılmış en yüksek zorluktur (PopupQuestFinished: ilk onur rank yoksa ya da rank < difficulty)."""
+        self.ps["questsRank"] = {}
+        sonuc = {"map": 0, "resources": {"g": 0, "x": 0}, "quest_id": 100000003, "item_rewards": {}, "set_unlocked_index": 0}
+        self.komut("end_quest", json.dumps(dict(sonuc, win=True, difficulty=1)))
+        self.assertEqual(self.ps["questsRank"], {"100000003": 1})
+        self.komut("end_quest", json.dumps(dict(sonuc, win=False, difficulty=2)))  # yenilgi açmaz
+        self.assertEqual(self.ps["questsRank"], {"100000003": 1})
+        self.komut("end_quest", json.dumps(dict(sonuc, win=True, difficulty=3)))
+        self.assertEqual(self.ps["questsRank"], {"100000003": 3})
+        self.komut("end_quest", json.dumps(dict(sonuc, win=True, difficulty=1)))  # kolay zafer düşürmez
+        self.assertEqual(self.ps["questsRank"], {"100000003": 3})
+        self.komut("end_quest", json.dumps(dict(sonuc, win=True, difficulty=7, quest_id=100000006)))  # 1-3 dışı
+        self.assertNotIn("100000006", self.ps["questsRank"])
+
     def test_depoda_olmayan_esya_yerlestirilip_satilamaz(self):
         # tekrarlanan komut: depo boşken eşya çoğalmamalı, iade verilmemeli
         self.ps["gifts"] = [0, 1]

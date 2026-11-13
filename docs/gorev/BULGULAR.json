@@ -2980,7 +2980,7 @@
       "isaret": "✔",
       "kanit": "Sahibi (12.11.2026): 'prenses görevi halen yok, olunca görseldeki gibi bu kadar goblin kaldı diyordu' (görsel: 'Enemy Camp 34 enemies alive', CountdownTimer/setTextOgres; oyunun metni CONTADOR_ENEMIGOS_VIVOS_PLURAL). Eski bir videoda 'Enemy Camp 03:11:53' (TIMER_OGRES_VILLAGE 14400 sn). 0926 istemcisi MapInitializer$/spawnInit@82-92 setCorrectQuest'ten sonra spawnQuestInMap(currentQuestId) çağırır; 1.4.07'nin spawnInit'inde bu çağrı yok, spawnQuestInMap'i yalnızca AdminPanel 'spawnMapQuest' geliştirici komutu çağırır (gonderen: tek çağıran MapInitializer$/spawnMapQuest). spawnQuestInMap ve QuestsInMap$/spawn* iki istemcide aynı. DNT-50'nin otuz görev denemesinde (prenses.js) hiçbir kamp kurulmamıştı: günlükte görev öğesi buy'ı yok; o deneme yalnızca açılışın çökmediğini gösterdi.",
       "test": "tests/test_swf_yama.py HikayeGoreviTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar), tests/test_kaynak_yenileme.py HalkaTemizligi; Ruffle'da üç açılış (elle)",
-      "pr": null,
+      "pr": "#84",
       "onay": null,
       "notlar": "oyun/swf_yama.py hikaye_gorevini_kur (YAMA_SURUMU 17): 0926'daki çağrı 1.4.07 spawnInit@73'e konur (findpropstrict spawnQuestInMap 16185, Base.Main.currentQuestId 474). Kamp her açılışta yeniden kurulur; 0926'da önceki kampı cleanBorderTiles silerdi. DNT-64 kaynak yenilemesi olmayan açılışta cleanBorderTiles'ı atladığı için o açılışta temizliği sunucu yapar (oyun/istemci.py halkadaki_kampi_temizle: orta 3×3 dışındaki halkada, oyuncunun genişlemediği büyük karolardaki binalar ve oyuncunun ırkından olmayan birlikler silinir; ağaç, taş, altın, hayvan ve oyuncunun birlikleri kalır; safeAreaClean@240-507). Ruffle'da (9. seviye, görev 0): ilk açılışta 41 Troll Wall II ve troller kuruldu; ikinci ve üçüncü açılışta kayıtta yine 41 duvar, ağaç 186 sabit. Bozmalar düştü (ekleme yeri, sunucu temizliği)."
     },
@@ -2989,13 +2989,13 @@
       "baslik": "Seferde ada bitince zorluk seçilemiyor, yıldız kazanılmıyor: questsRank hiç yazılmıyor",
       "sinif": "hata",
       "onem": "Yüksek",
-      "durum": "acik",
+      "durum": "ci_bekliyor",
       "isaret": "◐",
       "kanit": "Sahibi (12.11.2026): 'Seferde adayı bitirdim zorluk seçemiyorum böylece yıldız kazanmı olmuyor'. İstemci zorluk penceresini Base.Player.questsRank[questId]'den açar (PlayerStatus/Init@122-129 privateState.questsRank; PopupLoadingQuest/<kurucu>@1674-1755). end_quest JSON'u 'difficulty' taşır (Quest$/end@208; QuestIslaEgg1/2, God, Hard, TrollsGeneric, Heroes sendResults@153-155, QuestBoss*, QuestCollectable*). Bağımsız denetçi aynı yerleri buldu. Sunucunun end_quest'i bu alanı okumuyor; initial.json'da \"questsRank\": {} ve hiçbir kod yazmıyor (grep).",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_komutlar.py test_gorev_zaferi_zorlugu_kaydeder (bozma denemesi: max kaldırılınca düşer)",
+      "pr": "#84",
       "onay": null,
-      "notlar": "Önerilen düzeltme: end_quest kazançla gelirse questsRank[ada] = max(önceki, difficulty). Değerin anlamı (yıldız 1-3 mü, açılan en yüksek seviye mi) istemcide doğrulanacak. YOL_HARITASI_2 A2."
+      "notlar": "oyun/komutlar.py end_quest: zaferde questsRank[quest_id] = max(önceki, difficulty), yalnızca 1-3. Değerin anlamı istemcide doğrulandı: PopupLoadingQuest rank 1-2 ise rank+1'i açar, 3 tavan; PopupQuestFinished ilk onuru rank < difficulty iken verir. İstemci Player.Init'i her get_player_info yüklemesinde (Base/_parseLoadedInfo @85) çağırdığı için yeni yıldız kendi adasına dönünce görünür (◐; Ruffle'da denenmedi). Eski kayıtlarda geçmiş zaferler bilinmez; ada yeniden kazanılınca yazılır. YOL_HARITASI_2 A2."
     },
     {
       "id": "YOL-01",
