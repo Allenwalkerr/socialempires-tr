@@ -106,7 +106,7 @@ def bot_uret(adet=50):
         harita["food"] = 400 * seviye
         harita["timestamp"] = simdi
         harita["resourcesTraded"] = {}
-        harita["items"], harita["expansions"] = bot_koy.koy_kur(seviye, kisi, pid, simdi)
+        harita["items"], harita["expansions"] = bot_koy.koy_kur(seviye, kisi, pid, simdi, ad=isim)
         harita["skin"] = bot_koy.arazi_sec(pid)
 
         ps = kayit["privateState"]

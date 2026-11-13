@@ -126,6 +126,50 @@ def kaynak_yenilendi(kayit, kasaba, bugun=None, uid=None):
     return True
 
 
+# MapInitializer$/cleanBorderTiles (1.4.07 @0-86): orta 3×3 büyük karonun dışındaki halka (x ya da y 20'den küçük ya da
+# 79'dan büyük). safeAreaClean@240-507 halkadaki binaları satar, oyuncunun ırkından kendi birliklerini geri çeker (saveUnit),
+# hayvanlara (SUBCATFUNC_UNIT_COW, BOAR, SHEEP, HORSE) dokunmaz. Kaynak yenilemesi olmayan açılışta istemci bu temizliği
+# atlar (oyun/swf_yama.py KAYNAK_ATLA); hikâye görevinin kampı ise her açılışta yeniden kurulur (hikaye_gorevini_kur,
+# 0926 spawnInit gibi). Temizliği o açılışta sunucu yapar, yoksa kamp her açılışta üst üste eklenirdi.
+KAYNAK_KIMLIKLERI = frozenset((19, 20, 21, 69, 70, 71, 72, 73, 74, 75, 76, 80, 81))  # ağaç, taş, altın, yenilenen ocaklar
+HAYVAN_TURLERI = frozenset(("74", "75", "88", "90"))
+# Kampın birlikleri MapInitializer$/getEnemyIds'ten gelir (QuestsInMap$/spawnSavedQuest @828-880): kasaba insansa
+# (currentRace == FACTION_HUMAN 'h') trol birlikleri (Constants ID_UNIT_TROLL_1..8, RHINORIDER, HEALER), değilse
+# insan birlikleri (ID_UNIT_FOOTMAN/ARCHER/MOUNTED_1..4, CLERIC_HEALER, CLERIC_MONK). Sunucu yalnızca bunları siler:
+# kayıtta birliğin sahibi (istemcideki PlayerID) yok; oyuncunun başka ırktan birlikleri (kurt, yeti, golem...) halkaya
+# yürümüş olabilir, onlar kalır (#84 incelemesi).
+KAMP_TROLLERI = frozenset((525, 526, 527, 530, 531, 528, 529, 547, 601, 590))
+KAMP_INSANLARI = frozenset((509, 516, 512, 510, 517, 513, 511, 518, 514, 539, 540, 541, 502, 569))
+
+
+def halkadaki_kampi_temizle(harita):
+    """Halkada, oyuncunun genişlemediği büyük karolardaki binaları ve kampın birliklerini kayıttan siler; kaç öğe
+    silindi."""
+    from oyun.config import get_item_from_id
+    acik = {int(e) for e in harita.get("expansions") or [] if str(e).lstrip("-").isdigit()}
+    irk = harita.get("race") or "h"
+    kamp_birlikleri = KAMP_TROLLERI if irk == "h" else KAMP_INSANLARI
+    kalan, silinen = [], 0
+    for e in harita.get("items", []):
+        try:
+            kimlik, x, y = int(e[0]), int(e[1]), int(e[2])
+        except (TypeError, ValueError, IndexError):
+            kalan.append(e)
+            continue
+        halkada = not (20 <= x <= 79 and 20 <= y <= 79)
+        buyuk_karo = (y // 20) * 5 + x // 20 + 1
+        esya = get_item_from_id(kimlik) or {}
+        korunur = (kimlik in KAYNAK_KIMLIKLERI or str(esya.get("subcat_functional")) in HAYVAN_TURLERI
+                   or (esya.get("type") == "u" and kimlik not in kamp_birlikleri))
+        if halkada and buyuk_karo not in acik and not korunur:
+            silinen += 1
+            continue
+        kalan.append(e)
+    if silinen:
+        harita["items"] = kalan
+    return silinen
+
+
 @app.route(DINAMIK + "/get_game_config.php", methods=["GET", "POST"])
 def get_game_config_response():
     # İstemcinin dil ayarından bağımsız olarak metinler OYUN_DILI'nde gönderilir.
@@ -155,11 +199,13 @@ def get_player_info_response():
         with save_lock:  # get_player_info günlük ödülü kayda yazabilir (KAR-24): komutlarla aynı kilit
             yer_bildir(uid, True)  # DNT-49: kendi adası yüklendi
             kompu_donemini_guncelle(kayit)
-            yanit = get_player_info(uid, harita_no)
-            # yüklenen kasaba: get_player_info aralık dışı numarayı 0'a indirir (#82 incelemesi)
-            if kaynak_yenilendi(kayit, kayit["playerInfo"].get("acik_kasaba", 0), uid=uid):
+            # yüklenecek kasaba: get_player_info aralık dışı numarayı 0'a indirir (oyun/oyuncu.py; #82 incelemesi)
+            kasaba = harita_no if 0 <= harita_no < len(kayit.get("maps") or []) else 0
+            if kaynak_yenilendi(kayit, kasaba, uid=uid):
                 save_session(uid)  # gün hemen kalıcı olsun (komut gelmeden sunucu kapanabilir)
-            return (yanit, 200)
+            elif halkadaki_kampi_temizle(kayit["maps"][kasaba]):
+                save_session(uid)  # istemci bu açılışta halkayı temizlemez; temizlenmiş harita gider
+            return (get_player_info(uid, harita_no), 200)
     if gecerli_uid(uid):
         # DNT-49: Base/realLoadMap @129-169 user'ı yalnızca loadMapParams.userId doluysa ekler: komşu ya da görev haritası
         yer_bildir(uid, kullanici == uid)

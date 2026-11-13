@@ -14,8 +14,9 @@ Kaynaklar (1.4.07):
 import random
 
 from oyun.config import get_item_from_id
+from oyun.bot_kimlik import profil_birimi, tema
 
-TASARIM_SURUMU = 8  # 8: iç sur kapı kuleleri; 7: arazi türü; 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
+TASARIM_SURUMU = 9  # 9: profil birliği ve köy teması; 8: iç sur kapı kuleleri; 7: arazi türü; 6: iç surlar ve asker geçidi; 5: şerit sırası köyden köye karışır; 4: Arthur köyleri örnek alındı (sahibi, 12.11.2026)
 BUYUK_KARO = 20
 KULE_SINIRI = 10  # Config.MAX_TOWERS_PER_BIGTILE
 
@@ -101,6 +102,40 @@ def birim_sec(seviye, kisi, rng):
     if len(kademeler) >= 2 and rng.random() < 0.3:
         return kademeler[-2][1]
     return kademeler[-1][1]
+
+
+def _guc(kimlik):
+    """Birimin yaklaşık gücü: can × saldırı (oyun/dunya.py ordu_gucu ile aynı ölçü)."""
+    item = get_item_from_id(int(kimlik)) or {}
+    try:
+        return float(item.get("life") or 0) * float(item.get("attack") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def beklenen_guc(seviye, kisi):
+    """birim_sec'in seçtiği bir askerin ortalama gücü: kol, kişiliğin kol ağırlığıyla; kolda %70 en yüksek, %30 bir
+    alt kademe (birim_sec ile aynı kural)."""
+    agirlik = {k: a for k, a in KISILIK.get(kisi, KISILIK["dengeli"])["kollar"].items()
+               if a > 0 and acik_kademeler(k, seviye)} or {"piyade": 1}
+    toplam = 0.0
+    for kol, a in agirlik.items():
+        kademeler = acik_kademeler(kol, seviye)
+        if not kademeler:
+            continue
+        g = _guc(kademeler[-1][1])
+        if len(kademeler) >= 2:
+            g = 0.7 * g + 0.3 * _guc(kademeler[-2][1])
+        toplam += a * g
+    return toplam / sum(agirlik.values())
+
+
+def profil_agirligi(kimlik, seviye, kisi="dengeli"):
+    """Profil birliği kaç sıradan askerin yerini tutar: gücü / ortalama bir askerin gücü (en az 1). Köy kurulurken bu
+    kadar asker çıkarılır, dünya benzetimi de orduyu bu ağırlıkla sayar; yeniden dolan askerler de birim_sec'ten
+    geldiği için köyün ortalama ordu gücü adsız köyünkiyle aynı kalır (sahibi: 'oyunun dengesini bozmayacak')."""
+    ortalama = beklenen_guc(seviye, kisi)
+    return max(1, round(_guc(kimlik) / ortalama)) if ortalama else 1
 
 
 def _uretim(seviye, kisi, rng):
@@ -319,12 +354,16 @@ def serit_sirasi(kisi, rng):
     return bas + son
 
 
-def koy_kur(seviye, kisi, tohum, simdi):
-    """(items, expansions): botun köyü. Aynı tohum aynı köyü verir. Arthur köylerindeki düzen: sur köyün kenarında,
+def koy_kur(seviye, kisi, tohum, simdi, ad=None):
+    """(items, expansions): botun köyü. Aynı tohum aynı köyü verir. ad verilirse botun profil birliği meydanda,
+    belediyenin önünde durur; meydanın, köyün süsleri ve ağaçları o birliğin temasındandır (oyun/bot_kimlik.py TEMALAR). Arthur köylerindeki düzen: sur köyün kenarında,
     köşelerde kule öbekleri, kapı bir boşluk ve iki yanında kule, içeri ağaçlı bir yol; mahalleler sura yaslı
     boşluksuz şeritler; ortada çiçekli meydan; askerler düzensiz mangalar; aralarda çimen."""
     rng = random.Random(str(tohum))
     seviye = max(1, int(seviye))
+    profil = profil_birimi(ad) if ad else None
+    tm = tema(ad) if profil else None
+    trng = random.Random("tema-%s" % tohum)  # tema seçimleri ayrı: köyün geri kalanı (ordu dahil) adsız köyle aynı
     kisi = kisi if kisi in KISILIK else "dengeli"
     bks = sekil(seviye, rng)
     acik = sorted(genisleme_kimligi(c, r) for c, r in bks)
@@ -367,8 +406,16 @@ def koy_kur(seviye, kisi, tohum, simdi):
     heykeller = [k for s, k in HEYKEL if s <= seviye]
     sus = [CESME[1] if seviye >= CESME[0] else ATES[1], rng.choice(heykeller), rng.choice(heykeller),
            CESME[1] if seviye >= CESME[0] else rng.choice(heykeller)]
+    if tm:
+        sus = [trng.choice(tm["kucuk"]) for _ in range(4)]
     for (i, j), k in zip(((mx - 2, my - 2), (mx + 5, my - 2), (mx - 2, my + 5), (mx + 5, my + 5)), sus):
         a.koy(k, i, j, ayrik_serbest=True)
+    if profil:
+        # Profil birliği belediyenin önünde, iki yanında temanın süsleri
+        a.koy(profil, mx + 1, my + 5, ayrik_serbest=True)
+        yan = trng.choice(tm["kucuk"])
+        a.koy(yan, mx - 1, my + 5, ayrik_serbest=True)
+        a.koy(yan, mx + 3, my + 5, ayrik_serbest=True)
 
     # 3. Sur (3. seviyeden) ve kuleler: köşelerde üçlü öbek, kapının iki yanında birer, kalan bütçe sur boyunca
     sur, kule = kademe(SUR, seviye), kademe(KULE, seviye)
@@ -473,6 +520,8 @@ def koy_kur(seviye, kisi, tohum, simdi):
 
     # 6. Ordu: kışlaların önünde ve meydanda 2-4 düzensiz manga
     ordu = [birim_sec(seviye, kisi, rng) for _ in range(ordu_buyuklugu(seviye, kisi))]
+    if profil:  # profil birliği ağırlığı kadar askerin yerini alır (son çekilenler; çekiliş rastgele)
+        ordu = ordu[:max(0, len(ordu) - profil_agirligi(profil, seviye, kisi))]
     ordu.sort()
     # 15. seviyeden bir avluda asker geçidi: ordunun yarısı (en az 8, en çok 16), türüne göre sıra sıra, bir karo arayla
     #     (internet taraması: 55. seviye oyuncu köyünde avluda sıralı ordu; DNT-60)
@@ -514,6 +563,18 @@ def koy_kur(seviye, kisi, tohum, simdi):
     bayrak = 174 if rng.random() < 0.35 else rng.choice(bayraklar)
     for t in sorted(yol)[:: max(1, len(yol) // 4)]:
         a.koy(bayrak, t[0] + 2, t[1], ayrik_serbest=False)
+    if tm:
+        # Temanın büyük süsü meydanın yakınında boş bir yere (çevresinde bir karo boşluk); yer yoksa konmaz
+        orta = trng.choice(tm["orta"])
+        w, h = boyut(orta)
+        for x0, y0 in sorted(karolar, key=lambda t: (abs(t[0] - mx - 1) + abs(t[1] - my - 1), t)):
+            if a.bos_mu(x0 - 1, y0 - 1, w + 2, h + 2) and a.koy(orta, x0, y0):
+                break
+        for _ in range(2 + len(bks)):  # köye serpilen küçük süsler
+            x, y = trng.choice(sorted(karolar))
+            a.koy(trng.choice(tm["kucuk"]), x, y)
+        if tm["agac"]:
+            agaclar = agaclar + tm["agac"] * len(agaclar)  # ağaçların yarısı temadan
     for _ in range(2 + 2 * len(bks)):
         x, y = rng.choice(sorted(karolar))
         tur = rng.choice(agaclar)
@@ -526,7 +587,9 @@ def ordu_dolu_mu(kayit):
     harita = kayit["maps"][0]
     seviye = max(1, int(harita.get("level", 1)))
     kisi = kayit.get("playerInfo", {}).get("bot_kisi", "dengeli")
-    birimler = sum(1 for e in harita.get("items", []) if (get_item_from_id(e[0]) or {}).get("type") == "u")
+    profil = profil_birimi(kayit.get("playerInfo", {}).get("name"))
+    birimler = sum(profil_agirligi(profil, seviye, kisi) if profil and int(e[0]) == profil else 1
+                   for e in harita.get("items", []) if (get_item_from_id(e[0]) or {}).get("type") == "u")
     return birimler >= ordu_buyuklugu(seviye, kisi)
 
 
@@ -559,7 +622,8 @@ def yeniden_kur(kayit, simdi):
     if not pi.get("bot") or pi.get("bot_tasarim") == TASARIM_SURUMU:
         return False
     harita = kayit["maps"][0]
-    items, acik = koy_kur(harita.get("level", 1), pi.get("bot_kisi", "dengeli"), pi.get("pid", ""), simdi)
+    items, acik = koy_kur(harita.get("level", 1), pi.get("bot_kisi", "dengeli"), pi.get("pid", ""), simdi,
+                          ad=pi.get("name"))
     harita["items"], harita["expansions"] = items, acik
     harita["skin"] = arazi_sec(pi.get("pid", ""))
     pi["bot_tasarim"] = TASARIM_SURUMU

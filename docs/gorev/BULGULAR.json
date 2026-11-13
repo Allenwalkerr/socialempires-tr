@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65)."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65). 12.11.2026 gece, sahibi 'dur, limitim yenilenince devam' dedi. Yarım kalanlar: (a) DNT-65 (hikâye görevi kampı) bu dalda, PR'ı açılıp birleştirilecek (sahibine sor); (b) seferde (görev adası) ada bitince zorluk seçilemiyor, yıldız kazanılmıyor: incelenmedi; (c) bot köylerine profil resmindeki birlik ve ona uygun dekorasyon (sahibinin fikri): planlanacak; (d) tam ekran: eski videoda arayüz farklı görünüyor (sahibinin görseli), karşılaştırılacak; (e) v0.1.0-deneme3 sürümü yayında (sahibi etiketi açtı). 12.11.2026 ikinci yarı: ölçüme dayalı yol haritası yazıldı (docs/YOL_HARITASI_2.md, araclar/yol_haritasi_olcum.py; YOL-01…03). Seferdeki zorluk sorununun kökü bulundu (DNT-66: questsRank yazılmıyor). Sıradaki: Faz 1 = DNT-65'in birleşmesi ve DNT-66'nın düzeltmesi, ikisi aynı deneme sürümünde."
   },
   "maddeler": [
     {
@@ -2683,7 +2683,7 @@
       "test": "tests/test_komutlar.py test_hazine_dogru_kasabaya",
       "pr": "#80",
       "onay": null,
-      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma. 12.11.2026, oyunda F5 denemesi (Ruffle, yerel sunucu, 10. seviye köy): görev 0 açıkken istemcinin göndereceği collect_treasure [250, 10, 1, 0, 0, 0] verildi, sayfa yenilendi. Kayıtta idCurrentTreasure 0 → 1, altın 450 → 700, xp +10, timestampLastTreasure yazıldı; haritada eski görev işareti kalktı, yeni görevin nesneleri çıktı (hikâye ilk göreve dönmedi). Görevin savaşla bitirilmesi ve 30 görevin hepsi oyunda oynanmadı. 12.11.2026 otuz görev denemesi (scratchpad betiği prenses.js): her görev için numara oyunun ödülsüz collect_treasure [0,0,n,0,0,0] komutuyla ayarlandı, sayfa yeniden açıldı (Chromium + Ruffle). 30/30: açılıştaki idCurrentTreasure = n, Ruffle paniği 0, sync_error_track 0, sayfa/konsol hatası 0. Görevlerin oynanması (düşmanla savaş, görev ekranı) denenmedi: ekran görüntüleri yakın görünümde, görev öğeleri kadraj dışında (◐)."
+      "notlar": "Sunucu görev numarasını (0..29), zamanı, yiyeceği ve taşı yazar. 5 bozma düştü. Eski kayıtlarda idCurrentTreasure 0'da kaldığı için hikâye o oyuncuda bir sonraki görevden değil, istemcinin setCorrectQuest'iyle seçtiği görevden sürer. Oyun içinde görev bitirip F5 ile denenmedi (◐ o kısım). QuestsInMap$/spawnPrincessVillage yalnızca AdminPanel'den doğrudan çağrılır; prenses görevi hikâye sırasında gelir. #80 incelemesi: setCorrectQuest @227-274'ün ödülsüz çağrısı timestampLastTreasure'a dokunmaz; sunucu zamanı yalnızca ödüllü çağrıda yazar (finalizeQuest'te altın en az 250). Test ve bozma. 12.11.2026, oyunda F5 denemesi (Ruffle, yerel sunucu, 10. seviye köy): görev 0 açıkken istemcinin göndereceği collect_treasure [250, 10, 1, 0, 0, 0] verildi, sayfa yenilendi. Kayıtta idCurrentTreasure 0 → 1, altın 450 → 700, xp +10, timestampLastTreasure yazıldı; haritada eski görev işareti kalktı, yeni görevin nesneleri çıktı (hikâye ilk göreve dönmedi). Görevin savaşla bitirilmesi ve 30 görevin hepsi oyunda oynanmadı. 12.11.2026 otuz görev denemesi (scratchpad betiği prenses.js): her görev için numara oyunun ödülsüz collect_treasure [0,0,n,0,0,0] komutuyla ayarlandı, sayfa yeniden açıldı (Chromium + Ruffle). 30/30: açılıştaki idCurrentTreasure = n, Ruffle paniği 0, sync_error_track 0, sayfa/konsol hatası 0. Görevlerin oynanması (düşmanla savaş, görev ekranı) denenmedi: ekran görüntüleri yakın görünümde, görev öğeleri kadraj dışında (◐). Düzeltme (12.11.2026): otuz görev denemesinde kamp hiç kurulmamıştı (görev öğesi buy'ı yok); kök neden DNT-65."
     },
     {
       "id": "KAR-33",
@@ -2970,6 +2970,97 @@
       "pr": null,
       "onay": null,
       "notlar": "Yapılırsa: oyunun yanındaki sayfada (Diyar sayfası gibi), yalnızca oyunun kendi resimleriyle (CLAUDE.md); tek kişilik, rakipler botlar. Sahibi yeniden isteyince bu biçimle başlanır."
+    },
+    {
+      "id": "DNT-65",
+      "baslik": "Kendi adasındaki hikâye görevi (prenses, düşman kampı) 1.4.07'de hiç kurulmuyordu",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'prenses görevi halen yok, olunca görseldeki gibi bu kadar goblin kaldı diyordu' (görsel: 'Enemy Camp 34 enemies alive', CountdownTimer/setTextOgres; oyunun metni CONTADOR_ENEMIGOS_VIVOS_PLURAL). Eski bir videoda 'Enemy Camp 03:11:53' (TIMER_OGRES_VILLAGE 14400 sn). 0926 istemcisi MapInitializer$/spawnInit@82-92 setCorrectQuest'ten sonra spawnQuestInMap(currentQuestId) çağırır; 1.4.07'nin spawnInit'inde bu çağrı yok, spawnQuestInMap'i yalnızca AdminPanel 'spawnMapQuest' geliştirici komutu çağırır (gonderen: tek çağıran MapInitializer$/spawnMapQuest). spawnQuestInMap ve QuestsInMap$/spawn* iki istemcide aynı. DNT-50'nin otuz görev denemesinde (prenses.js) hiçbir kamp kurulmamıştı: günlükte görev öğesi buy'ı yok; o deneme yalnızca açılışın çökmediğini gösterdi.",
+      "test": "tests/test_swf_yama.py HikayeGoreviTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar), tests/test_kaynak_yenileme.py HalkaTemizligi; Ruffle'da üç açılış (elle)",
+      "pr": "#84",
+      "onay": null,
+      "notlar": "oyun/swf_yama.py hikaye_gorevini_kur (YAMA_SURUMU 17): 0926'daki çağrı 1.4.07 spawnInit@73'e konur (findpropstrict spawnQuestInMap 16185, Base.Main.currentQuestId 474). Kamp her açılışta yeniden kurulur; 0926'da önceki kampı cleanBorderTiles silerdi. DNT-64 kaynak yenilemesi olmayan açılışta cleanBorderTiles'ı atladığı için o açılışta temizliği sunucu yapar (oyun/istemci.py halkadaki_kampi_temizle: orta 3×3 dışındaki halkada, oyuncunun genişlemediği büyük karolardaki binalar ve oyuncunun ırkından olmayan birlikler silinir; ağaç, taş, altın, hayvan ve oyuncunun birlikleri kalır; safeAreaClean@240-507). Ruffle'da (9. seviye, görev 0): ilk açılışta 41 Troll Wall II ve troller kuruldu; ikinci ve üçüncü açılışta kayıtta yine 41 duvar, ağaç 186 sabit. Bozmalar düştü (ekleme yeri, sunucu temizliği). #84 incelemesi (13.11.2026): sunucu birlikleri ırkla ayırıyordu; halkaya yürümüş oyuncu birliği (kurt, yeti, golem) kalıcı silinebilirdi. Artık yalnızca kampın birlikleri silinir: MapInitializer$/getEnemyIds (insan kasabada trol ID_UNIT_TROLL_*, öteki kasabada insan ID_UNIT_FOOTMAN/ARCHER/MOUNTED_1..4, CLERIC); QuestsInMap$/spawnSavedQuest @828-880 bunlardan seçer. Testler: test_oyuncunun_baska_irktan_birligi_kalir, test_trol_kasabada_kamp_insanlardan."
+    },
+    {
+      "id": "DNT-66",
+      "baslik": "Seferde ada bitince zorluk seçilemiyor, yıldız kazanılmıyor: questsRank hiç yazılmıyor",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "◐",
+      "kanit": "Sahibi (12.11.2026): 'Seferde adayı bitirdim zorluk seçemiyorum böylece yıldız kazanmı olmuyor'. İstemci zorluk penceresini Base.Player.questsRank[questId]'den açar (PlayerStatus/Init@122-129 privateState.questsRank; PopupLoadingQuest/<kurucu>@1674-1755). end_quest JSON'u 'difficulty' taşır (Quest$/end@208; QuestIslaEgg1/2, God, Hard, TrollsGeneric, Heroes sendResults@153-155, QuestBoss*, QuestCollectable*). Bağımsız denetçi aynı yerleri buldu. Sunucunun end_quest'i bu alanı okumuyor; initial.json'da \"questsRank\": {} ve hiçbir kod yazmıyor (grep).",
+      "test": "tests/test_komutlar.py test_gorev_zaferi_zorlugu_kaydeder (bozma denemesi: max kaldırılınca düşer)",
+      "pr": "#84",
+      "onay": null,
+      "notlar": "oyun/komutlar.py end_quest: zaferde questsRank[quest_id] = max(önceki, difficulty), yalnızca 1-3. Değerin anlamı istemcide doğrulandı: PopupLoadingQuest rank 1-2 ise rank+1'i açar, 3 tavan; PopupQuestFinished ilk onuru rank < difficulty iken verir. İstemci Player.Init'i her get_player_info yüklemesinde (Base/_parseLoadedInfo @85) çağırdığı için yeni yıldız kendi adasına dönünce görünür (◐; Ruffle'da denenmedi). Eski kayıtlarda geçmiş zaferler bilinmez; ada yeniden kazanılınca yazılır. YOL_HARITASI_2 A2."
+    },
+    {
+      "id": "YOL-01",
+      "baslik": "Ölçüme dayalı yol haritası 2: komut ve uç kapsamı tam, sorunlar 'var ama yanlış işliyor' türünden",
+      "sinif": "karar",
+      "onem": "Orta",
+      "durum": "dogrulandi",
+      "isaret": "✔",
+      "kanit": "python araclar/yol_haritasi_olcum.py (12.11.2026): istemcinin gönderdiği 158 komutun 141'inin gerçek işleyicisi var, 17'si bilerek boş, işleyicisiz 0; sunucuda fazladan 1 (exchange_cash_new); çift kayıt 0. İstemcinin 32 HTTP ucunun 32'si yönlendiriliyor (veri 9, onay 19, boş/hata 4; get_continent.php 404 ama istemcide kullanan kod yok).",
+      "test": "araclar/yol_haritasi_olcum.py",
+      "pr": null,
+      "onay": null,
+      "notlar": "Belge: docs/YOL_HARITASI_2.md. Sıralama Etki×Güven×10/Emek; ilk iki iş DNT-65 ve DNT-66."
+    },
+    {
+      "id": "YOL-02",
+      "baslik": "İstemcinin okuduğu globals anahtarlarından 5'i config'te yok, 4'ü sıfır",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "dogrulandi",
+      "isaret": "✔",
+      "kanit": "yol_haritasi_olcum.py: istemci 92 globals anahtarı okuyor. Config'te yok: PVP_MAX_NUM_DRAGONS, PVP_NUM_RANDOM_UNITS (Base), TOWER_LIMIT_EXPANSION (BuildingLimits), CROSS_PROMOTIONS, FONT_EQUIVALENCE. Sıfır ya da boş: HONOR_POINT_QUEST_LOSE, SHOW_GRATS_PACK, SPEED_HACK_CONTROL, CHAINED_PACK_TRACKING.",
+      "test": "araclar/yol_haritasi_olcum.py",
+      "pr": null,
+      "onay": null,
+      "notlar": "Değerlerin kaynağı bulunmadı; oyunda etkisi denenmedi (?). Sayım yalnızca getproperty globals ardından gelen adı yakalar. YOL_HARITASI_2 A3, A6."
+    },
+    {
+      "id": "YOL-03",
+      "baslik": "İstemcide adı geçen 66 dosyanın 6'sı arşivde yok",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "dogrulandi",
+      "isaret": "✔",
+      "kanit": "yol_haritasi_olcum.py, config/onindirme.tsv (4751 dosya) ile: eksik PopupNewTown/new_town.png, largeexpansiongfx/expGen.png, mobile_storage.png, buildingsprites/magic_cast_marquee.swf, PopupDCi/promo_DCi_bg.jpg (başka oyun reklamı), crossdomain.xml (sunucu veriyor).",
+      "test": "araclar/yol_haritasi_olcum.py",
+      "pr": null,
+      "onay": null,
+      "notlar": "Birleştirilerek kurulan yollar sayılmaz. Yerine çizilemez (CLAUDE.md). İkinci kasaba penceresi oyunda denenecek (YOL_HARITASI_2 A5)."
+    },
+    {
+      "id": "YOL-04",
+      "baslik": "Boş işleyicili spy_player ve gold_statue_conversion istemcide bir değişiklik bekliyor olabilir",
+      "sinif": "hata",
+      "onem": "Düşük",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Bağımsız denetim (12.11.2026): spy_player kayda hiçbir şey yazmıyor (oyun/komutlar.py kayitsiz), oysa buy_spyings_pack spyingsPack'i 50 yapıyor ve istemci spyingsPack'i Base/processAttacks'ta okuyor; casusluk hakkı sunucuda azalmıyor olabilir. gold_statue_conversion da boş. İstemcide doğrulanmadı.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "YOL_HARITASI_2 A7, Faz 2."
+    },
+    {
+      "id": "DNT-67",
+      "baslik": "Bot köylerinde profil resmindeki birlik ve ona uygun tema süsleri",
+      "sinif": "ozellik",
+      "onem": "Orta",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Sahibi (12.11.2026): 'her botun profil fotoğrafındaki birlik o bot köyünde yer alsın', 'profil resimleri ile uygun bir şekilde dekorasyon', 'oyunun dengesini bozmayacak'. Ölçüm: 50 botun her köyünde birlik meydanda; 30 tohumda toplam ordu gücü adsız köylerin %96-104'ü; kurulan 50 köyün hepsi ordu_dolu_mu'da dolu sayılıyor (geri dolma yok). Ruffle'da İblis Kıran ve Balrog köyleri açıldı (ekran görüntüsü).",
+      "test": "tests/test_bot_koy.py ProfilBirligiVeTema (bozma denemeleri: asker çıkarılmayınca 31 test, ortalama güç yanlış hesaplanınca 1 test düşer)",
+      "pr": "#84",
+      "onay": null,
+      "notlar": "oyun/bot_kimlik.py TEMALAR ve BIRIM_TEMASI; oyun/bot_koy.py koy_kur(ad=...), profil_agirligi, ordu_dolu_mu; TASARIM_SURUMU 9 (var olan bot köyleri açılışta yeniden kurulur; ad, seviye, kaynak ve geçmiş kalır). Plan: docs/inceleme/bot-koyleri-plani.md. YOL_HARITASI_2 B2. PR incelemesi (13.11.2026): ilk sürümde çıkarılan asker sayısı ile ordu_dolu_mu ağırlığı farklıydı, köy zamanla güçlenebilirdi; ağırlık tek hesaptan (beklenen_guc) alınıyor."
     }
   ]
 }

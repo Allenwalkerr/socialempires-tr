@@ -1541,6 +1541,25 @@ def end_quest(save, a):
         gorev = str(veri.get("quest_id", ""))
         if gorev in sira:
             ps["unlockedQuestIndex"] = max(sira.index(gorev) + 1, int(ps.get("unlockedQuestIndex", 0) or 0))
+    # DNT-66: adada kazanılan en yüksek zorluk (1-3 yıldız). İstemci yalnızca kayıttan okur, kendisi yazmaz:
+    # PlayerStatus/Init privateState.questsRank'i alır; PopupLoadingQuest/<kurucu> @1674-1755 zorluğu
+    # max(1, rank) yapar, rank 1-2 ise rank + 1'i açar (3 yıldız tavan); PopupQuestFinished ilk kez kazanılan zorlukta
+    # HONOR_POINT_QUEST_FIRST_TIME verir (rank yok ya da rank < difficulty). Quest*/sendResults 'difficulty'yi yollar.
+    gorev = str(veri.get("quest_id", ""))
+    if int(veri.get("win", 0) or 0) == 1 and gorev:
+        try:
+            zorluk = int(veri.get("difficulty", 0) or 0)
+        except (TypeError, ValueError):
+            zorluk = 0
+        if 1 <= zorluk <= 3:
+            sirala = ps.get("questsRank")
+            if not isinstance(sirala, dict):
+                sirala = ps["questsRank"] = {}
+            try:
+                onceki = int(sirala.get(gorev, 0) or 0)
+            except (TypeError, ValueError):
+                onceki = 0
+            sirala[gorev] = max(onceki, zorluk)
     for esya_id, adet in (veri.get("item_rewards") or {}).items() if isinstance(veri.get("item_rewards"), dict) else []:
         depo_ekle(save, int(esya_id), int(adet))
 
