@@ -3095,11 +3095,11 @@
       "onem": "Orta",
       "durum": "acik",
       "isaret": "?",
-      "kanit": "Sahibi (12.11 ve 14.11.2026, eski video karesi): 'eski bir videoda tam ekran haline baktım bizimki gibi değil ... bizde ui onunla oranla büyüyor'.",
+      "kanit": "Sahibi (12.11 ve 14.11.2026, eski video karesi): 'eski bir videoda tam ekran haline baktım bizimki gibi değil ... bizde ui onunla oranla büyüyor'. Analiz (14.11.2026): iki istemcinin ölçekleme kodu aynı: Base/init EXACT_FIT; yalnızca Flash tam ekran olayında StateNormal/setFullScreen@51 NO_SCALE (0926 onFullscreenChange aynı). Sayfanın tam ekranı bu olayı tetiklemez: arayüz gerilir. Ruffle'da sayfadaki düğmeyle oyuncunun enterFullscreen'i denendi: oyuncu tam ekran oldu ama arayüz yine gerildi (olay gelmedi). Oyunun kendi dişli menüsündeki tam ekran düğmesi başsız tarayıcıda tam ekrana geçmedi (ortam sınırı). Sayfa düğmesi değişikliği işe yaramadığı için geri alındı.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "İncelenmedi (YOL_HARITASI_2 B3). Sahibine 13.11'de 'henüz başlanmadı' denmeliydi; açıkça söylenmedi."
+      "notlar": "Çözüm yolu: SWF yaması ile sahne büyüdüğünde (Event.RESIZE) oyunun kendi setFullScreen düzenini çalıştırmak ya da Ruffle'ın tam ekranında displayState'in fullScreen bildirilmesi. Gerçek tarayıcıda denenmeli."
     },
     {
       "id": "DNT-71",
@@ -3151,20 +3151,20 @@
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+      "notlar": "Net: simge resimleri arşivde yok (externalized/viral_buttons'ta yalnızca crossDCi, easterDragon, like, viralDynasty, viralFirstOffer, viralRecruitment). Açılırsa Paskalya ejderhası resmi çıkar; resim çizilmez (CLAUDE.md). Geri getirilemez."
     },
     {
       "id": "DNT-75",
       "baslik": "Prenses tutsak görevinde bedava Rıhtım ve 30. seviyede bedava Zeplin Kulesi verilmiyor",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "◐",
+      "durum": "curutuldu",
+      "isaret": "✔",
       "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 checkStartPopup@710-718 IsoEngine/checkOpenDock ve checkOpenZep (buyElementNoResources, AVISO_MUELLE/AVISO_ZEPPELIN). 1.4.07'de bu yöntemler yok. Mağazadan alınmasının yeni kural olup olmadığı bakılmadı.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+      "notlar": "Net: kaybolmadı. 1.4.07 config: Harbor (224) mağazada 8. seviyeden 300 odun, Zeppelin Tower (299) 25. seviyeden 3000 odun. Eskiden hediyeydi, şimdi satın alınıyor."
     },
     {
       "id": "DNT-76",
@@ -3172,12 +3172,103 @@
       "sinif": "hata",
       "onem": "Orta",
       "durum": "acik",
-      "isaret": "◐",
+      "isaret": "✔",
       "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 Base/init@756 onDeactivate→pauseGame; PopupPlayerProfile/fillPopup@518 lastConn. 1.4.07'de kayıt ya da alan yok. Oyuncu açısından küçük.",
       "test": null,
       "pr": null,
       "onay": null,
-      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+      "notlar": "Net: lastConn alanı 1.4.07'nin hiçbir arayüz dosyasında yok (bayt araması 0); eklemek yeni çizim ister (CLAUDE.md). Odak kaybında durma bilerek kapatılmış; çevrimdışı oyunda faydası yok. Geri getirilmez önerisi sahibine."
+    },
+    {
+      "id": "DNT-77",
+      "baslik": "Öğreticiden sonra 'ejderhanı seç' penceresi (bedava ejderha yavrusu) açılmıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). Config.POPUP_CHOOSE_YOUR_DRAGON 1.4.07'de false, 0926'da true (kendim okudum); Base/checkAfterTutorialPopup@20-25 bu yüzden atlar, pencereyi yalnızca AdminPanel açar.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-78",
+      "baslik": "Hayatta kalma kipine oyundan girilemiyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). 1.4.07 Base/processMap@514-541 arenayı (ID_BUILDING_SURVIVAL_ARENA) haritaya koymaz; createButtonsHerramientas@1130-1150 survivalButton'u gizler; openPopupSurvival'ı yalnızca AdminPanel çağırır (kendim aradım).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-79",
+      "baslik": "Savunma stratejisi penceresi (set_strategy) açılmıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). PopUpBattleOptions yalnızca ExplorationsManager/doArmy'den açılır; ExplorationsManager'ı yalnızca AdminPanel kurar (kendim aradım). Sunucunun set_strategy komutu çalışıyor ama istemci göndermiyor; savunma oranı varsayılanda kalır.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-80",
+      "baslik": "Oyundaki 'Add Cash' ve '+' düğmeleri hiçbir şey yapmıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). Base/gotoCash ExternalInterface.call('gotoBuy') yapar (kendim okudum); templates/js/oyun.js bunu karşılamıyor. Nakit → altın değiştirme penceresi (PopupBuyGold) 1.4.07'de yok: openPopupBuyGold yalnızca gotoCash'e gider.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-81",
+      "baslik": "Koleksiyon penceresinde sahip olunmayan birim nakitle alınamıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). PopupAllUnits/showUnitInfo@88-95 buyPane/btnBuy'u bağlamaz; buyUnit'i (CMD_BUY_STORED_ITEM_CASH) çağıran yok (karşılaştırma taraması). KAR-12 ile ilgisi sahibine sorulacak.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-82",
+      "baslik": "Turnuva takım seçiminde 'sıfırla' düğmesi ve seçilen takım şeridi yok",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). 0926 SelectionTeamWindow/init@325-337 ve PopupTournament/showThumbs@38; 1.4.07'de karşılığı yok (karşılaştırma taraması). Turnuva config'te kapalı (TOURNAMENT_ACTIVATED 0) ama bizim turnuva sistemimiz var.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
+    },
+    {
+      "id": "DNT-83",
+      "baslik": "Haftalık turnuvada 'süre az kaldı' uyarısı yok",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "0926 ile 1.4.07 tam karşılaştırması (14.11.2026; scratchpad/karsilastirma/siniflandirma.md: 1c 181 satır, ölü 39, yalnız-eski 311 sınıf; her satır KAYIP/TASINDI/ONEMSIZ). 0926 ThumbWeeklyTournament/clickEnter@220-235; 1.4.07'de MINIUM_SECONDS_TO_PREVENT_PLAY hiç yok (karşılaştırma taraması).",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Geri getirilip getirilmeyeceği sahibine soruldu (14.11.2026)."
     }
   ]
 }
