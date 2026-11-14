@@ -3071,7 +3071,7 @@
       "isaret": "✔",
       "kanit": "Sahibi (14.11.2026): 'prenses haritaya gelmiş ama sağ altta bu kadar şey kaldı falan yazmıyor. Eskiden böyle değildi'. 0926: GuiManager/addTimer@95-236 countdownTimerOgres'u kurup bgBar.mcTrolls'a ekler; Base/loadMap@642-647 setVisibleTimerOgres(true); IsoEngine/Update@248-256 setTextOgres(trol sayısı). 1.4.07'de addTimer yok, countdownTimerOgres hep boş; StateNormal/enter@374-384 mcTrolls'u gizler; Update'te sayı satırı yok. Ruffle (30. seviye köy, iki açılış): sağ altta 'Düşman Ordugâhı 51 düşman kaldı'; kamp tek (kayıtta 41 duvar); konsolda hata yok.",
       "test": "tests/test_swf_yama.py KampSayaciTestleri, HikayeGoreviTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar ve yığın; bozma: bağlantı, yer, yığın)",
-      "pr": null,
+      "pr": "#85",
       "onay": null,
       "notlar": "oyun/swf_yama.py YAMA_SURUMU 21: SAYAC_KURULUMU (spawnInit, boşsa new CountdownTimer(Main, Gui, TIMER_CAMPAMENTO_ENEMIGO, '', 8388608) ve mcTrolls.addChild; max_stack 3→7), SAYAC_YAZISI (Update@248: kendi köyünde değilse gizle, trol varsa mcTrolls ve sayacı göster, sayıyı yaz). İlk denemede setVisibleTimerOgres(true) spawnInit'e kondu: countdownTimerOgres boş olduğu için TypeError #1009, MapInitializer$/Init yarıda kaldı ve her karede yeniden kuruldu; bir açılışta 41 yerine 4592 trol duvarı geldi (S-86). Sahibine gitmeden yakalandı. Kamp yenilince sonraki kampa geri sayım istemcinin finalizeQuest'indeki setTimerOgres ile gelir; bu oyunda denenmedi (◐)."
     },
@@ -3080,13 +3080,13 @@
       "baslik": "Diyar Haberleri'nde Yılbaşı şenliği resmi kayık ve sürekli aşağı yukarı oynuyor",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Sahibi (14.11.2026, ekran görüntüsü): 'yılbaşı etkinliğinin sağında kırmızı binanın olduğu şeye dikkatle bak. Kayık ve sürekli aşağı yukarı hareket ediyor'. Görüntüde ilk satırın resmi çerçeveden taşmış.",
-      "test": null,
-      "pr": null,
+      "test": "tests/test_diyar.py EtkinlikPaneliTestleri (düzeltme geri alınınca 2 alt test düşer)",
+      "pr": "#85",
       "onay": null,
-      "notlar": "İncelenmedi. Sayfanın Diyar Haberleri paneli (bizim eklememiz)."
+      "notlar": "Kök: templates/css/oyun.css .etkinlik .simge translateY(-50%) ile ortalanıyordu; ilk satırdaki zipla animasyonu transform'u ezince resim yarı boyu kadar aşağı kayıp 2 sn'de bir oynuyordu. Ortalama top/bottom 0 + margin auto ile yapılır, animasyon kaldırıldı. Playwright: 0, 700 ve 2000 ms'deki panel görüntüleri piksel piksel aynı; resim çerçevede düz."
     },
     {
       "id": "DNT-70",

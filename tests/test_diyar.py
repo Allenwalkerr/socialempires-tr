@@ -149,3 +149,19 @@ class HilePaneliTestleri(unittest.TestCase):
         cevap = istemci.post("/cheat/uygula", json={"islem": "kaynak", "tur": "wood", "miktar": 1000})
         self.assertEqual(cevap.status_code, 200)
         self.assertIn("odun", cevap.get_json()["ozet"])
+
+
+class EtkinlikPaneliTestleri(unittest.TestCase):
+    def test_simge_transformla_ortalanmaz_ve_oynamaz(self):
+        """DNT-69. Sahibi (14.11.2026, ekran görüntüsü): Yılbaşı resmi 'kayık ve sürekli aşağı yukarı hareket ediyor'.
+        Resim translateY(-50%) ile ortalanıyordu; ilk satırdaki zipla animasyonu (transform) bunu ezip resmi yarı boyu kadar
+        aşağı itiyordu. Playwright'ta (14.11.2026) düzeltmeden sonra panelin 0, 700 ve 2000 ms'deki görüntüleri aynı."""
+        import os
+        import re
+        css = open(os.path.join(KOK, "templates", "css", "oyun.css"), encoding="utf-8").read()
+        kurallar = re.findall(r"([^{}]*\.etkinlik[^{}]*\.simge[^{}]*)\{([^}]*)\}", css)
+        self.assertTrue(kurallar)
+        for secici, govde in kurallar:
+            with self.subTest(secici.strip()):
+                self.assertNotIn("transform", govde)
+                self.assertNotIn("animation", govde)
