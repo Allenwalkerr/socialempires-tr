@@ -531,10 +531,11 @@ GOREV_YERI = 73
 # Kamp sayacı (DNT-68). Sahibi (14.11.2026): "prenses haritaya gelmiş ama sağ altta bu kadar şey kaldı yazmıyor; eskiden
 # böyle değildi". 0926 istemcisi sayacı Base/loadMap@642-647'de Base.Gui.setVisibleTimerOgres(true) ile açar ve
 # IsoEngine/Update@248-256'da kampta trol varken countdownTimerOgres.setTextOgres(trol sayısı) yazar ('N enemies alive').
-# 1.4.07'de ikisi de yok; StateNormal/enter@374-384 bgBar.mcTrolls'u gizler. setVisibleTimerOgres 1.4.07'de çağrılamaz:
-# bgBar.mcTrolls.cara ya da .buf bu sürümün arayüzünde yok, çağrı TypeError #1009 verir (Ruffle'da denendi: spawnInit'e
-# konunca MapInitializer$/Init yarıda kaldı, her karede yeniden kuruldu ve bir açılışta 41 yerine 4592 trol duvarı geldi).
-# Bu yüzden yalnızca var olan iki parça, boş değilse, görünür yapılır: bgBar.mcTrolls ve countdownTimerOgres.
+# 1.4.07'de ikisi de yok; StateNormal/enter@374-384 bgBar.mcTrolls'u gizler. 1.4.07 countdownTimerOgres'u hiç kurmaz
+# (0926 GuiManager/addTimer yok): setVisibleTimerOgres'in ilk satırı countdownTimerOgres.visible olduğu için sayaç boşken
+# çağrı TypeError #1009 verir (Ruffle'da denendi: spawnInit'e konunca MapInitializer$/Init yarıda kaldı, her karede
+# yeniden kuruldu ve bir açılışta 41 yerine 4592 trol duvarı geldi; S-86). Bu yüzden sayaç spawnInit'te kurulur
+# (SAYAC_KURULUMU) ve görünürlük, sayacın boş olmadığı denetlendikten sonra setVisibleTimerOgres ile verilir (SAYAC_YAZISI).
 #
 # Update'te 1.4.07 @171, @185 ve @235'teki dallar 248'e gider (denetim karesi değilse, trol varsa, trol yoksa
 # allTrollsDefeated'dan sonra). Eklenen kod 248'e konur:

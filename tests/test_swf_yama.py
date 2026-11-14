@@ -1294,3 +1294,59 @@ class TamEkranBoyuTestleri(unittest.TestCase):
         sonuc = swf_yama.turkcelestir(open(yol, "rb").read())
         veri = sonuc[0] if isinstance(sonuc, tuple) else sonuc
         self.assertNotIn(swf_yama._EKRAN_BOYU_KOD, swf_yama._govde(veri))  # turkcelestir yamayı uygular
+
+
+class TamEkranDugmesiTestleri(unittest.TestCase):
+    """DNT-70, #85 incelemesi. 1.4.07 GuiManager/toggleFullscreen@162-215: displayState NORMAL değilse NORMAL, değilse
+    FULL_SCREEN (@178 ifeq → 202, @198 jump → 218, @218 returnvoid). Ruffle'da ActionScript'in açtığı tam ekranda oyuna
+    tam ekran olayı gelmedi (arayüz gerildi, 14.11.2026); bölge ExternalInterface.call("toggleFullscreen") olur. Çok adlar:
+    ExternalInterface 260 (Base/gotoCash@41 ile aynı bayt 608402), call 477 (4fdd0302'deki gibi), dize 10065."""
+
+    def test_bolge_cagri_ve_noplar_uzunluk_ayni(self):
+        kod = swf_yama._TAM_EKRAN_DUGMESI_KOD
+        govde = _do_abc(["x"]) + swf_yama._u30_yaz(len(kod)) + kod
+        yeni, sayi = swf_yama.tam_ekran_dugmesi(govde)
+        self.assertEqual(sayi, 1)
+        self.assertEqual(len(yeni), len(govde))
+        yeni_kod = yeni[len(govde) - len(kod):]
+        bas, son = swf_yama.TAM_EKRAN_BOLGESI
+        self.assertEqual((bas, son), (162, 218))
+        self.assertEqual(yeni_kod[:bas], kod[:bas])
+        self.assertEqual(yeni_kod[son:], kod[son:])
+        self.assertEqual(yeni_kod[son:], b"\x47")  # returnvoid
+        bolge = yeni_kod[bas:son]
+        self.assertTrue(bolge.startswith(swf_yama.TAM_EKRAN_CAGRISI))
+        self.assertEqual(set(bolge[len(swf_yama.TAM_EKRAN_CAGRISI):]), {0x02})
+        islemler = KaynakYenilemeTestleri._coz(swf_yama.TAM_EKRAN_CAGRISI)
+        self.assertEqual([(i.ad, i.isl) for i in islemler],
+                         [("getlex", (260,)), ("pushstring", (10065,)), ("callpropvoid", (477, 1))])
+
+    def test_govde_yoksa_dokunmaz(self):
+        govde = _do_abc(["x"])
+        self.assertEqual(swf_yama.tam_ekran_dugmesi(govde), (govde, 0))
+
+    def test_gercek_istemcide(self):
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc, abc_etiketleri
+        et = [e for _, e in abc_etiketleri(open(yol, "rb").read()) if b"spawnRemainingResources" in e][0]
+        yeni, sayi = swf_yama.tam_ekran_dugmesi(et)
+        self.assertEqual(sayi, 1)
+        a = Abc(yeni)
+        i = [k for k, v in a.yontem_adlari().items() if v == "GuiManager/toggleFullscreen"][0]
+        isl = a.coz(a.govdeler[i])
+        adlar = [(x.ad, a.ad(x.isl[0]) if x.ad in ("getlex", "callpropvoid", "setproperty") else
+                  (a.deger(x) if x.ad == "pushstring" else None)) for _, x in sorted(isl.items())]
+        self.assertIn(("getlex", "ExternalInterface"), adlar)
+        self.assertIn(("pushstring", "toggleFullscreen"), adlar)
+        self.assertIn(("callpropvoid", "call"), adlar)
+        self.assertNotIn(("setproperty", "displayState"), adlar)
+        bas, son = swf_yama.TAM_EKRAN_BOLGESI
+        disaridan = [h for o, x in isl.items() if not bas <= o < son for h in x.hedefler if bas < h < son]
+        self.assertEqual(disaridan, [])
+        sonuc = swf_yama.turkcelestir(open(yol, "rb").read())
+        veri = sonuc[0] if isinstance(sonuc, tuple) else sonuc
+        self.assertNotIn(swf_yama._TAM_EKRAN_DUGMESI_KOD, swf_yama._govde(veri))
