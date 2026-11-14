@@ -205,6 +205,29 @@
     return /SocialEmpiresTR-Android/.test(navigator.userAgent) ? "doldur" : "sigdir";
   }
   // Ekran oyunun kendi boyutundan (760×600) küçükse (telefon) doldurmak menüleri keserdi: oran korunur
+  // Oyunun kendi tam ekranı (DNT-70). Ruffle tam ekran olayını oyun kutusu büyümeden gönderir; oyun menülerini o anki
+  // sahne boyuna göre dizer (StateNormal/setFullScreen, Base/getStageDimensions; swf_yama.tam_ekran_boyu). Kutu önce
+  // ekran boyuna getirilir, tam ekran kısa bir an sonra istenir (kullanıcı dokunuşunun geçici izni ~5 sn sürer).
+  // Çıkışta (fullscreenchange) eski boy geri gelir.
+  // İstek reddedilirse (tarayıcı izni, iframe) fullscreenchange gelmez: kutu ekran boyunda kalmasın (#85 incelemesi).
+  function kutuBoyunuSifirla() {
+    var o = document.querySelector("ruffle-player");
+    if (o && o.style) { o.style.width = ""; o.style.height = ""; }
+  }
+  function oyunTamEkrani(oyuncu) {
+    var ekran = window.screen || {};
+    if (ekran.width && ekran.height) {
+      oyuncu.style.width = ekran.width + "px";
+      oyuncu.style.height = ekran.height + "px";
+    }
+    setTimeout(function () { oyuncu.enterFullscreen(); }, 150);
+    setTimeout(function () { if (document.fullscreenElement !== oyuncu) kutuBoyunuSifirla(); }, 1500);
+  }
+  // Ekran oyunun kendi boyundan (760×600) küçükse oyunun tam ekranı menüleri keser: sayfanın tam ekranı kullanılır
+  function oyunTamEkraniSigarMi() {
+    var ekran = window.screen || {};
+    return ekran.width >= 760 && ekran.height >= 600;
+  }
   function doldurulsunMu() {
     return gorunumSecimi() === "doldur" && window.innerWidth >= 760 && window.innerHeight >= 600;
   }
@@ -251,6 +274,11 @@
       splashScreen: false,
       contextMenu: "rightClickOnly", // dokunmatikte uzun basma menü açmasın
       allowScriptAccess: true,       // oyun ExternalInterface kullanıyor
+      // DNT-70: oyunun kendi tam ekranı (dişli menüsü, GuiManager/toggleFullscreen: stage.displayState = FULL_SCREEN).
+      // Ruffle'da varsayılan kapalı (0.7.1 allowFullscreen:!1); kapalıyken düğme sessizce hiçbir şey yapmaz. Gerçek
+      // Flash'ta sayfa allowFullScreen="true" ile açılırdı (acidcaos/socialemperors templates/play.html). Yalnızca tam ekran
+      // olayında oyun NO_SCALE'e geçip menüleri kenarlara dizer (StateNormal/setFullScreen@51); arayüz gerilmez.
+      allowFullscreen: true,
       backgroundColor: "#669C2C",
       letterbox: "off",
       logLevel: "warn",
@@ -272,7 +300,7 @@
       // setNormalScreen ile menüleri kendisi geri dizer.
       var tamEkranaGec = function () {
         oyuncu.removeEventListener("pointerup", tamEkranaGec, true);
-        if (document.fullscreenElement !== oyuncu && typeof oyuncu.enterFullscreen === "function") oyuncu.enterFullscreen();
+        if (document.fullscreenElement !== oyuncu && typeof oyuncu.enterFullscreen === "function") oyunTamEkrani(oyuncu);
       };
       oyuncu.addEventListener("pointerup", tamEkranaGec, true);
     }
@@ -566,6 +594,7 @@
   var sayfaTamEkranda = false;
   function oyunModu(acik, kaydet, sayfaTamEkraniIsteme) {
     document.body.classList.toggle("oyun-modu", acik);
+    if (!acik) kutuBoyunuSifirla();
     tamCik.hidden = !acik;
     if (!acik) panelleriTazele();
     var oyuncu = document.querySelector("ruffle-player");
@@ -577,20 +606,33 @@
     if (acik && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {});
     else if (!acik && document.fullscreenElement === document.documentElement) document.exitFullscreen().catch(function () {});
   }
-  document.getElementById("tam-ekran").addEventListener("click", function () {
+  function tamEkranAc() {
     // Doldur: düğmeye basış kullanıcı dokunuşudur; yalnızca oyunun kendi tam ekranı istenir (menüler kenarlara
     // dizilir). Sayfanın tam ekranı da istenseydi ilk istek dokunuşu tüketir, ikincisi reddedilebilirdi (Fullscreen
     // belirtimi: başarılı istek kullanıcı etkinleşmesini tüketir; #81 incelemesi).
+    // DNT-70: her iki görünümde de oyunun kendi tam ekranı (eski videodaki gibi arayüz gerilmez, harita genişler).
+    // Sayfanın tam ekranı tam ekran olayını tetiklemez, oyun EXACT_FIT'te kalıp arayüzü ekranla birlikte gerer.
     var oyuncu = document.querySelector("ruffle-player");
-    var doldur = oyuncu && document.body.classList.contains("ekran-doldur") && typeof oyuncu.enterFullscreen === "function";
-    oyunModu(true, true, doldur);
-    if (doldur) oyuncu.enterFullscreen();
-  });
+    var oyununki = !!(oyuncu && typeof oyuncu.enterFullscreen === "function" &&
+                      (document.body.classList.contains("ekran-doldur") || oyunTamEkraniSigarMi()));
+    oyunModu(true, true, oyununki);
+    if (oyununki) oyunTamEkrani(oyuncu);
+  }
+  document.getElementById("tam-ekran").addEventListener("click", tamEkranAc);
+  // Oyunun dişli menüsündeki tam ekran düğmesi (swf_yama.tam_ekran_dugmesi): ExternalInterface.call("toggleFullscreen").
+  // Ruffle'da ActionScript'in açtığı tam ekranda oyuna olay gelmiyor; sayfanın yolu kullanılır. Çağrı oyuncunun tıklama
+  // olayı içinde gelir, kullanıcı etkinleşmesi geçerlidir.
+  window.toggleFullscreen = function () {
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    else tamEkranAc();
+  };
+  document.addEventListener("fullscreenerror", kutuBoyunuSifirla);
   tamCik.addEventListener("click", function () { oyunModu(false, true); });
   // Oyunun kendi tam ekranı (Ruffle, oyun kutusundaki öğe) sayfanın tam ekranından çıkış sayılmaz;
   // yalnızca tam ekran bütünüyle bitince (Esc) oyun modu kapanır.
   document.addEventListener("fullscreenchange", function () {
     if (!document.fullscreenElement) {
+      kutuBoyunuSifirla();  // oyunTamEkrani'nin verdiği boy
       if (sayfaTamEkranda && document.body.classList.contains("oyun-modu")) oyunModu(false, true);
       sayfaTamEkranda = false;
     } else if (document.fullscreenElement === document.documentElement ||

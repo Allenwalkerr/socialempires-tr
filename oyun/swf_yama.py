@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"17"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"25"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -528,16 +528,165 @@ _GOREV_KOD = bytes.fromhex(
     "cf9801d1080129608d014ff69b010047")
 GOREV_YERI = 73
 
+# Kamp sayacı (DNT-68). Sahibi (14.11.2026): "prenses haritaya gelmiş ama sağ altta bu kadar şey kaldı yazmıyor; eskiden
+# böyle değildi". 0926 istemcisi sayacı Base/loadMap@642-647'de Base.Gui.setVisibleTimerOgres(true) ile açar ve
+# IsoEngine/Update@248-256'da kampta trol varken countdownTimerOgres.setTextOgres(trol sayısı) yazar ('N enemies alive').
+# 1.4.07'de ikisi de yok; StateNormal/enter@374-384 bgBar.mcTrolls'u gizler. 1.4.07 countdownTimerOgres'u hiç kurmaz
+# (0926 GuiManager/addTimer yok): setVisibleTimerOgres'in ilk satırı countdownTimerOgres.visible olduğu için sayaç boşken
+# çağrı TypeError #1009 verir (Ruffle'da denendi: spawnInit'e konunca MapInitializer$/Init yarıda kaldı, her karede
+# yeniden kuruldu ve bir açılışta 41 yerine 4592 trol duvarı geldi; S-86). Bu yüzden sayaç spawnInit'te kurulur
+# (SAYAC_KURULUMU) ve görünürlük, sayacın boş olmadığı denetlendikten sonra setVisibleTimerOgres ile verilir (SAYAC_YAZISI).
+#
+# Update'te 1.4.07 @171, @185 ve @235'teki dallar 248'e gider (denetim karesi değilse, trol varsa, trol yoksa
+# allTrollsDefeated'dan sonra). Eklenen kod 248'e konur:
+#   kendi köyünde değilse (gameModeCurrent != NORMAL) sayaç ve mcTrolls gizlenir (komşu köyde eski sayı kalmasın);
+#   yerel 2 (countTrolls; denetim karesi değilse 0) sıfırdan büyükse mcTrolls ve sayaç görünür olur, sayı yazılır.
+# 248'i geçen başka dal ve istisna yok; üç dal eklenen kodun başına gider. En büyük yığın 3 (Update'inki 3).
+# Çok adlar (1.4.07): Base 1, Gui 45, bgBar 148, mcTrolls 4259, countdownTimerOgres 5382, visible 34, setTextOgres 21102.
+
+
+def _derle(parcalar):
+    """Etiketli küçük bayt kodu: dize -> etiket, (işlem kodu, etiket) -> s24 dal, bytes -> olduğu gibi."""
+    yer, uzunluk = {}, 0
+    for p in parcalar:
+        if isinstance(p, str):
+            yer[p] = uzunluk
+        else:
+            uzunluk += 4 if isinstance(p, tuple) else len(p)
+    cikti, uzunluk = b"", 0
+    for p in parcalar:
+        if isinstance(p, str):
+            continue
+        if isinstance(p, tuple):
+            uzaklik = yer[p[1]] - (uzunluk + 4)
+            p = bytes([p[0]]) + (uzaklik & 0xFFFFFF).to_bytes(3, "little")
+        cikti += p
+        uzunluk += len(p)
+    return cikti
+
+
+_GUI = bytes.fromhex("6001" "662d")                   # Base.Gui
+_SAYAC = _GUI + bytes.fromhex("66862a")               # .countdownTimerOgres
+
+
+# 1.4.07'de countdownTimerOgres hiç kurulmaz: 0926'daki GuiManager/addTimer@95-236 bu sürümde yok (setVisibleTimerOgres'in
+# TypeError'ı da buradan: ilk satırı countdownTimerOgres.visible). spawnInit'te, boşsa, 0926'daki gibi kurulur ve
+# bgBar.mcTrolls'a eklenir: new CountdownTimer(Base.Main, Base.Gui, Language.getLiteral(TIMER_CAMPAMENTO_ENEMIGO), "",
+# 8388608) (StateAssault/_addCountdown@18-60 countdownAssault'u aynı biçimle kurar). Çok adlar: CountdownTimer 2563,
+# Main 12, Language 11, TIMER_CAMPAMENTO_ENEMIGO 15928, getLiteral 19, addChild 46. Yığın 7'ye çıkar (spawnInit 3):
+# yöntem gövdesinin max_stack'i de yükseltilir.
+SAYAC_KURULUMU = _derle([
+    _SAYAC_ONCE := bytes.fromhex("6001" "662d" "66862a"), (0x11, "var"),          # iftrue: zaten kuruluysa atla
+    bytes.fromhex("6001662d" "5d8314" "6001660c" "6001662d" "600b600b66b87c" "461301" "2c01" "2dc107" "4a831405"
+                  "61862a"),
+    bytes.fromhex("6001662d66940166a321" "6001662d66862a" "4f2e01"), "var"])
+SAYAC_YIGINI = 7
+
+
+# Görünürlük oyunun kendi setVisibleTimerOgres'iyle (0926 ile aynı): countdownTimerOgres ve mcTrolls.cara görünür,
+# "Haritadaki düşmanlar" balonu (mcTrolls.buf) her zaman gizli, yüz ırka göre kare 1/2. Sayaç SAYAC_KURULUMU ile kurulmadıysa
+# (boşsa) çağrılmaz: boşken TypeError #1009 verir (S-86). Sahibi (14.11.2026, ekran görüntüsü): balon görünüyordu, kayıktı.
+# 1.4.07 StateNormal/enter@374-384 kabı (bgBar.mcTrolls) gizler, 0926'da bu satır yok: gösterirken kap da açılır.
+_GORUNURLUK = bytes.fromhex("4fffb90101")  # callpropvoid setVisibleTimerOgres 1 (23807)
+SAYAC_YAZISI = _derle(
+    [bytes.fromhex(_NORMAL_MI), (0x13, "normal"),     # ifeq: kendi köyündeyse gizleme atlanır
+     _SAYAC, (0x12, "normal"),                        # iffalse: sayaç kurulmamışsa dokunma
+     _GUI, b"\x27", _GORUNURLUK,                     # Gui.setVisibleTimerOgres(false)
+     "normal", b"\xd2\x24\x00", (0x0E, "son"),     # getlocal_2, pushbyte 0, ifngt: trol yoksa bitir
+     _SAYAC, b"\x2a", (0x12, "yok"),                  # sayaç boşsa bitir (dup, iffalse)
+     _GUI, b"\x26", _GORUNURLUK,                     # Gui.setVisibleTimerOgres(true)
+     _GUI, bytes.fromhex("669401" "66a321"), b"\x26\x61\x22",  # bgBar.mcTrolls.visible = true (StateNormal/enter gizler)
+     b"\xd2", bytes.fromhex("4feea40101"), (0x10, "son"),  # sayac.setTextOgres(trol)
+     "yok", b"\x29", "son"])
+_GUNCELLE_KOD = bytes.fromhex(
+    "d03020101100009404c20363040802c203c3026304c304288026d52400d62080cb12d724006304d066a2128263051012"
+    "00000962056204238026d5d1d066fa124ff3080132050411e7ffff08050804d066fa122432a42400ab2a120900002960"
+    "01660c66f76a762a120b0000296001661c66920620ab962a120e0000296001661c66920666bd022400ab2a121c000010"
+    "09000021d3abc0c026d6d7d2296001660c66c201609c01669b02ab12490000d046b54b0073d6d224000d3b0000600166"
+    "2d66862a24004feea40101604266a30180cb12d7604266a30120ab2a110b000029604266a3019660b602b31209000060"
+    "01660c4fda910100d066fa122446a42400ab2a12200000296001660c66c201609c01669b02100d0000d79204c2030802"
+    "28d376c202c1ab12060000d04fbf9d0100d066fa122455a42400141500006001661c608d016001661c66cf0246a76201"
+    "61c93dd02a630466fa129163056204620561fa120805080447")
+SAYI_YERI = 248
+
 
 def hikaye_gorevini_kur(t: bytes):
     """(yeni_etiket, değişen): spawnInit'e spawnQuestInMap çağrısı; gövde (yamasız ya da kaynak yamalı) tek değilse dokunmaz."""
+    ek = SAYAC_KURULUMU + GOREV_CAGRISI
     adaylar = [_GOREV_KOD[:25] + KAYNAK_ATLA + _GOREV_KOD[25:], _GOREV_KOD]
     for kod in adaylar:
         capa = _u30_yaz(len(kod)) + kod
         if t.count(capa) == 1:
+            i = t.index(capa)
+            # gövde başlığı: yöntem, max_stack 3, local_count 2, init_scope, max_scope, kod uzunluğu (hepsi tek bayt)
+            if t[i - 4:i - 2] != b"\x03\x02":
+                return t, 0
             yer = GOREV_YERI + (len(kod) - len(_GOREV_KOD))
-            return t.replace(capa, _u30_yaz(len(kod) + len(GOREV_CAGRISI)) + kod[:yer] + GOREV_CAGRISI + kod[yer:]), 1
+            yeni = _u30_yaz(len(kod) + len(ek)) + kod[:yer] + ek + kod[yer:]
+            return t[:i - 4] + bytes([SAYAC_YIGINI]) + t[i - 3:i] + yeni + t[i + len(capa):], 1
     return t, 0
+
+
+# Tam ekran boyu (DNT-70). Sahibi: tam ekranda menüler eski videodaki gibi değil. Oyun tam ekran olayında NO_SCALE'e geçip
+# menüleri Base/getStageDimensions'ın verdiği boya göre dizer (StateNormal/setFullScreen@51-58). getStageDimensions@59-67
+# tam ekranda stage.fullScreenWidth/Height okur; Ruffle 0.7.1'de bu iki alıcı taslak ("Encountered stub: Stage.fullScreenWidth
+# getter"): menüler ekranın kenarına değil, ortadaki bir kutuya dizildi (Ruffle'da görüldü). NO_SCALE'de stageWidth/Height
+# tam ekranın gerçek boyudur: aynı uzunlukta çok adla değiştirilir (fullScreenWidth 18101 → stageWidth 28860,
+# fullScreenHeight 17418 → stageHeight 28861; dördü de 4 bayt u30), dallar kaymaz.
+_EKRAN_BOYU_KOD = bytes.fromhex(
+    "d03020100900002a87aaa5a72321afa280bb0ad5100900002087afc12b74a0b375d0464e0080bb0ad5d166ae0f60961066f213141300002cad01"
+    "d166b58d012cb001d1668a88015502482cad01601d66d3582cb001601d669768550248")
+EKRAN_BOYU_DEGISIMI = ((bytes.fromhex("d166b58d01"), bytes.fromhex("d166bce101")),   # getlocal_1, getproperty
+                       (bytes.fromhex("d1668a8801"), bytes.fromhex("d166bde101")))
+
+
+def tam_ekran_boyu(t: bytes):
+    """(yeni_etiket, değişen): getStageDimensions tam ekranda stageWidth/Height okur (DNT-70); gövde tek değilse dokunmaz."""
+    capa = _u30_yaz(len(_EKRAN_BOYU_KOD)) + _EKRAN_BOYU_KOD
+    if t.count(capa) != 1:
+        return t, 0
+    yeni = _EKRAN_BOYU_KOD
+    for eski, yerine in EKRAN_BOYU_DEGISIMI:
+        assert yeni.count(eski) == 1 and len(eski) == len(yerine)
+        yeni = yeni.replace(eski, yerine)
+    return t.replace(capa, _u30_yaz(len(yeni)) + yeni), 1
+
+
+# Oyunun kendi tam ekran düğmesi (dişli menüsü; GuiManager/toggleFullscreen@162-215: displayState NORMAL değilse NORMAL,
+# değilse FULL_SCREEN). Ruffle 0.7.1'de ActionScript'in açtığı tam ekranda oyuna tam ekran olayı gelmiyor: oyun EXACT_FIT'te
+# kalıp arayüzü geriyor (Ruffle'da görüldü, 14.11.2026). Sayfanın açtığı tam ekranda olay geliyor ve menüler doğru diziliyor.
+# Bu yüzden iki atama ExternalInterface.call("toggleFullscreen") ile değiştirilir; sayfa (templates/js/oyun.js
+# window.toggleFullscreen) tam ekranı kendi yolundan açar ya da kapatır. Bayt: getlex ExternalInterface (60 8402, Base/gotoCash
+# @41 ile aynı), pushstring "toggleFullscreen" (2c d14e, dize 10065), callpropvoid call 1 (4f dd03 01); kalan 46 bayt nop
+# (02). @178 ve @198'deki iki dal bu bölgenin içinde kalır; @218 returnvoid ve öncesi (bf/bfo simgeleri) değişmez.
+_TAM_EKRAN_DUGMESI_KOD = bytes.fromhex(
+    "d030600110090000aa23859557a5adb0a0660c66c902762a11210000296001660c66f502600266d80cab2a110e0000296001660c66f50260"
+    "0266d30eab2a11160000296001660c100900001cb3a27457acd027a1668905762a12090000296001660c66f80f961201000047d066820666"
+    "b762d066820666b76266d5059661d50510090000d2d1c6a928b0a2ab85d066820666fe62d066820666fe6266d5059661d5056001660c464e"
+    "0066ae0f609610669b02131400006001660c464e00609610669b0261ae0f101000006001660c464e0060961066f21361ae0f47")
+TAM_EKRAN_BOLGESI = (162, 218)
+TAM_EKRAN_CAGRISI = bytes.fromhex("608402" "2cd14e" "4fdd0301")
+
+
+def tam_ekran_dugmesi(t: bytes):
+    """(yeni_etiket, değişen): dişli menüsündeki tam ekran düğmesi sayfanın tam ekranını çağırır (DNT-70)."""
+    capa = _u30_yaz(len(_TAM_EKRAN_DUGMESI_KOD)) + _TAM_EKRAN_DUGMESI_KOD
+    if t.count(capa) != 1:
+        return t, 0
+    bas, son = TAM_EKRAN_BOLGESI
+    yeni = (_TAM_EKRAN_DUGMESI_KOD[:bas] + TAM_EKRAN_CAGRISI + bytes([0x02]) * (son - bas - len(TAM_EKRAN_CAGRISI))
+            + _TAM_EKRAN_DUGMESI_KOD[son:])
+    return t.replace(capa, _u30_yaz(len(yeni)) + yeni), 1
+
+
+def kamp_sayaci(t: bytes):
+    """(yeni_etiket, değişen): IsoEngine/Update'e kalan trol sayısını sayaca yazan satır (DNT-68); gövde tek değilse
+    dokunmaz."""
+    capa = _u30_yaz(len(_GUNCELLE_KOD)) + _GUNCELLE_KOD
+    if t.count(capa) != 1:
+        return t, 0
+    yeni = _GUNCELLE_KOD[:SAYI_YERI] + SAYAC_YAZISI + _GUNCELLE_KOD[SAYI_YERI:]
+    return t.replace(capa, _u30_yaz(len(yeni)) + yeni), 1
 
 
 def turkcelestir(veri: bytes, sozluk=None):
@@ -568,9 +717,12 @@ def turkcelestir(veri: bytes, sozluk=None):
             t, komsu = komsudan_komsuya(t)
             t, kaynak = kaynaklari_gunde_bir(t)
             t, gorev = hikaye_gorevini_kur(t)
-            if sayi or kaldirilan or komsu or kaynak or gorev:
+            t, sayac = kamp_sayaci(t)
+            t, ekran = tam_ekran_boyu(t)
+            t, dugme = tam_ekran_dugmesi(t)
+            if sayi or kaldirilan or komsu or kaynak or gorev or sayac or ekran or dugme:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan + komsu + kaynak + gorev
+                degisen += sayi + kaldirilan + komsu + kaynak + gorev + sayac + ekran + dugme
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]
