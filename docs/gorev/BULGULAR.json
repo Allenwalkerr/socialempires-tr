@@ -4,7 +4,7 @@
   "devam_noktasi": {
     "faz": "1.4.07'ye tam geçiş (KAR-08)",
     "madde": "GEC-09",
-    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65). 12.11.2026 gece, sahibi 'dur, limitim yenilenince devam' dedi. Yarım kalanlar: (a) DNT-65 (hikâye görevi kampı) bu dalda, PR'ı açılıp birleştirilecek (sahibine sor); (b) seferde (görev adası) ada bitince zorluk seçilemiyor, yıldız kazanılmıyor: incelenmedi; (c) bot köylerine profil resmindeki birlik ve ona uygun dekorasyon (sahibinin fikri): planlanacak; (d) tam ekran: eski videoda arayüz farklı görünüyor (sahibinin görseli), karşılaştırılacak; (e) v0.1.0-deneme3 sürümü yayında (sahibi etiketi açtı). 12.11.2026 ikinci yarı: ölçüme dayalı yol haritası yazıldı (docs/YOL_HARITASI_2.md, araclar/yol_haritasi_olcum.py; YOL-01…03). Seferdeki zorluk sorununun kökü bulundu (DNT-66: questsRank yazılmıyor). Sıradaki: Faz 1 = DNT-65'in birleşmesi ve DNT-66'nın düzeltmesi, ikisi aynı deneme sürümünde."
+    "sonraki_adim": "Bulut oturumu 12.11.2026. #59 … #79 birleşti; v0.1.0-deneme2 yayında. #80, #81, #82 birleşti (#82: DNT-61…64, KAR-36; asker paketleri ve ağaç/taş/altının günde bir yenilenmesi). Sahibinin ilk oyunda bildirdiklerinin hepsi kapandı; savaştan sonra askerlerin yeri doğrulandı (TST-07 notu). Açık: (1) DNT-63: sahibinin sol panelde gördüğü üçüncü simge (sahibi: 'kalsın', bekletiliyor); (2) açık artırma: biçimi belirlendi, sahibi 'şimdilik kalsın' dedi (KAR-38); (3) Prenses hikâye serisi: 30 görevin her biri oyunda açıldı, çökme ve hata yok (DNT-50); görevlerin savaşla oynanması denenmedi. Sonra GEC-09: sahibi tablette şimdilik sorun görmedi; v0.1.0 etiketi sahibinin onayıyla. Altın Belediye ev sınırı 100 kalır (KAR-37). Yeni oturumda: git config user.name lahmacunveayran (S-65). 12.11.2026 gece, sahibi 'dur, limitim yenilenince devam' dedi. Yarım kalanlar: (a) DNT-65 (hikâye görevi kampı) bu dalda, PR'ı açılıp birleştirilecek (sahibine sor); (b) seferde (görev adası) ada bitince zorluk seçilemiyor, yıldız kazanılmıyor: incelenmedi; (c) bot köylerine profil resmindeki birlik ve ona uygun dekorasyon (sahibinin fikri): planlanacak; (d) tam ekran: eski videoda arayüz farklı görünüyor (sahibinin görseli), karşılaştırılacak; (e) v0.1.0-deneme3 sürümü yayında (sahibi etiketi açtı). 12.11.2026 ikinci yarı: ölçüme dayalı yol haritası yazıldı (docs/YOL_HARITASI_2.md, araclar/yol_haritasi_olcum.py; YOL-01…03). Seferdeki zorluk sorununun kökü bulundu (DNT-66: questsRank yazılmıyor). Sıradaki: Faz 1 = DNT-65'in birleşmesi ve DNT-66'nın düzeltmesi, ikisi aynı deneme sürümünde. 14.11.2026: sahibi prenses kampında sayacın olmadığını bildirdi (DNT-68, düzeltildi, PR bekliyor); yılbaşı resmi kayıyor (DNT-69) ve tam ekran (DNT-70) açık. 0926 ile 1.4.07 arasında kaldırılmış başka çağrılar karşılaştırılıyor."
   },
   "maddeler": [
     {
@@ -3061,6 +3061,45 @@
       "pr": "#84",
       "onay": null,
       "notlar": "oyun/bot_kimlik.py TEMALAR ve BIRIM_TEMASI; oyun/bot_koy.py koy_kur(ad=...), profil_agirligi, ordu_dolu_mu; TASARIM_SURUMU 9 (var olan bot köyleri açılışta yeniden kurulur; ad, seviye, kaynak ve geçmiş kalır). Plan: docs/inceleme/bot-koyleri-plani.md. YOL_HARITASI_2 B2. PR incelemesi (13.11.2026): ilk sürümde çıkarılan asker sayısı ile ordu_dolu_mu ağırlığı farklıydı, köy zamanla güçlenebilirdi; ağırlık tek hesaptan (beklenen_guc) alınıyor."
+    },
+    {
+      "id": "DNT-68",
+      "baslik": "Prenses kampında 'kaç düşman kaldı' sayacı yoktu; 1.4.07 sayaç nesnesini hiç kurmuyor",
+      "sinif": "hata",
+      "onem": "Yüksek",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
+      "kanit": "Sahibi (14.11.2026): 'prenses haritaya gelmiş ama sağ altta bu kadar şey kaldı falan yazmıyor. Eskiden böyle değildi'. 0926: GuiManager/addTimer@95-236 countdownTimerOgres'u kurup bgBar.mcTrolls'a ekler; Base/loadMap@642-647 setVisibleTimerOgres(true); IsoEngine/Update@248-256 setTextOgres(trol sayısı). 1.4.07'de addTimer yok, countdownTimerOgres hep boş; StateNormal/enter@374-384 mcTrolls'u gizler; Update'te sayı satırı yok. Ruffle (30. seviye köy, iki açılış): sağ altta 'Düşman Ordugâhı 51 düşman kaldı'; kamp tek (kayıtta 41 duvar); konsolda hata yok.",
+      "test": "tests/test_swf_yama.py KampSayaciTestleri, HikayeGoreviTestleri (SE_ISTEMCI_SWF ile gerçek istemcide dallar ve yığın; bozma: bağlantı, yer, yığın)",
+      "pr": null,
+      "onay": null,
+      "notlar": "oyun/swf_yama.py YAMA_SURUMU 21: SAYAC_KURULUMU (spawnInit, boşsa new CountdownTimer(Main, Gui, TIMER_CAMPAMENTO_ENEMIGO, '', 8388608) ve mcTrolls.addChild; max_stack 3→7), SAYAC_YAZISI (Update@248: kendi köyünde değilse gizle, trol varsa mcTrolls ve sayacı göster, sayıyı yaz). İlk denemede setVisibleTimerOgres(true) spawnInit'e kondu: countdownTimerOgres boş olduğu için TypeError #1009, MapInitializer$/Init yarıda kaldı ve her karede yeniden kuruldu; bir açılışta 41 yerine 4592 trol duvarı geldi (S-86). Sahibine gitmeden yakalandı. Kamp yenilince sonraki kampa geri sayım istemcinin finalizeQuest'indeki setTimerOgres ile gelir; bu oyunda denenmedi (◐)."
+    },
+    {
+      "id": "DNT-69",
+      "baslik": "Diyar Haberleri'nde Yılbaşı şenliği resmi kayık ve sürekli aşağı yukarı oynuyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Sahibi (14.11.2026, ekran görüntüsü): 'yılbaşı etkinliğinin sağında kırmızı binanın olduğu şeye dikkatle bak. Kayık ve sürekli aşağı yukarı hareket ediyor'. Görüntüde ilk satırın resmi çerçeveden taşmış.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "İncelenmedi. Sayfanın Diyar Haberleri paneli (bizim eklememiz)."
+    },
+    {
+      "id": "DNT-70",
+      "baslik": "Tam ekranda oyunun arayüzü ekranla orantılı büyüyor; eski videoda öyle değil",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "?",
+      "kanit": "Sahibi (12.11 ve 14.11.2026, eski video karesi): 'eski bir videoda tam ekran haline baktım bizimki gibi değil ... bizde ui onunla oranla büyüyor'.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "İncelenmedi (YOL_HARITASI_2 B3). Sahibine 13.11'de 'henüz başlanmadı' denmeliydi; açıkça söylenmedi."
     }
   ]
 }

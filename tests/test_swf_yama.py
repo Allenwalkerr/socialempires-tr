@@ -1108,20 +1108,29 @@ class HikayeGoreviTestleri(unittest.TestCase):
 
     def test_yamasiz_ve_kaynak_yamali_govdeye_konur(self):
         kod = swf_yama._GOREV_KOD
+        ek = swf_yama.SAYAC_KURULUMU + swf_yama.GOREV_CAGRISI
         for kaynakli in (False, True):
+            # gövde başlığı: yöntem 5, max_stack 3, local_count 2, init_scope 1, max_scope 2 (1.4.07 spawnInit)
             govde = _do_abc(["x"]) + b"".join(swf_yama._u30_yaz(u) + bas for ad, u, bas, _, _ in swf_yama.KAYNAK_YAMALARI
-                                              if ad != "spawnInit") + swf_yama._u30_yaz(len(kod)) + kod
+                                              if ad != "spawnInit") + b"\x05\x03\x02\x01\x02" + swf_yama._u30_yaz(len(kod)) + kod
             if kaynakli:
                 govde, sayi = swf_yama.kaynaklari_gunde_bir(govde)
                 self.assertEqual(sayi, 3)
             yeni, sayi = swf_yama.hikaye_gorevini_kur(govde)
             self.assertEqual(sayi, 1)
-            self.assertEqual(yeni.count(swf_yama.GOREV_CAGRISI), 1)
-            i = yeni.index(swf_yama.GOREV_CAGRISI)
+            self.assertEqual(yeni.count(ek), 1)
+            i = yeni.index(ek)
             self.assertEqual(yeni[i - 1], 0x29)  # önünde setCorrectQuest bloğunun pop'u
-            self.assertEqual(yeni[i + len(swf_yama.GOREV_CAGRISI):][:5], bytes.fromhex("6001660c66"))  # ardı tutorialMode
-            uzunluk = len(kod) + len(swf_yama.GOREV_CAGRISI) + (len(swf_yama.KAYNAK_ATLA) if kaynakli else 0)
-            self.assertIn(swf_yama._u30_yaz(uzunluk) + kod[:25], yeni)  # gövde uzunluğu eklemeyle büyür
+            self.assertEqual(yeni[i + len(ek):][:5], bytes.fromhex("6001660c66"))  # ardı tutorialMode
+            uzunluk = len(kod) + len(ek) + (len(swf_yama.KAYNAK_ATLA) if kaynakli else 0)
+            baslik = b"\x05" + bytes([swf_yama.SAYAC_YIGINI]) + b"\x02\x01\x02"
+            self.assertIn(baslik + swf_yama._u30_yaz(uzunluk) + kod[:25], yeni)  # yığın 7, uzunluk eklemeyle büyür
+
+    def test_baslik_beklenmedikse_dokunmaz(self):
+        """max_stack/local_count 3/2 değilse (başka sürüm) yığın yükseltilemez; gövdeye hiç dokunulmaz."""
+        kod = swf_yama._GOREV_KOD
+        govde = _do_abc(["x"]) + b"\x05\x04\x02\x01\x02" + swf_yama._u30_yaz(len(kod)) + kod
+        self.assertEqual(swf_yama.hikaye_gorevini_kur(govde), (govde, 0))
 
     def test_govde_yoksa_dokunmaz(self):
         govde = _do_abc(["x"])
@@ -1142,11 +1151,71 @@ class HikayeGoreviTestleri(unittest.TestCase):
             a0, a1 = Abc(once), Abc(yeni)
             i = [k for k, v in a0.yontem_adlari().items() if v == "MapInitializer$/spawnInit"][0]
             yer = swf_yama.GOREV_YERI + (len(swf_yama.KAYNAK_ATLA) if kaynakli else 0)
-            d = len(swf_yama.GOREV_CAGRISI)
+            d = len(swf_yama.SAYAC_KURULUMU + swf_yama.GOREV_CAGRISI)
+            self.assertEqual(a1.govdeler[i].max_yigin, swf_yama.SAYAC_YIGINI)
             eski, yeni_isl = a0.coz(a0.govdeler[i]), a1.coz(a1.govdeler[i])
             kay = lambda o: o if o < yer else o + d  # noqa: E731
             for o, isl in eski.items():
                 karsi = yeni_isl[kay(o)]
                 self.assertEqual((karsi.ad, karsi.isl, karsi.hedefler), (isl.ad, isl.isl, tuple(map(kay, isl.hedefler))))
-            self.assertEqual([yeni_isl[o].ad for o in sorted(yeni_isl) if yer <= o < yer + d],
+            adlar = [(yeni_isl[o].ad, a1.ad(yeni_isl[o].isl[0]) if yeni_isl[o].isl and yeni_isl[o].ad != "pushint" else "")
+                     for o in sorted(yeni_isl) if yer <= o < yer + d]
+            self.assertEqual([a for a, _ in adlar[-5:]],
                              ["findpropstrict", "getlex", "getproperty", "getproperty", "callpropvoid"])
+            # 0926 GuiManager/addTimer@95-236: new CountdownTimer(5 argüman) -> countdownTimerOgres, mcTrolls.addChild
+            self.assertIn(("constructprop", "CountdownTimer"), adlar)
+            self.assertIn(("setproperty", "countdownTimerOgres"), adlar)
+            self.assertIn(("getproperty", "TIMER_CAMPAMENTO_ENEMIGO"), adlar)
+            self.assertIn(("callpropvoid", "addChild"), adlar)
+
+
+class KampSayaciTestleri(unittest.TestCase):
+    """DNT-68. Sahibi (14.11.2026): prenses kampı geldi ama 'bu kadar düşman kaldı' yazmıyor. 0926 IsoEngine/Update
+    @248-256: trol varken countdownTimerOgres.setTextOgres(trol sayısı). 1.4.07 Update'te o satır yok; @171, @185 ve
+    @235'teki dallar 248'e gider. Çok adlar (1.4.07): Base 1, Gui 45, bgBar 148, mcTrolls 4259, countdownTimerOgres 5382,
+    visible 34, setTextOgres 21102. Ruffle'da (30. seviye köy): sağ altta 'Düşman Ordugâhı 51 düşman kaldı', kamp tek
+    (41 duvar), konsolda hata yok."""
+
+    def test_yazi_kodunun_bicimi(self):
+        islemler = KaynakYenilemeTestleri._coz(swf_yama.SAYAC_YAZISI)
+        adlar = [(i.ad, i.isl) for i in islemler]
+        self.assertIn(("callpropvoid", (21102, 1)), adlar)  # setTextOgres(trol)
+        self.assertIn(("getproperty", (4259,)), adlar)      # mcTrolls
+        self.assertIn(("ifngt", ()), [(i.ad, ()) for i in islemler])  # trol yoksa yazmaz
+        self.assertIn(("ifeq", ()), [(i.ad, ()) for i in islemler])   # kendi köyü değilse gizler
+        # setVisibleTimerOgres (23807) çağrılmaz: 1.4.07 arayüzünde TypeError #1009 verir
+        self.assertNotIn(23807, [x for i in islemler for x in i.isl])
+
+    def test_gercek_istemcide_dallar(self):
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc, abc_etiketleri
+        et = [e for _, e in abc_etiketleri(open(yol, "rb").read()) if b"spawnRemainingResources" in e][0]
+        yeni, sayi = swf_yama.kamp_sayaci(et)
+        self.assertEqual(sayi, 1)
+        a0, a1 = Abc(et), Abc(yeni)
+        i = [k for k, v in a0.yontem_adlari().items() if v == "IsoEngine/Update"][0]
+        eski, yeni_isl = a0.coz(a0.govdeler[i]), a1.coz(a1.govdeler[i])
+        yer, d = swf_yama.SAYI_YERI, len(swf_yama.SAYAC_YAZISI)
+        self.assertEqual(sorted(o for o, isl in eski.items() if yer in isl.hedefler), [171, 185, 235])
+        kay = lambda o: o if o <= yer else o + d  # noqa: E731  (248'e giden dallar eklenen kodun başına)
+        for o, isl in eski.items():
+            karsi = yeni_isl[kay(o) if o != yer else o + d]
+            self.assertEqual((karsi.ad, karsi.isl), (isl.ad, isl.isl))
+            self.assertEqual(karsi.hedefler, tuple(h if h <= yer else h + d for h in isl.hedefler))
+        self.assertLessEqual(3, a1.govdeler[i].max_yigin)
+        self.assertEqual(a1.govdeler[i].istisnalar, [])
+
+    def test_turkcelestir_iki_yamayi_da_koyar(self):
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        sonuc = swf_yama.turkcelestir(open(yol, "rb").read())
+        veri = sonuc[0] if isinstance(sonuc, tuple) else sonuc
+        govde = swf_yama._govde(veri)
+        govde = govde[0] if isinstance(govde, tuple) else govde
+        self.assertIn(swf_yama.SAYAC_YAZISI, govde)
+        self.assertIn(swf_yama.SAYAC_KURULUMU + swf_yama.GOREV_CAGRISI, govde)
