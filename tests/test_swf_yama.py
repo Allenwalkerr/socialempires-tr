@@ -1167,24 +1167,35 @@ class HikayeGoreviTestleri(unittest.TestCase):
             self.assertIn(("setproperty", "countdownTimerOgres"), adlar)
             self.assertIn(("getproperty", "TIMER_CAMPAMENTO_ENEMIGO"), adlar)
             self.assertIn(("callpropvoid", "addChild"), adlar)
+            self.assertIn(("callproperty", "getLiteral"), adlar)  # çok ad 19 (#85 incelemesi: açıklama 147 diyordu)
 
 
 class KampSayaciTestleri(unittest.TestCase):
     """DNT-68. Sahibi (14.11.2026): prenses kampı geldi ama 'bu kadar düşman kaldı' yazmıyor. 0926 IsoEngine/Update
     @248-256: trol varken countdownTimerOgres.setTextOgres(trol sayısı). 1.4.07 Update'te o satır yok; @171, @185 ve
     @235'teki dallar 248'e gider. Çok adlar (1.4.07): Base 1, Gui 45, bgBar 148, mcTrolls 4259, countdownTimerOgres 5382,
-    visible 34, setTextOgres 21102. Ruffle'da (30. seviye köy): sağ altta 'Düşman Ordugâhı 51 düşman kaldı', kamp tek
+    visible 34, setTextOgres 21102. Ruffle'da (30. seviye köy): sağ altta 'Düşman Kampı 51 düşman kaldı', kamp tek
     (41 duvar), konsolda hata yok."""
 
     def test_yazi_kodunun_bicimi(self):
+        """Görünürlük 0926'daki gibi oyunun kendi setVisibleTimerOgres'iyle (23807): 0926 GuiManager/setVisibleTimerOgres
+        @49-72 'Haritadaki düşmanlar' balonunu (mcTrolls.buf) her zaman gizler. Sahibi (14.11.2026, ekran görüntüsü):
+        balon görünüyordu. Sayaç (5382) boşsa çağrı TypeError verir (S-86): her çağrıdan önce iffalse ile denetlenir."""
         islemler = KaynakYenilemeTestleri._coz(swf_yama.SAYAC_YAZISI)
         adlar = [(i.ad, i.isl) for i in islemler]
+        cagrilar = [k for k, x in enumerate(adlar) if x == ("callpropvoid", (23807, 1))]
+        self.assertEqual(len(cagrilar), 2)
+        self.assertEqual([adlar[k - 1][0] for k in cagrilar], ["pushfalse", "pushtrue"])
+        for k in cagrilar:  # öncesinde sayacın boşluğu denetlenmiş olmalı
+            once = adlar[:k]
+            son_sayac = max(j for j, x in enumerate(once) if x == ("getproperty", (5382,)))
+            self.assertIn(once[son_sayac + 1][0], ("iffalse", "dup"))
         self.assertIn(("callpropvoid", (21102, 1)), adlar)  # setTextOgres(trol)
-        self.assertIn(("getproperty", (4259,)), adlar)      # mcTrolls
-        self.assertIn(("ifngt", ()), [(i.ad, ()) for i in islemler])  # trol yoksa yazmaz
-        self.assertIn(("ifeq", ()), [(i.ad, ()) for i in islemler])   # kendi köyü değilse gizler
-        # setVisibleTimerOgres (23807) çağrılmaz: 1.4.07 arayüzünde TypeError #1009 verir
-        self.assertNotIn(23807, [x for i in islemler for x in i.isl])
+        # kap (mcTrolls 4259) yalnızca gösterilirken açılır (1.4.07 StateNormal/enter@374-384 gizler; 0926'da yok)
+        kap = [k for k, x in enumerate(adlar) if x == ("getproperty", (4259,))]
+        self.assertEqual(len(kap), 1)
+        self.assertEqual(adlar[kap[0] + 1:kap[0] + 3], [("pushtrue", ()), ("setproperty", (34,))])
+        self.assertGreater(kap[0], cagrilar[1])
 
     def test_gercek_istemcide_dallar(self):
         yol = os.environ.get("SE_ISTEMCI_SWF")
@@ -1206,8 +1217,29 @@ class KampSayaciTestleri(unittest.TestCase):
             karsi = yeni_isl[kay(o) if o != yer else o + d]
             self.assertEqual((karsi.ad, karsi.isl), (isl.ad, isl.isl))
             self.assertEqual(karsi.hedefler, tuple(h if h <= yer else h + d for h in isl.hedefler))
-        self.assertLessEqual(3, a1.govdeler[i].max_yigin)
         self.assertEqual(a1.govdeler[i].istisnalar, [])
+        # Eklenen kodun en büyük yığın derinliği gövdenin max_stack'ini (3) aşmamalı. 248'de yığın boş (235 iffalse ve
+        # 239 callpropvoid boşaltır). AVM2 yığın etkileri: getlex/getlocal/push* +1, getproperty 0, dup +1, setproperty -2,
+        # iffalse/iftrue -1, ifeq/ifngt -2, pop -1, callpropvoid ad,n -(1+n), jump/nop 0.
+        etki = {"getlex": 1, "getlocal_2": 1, "pushbyte": 1, "pushtrue": 1, "pushfalse": 1, "dup": 1, "getproperty": 0,
+                "setproperty": -2, "iffalse": -1, "iftrue": -1, "ifeq": -2, "ifngt": -2, "pop": -1, "jump": 0, "nop": 0}
+        derinlik, en_cok, yollar = {yer: 0}, 0, [yer]
+        while yollar:
+            o = yollar.pop()
+            if o >= yer + d:
+                continue
+            isl = yeni_isl[o]
+            dd = derinlik[o] + (-(1 + isl.isl[1]) if isl.ad == "callpropvoid" else etki[isl.ad])
+            self.assertGreaterEqual(dd, 0, (o, isl.ad))
+            en_cok = max(en_cok, dd, derinlik[o] + (1 if isl.ad in ("getlex", "dup") else 0))
+            for h in (list(isl.hedefler) + ([] if isl.ad == "jump" else [isl.sonraki])):
+                if h not in derinlik:
+                    derinlik[h] = dd
+                    yollar.append(h)
+                else:
+                    self.assertEqual(derinlik[h], dd, h)  # birleşen yollarda aynı derinlik
+        self.assertLessEqual(en_cok, a1.govdeler[i].max_yigin)
+        self.assertEqual(derinlik[yer + d], 0)  # eklenen kodun sonunda yığın yine boş
 
     def test_turkcelestir_iki_yamayi_da_koyar(self):
         yol = os.environ.get("SE_ISTEMCI_SWF")

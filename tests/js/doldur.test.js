@@ -70,7 +70,8 @@ function sayfa(doldur, buyukEkran = true) {
   };
   vm.runInNewContext(modBolumu, { document, navigator: { userAgent: "Chrome" }, localStorage: { setItem() {} },
                                   panelleriTazele() {}, oyunTamEkrani: (o) => o.enterFullscreen(),
-                                  oyunTamEkraniSigarMi: () => buyukEkran });
+                                  oyunTamEkraniSigarMi: () => buyukEkran, window: {},
+                                  kutuBoyunuSifirla() { if (oyuncu.style) { oyuncu.style.width = ""; oyuncu.style.height = ""; } } });
   return { k, dinle, document, oyuncu, siniflar };
 }
 
@@ -105,18 +106,23 @@ test("Sığdır, 760×600'den küçük ekran: sayfanın tam ekranı (NO_SCALE me
 // Ruffle tam ekran olayını kutu büyümeden gönderir; oyun menüleri o anki sahne boyuna dizer. Kutu önce ekran boyuna
 // getirilmeli, istek ondan sonra (Ruffle'da kutu büyütülmeden menüler 877×693'lük kutuda kaldı).
 test("oyunTamEkrani: önce kutu ekran boyuna, sonra tam ekran isteği; çıkışta boy geri gelir", () => {
-  const bas3 = js.indexOf("  function oyunTamEkrani(oyuncu) {");
+  const bas3 = js.indexOf("  function kutuBoyunuSifirla() {");
   const son3 = js.indexOf("  function doldurulsunMu() {", bas3);
   assert.ok(bas3 > 0 && son3 > bas3);
   const sira = [];
   const oyuncu = { style: {}, enterFullscreen() { sira.push("istek " + this.style.width + "x" + this.style.height); } };
   const zamanlayici = [];
-  const ctx = { window: { screen: { width: 1920, height: 1080 } }, setTimeout: (f) => zamanlayici.push(f), oyuncu };
+  const belge = { fullscreenElement: null, querySelector: () => oyuncu };
+  const ctx = { window: { screen: { width: 1920, height: 1080 } }, setTimeout: (f) => zamanlayici.push(f), oyuncu,
+                document: belge };
   vm.runInNewContext(js.slice(bas3, son3) + "\noyunTamEkrani(oyuncu);", ctx);
   assert.deepStrictEqual(sira, []);  // istek hemen değil
   assert.deepStrictEqual(oyuncu.style, { width: "1920px", height: "1080px" });
-  zamanlayici.forEach((f) => f());
+  zamanlayici[0]();
   assert.deepStrictEqual(sira, ["istek 1920pxx1080px"]);
+  belge.fullscreenElement = oyuncu;  // istek kabul edildi: boy kalır
+  zamanlayici[1]();
+  assert.deepStrictEqual(oyuncu.style, { width: "1920px", height: "1080px" });
   const s = sayfa(false);
   const o = s.oyuncu; o.style = { width: "1920px", height: "1080px" };
   s.dinle["belge-fullscreenchange"]();  // fullscreenElement null: çıkış
@@ -128,4 +134,47 @@ test("oyunTamEkrani: önce kutu ekran boyuna, sonra tam ekran isteği; çıkış
 // Flash'ta allowFullScreen="true").
 test("Ruffle ayarı: oyunun kendi tam ekranına izin var", () => {
   assert.ok(/allowFullscreen:\s*true/.test(js));
+});
+
+test("Tam ekran isteği reddedilirse kutu eski boyuna döner (#85 incelemesi)", () => {
+  const bas3 = js.indexOf("  function kutuBoyunuSifirla() {");
+  const son3 = js.indexOf("  function doldurulsunMu() {", bas3);
+  const oyuncu = { style: {}, enterFullscreen() {} };
+  const zamanlayici = [];
+  const belge = { fullscreenElement: null, querySelector: () => oyuncu };
+  vm.runInNewContext(js.slice(bas3, son3) + "\noyunTamEkrani(oyuncu);",
+                     { window: { screen: { width: 1920, height: 1080 } }, setTimeout: (f) => zamanlayici.push(f), oyuncu, document: belge });
+  zamanlayici.forEach((f) => f());  // istek gitti ama tam ekran olmadı
+  assert.deepStrictEqual(oyuncu.style, { width: "", height: "" });
+  const s = sayfa(false);
+  s.oyuncu.style = { width: "1920px", height: "1080px" };
+  s.dinle["belge-fullscreenerror"]();
+  assert.deepStrictEqual(s.oyuncu.style, { width: "", height: "" });
+});
+
+test("Oyunun dişli menüsündeki tam ekran düğmesi sayfanın yolunu kullanır (window.toggleFullscreen)", () => {
+  assert.ok(/window\.toggleFullscreen = function/.test(modBolumu));
+  const ctx = {};
+  const dinle = {};
+  const siniflar = new Set();
+  const k = { sayfaIstek: 0, oyuncuIstek: 0, cikis: 0 };
+  const oyuncu = { focus() {}, style: {}, enterFullscreen() { k.oyuncuIstek += 1; } };
+  const document = {
+    fullscreenElement: null,
+    body: { classList: { toggle: (c, a) => (a ? siniflar.add(c) : siniflar.delete(c)), contains: (c) => siniflar.has(c) } },
+    documentElement: { requestFullscreen() { k.sayfaIstek += 1; return Promise.resolve(); } },
+    exitFullscreen() { k.cikis += 1; return Promise.resolve(); },
+    querySelector: (q) => (q === "ruffle-player" ? oyuncu : null),
+    getElementById: (id) => (dinle[id] = dinle[id] || { hidden: true, addEventListener(ad, f) { this[ad] = f; } }),
+    addEventListener() {},
+  };
+  const pencere = {};
+  vm.runInNewContext(modBolumu, { document, navigator: { userAgent: "Chrome" }, localStorage: { setItem() {} },
+                                  panelleriTazele() {}, oyunTamEkrani: (o) => o.enterFullscreen(),
+                                  oyunTamEkraniSigarMi: () => true, window: pencere, kutuBoyunuSifirla() {} });
+  pencere.toggleFullscreen();
+  assert.deepStrictEqual(k, { sayfaIstek: 0, oyuncuIstek: 1, cikis: 0 });
+  document.fullscreenElement = oyuncu;
+  pencere.toggleFullscreen();
+  assert.strictEqual(k.cikis, 1);
 });
