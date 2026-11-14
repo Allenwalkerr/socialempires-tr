@@ -3100,6 +3100,84 @@
       "pr": null,
       "onay": null,
       "notlar": "İncelenmedi (YOL_HARITASI_2 B3). Sahibine 13.11'de 'henüz başlanmadı' denmeliydi; açıkça söylenmedi."
+    },
+    {
+      "id": "DNT-71",
+      "baslik": "Hikâye görevinin tanıtım penceresi açılmıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 MapInitializer$/spawnInit@136-140 haber yoksa Base.PopUp.openPopupQuestInfo() çağırır, varsa PopupManager/checkStartPopup@460-479 sonra açar. 1.4.07'de PopupManager/openPopupQuestInfo gövdesi yalnızca returnvoid (kendim gördüm); deferredPopupQuestInfo yazılıyor ama okunmuyor.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+    },
+    {
+      "id": "DNT-72",
+      "baslik": "Kamp sonrası 4 saatlik geri sayım ve kampın yalnızca süre dolunca kurulması yok",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 MapInitializer$/Init@899-990: setTimerOgres() 0 ise ve sandık yoksa spawnInit; Base/loadMapHandler@278 sayacı yeniden başlatır. 1.4.07 Init@462 spawnInit'i her açılışta çağırır; setTimerOgres yalnızca finalizeQuest'te. DNT-68 sayıyı getirdi, bekleme kuralını getirmedi.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+    },
+    {
+      "id": "DNT-73",
+      "baslik": "Dart oyunu ve dünya/ırk seçici (ikinci kasaba) menüsüne oyundan ulaşılamıyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 GuiManager/createButtonsHerramientas oyunlar düğmesini, abrirDarts ve abrirSelectorMundo'yu bağlar. 1.4.07'de gamesButton.visible=false; abrirDarts ve checkForDartsPopup'ı çağıran yok (kendim aradım); openPopupRaceSelector yalnızca AdminPanel ve JS geri çağrısı openTrolls'tan (Base/init kaydeder), depodaki sayfalar openTrolls'u çağırmıyor. Sunucunun darts_* komutları bu yüzden kullanılmıyor.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+    },
+    {
+      "id": "DNT-74",
+      "baslik": "Pazartesi ödülü ve dönüş ödülü simgeleri kapalı",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "✔",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 1.4.07'de tek açıcı MondayBonusButton/clickButton ve comebackButtonViral/clickButton; config/patch/1-mega_patch.json viral_icons ikisini active 0 yapar (kendim gördüm). Sunucuda weekly_reward (KMT-07) ve comeback_reward var.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+    },
+    {
+      "id": "DNT-75",
+      "baslik": "Prenses tutsak görevinde bedava Rıhtım ve 30. seviyede bedava Zeplin Kulesi verilmiyor",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 checkStartPopup@710-718 IsoEngine/checkOpenDock ve checkOpenZep (buyElementNoResources, AVISO_MUELLE/AVISO_ZEPPELIN). 1.4.07'de bu yöntemler yok. Mağazadan alınmasının yeni kural olup olmadığı bakılmadı.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
+    },
+    {
+      "id": "DNT-76",
+      "baslik": "Küçük farklar: odak kaybında oyun durmuyor, komşu profilinde son bağlantı yok",
+      "sinif": "hata",
+      "onem": "Orta",
+      "durum": "acik",
+      "isaret": "◐",
+      "kanit": "0926 ile 1.4.07 bayt kodu karşılaştırması (14.11.2026; betikler scratchpad/karsilastirma). 0926 Base/init@756 onDeactivate→pauseGame; PopupPlayerProfile/fillPopup@518 lastConn. 1.4.07'de kayıt ya da alan yok. Oyuncu açısından küçük.",
+      "test": null,
+      "pr": null,
+      "onay": null,
+      "notlar": "Sahibine soruldu: geri getirilsin mi (1.4.07'yi yapanlar bilerek kapatmış olabilir)."
     }
   ]
 }
