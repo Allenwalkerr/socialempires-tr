@@ -3093,13 +3093,13 @@
       "baslik": "Tam ekranda oyunun arayüzü ekranla orantılı büyüyor; eski videoda öyle değil",
       "sinif": "hata",
       "onem": "Orta",
-      "durum": "acik",
-      "isaret": "?",
+      "durum": "ci_bekliyor",
+      "isaret": "✔",
       "kanit": "Sahibi (12.11 ve 14.11.2026, eski video karesi): 'eski bir videoda tam ekran haline baktım bizimki gibi değil ... bizde ui onunla oranla büyüyor'. Analiz (14.11.2026): iki istemcinin ölçekleme kodu aynı: Base/init EXACT_FIT; yalnızca Flash tam ekran olayında StateNormal/setFullScreen@51 NO_SCALE (0926 onFullscreenChange aynı). Sayfanın tam ekranı bu olayı tetiklemez: arayüz gerilir. Ruffle'da sayfadaki düğmeyle oyuncunun enterFullscreen'i denendi: oyuncu tam ekran oldu ama arayüz yine gerildi (olay gelmedi). Oyunun kendi dişli menüsündeki tam ekran düğmesi başsız tarayıcıda tam ekrana geçmedi (ortam sınırı). Sayfa düğmesi değişikliği işe yaramadığı için geri alındı.",
-      "test": null,
-      "pr": null,
+      "test": "tests/js/doldur.test.js (Sığdır büyük/küçük ekran, oyunTamEkrani sırası, allowFullscreen; bozmalar düşer), tests/test_swf_yama.py TamEkranBoyuTestleri",
+      "pr": "#85",
       "onay": null,
-      "notlar": "Çözüm yolu: SWF yaması ile sahne büyüdüğünde (Event.RESIZE) oyunun kendi setFullScreen düzenini çalıştırmak ya da Ruffle'ın tam ekranında displayState'in fullScreen bildirilmesi. Gerçek tarayıcıda denenmeli."
+      "notlar": "Üç kök birlikte: (1) Ruffle 0.7.1 allowFullscreen varsayılan kapalı; oyunun kendi tam ekran düğmesi (GuiManager/toggleFullscreen) sessizce yok sayılıyordu. acidcaos play.html gerçek Flash'ta allowFullScreen=\"true\". (2) Sayfadaki Tam Ekran Sığdır'da sayfanın tam ekranını açıyordu: tam ekran olayı gelmez, EXACT_FIT arayüzü gerer. Artık ekran 760×600 ve üstüyse oyunun kendi tam ekranı. (3) Ruffle'da Stage.fullScreenWidth/Height taslak ve tam ekran olayı kutu büyümeden geliyor: getStageDimensions stageWidth/Height okur (swf_yama.tam_ekran_boyu, YAMA_SURUMU 22), sayfa kutuyu önce ekran boyuna getirip 150 ms sonra tam ekran ister. Ruffle (1600×1000, Sığdır + Tam Ekran): arayüz kendi boyunda, üst ve alt çubuk ekranın üstünde ve altında ortalı, yan düğmeler kenarlarda; Esc ile eski görünüme dönüyor. İlk deneme (yalnızca sayfa düğmesini değiştirmek) işe yaramadı, geri alındı."
     },
     {
       "id": "DNT-71",

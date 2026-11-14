@@ -29,7 +29,7 @@ from oyun import swf_font
 from oyun.yollar import ASSETS_DIR, CEVIRI_DIR
 TR_FONTLARI = ("tr_ArialRoundedBold.swf", "tr_ErasBold.swf")
 _URETIM_KILIDI = threading.Lock()
-YAMA_SURUMU = b"21"  # yama mantığı değişince artırın (önbellek yenilensin)
+YAMA_SURUMU = b"22"  # yama mantığı değişince artırın (önbellek yenilensin)
 SOZLUK = os.path.join(CEVIRI_DIR, "arayuz_tr.json")
 
 _ETIKET = re.compile(r"<[^>]+>")
@@ -625,6 +625,31 @@ def hikaye_gorevini_kur(t: bytes):
     return t, 0
 
 
+# Tam ekran boyu (DNT-70). Sahibi: tam ekranda menüler eski videodaki gibi değil. Oyun tam ekran olayında NO_SCALE'e geçip
+# menüleri Base/getStageDimensions'ın verdiği boya göre dizer (StateNormal/setFullScreen@51-58). getStageDimensions@59-67
+# tam ekranda stage.fullScreenWidth/Height okur; Ruffle 0.7.1'de bu iki alıcı taslak ("Encountered stub: Stage.fullScreenWidth
+# getter"): menüler ekranın kenarına değil, ortadaki bir kutuya dizildi (Ruffle'da görüldü). NO_SCALE'de stageWidth/Height
+# tam ekranın gerçek boyudur: aynı uzunlukta çok adla değiştirilir (fullScreenWidth 18101 → stageWidth 28860,
+# fullScreenHeight 17418 → stageHeight 28861; dördü de 4 bayt u30), dallar kaymaz.
+_EKRAN_BOYU_KOD = bytes.fromhex(
+    "d03020100900002a87aaa5a72321afa280bb0ad5100900002087afc12b74a0b375d0464e0080bb0ad5d166ae0f60961066f213141300002cad01"
+    "d166b58d012cb001d1668a88015502482cad01601d66d3582cb001601d669768550248")
+EKRAN_BOYU_DEGISIMI = ((bytes.fromhex("d166b58d01"), bytes.fromhex("d166bce101")),   # getlocal_1, getproperty
+                       (bytes.fromhex("d1668a8801"), bytes.fromhex("d166bde101")))
+
+
+def tam_ekran_boyu(t: bytes):
+    """(yeni_etiket, değişen): getStageDimensions tam ekranda stageWidth/Height okur (DNT-70); gövde tek değilse dokunmaz."""
+    capa = _u30_yaz(len(_EKRAN_BOYU_KOD)) + _EKRAN_BOYU_KOD
+    if t.count(capa) != 1:
+        return t, 0
+    yeni = _EKRAN_BOYU_KOD
+    for eski, yerine in EKRAN_BOYU_DEGISIMI:
+        assert yeni.count(eski) == 1 and len(eski) == len(yerine)
+        yeni = yeni.replace(eski, yerine)
+    return t.replace(capa, _u30_yaz(len(yeni)) + yeni), 1
+
+
 def kamp_sayaci(t: bytes):
     """(yeni_etiket, değişen): IsoEngine/Update'e kalan trol sayısını sayaca yazan satır (DNT-68); gövde tek değilse
     dokunmaz."""
@@ -664,9 +689,10 @@ def turkcelestir(veri: bytes, sozluk=None):
             t, kaynak = kaynaklari_gunde_bir(t)
             t, gorev = hikaye_gorevini_kur(t)
             t, sayac = kamp_sayaci(t)
-            if sayi or kaldirilan or komsu or kaynak or gorev or sayac:
+            t, ekran = tam_ekran_boyu(t)
+            if sayi or kaldirilan or komsu or kaynak or gorev or sayac or ekran:
                 cikti.append(_baslik(kod, len(t)) + t)
-                degisen += sayi + kaldirilan + komsu + kaynak + gorev + sayac
+                degisen += sayi + kaldirilan + komsu + kaynak + gorev + sayac + ekran
                 continue
         if kod in (swf_font.DEFINE_TEXT, swf_font.DEFINE_TEXT2):
             t = govde[bas:son]

@@ -1219,3 +1219,46 @@ class KampSayaciTestleri(unittest.TestCase):
         govde = govde[0] if isinstance(govde, tuple) else govde
         self.assertIn(swf_yama.SAYAC_YAZISI, govde)
         self.assertIn(swf_yama.SAYAC_KURULUMU + swf_yama.GOREV_CAGRISI, govde)
+
+
+class TamEkranBoyuTestleri(unittest.TestCase):
+    """DNT-70. 1.4.07 Base/getStageDimensions@51-67: displayState FULL_SCREEN ise stage.fullScreenWidth/Height
+    (çok adlar 18101, 17418), değilse Config.STAGE_WIDTH/HEIGHT. Ruffle 0.7.1'de iki alıcı taslak ("Encountered stub:
+    AVM2 flash.display.Stage.fullScreenWidth getter"); menüler ekranın kenarına dizilmedi. stageWidth 28860, stageHeight
+    28861 (1.4.07'de başka yöntemlerde kullanılan çok adlar), dördü de 4 baytlık u30."""
+
+    def test_yalnizca_iki_ad_degisir_uzunluk_ayni(self):
+        govde = _do_abc(["x"]) + swf_yama._u30_yaz(len(swf_yama._EKRAN_BOYU_KOD)) + swf_yama._EKRAN_BOYU_KOD
+        yeni, sayi = swf_yama.tam_ekran_boyu(govde)
+        self.assertEqual(sayi, 1)
+        self.assertEqual(len(yeni), len(govde))
+        fark = [i for i, (a, b) in enumerate(zip(govde, yeni)) if a != b]
+        self.assertEqual(len(fark), 4)  # u30 b58d01→bce101, 8a8801→bde101: üçüncü baytlar (01) ortak
+        islemler = KaynakYenilemeTestleri._coz(yeni[len(govde) - len(swf_yama._EKRAN_BOYU_KOD):])
+        self.assertIn(("getproperty", (28860,)), [(i.ad, i.isl) for i in islemler])
+        self.assertIn(("getproperty", (28861,)), [(i.ad, i.isl) for i in islemler])
+        self.assertNotIn(("getproperty", (18101,)), [(i.ad, i.isl) for i in islemler])
+
+    def test_govde_yoksa_dokunmaz(self):
+        govde = _do_abc(["x"])
+        self.assertEqual(swf_yama.tam_ekran_boyu(govde), (govde, 0))
+
+    def test_gercek_istemcide_adlar(self):
+        yol = os.environ.get("SE_ISTEMCI_SWF")
+        if not yol or not os.path.exists(yol):
+            self.skipTest("SE_ISTEMCI_SWF yok")
+        import sys
+        sys.path.insert(0, os.path.join(KOK, "araclar"))
+        from abc_okur import Abc, abc_etiketleri
+        et = [e for _, e in abc_etiketleri(open(yol, "rb").read()) if b"spawnRemainingResources" in e][0]
+        yeni, sayi = swf_yama.tam_ekran_boyu(et)
+        self.assertEqual(sayi, 1)
+        a = Abc(yeni)
+        i = [k for k, v in a.yontem_adlari().items() if v == "Base/getStageDimensions"][0]
+        adlar = [a.ad(x.isl[0]) for _, x in sorted(a.coz(a.govdeler[i]).items()) if x.ad == "getproperty"]
+        self.assertIn("stageWidth", adlar)
+        self.assertIn("stageHeight", adlar)
+        self.assertNotIn("fullScreenWidth", adlar)
+        sonuc = swf_yama.turkcelestir(open(yol, "rb").read())
+        veri = sonuc[0] if isinstance(sonuc, tuple) else sonuc
+        self.assertNotIn(swf_yama._EKRAN_BOYU_KOD, swf_yama._govde(veri))  # turkcelestir yamayı uygular
